@@ -106,3 +106,41 @@ footer {
   from { opacity: 0; transform: translateY(-30px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Feedback Popup */
+#popupContainer {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  z-index: 100;
+}
+
+.feedback-popup {
+  background: white;
+  width: 280px;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  margin-top: 15px;
+  animation: slideIn 0.5s ease;
+}
+
+.feedback-popup strong {
+  font-size: 15px;
+}
+
+.feedback-popup .stars {
+  color: #ffc107;
+  margin: 5px 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
