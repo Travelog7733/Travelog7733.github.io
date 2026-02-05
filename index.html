@@ -47,7 +47,7 @@
       width: auto;
     }
 
-    /* Center menu */
+    /* Center menu (Desktop) */
     nav {
       flex: 1;
       display: flex;
@@ -65,6 +65,43 @@
 
     nav a:hover {
       opacity: 0.7;
+    }
+
+    /* ===== Hamburger Button ===== */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+    }
+
+    /* ===== Mobile Menu ===== */
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px 20px;
+    }
+
+    .mobile-menu a {
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 0;
+      font-weight: 600;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .mobile-menu a:last-child {
+      border-bottom: none;
     }
 
     /* ===== Main Content ===== */
@@ -104,12 +141,19 @@
       }
     }
 
-    @media (max-width: 500px) {
+    @media (max-width: 768px) {
+      /* Hide desktop menu */
       nav {
-        gap: 15px;
-        flex-wrap: wrap;
+        display: none;
       }
 
+      /* Show hamburger */
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 500px) {
       .tiles {
         grid-template-columns: 1fr;
       }
@@ -124,7 +168,7 @@
       <!-- Left Logo -->
       <img src="logo.png" alt="Logo" class="logo">
 
-      <!-- Center Menu -->
+      <!-- Desktop Menu -->
       <nav>
         <a href="#">Home</a>
         <a href="#">Gallery</a>
@@ -133,13 +177,29 @@
         <a href="#">Contact Us</a>
         <a href="#">Feedback</a>
       </nav>
+
+      <!-- Hamburger (Mobile) -->
+      <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#">Home</a>
+      <a href="#">Gallery</a>
+      <a href="#">Tour Packages</a>
+      <a href="#">About Us</a>
+      <a href="#">Contact Us</a>
+      <a href="#">Feedback</a>
     </div>
   </header>
 
   <!-- ===== Main Content ===== -->
   <main>
     <div class="tiles">
-      <!-- You can change these headings -->
       <div class="tile">Popular Tours</div>
       <div class="tile">Top Destinations</div>
       <div class="tile">Best Deals</div>
@@ -147,7 +207,18 @@
     </div>
   </main>
 
+  <!-- ===== Script ===== -->
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("mobileMenu");
+      if (menu.style.display === "flex") {
+        menu.style.display = "none";
+      } else {
+        menu.style.display = "flex";
+      }
+    }
+  </script>
+
 </body>
 </html>
-
 
