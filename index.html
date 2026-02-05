@@ -5,6 +5,66 @@
   <title>Travelog | Vietnam Tours</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+
+  <!-- Extra styles for social buttons -->
+  <style>
+    /* WhatsApp Button (Floating) */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 100px; /* moved up */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #25D366;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+      z-index: 99;
+    }
+
+    /* Social buttons container */
+    .social-float {
+      position: fixed;
+      bottom: 30px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .social-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px; /* rounded square */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .social-btn img {
+      width: 26px;
+      height: 26px;
+    }
+
+    .social-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 22px rgba(0,0,0,0.3);
+    }
+
+    .social-btn.instagram {
+      background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af);
+    }
+
+    .social-btn.facebook {
+      background: #1877F2;
+    }
+  </style>
 </head>
 
 <body>
@@ -29,7 +89,7 @@
   <div class="plane">✈</div>
 </header>
 
-<!-- ===== MAIN CONTENT WRAPPER (IMPORTANT) ===== -->
+<!-- ===== MAIN CONTENT WRAPPER ===== -->
 <div class="main-content">
 
   <section>
@@ -66,6 +126,16 @@
    WhatsApp Us
 </a>
 
+<!-- Social Floating Buttons -->
+<div class="social-float">
+  <a href="https://instagram.com/yourpage" target="_blank" class="social-btn instagram">
+    <img src="instagram.svg" alt="Instagram">
+  </a>
+  <a href="https://facebook.com/yourpage" target="_blank" class="social-btn facebook">
+    <img src="facebook.svg" alt="Facebook">
+  </a>
+</div>
+
 <!-- Footer -->
 <footer>
   © 2026 Travelog. All rights reserved.
@@ -76,21 +146,9 @@
 
 <script>
   const feedbacks = [
-    {
-      name: "Rahul Sharma",
-      rating: 5,
-      text: "Excellent Vietnam tour support. Very professional team!"
-    },
-    {
-      name: "Anita Patel",
-      rating: 4,
-      text: "Smooth hotel bookings and quick responses. Highly recommend."
-    },
-    {
-      name: "Mohammed Ali",
-      rating: 5,
-      text: "Best ground handling partner in Vietnam."
-    }
+    { name: "Rahul Sharma", rating: 5, text: "Excellent Vietnam tour support. Very professional team!" },
+    { name: "Anita Patel", rating: 4, text: "Smooth hotel bookings and quick responses. Highly recommend." },
+    { name: "Mohammed Ali", rating: 5, text: "Best ground handling partner in Vietnam." }
   ];
 
   let index = 0;
@@ -122,4 +180,3 @@
 
 </body>
 </html>
-
