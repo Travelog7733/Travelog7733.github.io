@@ -40,8 +40,25 @@ nav a:hover{opacity:.7}
 }
 .hamburger span{width:25px;height:3px;background:#fff;border-radius:2px}
 
+/* ===== Main ===== */
+main{max-width:1200px;margin:40px auto;padding:0 20px;}
+
+/* Intro text */
+.home-intro{
+  background:rgba(0,0,0,0.35);
+  padding:30px;
+  border-radius:16px;
+  margin-bottom:40px;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+.home-intro p{
+  font-size:14px;
+  line-height:1.8;
+  letter-spacing:0.5px;
+  text-transform:none;
+}
+
 /* ===== Tiles ===== */
-main{max-width:1200px;margin:60px auto;padding:0 20px;}
 .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
 .tile{
   background:rgba(0,0,0,0.35);
@@ -146,6 +163,23 @@ main{max-width:1200px;margin:60px auto;padding:0 20px;}
 </header>
 
 <main>
+
+  <!-- ===== Home Intro Text ===== -->
+  <div class="home-intro">
+    <p>
+      We are a direct management travel company with fully operational offices in Vietnam and India, built with one clear mission: to create unforgettable journeys with complete control, transparent pricing, and exceptional service quality. Unlike traditional travel agents who depend on multiple intermediaries, we manage our tours directly on the ground. This approach allows us to maintain strict quality standards, ensure smooth operations, and deliver better value to our customers. From the first enquiry to the final day of your trip, every detail of your journey is handled by our own experienced and dedicated team.
+      <br><br>
+      Our strong presence in both Vietnam and India gives us a unique advantage. Our Vietnam office takes care of on-ground operations such as hotels, transportation, sightseeing, and local experiences, while our India office focuses on customer support, trip planning, and personalized itinerary design. This dual-country structure helps us bridge expectations with reality, ensuring that what you see in your plan is exactly what you experience on your holiday. Because we work directly with hotels, transport providers, and in-house DMC partners, we eliminate unnecessary middlemen and pass those savings directly to you.
+      <br><br>
+      We believe that great travel should be accessible to everyone. That is why we offer more than 200+ thoughtfully designed itineraries, ranging from budget-friendly tours to premium experiences. Whether you are planning a relaxing beach holiday, a romantic honeymoon, a family vacation, a cultural exploration, or an adventurous escape, our team carefully crafts each journey to match your style, comfort, and budget. Our destinations include some of the most loved locations in Asia, such as Vietnam, Thailand, Malaysia, and Bali, each curated with attention to detail and local expertise.
+      <br><br>
+      What truly sets us apart is control and commitment. With direct management in Vietnam and strong operational support from India, we are able to respond quickly, customize deeply, and maintain consistent service quality throughout your journey. Our team is available before, during, and after your trip to make sure everything runs smoothly. We focus not only on selling tours, but on building long-term relationships with our travelers through trust, reliability, and honest service.
+      <br><br>
+      When you travel with us, you are not just booking a package—you are choosing a partner who cares about your experience as much as you do. We take pride in offering some of the best price deals in the market without compromising on comfort or safety. With our direct management model, local expertise, and customer-first approach, we promise journeys that are seamless, memorable, and truly worth every moment. Your dream vacation deserves more than a посредник—it deserves a team that manages it directly, professionally, and passionately.
+    </p>
+  </div>
+
+  <!-- ===== Tiles ===== -->
   <div class="tiles">
     <div class="tile" onclick="toggleTile(this)">
       <h3>Popular Tours</h3>
@@ -164,6 +198,7 @@ main{max-width:1200px;margin:60px auto;padding:0 20px;}
       <p>We have the best price deals in India. We have direct management all over Vietnam.</p>
     </div>
   </div>
+
 </main>
 
 <!-- WhatsApp Button -->
@@ -196,7 +231,7 @@ function toggleChat(){
   document.getElementById("waChat").classList.toggle("active");
 }
 
-// Auto open animation after 2 seconds
+// Auto open chat after 2 seconds
 setTimeout(()=>{document.getElementById("waChat").classList.add("active");},2000);
 
 function sendWA(){
@@ -210,3 +245,4 @@ function sendWA(){
 
 </body>
 </html>
+
