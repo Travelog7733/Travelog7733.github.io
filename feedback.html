@@ -92,9 +92,13 @@ let stars = "★".repeat(rating) + "☆".repeat(5 - rating);
 
   document.getElementById("popupContainer").appendChild(popup);
 
-  setTimeout(() => {
+setTimeout(() => {
+  popup.style.animation = "fadeOut 0.6s ease forwards";
+  
+setTimeout(() => {
     popup.remove();
-  }, 6000);
+  }, 600);
+}, 5400);
 }
 
   document.getElementById("feedbackForm").addEventListener("submit", function(e) {
