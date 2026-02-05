@@ -7,136 +7,13 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
+    /* Page background so glass effect is visible */
     body {
-      margin: 0;
-      background: #ffffff;
-      color: #111;
+      background: linear-gradient(135deg, #0b5ed7, #0d6efd, #20c997);
       min-height: 100vh;
     }
 
-    nav {
-      display: flex;
-      gap: 20px;
-      padding: 14px 24px;
-      background: #0b5ed7;
-    }
-
-    nav a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    /* ===== Glass Hero Header ===== */
-    .hero-header {
-      position: relative;
-      margin: 20px;
-      border-radius: 24px;
-      padding: 60px 20px 50px;
-      text-align: center;
-
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-
-      color: #111;
-    }
-
-    .hero-header p {
-      color: #333;
-      font-size: 18px;
-      margin-top: 12px;
-    }
-
-    /* Center and resize logo */
-    .hero-header .brand {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .hero-header .logo {
-      height: 90px;   /* increase/decrease if needed */
-      width: auto;
-      display: block;
-    }
-
-    /* Plane */
-    .plane {
-      position: absolute;
-      right: 20px;
-      bottom: 20px;
-      font-size: 32px;
-      opacity: 0.7;
-    }
-
-    /* Top-right contact buttons */
-    .header-contact {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      gap: 12px;
-    }
-
-    .contact-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: #0b5ed7;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-      text-decoration: none;
-      transition: transform 0.2s ease;
-    }
-
-    .contact-btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .contact-btn svg {
-      width: 22px;
-      height: 22px;
-      fill: #fff; /* white vector icons */
-    }
-
-    /* Cards */
-    .main-content {
-      padding: 20px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      margin-top: 40px;
-      color: #555;
-    }
-
-    /* WhatsApp Button */
+    /* WhatsApp Button (Floating) */
     .whatsapp-float {
       position: fixed;
       bottom: 100px;
@@ -152,7 +29,7 @@
       z-index: 99;
     }
 
-    /* Social buttons */
+    /* Social buttons container */
     .social-float {
       position: fixed;
       bottom: 30px;
@@ -172,11 +49,19 @@
       justify-content: center;
       box-shadow: 0 8px 16px rgba(0,0,0,0.25);
       text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .social-btn img {
       width: 24px;
       height: 24px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .social-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 22px rgba(0,0,0,0.3);
     }
 
     .social-btn.instagram {
@@ -187,28 +72,74 @@
       background: #1877F2;
     }
 
-    /* Feedback popup */
-    .feedback-popup {
-      position: fixed;
-      bottom: 20px;
+    /* ===== Glass Hero Header ===== */
+    .hero-header {
+      position: relative;
+      margin: 20px;
+      border-radius: 24px;
+      padding: 60px 20px;
+      text-align: center;
+
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+
+      color: #fff;
+    }
+
+    .hero-header p {
+      font-size: 18px;
+      margin-top: 12px;
+      opacity: 0.95;
+    }
+
+    /* ===== Header Contact Buttons (Glass, Icon Only) ===== */
+    .header-contact {
+      position: absolute;
+      top: 20px;
       right: 20px;
-      background: #fff;
-      padding: 16px 18px;
-      border-radius: 14px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      max-width: 260px;
-      z-index: 9999;
-      animation: fadeIn 0.4s ease;
+      display: flex;
+      gap: 12px;
+      z-index: 10;
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
 
-    .feedback-popup .stars {
-      color: #f5b301;
-      margin: 4px 0;
+    .header-contact.hide {
+      transform: translateY(-20px);
+      opacity: 0;
+      pointer-events: none;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .header-contact a {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .header-contact a:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.35);
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    .header-contact svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
     }
   </style>
 </head>
@@ -226,19 +157,19 @@
 
 <header class="hero-header">
 
-  <!-- Top right contact buttons -->
-  <div class="header-contact">
-    <!-- Phone -->
-    <a href="tel:+917994256121" class="contact-btn" title="Call Us">
+  <!-- Header Contact Buttons (Glass, Icon Only) -->
+  <div class="header-contact" id="headerContact">
+    <a href="tel:+917994256121" aria-label="Call">
+      <!-- Phone Icon -->
       <svg viewBox="0 0 24 24">
-        <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1v3.5a1 1 0 01-1 1C10.07 21.01 3 13.94 3 5.5a1 1 0 011-1H7.5a1 1 0 011 1c0 1.25.2 2.46.57 3.59a1 1 0 01-.25 1.01l-2.2 2.19z"/>
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.12.86.3 1.7.54 2.5a2 2 0 0 1-.45 2.11L9.1 10.9a16 16 0 0 0 4 4l1.57-1.57a2 2 0 0 1 2.11-.45c.8.24 1.64.42 2.5.54A2 2 0 0 1 22 16.92z"/>
       </svg>
     </a>
 
-    <!-- Email -->
-    <a href="mailto:info@travelog.com" class="contact-btn" title="Email Us">
+    <a href="mailto:info@travelogdmc.com" aria-label="Email">
+      <!-- Email Icon -->
       <svg viewBox="0 0 24 24">
-        <path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+        <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 4 8 5 8-5"/>
       </svg>
     </a>
   </div>
@@ -249,9 +180,11 @@
 
   <p>Vietnam Tour Packages for Indian Travelers & B2B Agents</p>
 
+  <!-- Flying plane -->
   <div class="plane">✈</div>
 </header>
 
+<!-- ===== MAIN CONTENT WRAPPER ===== -->
 <div class="main-content">
   <section>
     <div class="cards">
@@ -259,6 +192,87 @@
         <h3>Vietnam Tour Packages</h3>
         <p>Premium Vietnam tour packages for Indian travelers.</p>
       </div>
+      <div class="card">
+        <h3>B2B Agent Support</h3>
+        <p>Dedicated Vietnam ground support for Indian travel agents.</p>
+      </div>
+      <div class="card">
+        <h3>Customized Itineraries</h3>
+        <p>Tailor-made itineraries based on budget and travel style.</p>
+      </div>
+      <div class="card">
+        <h3>Hotels, Transport & Tours</h3>
+        <p>Trusted hotels, airport transfers, guides and sightseeing.</p>
+      </div>
+    </div>
+  </section>
+</div>
 
-      <div cl
+<!-- WhatsApp Floating Button -->
+<a class="whatsapp-float" href="https://wa.me/917994256121" target="_blank">
+  WhatsApp Us
+</a>
 
+<!-- Social Floating Buttons -->
+<div class="social-float">
+  <a href="https://www.instagram.com/flywith_travelog_dmc/" target="_blank" class="social-btn instagram">
+    <img src="instagram.svg" alt="Instagram">
+  </a>
+  <a href="https://www.facebook.com/profile.php?id=61578953265001" target="_blank" class="social-btn facebook">
+    <img src="facebook.svg" alt="Facebook">
+  </a>
+</div>
+
+<footer>
+  © 2026 Travelog. All rights reserved.
+</footer>
+
+<div id="popupContainer"></div>
+
+<script>
+  // Feedback popup
+  const feedbacks = [
+    { name: "Rahul Sharma", rating: 5, text: "Excellent Vietnam tour support. Very professional team!" },
+    { name: "Anita Patel", rating: 4, text: "Smooth hotel bookings and quick responses. Highly recommend." },
+    { name: "Mohammed Ali", rating: 5, text: "Best ground handling partner in Vietnam." }
+  ];
+
+  let index = 0;
+
+  function showPopup() {
+    const f = feedbacks[index];
+    const stars = "★".repeat(f.rating) + "☆".repeat(5 - f.rating);
+
+    const popup = document.createElement("div");
+    popup.className = "feedback-popup";
+    popup.innerHTML = `
+      <strong>${f.name}</strong>
+      <div class="stars">${stars}</div>
+      <p>${f.text}</p>
+    `;
+
+    const container = document.getElementById("popupContainer");
+    container.appendChild(popup);
+
+    setTimeout(() => popup.remove(), 5000);
+    index = (index + 1) % feedbacks.length;
+  }
+
+  setInterval(showPopup, 6000);
+
+  // Auto-hide header contact buttons on scroll
+  let lastScrollY = window.scrollY;
+  const headerContact = document.getElementById("headerContact");
+
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > lastScrollY) {
+      headerContact.classList.add("hide");
+    } else {
+      headerContact.classList.remove("hide");
+    }
+    lastScrollY = window.scrollY;
+  });
+</script>
+
+</body>
+</html>
