@@ -15,7 +15,7 @@ body {
 header {
   background: linear-gradient(135deg, #0b5ed7, #0099ff);
   color: white;
-  padding: 70px 10px;
+  padding: 50px 10px;
   text-align: center;
   animation: fadeDown 1s ease;
 }
