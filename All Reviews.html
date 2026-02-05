@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Reviews | Travelog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="gallery.html">Gallery</a>
+  <a href="packages.html">Tour Packages</a>
+  <a href="about.html">About Us</a>
+  <a href="contact.html">Contact</a>
+  <a href="feedback.html">Feedback</a>
+</nav>
+
+<header>
+  <h1>ALL CUSTOMER REVIEWS</h1>
+  <p>Every review submitted by customers</p>
+</header>
+
+<section class="feedback-section">
+  <div class="feedback-list" id="allReviews">
+    <!-- Reviews will appear here -->
+  </div>
+</section>
+
+<footer>
+  © 2026 Travelog. All rights reserved.
+</footer>
+
+<script>
+  const container = document.getElementById("allReviews");
+  let stored = JSON.parse(localStorage.getItem("feedbacks")) || [];
+
+  if (stored.length === 0) {
+    container.innerHTML = "<p style='text-align:center;'>No reviews yet.</p>";
+  } else {
+    // Show newest first
+    stored.reverse().forEach(feedback => {
+      let rating = Number(feedback.rating);
+      let stars = "★".repeat(rating) + "☆".repeat(5 - rating);
+
+      const card = document.createElement("div");
+      card.className = "feedback-card";
+      card.innerHTML = `
+        <div class="stars">${stars}</div>
+        <p>"${feedback.message}"</p>
+        <strong>- ${feedback.name}</strong>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+</script>
+
+</body>
+</html>
 
