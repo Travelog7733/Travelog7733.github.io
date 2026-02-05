@@ -78,22 +78,24 @@
   const container = document.getElementById("popupContainer");
 
   function showPopup(feedback) {
-    const stars = "★".repeat(feedback.rating) + "☆".repeat(5 - feedback.rating);
+  const popup = document.createElement("div");
+  popup.className = "feedback-popup";
 
-    const popup = document.createElement("div");
-    popup.className = "feedback-popup";
-    popup.innerHTML = `
-      <strong>${feedback.name}</strong>
-      <div class="stars">${stars}</div>
-      <p>${feedback.message}</p>
-    `;
+let rating = Number(feedback.rating);
+let stars = "★".repeat(rating) + "☆".repeat(5 - rating);
 
-    container.appendChild(popup);
+ popup.innerHTML = `
+  <strong>${feedback.name}</strong>
+  <div class="stars">${stars}</div>
+  <p>${feedback.message}</p>
+`;
 
-    setTimeout(() => {
-      popup.remove();
-    }, 6000);
-  }
+  document.getElementById("popupContainer").appendChild(popup);
+
+  setTimeout(() => {
+    popup.remove();
+  }, 6000);
+}
 
   document.getElementById("feedbackForm").addEventListener("submit", function(e) {
     e.preventDefault();
@@ -119,31 +121,5 @@
   };
 </script>
   
-  function showPopup(name, rating, message) {
-    const popup = document.createElement("div");
-    popup.className = "feedback-popup";
-
-    let stars = "★".repeat(rating) + "☆".repeat(5 - rating);
-
-    popup.innerHTML = `
-      <strong>${name}</strong>
-      <div class="stars">${stars}</div>
-      <p>${message}</p>
-    `;
-
-    popupContainer.appendChild(popup);
-
-    setTimeout(() => {
-      popup.remove();
-    }, 6000);
-  }
-
-  // Show last submitted feedback
-  const feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
-  if (feedbacks.length > 0) {
-    const last = feedbacks[feedbacks.length - 1];
-    showPopup(last.name, last.rating, last.message);
-  }
-</script>
 </body>
 </html>
