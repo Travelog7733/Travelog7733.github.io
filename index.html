@@ -57,4 +57,52 @@
 </footer>
 
 </body>
+  <!-- Feedback Popup Container -->
+<div id="popupContainer"></div>
+
+<script>
+  const feedbacks = [
+    {
+      name: "Rahul Sharma",
+      rating: 5,
+      text: "Excellent Vietnam tour support. Very professional team!"
+    },
+    {
+      name: "Anita Patel",
+      rating: 4,
+      text: "Smooth hotel bookings and quick responses. Highly recommend."
+    },
+    {
+      name: "Mohammed Ali",
+      rating: 5,
+      text: "Best ground handling partner in Vietnam."
+    }
+  ];
+
+  let index = 0;
+
+  function showPopup() {
+    const f = feedbacks[index];
+    const stars = "★".repeat(f.rating) + "☆".repeat(5 - f.rating);
+
+    const popup = document.createElement("div");
+    popup.className = "feedback-popup";
+    popup.innerHTML = `
+      <strong>${f.name}</strong>
+      <div class="stars">${stars}</div>
+      <p>${f.text}</p>
+    `;
+
+    const container = document.getElementById("popupContainer");
+    container.appendChild(popup);
+
+    setTimeout(() => {
+      popup.remove();
+    }, 5000);
+
+    index = (index + 1) % feedbacks.length;
+  }
+
+  setInterval(showPopup, 6000);
+</script>
 </html>
