@@ -5,6 +5,9 @@
 <title>Travelog | Home</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="web-icon.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -69,11 +72,7 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
   box-shadow:0 10px 25px rgba(0,0,0,.2);
   margin-bottom:40px;
 }
-.book-now h2{
-  text-align:center;
-  margin-bottom:20px;
-  letter-spacing:1px;
-}
+.book-now h2{text-align:center;margin-bottom:20px;letter-spacing:1px;}
 .book-form{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -197,7 +196,7 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
 
 <main>
 
-  <!-- ===== Tiles ===== -->
+  <!-- Tiles -->
   <div class="tiles">
     <div class="tile" onclick="toggleTile(this)">
       <h3>Popular Tours</h3>
@@ -217,7 +216,7 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
     </div>
   </div>
 
-  <!-- ===== Book Now Form ===== -->
+  <!-- Book Now -->
   <div class="book-now">
     <h2>Book Now</h2>
     <form class="book-form" onsubmit="submitBooking(event)">
@@ -234,7 +233,7 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
     </form>
   </div>
 
-  <!-- ===== Text Section ===== -->
+  <!-- About Text -->
   <div class="home-intro">
     <p id="introText">
       We are a direct management travel company with fully operational offices in Vietnam and India, built with one clear mission: to create unforgettable journeys with complete control, transparent pricing, and exceptional service quality. Unlike traditional travel agents who depend on multiple intermediaries, we manage our tours directly on the ground. This approach allows us to maintain strict quality standards, ensure smooth operations, and deliver better value to our customers. From the first enquiry to the final day of your trip, every detail of your journey is handled by our own experienced and dedicated team. Our strong presence in both Vietnam and India gives us a unique advantage. Our Vietnam office takes care of on-ground operations such as hotels, transportation, sightseeing, and local experiences, while our India office focuses on customer support, trip planning, and personalized itinerary design. This dual-country structure helps us bridge expectations with reality, ensuring that what you see in your plan is exactly what you experience on your holiday. We believe that great travel should be accessible to everyone. That is why we offer more than 200+ thoughtfully designed itineraries, ranging from budget-friendly tours to premium experiences. Whether you are planning a relaxing beach holiday, a romantic honeymoon, a family vacation, a cultural exploration, or an adventurous escape, our team carefully crafts each journey to match your style, comfort, and budget. Our destinations include some of the most loved locations in Asia, such as Vietnam, Thailand, Malaysia, and Bali. What truly sets us apart is control and commitment, and when you travel with us, you are choosing a partner who cares about your experience as much as you do.
@@ -293,12 +292,12 @@ function submitBooking(e){
 
 // Read more / less
 let expanded = false;
-const fullText = document.getElementById("introText").innerText;
+const p = document.getElementById("introText");
+const fullText = p.innerText;
 const shortText = fullText.substring(0, 350) + "...";
-document.getElementById("introText").innerText = shortText;
+p.innerText = shortText;
 
 function toggleRead(){
-  const p = document.getElementById("introText");
   const btn = document.querySelector(".read-more-btn");
   if(expanded){
     p.innerText = shortText;
@@ -314,5 +313,6 @@ function toggleRead(){
 
 </body>
 </html>
+
 
 
