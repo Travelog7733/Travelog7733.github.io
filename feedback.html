@@ -25,50 +25,59 @@
   <p>Your feedback helps us improve</p>
 </header>
 
-<section class="feedback-section">
-  <div class="feedback-page">
+<!-- ===== MAIN CONTENT WRAPPER (IMPORTANT FOR STICKY FOOTER) ===== -->
+<div class="main-content">
 
-<form class="feedback-form" id="feedbackForm">
-  <h2>Submit Your Feedback</h2>
+  <section class="feedback-section">
+    <div class="feedback-page">
 
-  <input type="text" id="name" placeholder="Your Name" required>
+      <form class="feedback-form" id="feedbackForm">
+        <h2>Submit Your Feedback</h2>
 
-  <select id="rating" required>
-    <option value="">Rating</option>
-    <option value="5">⭐⭐⭐⭐⭐</option>
-    <option value="4">⭐⭐⭐⭐</option>
-    <option value="3">⭐⭐⭐</option>
-    <option value="2">⭐⭐</option>
-    <option value="1">⭐</option>
-  </select>
+        <input type="text" id="name" placeholder="Your Name" required>
 
-  <textarea id="message" placeholder="Your Feedback" required></textarea>
+        <select id="rating" required>
+          <option value="">Rating</option>
+          <option value="5">⭐⭐⭐⭐⭐</option>
+          <option value="4">⭐⭐⭐⭐</option>
+          <option value="3">⭐⭐⭐</option>
+          <option value="2">⭐⭐</option>
+          <option value="1">⭐</option>
+        </select>
 
-  <button type="submit">Submit Feedback</button>
-</form>
+        <textarea id="message" placeholder="Your Feedback" required></textarea>
 
-<!-- POPUP CONTAINER -->
-<div id="popupContainer"></div>
+        <button type="submit">Submit Feedback</button>
+      </form>
 
-<div class="feedback-list">
-  <h2>What Our Clients Say</h2>
+      <!-- POPUP CONTAINER -->
+      <div id="popupContainer"></div>
 
-  <div id="feedbackCards"></div>
+      <div class="feedback-list">
+        <h2>What Our Clients Say</h2>
 
-  <!-- VIEW ALL BUTTON -->
-  <div style="text-align:center; margin-top:20px;">
-    <a href="all-reviews.html" class="view-all-btn">View All Reviews</a>
-  </div>
+        <div id="feedbackCards"></div>
+
+        <!-- VIEW ALL BUTTON -->
+        <div style="text-align:center; margin-top:20px;">
+          <a href="all-reviews.html" class="view-all-btn">View All Reviews</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 </div>
+<!-- ===== END MAIN CONTENT ===== -->
 
-</section>
-
+<!-- WhatsApp Floating Button -->
 <a class="whatsapp-float"
    href="https://wa.me/917994256121"
    target="_blank">
    WhatsApp Us
 </a>
 
+<!-- Footer -->
 <footer>
   © 2026 Travelog. All rights reserved.
 </footer>
@@ -100,5 +109,23 @@ function showPopup(feedback) {
   setTimeout(() => {
     popup.style.animation = "fadeOut 0.6s ease forwards";
     setTimeout(() => popup.remove(), 600);
-  },
+  }, 5000);
+}
 
+// Example auto popup demo data
+const demoFeedbacks = [
+  { name: "Rahul Sharma", rating: 5, message: "Excellent service!" },
+  { name: "Anita Patel", rating: 4, message: "Very smooth experience." },
+  { name: "Mohammed Ali", rating: 5, message: "Best Vietnam partner!" }
+];
+
+let demoIndex = 0;
+
+setInterval(() => {
+  showPopup(demoFeedbacks[demoIndex]);
+  demoIndex = (demoIndex + 1) % demoFeedbacks.length;
+}, 6000);
+</script>
+
+</body>
+</html>
