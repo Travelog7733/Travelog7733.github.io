@@ -314,3 +314,14 @@ body {
     transform: translateX(110vw);
   }
 }
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.logo {
+  height: 60px;   /* adjust size as needed */
+  width: auto;
+}
