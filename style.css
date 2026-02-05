@@ -239,3 +239,17 @@ body {
 .feedback-card p {
   margin: 10px 0;
 }
+.view-all-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #ff6b00;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.view-all-btn:hover {
+  background: #e65c00;
+}
