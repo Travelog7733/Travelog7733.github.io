@@ -93,7 +93,7 @@ section {
 /* ===== WhatsApp Button (Floating) ===== */
 .whatsapp-float {
   position: fixed;
-  bottom: 120px;
+  bottom: 90px;
   left: 50%;
   transform: translateX(-50%);
   background: #25D366;
