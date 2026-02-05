@@ -35,13 +35,13 @@ header {
 }
 
 header h1 {
-  font-size: 42px;
+  font-size: clamp(24px, 5vw, 42px);
   font-weight: 700;
 }
 
 header p {
   margin-top: 10px;
-  font-size: 18px;
+  font-size: clamp(14px, 2.5vw, 18px);
   opacity: 0.95;
 }
 
@@ -56,17 +56,22 @@ nav {
   position: sticky;
   top: 0;
   z-index: 10;
+  flex-wrap: wrap;
 }
 
 nav a {
   text-decoration: none;
   color: #0b5ed7;
   font-weight: 600;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 /* ===== Sections ===== */
 section {
   max-width: 1100px;
+  width: 100%;
   margin: 60px auto;
   padding: 0 20px;
   animation: fadeUp 1s ease;
@@ -93,7 +98,7 @@ section {
 /* ===== WhatsApp Button (Floating) ===== */
 .whatsapp-float {
   position: fixed;
-  bottom: 75px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   background: #25D366;
@@ -104,6 +109,9 @@ section {
   text-decoration: none;
   box-shadow: 0 10px 20px rgba(0,0,0,0.25);
   z-index: 99;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 /* ===== Footer ===== */
@@ -112,7 +120,7 @@ footer {
   color: #bbb;
   text-align: center;
   padding: 20px;
-  margin-top: auto; /* THIS pushes footer to bottom */
+  margin-top: auto;
 }
 
 /* ===== Animations ===== */
@@ -174,6 +182,7 @@ footer {
 /* ===== Feedback Page ===== */
 .feedback-page {
   max-width: 900px;
+  width: 100%;
   margin: 40px auto;
   padding: 40px;
   background: #ffffff;
@@ -217,6 +226,7 @@ footer {
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
+  min-height: 44px;
 }
 
 .feedback-form button:hover {
@@ -248,6 +258,7 @@ footer {
   border-radius: 6px;
   font-weight: bold;
   transition: 0.3s;
+  min-height: 44px;
 }
 
 .view-all-btn:hover {
@@ -289,4 +300,35 @@ footer {
   width: auto;
 }
 
+/* ===== Mobile Optimisation ===== */
+@media (max-width: 600px) {
+  section {
+    margin: 40px auto;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .feedback-form {
+    grid-template-columns: 1fr;
+  }
+
+  .feedback-form textarea,
+  .feedback-form button {
+    grid-column: span 1;
+  }
+
+  .feedback-page {
+    padding: 20px;
+    margin: 20px;
+  }
+
+  .logo {
+    height: 55px;
+  }
+
+  .plane {
+    display: none;
+  }
 }
