@@ -118,5 +118,32 @@
     stored.slice(-3).forEach(f => showPopup(f));
   };
 </script>
+  
+  function showPopup(name, rating, message) {
+    const popup = document.createElement("div");
+    popup.className = "feedback-popup";
+
+    let stars = "★".repeat(rating) + "☆".repeat(5 - rating);
+
+    popup.innerHTML = `
+      <strong>${name}</strong>
+      <div class="stars">${stars}</div>
+      <p>${message}</p>
+    `;
+
+    popupContainer.appendChild(popup);
+
+    setTimeout(() => {
+      popup.remove();
+    }, 6000);
+  }
+
+  // Show last submitted feedback
+  const feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+  if (feedbacks.length > 0) {
+    const last = feedbacks[feedbacks.length - 1];
+    showPopup(last.name, last.rating, last.message);
+  }
+</script>
 </body>
 </html>
