@@ -316,12 +316,12 @@ body {
 }
 .brand {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: Left;
+  justify-content: left;
   gap: 15px;
 }
 
 .logo {
-  height: 60px;   /* adjust size as needed */
+  height: 80px;   /* adjust size as needed */
   width: auto;
 }
