@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Travelog | Vietnam Tours</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
 
 <style>
 /* Page background so glass effect is visible */
@@ -12,6 +11,7 @@ body {
   background: linear-gradient(135deg, #0b5ed7, #0d6efd, #20c997);
   min-height: 100vh;
   margin: 0;
+  font-family: Arial, sans-serif;
 }
 
 /* ===== Desktop Nav (unchanged) ===== */
@@ -174,12 +174,11 @@ footer {
 /* ================= MOBILE ONLY CHANGES ================= */
 @media (max-width: 768px) {
 
-  /* Show hamburger */
   .hamburger {
     display: block;
   }
 
-  /* Turn nav into sidebar drawer */
+  /* Sidebar nav */
   nav {
     position: fixed;
     top: 0;
@@ -201,11 +200,20 @@ footer {
     left: 0;
   }
 
+  /* FINAL FIX: mobile menu text visible */
   nav a {
-    font-size: 18px;
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 14px 12px;
+    width: 100%;
+    border-radius: 10px;
+    display: block;
   }
 
-  /* Hero spacing smaller */
+  nav a:hover {
+    background: rgba(255,255,255,0.15);
+  }
+
   .hero-header {
     margin: 12px;
     padding: 40px 16px;
@@ -219,13 +227,11 @@ footer {
     font-size: 16px;
   }
 
-  /* Cards stack */
   .cards {
     grid-template-columns: 1fr;
     padding: 16px;
   }
 
-  /* Buttons scale */
   .whatsapp-float {
     bottom: 90px;
     padding: 12px 22px;
@@ -295,8 +301,8 @@ footer {
 <a class="whatsapp-float" href="https://wa.me/917994256121" target="_blank">WhatsApp Us</a>
 
 <div class="social-float">
-  <a href="https://www.instagram.com/flywith_travelog_dmc/" target="_blank" class="social-btn instagram"><img src="instagram.svg"></a>
-  <a href="https://www.facebook.com/profile.php?id=61578953265001" target="_blank" class="social-btn facebook"><img src="facebook.svg"></a>
+  <a href="https://www.instagram.com/flywith_travelog_dmc/" target="_blank" class="social-btn instagram"><img src="instagram.svg" alt=""></a>
+  <a href="https://www.facebook.com/profile.php?id=61578953265001" target="_blank" class="social-btn facebook"><img src="facebook.svg" alt=""></a>
 </div>
 
 <footer>© 2026 Travelog. All rights reserved.</footer>
@@ -342,3 +348,4 @@ window.addEventListener("scroll", () => {
 
 </body>
 </html>
+
