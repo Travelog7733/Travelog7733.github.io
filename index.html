@@ -261,4 +261,84 @@ footer {
   <a href="about.html">About Us</a>
   <a href="contact.html">Contact</a>
   <a href="feedback.html">Feedback</a>
-</n
+</nav>
+
+<header class="hero-header">
+
+  <div class="header-contact" id="headerContact">
+    <a href="tel:+917994256121" aria-label="Call">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.12.86.3 1.7.54 2.5a2 2 0 0 1-.45 2.11L9.1 10.9a16 16 0 0 0 4 4l1.57-1.57a2 2 0 0 1 2.11-.45c.8.24 1.64.42 2.5.54A2 2 0 0 1 22 16.92z"/></svg>
+    </a>
+    <a href="mailto:sales@travelogdrop.online" aria-label="Email">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 4 8 5 8-5"/></svg>
+    </a>
+  </div>
+
+  <div class="brand">
+    <img src="logo.png" alt="Travelog Logo" class="logo">
+  </div>
+
+  <p>Vietnam Tour Packages for Indian Travelers & B2B Agents</p>
+</header>
+
+<div class="main-content">
+  <section>
+    <div class="cards">
+      <div class="card"><h3>Vietnam Tour Packages</h3><p>Premium Vietnam tour packages for Indian travelers.</p></div>
+      <div class="card"><h3>B2B Agent Support</h3><p>Dedicated Vietnam ground support for Indian travel agents.</p></div>
+      <div class="card"><h3>Customized Itineraries</h3><p>Tailor-made itineraries based on budget and travel style.</p></div>
+      <div class="card"><h3>Hotels, Transport & Tours</h3><p>Trusted hotels, airport transfers, guides and sightseeing.</p></div>
+    </div>
+  </section>
+</div>
+
+<a class="whatsapp-float" href="https://wa.me/917994256121" target="_blank">WhatsApp Us</a>
+
+<div class="social-float">
+  <a href="https://www.instagram.com/flywith_travelog_dmc/" target="_blank" class="social-btn instagram"><img src="instagram.svg"></a>
+  <a href="https://www.facebook.com/profile.php?id=61578953265001" target="_blank" class="social-btn facebook"><img src="facebook.svg"></a>
+</div>
+
+<footer>© 2026 Travelog. All rights reserved.</footer>
+
+<div id="popupContainer"></div>
+
+<script>
+// Mobile hamburger toggle
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+hamburgerBtn.addEventListener("click", () => {
+  document.body.classList.toggle("nav-open");
+});
+
+// Feedback popup
+const feedbacks = [
+  { name: "Rahul Sharma", rating: 5, text: "Excellent Vietnam tour support. Very professional team!" },
+  { name: "Anita Patel", rating: 4, text: "Smooth hotel bookings and quick responses. Highly recommend." },
+  { name: "Mohammed Ali", rating: 5, text: "Best ground handling partner in Vietnam." }
+];
+
+let index = 0;
+function showPopup() {
+  const f = feedbacks[index];
+  const stars = "★".repeat(f.rating) + "☆".repeat(5 - f.rating);
+  const popup = document.createElement("div");
+  popup.className = "feedback-popup";
+  popup.innerHTML = `<strong>${f.name}</strong><div class="stars">${stars}</div><p>${f.text}</p>`;
+  document.getElementById("popupContainer").appendChild(popup);
+  setTimeout(() => popup.remove(), 5000);
+  index = (index + 1) % feedbacks.length;
+}
+setInterval(showPopup, 6000);
+
+// Auto-hide header contact on scroll
+let lastScrollY = window.scrollY;
+const headerContact = document.getElementById("headerContact");
+window.addEventListener("scroll", () => {
+  if (window.scrollY > lastScrollY) headerContact.classList.add("hide");
+  else headerContact.classList.remove("hide");
+  lastScrollY = window.scrollY;
+});
+</script>
+
+</body>
+</html>
