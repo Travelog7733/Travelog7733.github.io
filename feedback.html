@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback | Travelog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+<nav>
+  <a href="index.html">Home</a>
+  <a href="gallery.html">Gallery</a>
+  <a href="packages.html">Tour Packages</a>
+  <a href="about.html">About Us</a>
+  <a href="contact.html">Contact</a>
+  <a href="feedback.html">Feedback</a>
+</nav>
+
+<header>
+  <h1>Customer Feedback</h1>
+  <p>Your feedback helps us improve</p>
+</header>
+
+<section class="feedback-section">
+
+ <form class="feedback-form" id="feedbackForm">
+  <h2>Submit Your Feedback</h2>
+
+  <input type="text" id="name" placeholder="Your Name" required>
+
+  <select id="rating" required>
+    <option value="">Rating</option>
+    <option value="5">⭐⭐⭐⭐⭐</option>
+    <option value="4">⭐⭐⭐⭐</option>
+    <option value="3">⭐⭐⭐</option>
+    <option value="2">⭐⭐</option>
+    <option value="1">⭐</option>
+  </select>
+
+  <textarea id="message" placeholder="Your Feedback" required></textarea>
+
+  <button type="submit">Submit Feedback</button>
+</form>
+
+<!-- POPUP CONTAINER -->
+<div id="popupContainer"></div>
+
+  <div class="feedback-list">
+    <h2>What Our Clients Say</h2>
+
+    <div class="feedback-card">
+      ⭐⭐⭐⭐⭐
+      <p>"Excellent Vietnam tour support for Indian agents!"</p>
+      <strong>- Rahul, India</strong>
+    </div>
+
+    <div class="feedback-card">
+      ⭐⭐⭐⭐⭐
+      <p>"Very professional team and smooth operations."</p>
+      <strong>- Anjali, Mumbai</strong>
+    </div>
+
+  </div>
+
+</section>
+
+<a class="whatsapp-float"
+   href="https://wa.me/917994256121"
+   target="_blank">
+   WhatsApp Us
+</a>
+
+<footer>
+  © 2026 Travelog. All rights reserved.
+</footer>
+
+</body>
+</html>
