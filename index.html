@@ -61,9 +61,7 @@
       transition: opacity 0.2s ease;
     }
 
-    nav a:hover {
-      opacity: 0.7;
-    }
+    nav a:hover { opacity: 0.7; }
 
     /* ===== Hamburger ===== */
     .hamburger {
@@ -96,10 +94,7 @@
       letter-spacing: 1px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
-
-    .mobile-menu a:last-child {
-      border-bottom: none;
-    }
+    .mobile-menu a:last-child { border-bottom: none; }
 
     /* ===== Main Content ===== */
     main {
@@ -152,93 +147,133 @@
       margin-top: 10px;
     }
 
-    /* ===== Floating Chat Button ===== */
-    .chat-float-btn {
+    /* ===== Floating WhatsApp Button ===== */
+    .wa-float-btn {
       position: fixed;
       right: 20px;
       bottom: 20px;
-      width: 60px;
-      height: 60px;
+      width: 62px;
+      height: 62px;
       border-radius: 50%;
-      background: linear-gradient(145deg, #0ea5e9, #38bdf8);
+      background: linear-gradient(145deg, #25D366, #1ebe5d);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      color: #fff;
       cursor: pointer;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3), inset 0 2px 5px rgba(255,255,255,0.4);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.35), inset 0 2px 5px rgba(255,255,255,0.4);
       z-index: 2000;
       transition: transform 0.2s ease;
     }
+    .wa-float-btn:hover { transform: scale(1.08); }
 
-    .chat-float-btn:hover {
-      transform: scale(1.08);
+    .wa-float-btn svg {
+      width: 30px;
+      height: 30px;
+      fill: #fff;
     }
 
-    /* ===== Chat Popup ===== */
-    .chat-popup {
+    /* ===== WhatsApp Chat Popup ===== */
+    .wa-chat {
       position: fixed;
       right: 20px;
-      bottom: 90px;
-      width: 280px;
-      background: rgba(0,0,0,0.9);
+      bottom: 95px;
+      width: 300px;
+      background: #0f1f17;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      display: none;
-      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
       overflow: hidden;
       z-index: 2000;
+      transform: translateY(20px) scale(0.95);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
     }
 
-    .chat-header {
-      padding: 12px 15px;
-      background: rgba(0,0,0,0.8);
+    .wa-chat.open {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .wa-header {
+      background: #075E54;
+      padding: 12px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-weight: 600;
       font-size: 14px;
+      font-weight: 600;
     }
 
-    .chat-header span {
+    .wa-header .title {
+      text-transform: none;
+    }
+
+    .wa-header .close {
       cursor: pointer;
       font-size: 18px;
     }
 
-    .chat-body {
-      padding: 20px;
+    .wa-body {
+      background: #111b21;
+      padding: 14px;
+      min-height: 140px;
       font-size: 13px;
-      line-height: 1.6;
       text-transform: none;
     }
 
-    .chat-body a {
-      color: #38bdf8;
-      text-decoration: none;
-      font-weight: 600;
+    .wa-bubble {
+      background: #202c33;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: inline-block;
+      max-width: 90%;
+      line-height: 1.5;
+    }
+
+    .wa-footer {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      background: #0b141a;
+    }
+
+    .wa-footer input {
+      flex: 1;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 14px;
+      outline: none;
+      font-size: 13px;
+    }
+
+    .wa-footer button {
+      border: none;
+      background: #25D366;
+      color: #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* ===== Responsive ===== */
     @media (max-width: 900px) {
-      .tiles {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .tiles { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 768px) {
-      nav {
-        display: none;
-      }
-      .hamburger {
-        display: flex;
-      }
+      nav { display: none; }
+      .hamburger { display: flex; }
     }
 
     @media (max-width: 500px) {
-      .tiles {
-        grid-template-columns: 1fr;
-      }
+      .tiles { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -259,9 +294,7 @@
       </nav>
 
       <div class="hamburger" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </div>
     </div>
 
@@ -306,24 +339,35 @@
     </div>
   </main>
 
-  <!-- ===== Floating Chat Button ===== -->
-  <div class="chat-float-btn" onclick="toggleChat()">💬</div>
+  <!-- ===== Floating WhatsApp Button ===== -->
+  <div class="wa-float-btn" onclick="toggleChat()">
+    <!-- WhatsApp SVG Icon -->
+    <svg viewBox="0 0 32 32">
+      <path d="M19.11 17.21c-.28-.14-1.64-.81-1.9-.9-.25-.09-.43-.14-.61.14-.18.28-.7.9-.86 1.08-.16.18-.32.21-.6.07-.28-.14-1.18-.43-2.25-1.38-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.35-.02-.49-.07-.14-.61-1.47-.84-2.01-.22-.53-.44-.46-.61-.47h-.52c-.18 0-.46.07-.7.35-.25.28-.95.93-.95 2.26 0 1.33.97 2.62 1.11 2.8.14.18 1.9 2.9 4.6 4.07.64.28 1.14.45 1.53.58.64.2 1.22.17 1.68.1.51-.08 1.64-.67 1.87-1.32.23-.65.23-1.21.16-1.32-.07-.11-.25-.18-.53-.32zM16 2.67c-7.36 0-13.33 5.97-13.33 13.33 0 2.35.62 4.65 1.8 6.68L2 30l7.55-2.43a13.28 13.28 0 006.45 1.66h.01c7.36 0 13.33-5.97 13.33-13.33S23.36 2.67 16 2.67zm0 24c-2.05 0-4.05-.55-5.78-1.6l-.41-.24-4.48 1.44 1.46-4.36-.27-.45a10.62 10.62 0 01-1.63-5.72C4.89 9.7 9.7 4.89 16 4.89c6.3 0 11.11 4.81 11.11 10.89S22.3 26.67 16 26.67z"/>
+    </svg>
+  </div>
 
-  <!-- ===== Chat Popup ===== -->
-  <div class="chat-popup" id="chatPopup">
-    <div class="chat-header">
-      <div>Chat With Us</div>
-      <span onclick="toggleChat()">✕</span>
+  <!-- ===== WhatsApp Chat Popup ===== -->
+  <div class="wa-chat" id="waChat">
+    <div class="wa-header">
+      <div class="title">Chat With Us</div>
+      <div class="close" onclick="toggleChat()">✕</div>
     </div>
-    <div class="chat-body">
-      Need help with tours or packages?<br><br>
-      📞 Call / WhatsApp:<br>
-      <a href="tel:+917994256121">+91 7994256121</a>
+    <div class="wa-body">
+      <div class="wa-bubble">
+        Hi 👋 How can we help you with tours or packages?
+      </div>
+    </div>
+    <div class="wa-footer">
+      <input type="text" id="waMessage" placeholder="Type your message..." />
+      <button onclick="sendWhatsApp()">➤</button>
     </div>
   </div>
 
   <!-- ===== Script ===== -->
   <script>
+    const WA_NUMBER = "917994256121"; // without +
+
     function toggleMenu() {
       const menu = document.getElementById("mobileMenu");
       menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
@@ -334,11 +378,29 @@
     }
 
     function toggleChat() {
-      const chat = document.getElementById("chatPopup");
-      chat.style.display = (chat.style.display === "flex") ? "none" : "flex";
+      const chat = document.getElementById("waChat");
+      chat.classList.toggle("open");
     }
+
+    function sendWhatsApp() {
+      const msgInput = document.getElementById("waMessage");
+      const text = msgInput.value.trim();
+      if (!text) return;
+
+      const url = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(text);
+      window.open(url, "_blank");
+      msgInput.value = "";
+    }
+
+    // Auto open animation after page load
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        document.getElementById("waChat").classList.add("open");
+      }, 1200);
+    });
   </script>
 
 </body>
 </html>
+
 
