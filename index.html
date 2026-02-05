@@ -143,13 +143,80 @@
       font-size: 14px;
       font-weight: 400;
       line-height: 1.6;
-      text-transform: none; /* content looks better normal case */
+      text-transform: none;
       opacity: 0.9;
     }
 
     .tile.active .tile-content {
       max-height: 200px;
       margin-top: 10px;
+    }
+
+    /* ===== Floating Chat Button ===== */
+    .chat-float-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #0ea5e9, #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3), inset 0 2px 5px rgba(255,255,255,0.4);
+      z-index: 2000;
+      transition: transform 0.2s ease;
+    }
+
+    .chat-float-btn:hover {
+      transform: scale(1.08);
+    }
+
+    /* ===== Chat Popup ===== */
+    .chat-popup {
+      position: fixed;
+      right: 20px;
+      bottom: 90px;
+      width: 280px;
+      background: rgba(0,0,0,0.9);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 2000;
+    }
+
+    .chat-header {
+      padding: 12px 15px;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .chat-header span {
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .chat-body {
+      padding: 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      text-transform: none;
+    }
+
+    .chat-body a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: 600;
     }
 
     /* ===== Responsive ===== */
@@ -214,16 +281,12 @@
 
       <div class="tile" onclick="toggleTile(this)">
         <h3>Popular Tours</h3>
-        <div class="tile-content">
-          More than 200+ budget itineraries.
-        </div>
+        <div class="tile-content">More than 200+ budget itineraries.</div>
       </div>
 
       <div class="tile" onclick="toggleTile(this)">
         <h3>Top Destinations</h3>
-        <div class="tile-content">
-          Vietnam, Thailand, Malaysia, Bali.
-        </div>
+        <div class="tile-content">Vietnam, Thailand, Malaysia, Bali.</div>
       </div>
 
       <div class="tile" onclick="toggleTile(this)">
@@ -243,6 +306,22 @@
     </div>
   </main>
 
+  <!-- ===== Floating Chat Button ===== -->
+  <div class="chat-float-btn" onclick="toggleChat()">💬</div>
+
+  <!-- ===== Chat Popup ===== -->
+  <div class="chat-popup" id="chatPopup">
+    <div class="chat-header">
+      <div>Chat With Us</div>
+      <span onclick="toggleChat()">✕</span>
+    </div>
+    <div class="chat-body">
+      Need help with tours or packages?<br><br>
+      📞 Call / WhatsApp:<br>
+      <a href="tel:+917994256121">+91 7994256121</a>
+    </div>
+  </div>
+
   <!-- ===== Script ===== -->
   <script>
     function toggleMenu() {
@@ -252,6 +331,11 @@
 
     function toggleTile(tile) {
       tile.classList.toggle("active");
+    }
+
+    function toggleChat() {
+      const chat = document.getElementById("chatPopup");
+      chat.style.display = (chat.style.display === "flex") ? "none" : "flex";
     }
   </script>
 
