@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Travelog | Feedback</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="icon" type="image/png" href="web-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8,#0ea5e9);
+  color:#fff;
+  text-transform:uppercase;
+}
+
+/* ===== Ribbon ===== */
+header{
+  position:sticky;top:0;z-index:1000;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(4px);
+}
+.nav-bar{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;
+  padding:12px 20px;
+}
+.logo{height:50px}
+nav{flex:1;display:flex;justify-content:center;gap:30px;}
+nav a{color:#fff;text-decoration:none;font-weight:600;letter-spacing:1px;}
+nav a:hover{opacity:.7}
+
+/* Hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+.hamburger span{width:25px;height:3px;background:#fff;border-radius:2px}
+
+/* ===== Main ===== */
+main{max-width:1200px;margin:40px auto;padding:0 20px;}
+
+/* ===== Tiles ===== */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:30px;}
+.tile{
+  background:rgba(0,0,0,0.35);
+  border-radius:16px;
+  padding:25px;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+
+/* ===== Feedback Form ===== */
+.tile h3{text-align:center;margin-bottom:15px;}
+.feedback-form{display:grid;gap:12px;}
+.feedback-form input, .feedback-form select{
+  padding:12px;border-radius:8px;border:none;outline:none;text-transform:none;
+}
+.feedback-form button{
+  padding:12px;border:none;border-radius:8px;
+  background:#25D366;color:#fff;font-weight:700;cursor:pointer;
+}
+
+/* ===== Stars ===== */
+.stars{display:flex;gap:5px;justify-content:center;}
+.star{
+  font-size:26px;cursor:pointer;color:#999;
+}
+.star.active{color:gold;}
+
+/* ===== Feedback Cards ===== */
+.feedback-list{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.feedback-card{
+  background:rgba(0,0,0,0.45);
+  border-radius:16px;
+  padding:20px;
+}
+.feedback-card h4{margin-bottom:5px;}
+.feedback-card .dest{font-size:13px;opacity:.9;text-transform:none;}
+.feedback-card .stars-view{color:gold;margin:8px 0;}
+.feedback-images{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;
+}
+.feedback-images img{
+  width:100%;aspect-ratio:1/1;object-fit:cover;
+  border-radius:10px;
+  box-shadow:0 5px 10px rgba(0,0,0,.3);
+}
+
+/* ===== Responsive ===== */
+@media(max-width:900px){
+  .tiles{grid-template-columns:1fr;}
+  .feedback-list{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:600px){
+  nav{
+    position:absolute;top:100%;left:0;width:100%;
+    background:rgba(0,0,0,0.9);
+    flex-direction:column;align-items:center;
+    display:none;padding:20px 0;
+  }
+  nav.show{display:flex;}
+  .hamburger{display:flex;margin-left:auto;}
+}
+@media(max-width:500px){
+  .feedback-list{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-bar">
+    <img src="logo.png" class="logo" alt="Logo">
+    <nav id="menu">
+      <a href="index.html">Home</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="packages.html">Tour Packages</a>
+      <a href="about.html">About Us</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="feedback.html">Feedback</a>
+    </nav>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ===== Feedback Form Tile ===== -->
+<div class="tiles">
+  <div class="tile">
+    <h3>Give Your Feedback</h3>
+    <form class="feedback-form" onsubmit="submitFeedback(event)">
+      <input type="text" id="fbName" placeholder="Your Name" required>
+      <input type="text" id="fbDest" placeholder="Destination" required>
+
+      <div class="stars" id="starBox">
+        <span class="star" data-val="1">★</span>
+        <span class="star" data-val="2">★</span>
+        <span class="star" data-val="3">★</span>
+        <span class="star" data-val="4">★</span>
+        <span class="star" data-val="5">★</span>
+      </div>
+
+      <input type="file" id="fbImages" multiple accept="image/*">
+      <button type="submit">Submit Feedback</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== Latest Feedbacks ===== -->
+<h2 style="margin-bottom:15px;">Latest Feedbacks</h2>
+<div class="feedback-list" id="feedbackList"></div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("show");
+}
+
+let selectedRating = 0;
+const stars = document.querySelectorAll(".star");
+stars.forEach(star=>{
+  star.addEventListener("click", ()=>{
+    selectedRating = parseInt(star.dataset.val);
+    stars.forEach(s=>{
+      s.classList.toggle("active", parseInt(s.dataset.val) <= selectedRating);
+    });
+  });
+});
+
+let feedbacks = [];
+
+function submitFeedback(e){
+  e.preventDefault();
+
+  const name = document.getElementById("fbName").value;
+  const dest = document.getElementById("fbDest").value;
+  const files = document.getElementById("fbImages").files;
+
+  if(selectedRating === 0){
+    alert("Please select rating");
+    return;
+  }
+
+  const images = [];
+  let loaded = 0;
+
+  if(files.length === 0){
+    addFeedback({name, dest, rating:selectedRating, images:[]});
+  } else {
+    for(let i=0;i<files.length;i++){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        images.push(e.target.result);
+        loaded++;
+        if(loaded === files.length){
+          addFeedback({name, dest, rating:selectedRating, images});
+        }
+      };
+      reader.readAsDataURL(files[i]);
+    }
+  }
+
+  e.target.reset();
+  selectedRating = 0;
+  stars.forEach(s=>s.classList.remove("active"));
+}
+
+function addFeedback(data){
+  feedbacks.unshift(data);
+  if(feedbacks.length > 3) feedbacks.pop(); // keep only latest 3
+  renderFeedbacks();
+}
+
+function renderFeedbacks(){
+  const box = document.getElementById("feedbackList");
+  box.innerHTML = "";
+
+  feedbacks.forEach(fb=>{
+    const card = document.createElement("div");
+    card.className = "feedback-card";
+
+    let starsHtml = "★".repeat(fb.rating) + "☆".repeat(5 - fb.rating);
+
+    let imgsHtml = "";
+    if(fb.images.length){
+      imgsHtml = '<div class="feedback-images">' + fb.images.map(img=>`<img src="${img}">`).join("") + '</div>';
+    }
+
+    card.innerHTML = `
+      <h4>${fb.name}</h4>
+      <div class="dest">${fb.dest}</div>
+      <div class="stars-view">${starsHtml}</div>
+      ${imgsHtml}
+    `;
+    box.appendChild(card);
+  });
+}
+</script>
+
+</body>
+</html>
+
