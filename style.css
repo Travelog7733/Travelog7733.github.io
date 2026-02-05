@@ -288,3 +288,29 @@ body {
     transform: translateX(-60px) translateY(20px) rotate(10deg);
   }
 }
+.hero-header {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Plane icon */
+.plane {
+  position: absolute;
+  top: 30%;
+  left: -50px;
+  font-size: 24px;
+  color: white;
+  animation: flyStraight 10s linear infinite;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Straight flight animation */
+@keyframes flyStraight {
+  0% {
+    transform: translateX(-60px);
+  }
+  100% {
+    transform: translateX(110vw);
+  }
+}
