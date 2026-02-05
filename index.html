@@ -44,7 +44,7 @@ nav a:hover{opacity:.7}
 main{max-width:1200px;margin:40px auto;padding:0 20px;}
 
 /* ===== Tiles ===== */
-.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:40px;}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:30px;}
 .tile{
   background:rgba(0,0,0,0.35);
   border-radius:16px;
@@ -61,6 +61,43 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
 }
 .tile.active p{display:block}
 
+/* ===== Book Now Form ===== */
+.book-now{
+  background:rgba(0,0,0,0.35);
+  padding:25px;
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  margin-bottom:40px;
+}
+.book-now h2{
+  text-align:center;
+  margin-bottom:20px;
+  letter-spacing:1px;
+}
+.book-form{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+.book-form input, .book-form select{
+  padding:12px 14px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+  font-size:14px;
+  text-transform:none;
+}
+.book-form button{
+  background:#25D366;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:1px;
+}
+.book-form button:hover{opacity:.9}
+
 /* ===== Home Text ===== */
 .home-intro{
   background:rgba(0,0,0,0.35);
@@ -73,6 +110,16 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
   line-height:1.8;
   letter-spacing:0.5px;
   text-transform:none;
+}
+.read-more-btn{
+  margin-top:15px;
+  background:#fff;
+  color:#000;
+  border:none;
+  padding:8px 16px;
+  border-radius:20px;
+  cursor:pointer;
+  font-weight:600;
 }
 
 /* ===== WhatsApp Floating Button ===== */
@@ -99,31 +146,17 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
 .wa-chat.active{display:flex;animation:slideUp .3s ease;}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-.wa-header{
-  background:#075E54;color:#fff;padding:12px;font-weight:600;
-}
-.wa-body{
-  padding:15px;flex:1;font-size:13px;color:#000;text-transform:none;
-}
-.wa-msg{
-  background:#fff;padding:10px 12px;border-radius:8px;
-  max-width:80%;box-shadow:0 2px 5px rgba(0,0,0,.1);
-}
-.wa-footer{
-  display:flex;padding:10px;background:#f0f0f0;gap:8px;
-}
-.wa-footer input{
-  flex:1;padding:8px 10px;border-radius:20px;border:1px solid #ccc;
-  outline:none;text-transform:none;
-}
-.wa-footer button{
-  padding:8px 15px;border:none;border-radius:20px;
-  background:#25D366;color:#fff;cursor:pointer;font-weight:600;
-}
+.wa-header{background:#075E54;color:#fff;padding:12px;font-weight:600;}
+.wa-body{padding:15px;flex:1;font-size:13px;color:#000;text-transform:none;}
+.wa-msg{background:#fff;padding:10px 12px;border-radius:8px;max-width:80%;}
+.wa-footer{display:flex;padding:10px;background:#f0f0f0;gap:8px;}
+.wa-footer input{flex:1;padding:8px 10px;border-radius:20px;border:1px solid #ccc;outline:none;text-transform:none;}
+.wa-footer button{padding:8px 15px;border:none;border-radius:20px;background:#25D366;color:#fff;cursor:pointer;font-weight:600;}
 
 /* ===== Responsive ===== */
 @media(max-width:900px){
   .tiles{grid-template-columns:repeat(2,1fr);}
+  .book-form{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:600px){
   nav{
@@ -137,6 +170,7 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
 }
 @media(max-width:500px){
   .tiles{grid-template-columns:1fr;}
+  .book-form{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -163,7 +197,7 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
 
 <main>
 
-  <!-- ===== Tiles First ===== -->
+  <!-- ===== Tiles ===== -->
   <div class="tiles">
     <div class="tile" onclick="toggleTile(this)">
       <h3>Popular Tours</h3>
@@ -183,19 +217,29 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
     </div>
   </div>
 
-  <!-- ===== Text Below Tiles ===== -->
+  <!-- ===== Book Now Form ===== -->
+  <div class="book-now">
+    <h2>Book Now</h2>
+    <form class="book-form" onsubmit="submitBooking(event)">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="tel" id="phone" placeholder="Phone Number" required>
+      <select id="country" required>
+        <option value="">Select Country</option>
+        <option>Vietnam</option>
+        <option>Thailand</option>
+        <option>Malaysia</option>
+        <option>Bali</option>
+      </select>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <!-- ===== Text Section ===== -->
   <div class="home-intro">
-    <p>
-      We are a direct management travel company with fully operational offices in Vietnam and India, built with one clear mission: to create unforgettable journeys with complete control, transparent pricing, and exceptional service quality. Unlike traditional travel agents who depend on multiple intermediaries, we manage our tours directly on the ground. This approach allows us to maintain strict quality standards, ensure smooth operations, and deliver better value to our customers. From the first enquiry to the final day of your trip, every detail of your journey is handled by our own experienced and dedicated team.
-      <br><br>
-      Our strong presence in both Vietnam and India gives us a unique advantage. Our Vietnam office takes care of on-ground operations such as hotels, transportation, sightseeing, and local experiences, while our India office focuses on customer support, trip planning, and personalized itinerary design. This dual-country structure helps us bridge expectations with reality, ensuring that what you see in your plan is exactly what you experience on your holiday. Because we work directly with hotels, transport providers, and in-house DMC partners, we eliminate unnecessary middlemen and pass those savings directly to you.
-      <br><br>
-      We believe that great travel should be accessible to everyone. That is why we offer more than 200+ thoughtfully designed itineraries, ranging from budget-friendly tours to premium experiences. Whether you are planning a relaxing beach holiday, a romantic honeymoon, a family vacation, a cultural exploration, or an adventurous escape, our team carefully crafts each journey to match your style, comfort, and budget. Our destinations include some of the most loved locations in Asia, such as Vietnam, Thailand, Malaysia, and Bali, each curated with attention to detail and local expertise.
-      <br><br>
-      What truly sets us apart is control and commitment. With direct management in Vietnam and strong operational support from India, we are able to respond quickly, customize deeply, and maintain consistent service quality throughout your journey. Our team is available before, during, and after your trip to make sure everything runs smoothly. We focus not only on selling tours, but on building long-term relationships with our travelers through trust, reliability, and honest service.
-      <br><br>
-      When you travel with us, you are not just booking a package—you are choosing a partner who cares about your experience as much as you do. We take pride in offering some of the best price deals in the market without compromising on comfort or safety. With our direct management model, local expertise, and customer-first approach, we promise journeys that are seamless, memorable, and truly worth every moment.
+    <p id="introText">
+      We are a direct management travel company with fully operational offices in Vietnam and India, built with one clear mission: to create unforgettable journeys with complete control, transparent pricing, and exceptional service quality. Unlike traditional travel agents who depend on multiple intermediaries, we manage our tours directly on the ground. This approach allows us to maintain strict quality standards, ensure smooth operations, and deliver better value to our customers. From the first enquiry to the final day of your trip, every detail of your journey is handled by our own experienced and dedicated team. Our strong presence in both Vietnam and India gives us a unique advantage. Our Vietnam office takes care of on-ground operations such as hotels, transportation, sightseeing, and local experiences, while our India office focuses on customer support, trip planning, and personalized itinerary design. This dual-country structure helps us bridge expectations with reality, ensuring that what you see in your plan is exactly what you experience on your holiday. We believe that great travel should be accessible to everyone. That is why we offer more than 200+ thoughtfully designed itineraries, ranging from budget-friendly tours to premium experiences. Whether you are planning a relaxing beach holiday, a romantic honeymoon, a family vacation, a cultural exploration, or an adventurous escape, our team carefully crafts each journey to match your style, comfort, and budget. Our destinations include some of the most loved locations in Asia, such as Vietnam, Thailand, Malaysia, and Bali. What truly sets us apart is control and commitment, and when you travel with us, you are choosing a partner who cares about your experience as much as you do.
     </p>
+    <button class="read-more-btn" onclick="toggleRead()">Read More</button>
   </div>
 
 </main>
@@ -228,12 +272,43 @@ function toggleChat(){
   document.getElementById("waChat").classList.toggle("active");
 }
 setTimeout(()=>{document.getElementById("waChat").classList.add("active");},2000);
+
 function sendWA(){
   const msg = document.getElementById("waInput").value.trim();
   if(!msg) return;
   const phone = "917994256121";
   const url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
   window.open(url, "_blank");
+}
+
+function submitBooking(e){
+  e.preventDefault();
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const country = document.getElementById("country").value;
+  const msg = `Hello, I want to book a tour. Name: ${name}, Phone: ${phone}, Country: ${country}`;
+  const url = "https://wa.me/917994256121?text=" + encodeURIComponent(msg);
+  window.open(url, "_blank");
+}
+
+// Read more / less
+let expanded = false;
+const fullText = document.getElementById("introText").innerText;
+const shortText = fullText.substring(0, 350) + "...";
+document.getElementById("introText").innerText = shortText;
+
+function toggleRead(){
+  const p = document.getElementById("introText");
+  const btn = document.querySelector(".read-more-btn");
+  if(expanded){
+    p.innerText = shortText;
+    btn.innerText = "Read More";
+    expanded = false;
+  } else {
+    p.innerText = fullText;
+    btn.innerText = "Read Less";
+    expanded = true;
+  }
 }
 </script>
 
