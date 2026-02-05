@@ -4,123 +4,47 @@
 <meta charset="UTF-8">
 <title>Travelog | Vietnam Tours</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
+/* Page background so glass effect is visible */
 body {
   background: linear-gradient(135deg, #0b5ed7, #0d6efd, #20c997);
   min-height: 100vh;
-  color: #fff;
+  margin: 0;
 }
 
-/* ===== Desktop Nav ===== */
+/* ===== Desktop Nav (unchanged) ===== */
 nav {
   display: flex;
+  gap: 20px;
+  padding: 20px;
   justify-content: center;
-  gap: 24px;
-  padding: 16px;
 }
-
 nav a {
   color: #fff;
   text-decoration: none;
   font-weight: 600;
 }
 
-/* ===== Mobile Menu Button ===== */
-.menu-btn {
+/* ===== Hamburger (hidden on desktop) ===== */
+.hamburger {
   display: none;
   position: fixed;
-  top: 16px;
-  left: 16px;
-  font-size: 28px;
+  top: 20px;
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.2);
-  border: none;
+  backdrop-filter: blur(10px);
   color: #fff;
-  padding: 8px 14px;
-  border-radius: 10px;
+  font-size: 24px;
   z-index: 10001;
 }
 
-/* ===== Sidebar Menu ===== */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: -260px;
-  width: 260px;
-  height: 100%;
-  background: rgba(20,20,20,0.95);
-  padding: 30px 20px;
-  transition: 0.3s ease;
-  z-index: 10000;
-}
-
-.sidebar a {
-  display: block;
-  color: #fff;
-  text-decoration: none;
-  margin-bottom: 18px;
-  font-size: 18px;
-}
-
-.sidebar.active {
-  left: 0;
-}
-
-/* ===== Hero Header ===== */
-.hero-header {
-  margin: 20px;
-  border-radius: 24px;
-  padding: 60px 20px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-}
-
-.brand {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.logo {
-  max-width: 180px;
-  width: 60%;
-  height: auto;
-}
-
-.hero-header p {
-  font-size: 18px;
-  margin-top: 10px;
-}
-
-/* ===== Cards ===== */
-.main-content {
-  padding: 20px;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-.card {
-  background: rgba(255,255,255,0.15);
-  padding: 20px;
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-}
-
-/* ===== Floating Buttons ===== */
+/* ===== WhatsApp Button (Floating) ===== */
 .whatsapp-float {
   position: fixed;
   bottom: 100px;
@@ -136,6 +60,7 @@ nav a {
   z-index: 99;
 }
 
+/* ===== Social buttons ===== */
 .social-float {
   position: fixed;
   bottom: 30px;
@@ -143,8 +68,8 @@ nav a {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  z-index: 9999;
 }
-
 .social-btn {
   width: 52px;
   height: 52px;
@@ -155,49 +80,171 @@ nav a {
   box-shadow: 0 8px 16px rgba(0,0,0,0.25);
   text-decoration: none;
 }
-
 .social-btn img {
   width: 24px;
   height: 24px;
+}
+.social-btn.instagram { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af); }
+.social-btn.facebook { background: #1877F2; }
+
+/* ===== Glass Hero Header ===== */
+.hero-header {
+  position: relative;
+  margin: 20px;
+  border-radius: 24px;
+  padding: 60px 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  color: #fff;
+}
+.hero-header p {
+  font-size: 18px;
+  margin-top: 12px;
+  opacity: 0.95;
+}
+
+/* ===== Header Contact Buttons ===== */
+.header-contact {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.header-contact.hide {
+  transform: translateY(-20px);
+  opacity: 0;
+  pointer-events: none;
+}
+.header-contact a {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+.header-contact svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
+/* ===== Brand ===== */
+.brand {
+  display: flex;
+  justify-content: center;
+}
+.logo {
+  height: 90px;
+  width: auto;
+}
+
+/* ===== Cards ===== */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+.card {
+  background: rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 20px;
+  color: #fff;
 }
 
 /* ===== Footer ===== */
 footer {
   text-align: center;
   padding: 20px;
-  opacity: 0.8;
+  color: #fff;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 900px) {
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+/* ================= MOBILE ONLY CHANGES ================= */
+@media (max-width: 768px) {
 
-@media (max-width: 600px) {
-  nav {
-    display: none;
-  }
-
-  .menu-btn {
+  /* Show hamburger */
+  .hamburger {
     display: block;
   }
 
-  .cards {
-    grid-template-columns: 1fr;
+  /* Turn nav into sidebar drawer */
+  nav {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    height: 100vh;
+    width: 75%;
+    max-width: 280px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 80px 20px;
+    gap: 16px;
+    background: rgba(15, 30, 60, 0.95);
+    backdrop-filter: blur(10px);
+    transition: left 0.3s ease;
+    z-index: 10000;
   }
 
+  body.nav-open nav {
+    left: 0;
+  }
+
+  nav a {
+    font-size: 18px;
+  }
+
+  /* Hero spacing smaller */
   .hero-header {
-    margin-top: 70px;
+    margin: 12px;
+    padding: 40px 16px;
+  }
+
+  .logo {
+    height: 70px;
   }
 
   .hero-header p {
     font-size: 16px;
   }
 
-  .logo {
-    max-width: 150px;
+  /* Cards stack */
+  .cards {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  /* Buttons scale */
+  .whatsapp-float {
+    bottom: 90px;
+    padding: 12px 22px;
+    font-size: 14px;
+  }
+
+  .social-float {
+    left: 12px;
+    bottom: 20px;
+  }
+
+  .social-btn {
+    width: 46px;
+    height: 46px;
+  }
+
+  .header-contact {
+    top: 16px;
+    right: 16px;
   }
 }
 </style>
@@ -205,59 +252,13 @@ footer {
 
 <body>
 
-<button class="menu-btn" onclick="toggleMenu()">☰</button>
+<button class="hamburger" id="hamburgerBtn">☰</button>
 
-<div class="sidebar" id="sidebar">
+<nav id="mainNav">
   <a href="index.html">Home</a>
   <a href="gallery.html">Gallery</a>
   <a href="packages.html">Tour Packages</a>
   <a href="about.html">About Us</a>
   <a href="contact.html">Contact</a>
   <a href="feedback.html">Feedback</a>
-</div>
-
-<nav>
-  <a href="index.html">Home</a>
-  <a href="gallery.html">Gallery</a>
-  <a href="packages.html">Tour Packages</a>
-  <a href="about.html">About Us</a>
-  <a href="contact.html">Contact</a>
-  <a href="feedback.html">Feedback</a>
-</nav>
-
-<header class="hero-header">
-  <div class="brand">
-    <img src="logo.png" alt="Travelog Logo" class="logo">
-  </div>
-  <p>Vietnam Tour Packages for Indian Travelers & B2B Agents</p>
-</header>
-
-<div class="main-content">
-  <div class="cards">
-    <div class="card"><h3>Vietnam Tour Packages</h3><p>Premium Vietnam tours for Indian travelers.</p></div>
-    <div class="card"><h3>B2B Agent Support</h3><p>Dedicated Vietnam ground support.</p></div>
-    <div class="card"><h3>Customized Itineraries</h3><p>Tailor-made trips for every budget.</p></div>
-    <div class="card"><h3>Hotels & Transport</h3><p>Trusted hotels, transfers & guides.</p></div>
-  </div>
-</div>
-
-<a class="whatsapp-float" href="https://wa.me/917994256121" target="_blank">WhatsApp Us</a>
-
-<div class="social-float">
-  <a href="#" class="social-btn"><img src="instagram.svg"></a>
-  <a href="#" class="social-btn"><img src="facebook.svg"></a>
-</div>
-
-<footer>© 2026 Travelog. All rights reserved.</footer>
-
-<script>
-function toggleMenu() {
-  document.getElementById("sidebar").classList.toggle("active");
-}
-</script>
-
-</body>
-</html>
-
-</body>
-</html>
+</n
