@@ -41,8 +41,14 @@ nav a:hover{opacity:.7}
 main{max-width:1200px;margin:40px auto;padding:0 20px;}
 
 /* ===== Tiles ===== */
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:30px;}
+.tiles{
+  display:grid;
+  grid-template-columns:1fr; /* FULL WIDTH */
+  gap:20px;
+  margin-bottom:30px;
+}
 .tile{
+  width:100%;
   background:rgba(0,0,0,0.35);
   border-radius:16px;
   padding:25px;
@@ -73,6 +79,8 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
   background:rgba(0,0,0,0.45);
   border-radius:16px;
   padding:20px;
+  opacity:0;
+  animation: fadeInUp 0.6s ease forwards;
 }
 .feedback-card h4{margin-bottom:5px;}
 .feedback-card .dest{font-size:13px;opacity:.9;text-transform:none;}
@@ -86,9 +94,20 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
   box-shadow:0 5px 10px rgba(0,0,0,.3);
 }
 
+/* ===== Fade Animation ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ===== Responsive ===== */
 @media(max-width:900px){
-  .tiles{grid-template-columns:1fr;}
   .feedback-list{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:600px){
@@ -113,12 +132,11 @@ main{max-width:1200px;margin:40px auto;padding:0 20px;}
     <img src="logo.png" class="logo" alt="Logo">
     <nav id="menu">
       <a href="index.html">Home</a>
-<a href="gallery.html">Gallery</a>
-<a href="packages.html">Tour Packages</a>
-<a href="about.html">About Us</a>
-<a href="contact.html">Contact Us</a>
-<a href="feedback.html">Feedback</a>
-
+      <a href="gallery.html">Gallery</a>
+      <a href="packages.html">Tour Packages</a>
+      <a href="about.html">About Us</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="feedback.html">Feedback</a>
     </nav>
     <div class="hamburger" onclick="toggleMenu()">
       <span></span><span></span><span></span>
@@ -244,4 +262,5 @@ function renderFeedbacks(){
 
 </body>
 </html>
+
 
