@@ -160,3 +160,82 @@ footer {
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
+
+/* ===============================
+   FEEDBACK PAGE – MODERN DESIGN
+================================ */
+
+body {
+  background-color: #f4f6f9;
+}
+
+/* Page Container */
+.feedback-page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* Form Layout */
+.feedback-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.feedback-form textarea {
+  grid-column: span 2;
+}
+
+.feedback-form input,
+.feedback-form select,
+.feedback-form textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+.feedback-form input:focus,
+.feedback-form select:focus,
+.feedback-form textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Submit Button */
+.feedback-form button {
+  grid-column: span 2;
+  padding: 12px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.feedback-form button:hover {
+  background: #0056b3;
+}
+
+/* Feedback Cards */
+.feedback-list {
+  display: grid;
+  gap: 20px;
+}
+
+.feedback-card {
+  background: #f9fafc;
+  padding: 18px;
+  border-radius: 10px;
+  border-left: 5px solid #f4b400;
+}
+
+.feedback-card p {
+  margin: 10px 0;
+}
