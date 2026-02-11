@@ -5,7 +5,6 @@
 <title>Travelog | Employee Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="icon" type="image/png" href="web-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -57,9 +56,7 @@ body{
   cursor:pointer;
 }
 
-.login-box button:hover{
-  opacity:0.9;
-}
+.login-box button:hover{opacity:0.9;}
 
 .error{
   margin-top:10px;
@@ -92,10 +89,8 @@ function loginEmployee(e){
   const correctPass = "Travelog01";
 
   if(user === correctUser && pass === correctPass){
-    window.open(
-      "https://ai.studio/apps/drive/1nSjwSa7HyJHwNNgDN4c14kJbZmLWHQe-?fullscreenApplet=true",
-      "_blank"
-    );
+    // Open dashboard page
+    window.location.href = "dashboard.html";
   } else {
     document.getElementById("errorMsg").style.display = "block";
   }
@@ -104,4 +99,5 @@ function loginEmployee(e){
 
 </body>
 </html>
+
 
