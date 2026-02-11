@@ -1,1 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Travelog | Employees</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="icon" type="image/png" href="web-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8,#0ea5e9);
+  color:#fff;
+  text-transform:uppercase;
+}
+
+/* ===== Ribbon ===== */
+header{
+  position:sticky;top:0;z-index:1000;
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(4px);
+}
+.nav-bar{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;
+  padding:12px 20px;
+}
+.logo{height:50px}
+nav{flex:1;display:flex;justify-content:center;gap:30px;}
+nav a{color:#fff;text-decoration:none;font-weight:600;letter-spacing:1px;}
+nav a:hover{opacity:.7}
+
+/* Hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+.hamburger span{width:25px;height:3px;background:#fff;border-radius:2px}
+
+/* ===== Main ===== */
+main{max-width:1200px;margin:40px auto;padding:0 20px;}
+
+/* ===== Employees Grid ===== */
+.employees{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+}
+.employee-card{
+  background:rgba(0,0,0,0.35);
+  border-radius:16px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  transition:.2s;
+}
+.employee-card:hover{
+  transform:translateY(-5px);
+  background:rgba(0,0,0,0.45);
+}
+.employee-card img{
+  width:120px;height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:15px;
+  border:3px solid #fff;
+}
+.employee-card h3{font-size:18px;margin-bottom:5px;}
+.employee-card p{
+  font-size:13px;
+  text-transform:none;
+  opacity:.9;
+}
+
+/* ===== Section Title ===== */
+.section-title{
+  text-align:center;
+  margin-bottom:25px;
+  letter-spacing:1px;
+}
+
+/* ===== Responsive ===== */
+@media(max-width:900px){
+  .employees{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:600px){
+  nav{
+    position:absolute;top:100%;left:0;width:100%;
+    background:rgba(0,0,0,0.9);
+    flex-direction:column;align-items:center;
+    display:none;padding:20px 0;
+  }
+  nav.show{display:flex;}
+  .hamburger{display:flex;margin-left:auto;}
+}
+@media(max-width:500px){
+  .employees{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-bar">
+    <img src="logo.png" class="logo" alt="Logo">
+    <nav id="menu">
+      <a href="index.html">Home</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="employees.html">Employees</a>
+      <a href="packages.html">Tour Packages</a>
+      <a href="about.html">About Us</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="feedback.html">Feedback</a>
+    </nav>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<h2 class="section-title">Our Team</h2>
+
+<div class="employees">
+  <!-- Employee 1 -->
+  <div class="employee-card">
+    <img src="employee1.jpg" alt="Employee">
+    <h3>Rahul Sharma</h3>
+    <p>Tour Manager - Vietnam</p>
+  </div>
+
+  <!-- Employee 2 -->
+  <div class="employee-card">
+    <img src="employee2.jpg" alt="Employee">
+    <h3>Ananya Patel</h3>
+    <p>Customer Support - India</p>
+  </div>
+
+  <!-- Employee 3 -->
+  <div class="employee-card">
+    <img src="employee3.jpg" alt="Employee">
+    <h3>Nguyen Minh</h3>
+    <p>Operations Head - Vietnam</p>
+  </div>
+
+  <!-- Employee 4 -->
+  <div class="employee-card">
+    <img src="employee4.jpg" alt="Employee">
+    <h3>Arjun Verma</h3>
+    <p>Sales & Planning</p>
+  </div>
+</div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("show");
+}
+</script>
+
+</body>
+</html>
 
