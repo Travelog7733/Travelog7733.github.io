@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Travelog | Employee Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#0ea5e9,#38bdf8,#7dd3fc);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+}
+
+.container{
+  width:100%;
+  max-width:900px;
+  padding:20px;
+  text-align:center;
+}
+
+h1{
+  margin-bottom:30px;
+  letter-spacing:1px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:25px;
+}
+
+.card{
+  background:rgba(0,0,0,0.7);
+  padding:40px 20px;
+  border-radius:16px;
+  cursor:pointer;
+  transition:0.2s;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+.card:hover{
+  transform:translateY(-5px);
+  background:rgba(0,0,0,0.8);
+}
+
+.card h2{
+  margin-bottom:10px;
+}
+
+.card p{
+  font-size:14px;
+  opacity:0.9;
+}
+
+@media(max-width:600px){
+  .cards{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Employee Dashboard</h1>
+
+  <div class="cards">
+    <div class="card" onclick="openItinerary()">
+      <h2>Create Itinerary</h2>
+      <p>Build custom travel plans for customers</p>
+    </div>
+
+    <div class="card" onclick="openCalculator()">
+      <h2>Cost Calculator</h2>
+      <p>Calculate trip cost and package pricing</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function openItinerary(){
+  alert("Here you can connect your Itinerary Builder page or AI app");
+  // Example:
+  // window.open("itinerary.html", "_blank");
+}
+
+function openCalculator(){
+  alert("Here you can connect your Cost Calculator page");
+  // Example:
+  // window.open("calculator.html", "_blank");
+}
+</script>
+
+</body>
+</html>
 
