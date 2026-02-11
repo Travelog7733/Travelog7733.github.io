@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Travelog | Employees Login</title>
+<title>Travelog | Employee Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="icon" type="image/png" href="web-icon.png">
@@ -12,141 +12,76 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 body{
   min-height:100vh;
-  background:linear-gradient(135deg,#7dd3fc,#38bdf8,#0ea5e9);
-  color:#fff;
-  text-transform:uppercase;
-  display:flex;
-  flex-direction:column;
-}
-
-/* ===== Ribbon ===== */
-header{
-  position:sticky;top:0;z-index:1000;
-  background:rgba(0,0,0,0.75);
-  backdrop-filter:blur(4px);
-}
-.nav-bar{
-  max-width:1200px;margin:0 auto;
-  display:flex;align-items:center;
-  padding:12px 20px;
-}
-.logo{height:50px}
-nav{flex:1;display:flex;justify-content:center;gap:30px;}
-nav a{color:#fff;text-decoration:none;font-weight:600;letter-spacing:1px;}
-nav a:hover{opacity:.7}
-
-/* Hamburger */
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
-.hamburger span{width:25px;height:3px;background:#fff;border-radius:2px}
-
-/* ===== Main ===== */
-main{
-  flex:1;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:20px;
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8,#0ea5e9);
 }
 
-/* ===== Login Box ===== */
 .login-box{
-  width:100%;
-  max-width:400px;
-  background:rgba(0,0,0,0.35);
+  background:rgba(0,0,0,0.75);
   padding:30px;
   border-radius:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  width:100%;
+  max-width:380px;
+  color:#fff;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
   text-align:center;
 }
+
 .login-box h2{
   margin-bottom:20px;
   letter-spacing:1px;
 }
+
 .login-box input{
   width:100%;
   padding:12px 14px;
-  margin-bottom:15px;
-  border-radius:8px;
+  margin:10px 0;
   border:none;
+  border-radius:8px;
   outline:none;
-  font-size:14px;
-  text-transform:none;
+  font-size:15px;
 }
+
 .login-box button{
   width:100%;
   padding:12px;
+  margin-top:15px;
   border:none;
   border-radius:8px;
-  background:#25D366;
-  color:#fff;
-  font-weight:700;
+  background:#38bdf8;
+  color:#000;
+  font-weight:600;
+  font-size:16px;
   cursor:pointer;
-  letter-spacing:1px;
 }
-.login-box button:hover{opacity:.9;}
 
-.error-msg{
+.login-box button:hover{
+  opacity:0.9;
+}
+
+.error{
   margin-top:10px;
-  color:#ffdddd;
-  background:rgba(255,0,0,0.2);
-  padding:8px;
-  border-radius:8px;
+  color:#ff6b6b;
   display:none;
-  text-transform:none;
-}
-
-/* ===== Responsive ===== */
-@media(max-width:600px){
-  nav{
-    position:absolute;top:100%;left:0;width:100%;
-    background:rgba(0,0,0,0.9);
-    flex-direction:column;align-items:center;
-    display:none;padding:20px 0;
-  }
-  nav.show{display:flex;}
-  .hamburger{display:flex;margin-left:auto;}
+  font-size:14px;
 }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="nav-bar">
-    <img src="logo.png" class="logo" alt="Logo">
-    <nav id="menu">
-      <a href="index.html">Home</a>
-      <a href="gallery.html">Gallery</a>
-      <a href="employees.html">Employees</a>
-      <a href="packages.html">Tour Packages</a>
-      <a href="about.html">About Us</a>
-      <a href="contact.html">Contact Us</a>
-      <a href="feedback.html">Feedback</a>
-    </nav>
-    <div class="hamburger" onclick="toggleMenu()">
-      <span></span><span></span><span></span>
-    </div>
-  </div>
-</header>
-
-<main>
-
-  <div class="login-box">
-    <h2>Employees Login</h2>
-    <form onsubmit="loginEmployee(event)">
-      <input type="text" id="username" placeholder="Username" required>
-      <input type="password" id="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-    </form>
-    <div class="error-msg" id="errorMsg">Invalid username or password</div>
-  </div>
-
-</main>
+<div class="login-box">
+  <h2>Employee Login</h2>
+  <form onsubmit="loginEmployee(event)">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+    <div class="error" id="errorMsg">Invalid username or password</div>
+  </form>
+</div>
 
 <script>
-function toggleMenu(){
-  document.getElementById("menu").classList.toggle("show");
-}
-
 function loginEmployee(e){
   e.preventDefault();
 
@@ -157,8 +92,10 @@ function loginEmployee(e){
   const correctPass = "Travelog01";
 
   if(user === correctUser && pass === correctPass){
-    // Redirect to your Google AI Studio App
-    window.location.href = "https://ai.studio/apps/drive/1nSjwSa7HyJHwNNgDN4c14kJbZmLWHQe-?fullscreenApplet=true";
+    window.open(
+      "https://ai.studio/apps/drive/1nSjwSa7HyJHwNNgDN4c14kJbZmLWHQe-?fullscreenApplet=true",
+      "_blank"
+    );
   } else {
     document.getElementById("errorMsg").style.display = "block";
   }
