@@ -149,29 +149,39 @@ async function generateDescription(){
 
   const prompt = `Write a professional, attractive travel itinerary description for a trip to ${destination} from ${startDate} to ${endDate}. Make it suitable for a travel agency customer.`;
 
-  // 🔴 REPLACE WITH YOUR GOOGLE GEMINI API KEY
+  // 🔴 YOUR GEMINI API KEY (already added)
   const API_KEY = "AIzaSyDOgV_zOm8BqGOhoZGR16j7pCtwAKdnQe4";
 
-  try{
+  try {
     const res = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + API_KEY,
+      "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + API_KEY,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           contents: [
-            { parts: [{ text: prompt }] }
+            {
+              role: "user",
+              parts: [{ text: prompt }]
+            }
           ]
         })
       }
     );
 
     const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate description.";
+    console.log("Gemini response:", data);
 
-    document.getElementById("description").value = text;
+    if (data.candidates && data.candidates.length > 0) {
+      const text = data.candidates[0].content.parts[0].text;
+      document.getElementById("description").value = text;
+    } else {
+      document.getElementById("description").value = "AI did not return any text. Try again.";
+    }
 
-  }catch(err){
+  } catch (err) {
     console.error(err);
     alert("Error generating description. Check API key or internet.");
   }
@@ -189,7 +199,6 @@ function saveItinerary(){
   };
 
   localStorage.setItem("latestItinerary", JSON.stringify(itinerary));
-
   alert("Itinerary saved successfully!");
 }
 
@@ -200,4 +209,5 @@ function goBack(){
 
 </body>
 </html>
+
 
