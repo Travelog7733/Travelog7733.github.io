@@ -126,7 +126,7 @@ button:hover{
 
   <div class="form-group">
     <label>Description</label>
-    <textarea id="description" rows="7" placeholder="Click 'Generate with AI' or write manually..."></textarea>
+    <textarea id="description" rows="8" placeholder="Click 'Generate with AI' or write manually..."></textarea>
   </div>
 
   <div class="actions">
@@ -149,21 +149,18 @@ async function generateDescription(){
 
   const prompt = `Write a professional, attractive travel itinerary description for a trip to ${destination} from ${startDate} to ${endDate}. Make it suitable for a travel agency customer.`;
 
-  // 🔴 YOUR GEMINI API KEY (already added)
-  const API_KEY = "AIzaSyDOgV_zOm8BqGOhoZGR16j7pCtwAKdnQe4";
+  // 🔴 PASTE YOUR NEW GOOGLE GEMINI API KEY HERE
+  const API_KEY = "AIzaSyCn2-nWTrJmlsWSKLifhjaQvOTxnbo9McQ";
 
   try {
     const res = await fetch(
       "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + API_KEY,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [
             {
-              role: "user",
               parts: [{ text: prompt }]
             }
           ]
@@ -174,40 +171,11 @@ async function generateDescription(){
     const data = await res.json();
     console.log("Gemini response:", data);
 
-    if (data.candidates && data.candidates.length > 0) {
-      const text = data.candidates[0].content.parts[0].text;
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+      const text = data.candidates[0].content.parts.map(p => p.text).join("");
       document.getElementById("description").value = text;
+    } else if (data.error) {
+      alert("API Error: " + data.error.message);
     } else {
-      document.getElementById("description").value = "AI did not return any text. Try again.";
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert("Error generating description. Check API key or internet.");
-  }
-}
-
-function saveItinerary(){
-  const itinerary = {
-    customerName: document.getElementById("customerName").value,
-    createdBy: document.getElementById("createdBy").value,
-    startDate: document.getElementById("startDate").value,
-    endDate: document.getElementById("endDate").value,
-    destination: document.getElementById("destination").value,
-    description: document.getElementById("description").value,
-    createdAt: new Date().toISOString()
-  };
-
-  localStorage.setItem("latestItinerary", JSON.stringify(itinerary));
-  alert("Itinerary saved successfully!");
-}
-
-function goBack(){
-  window.location.href = "dashboard.html";
-}
-</script>
-
-</body>
-</html>
-
+      document.getElementById("description
 
