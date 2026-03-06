@@ -100,14 +100,22 @@ transform:translateY(-2px);
 .site-icon{
 
 position:fixed;
-top:10px;
-left:10px;
+top:15px;
+left:20px;
 
-width:42px;
+width:60px;
+
+cursor:pointer;
+
+transition:transform 0.3s ease;
 
 z-index:1100;
 
-filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+}
+
+.site-icon:hover{
+
+transform:scale(1.15);
 
 }
 
