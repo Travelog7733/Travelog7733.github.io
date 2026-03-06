@@ -115,12 +115,14 @@ margin-top:20px;
 
 /* ================= BOOK BUTTON ================= */
 
+/* ================= BOOK TILE BUTTON ================= */
+
 .book-btn{
 
 display:inline-block;
 margin-top:40px;
 
-padding:16px 40px;
+padding:18px 45px;
 
 font-size:18px;
 font-weight:bold;
@@ -128,11 +130,16 @@ font-weight:bold;
 color:white;
 text-decoration:none;
 
-background:linear-gradient(45deg,#ff7a00,#ffb300);
+background:rgba(255,165,0,0.9);
 
-border-radius:40px;
+/* rectangle shape */
+border-radius:8px;
 
-box-shadow:0 8px 25px rgba(0,0,0,0.4);
+/* glass tile feel */
+backdrop-filter:blur(5px);
+border:1px solid rgba(255,255,255,0.2);
+
+box-shadow:0 8px 20px rgba(0,0,0,0.5);
 
 transition:all 0.3s ease;
 
@@ -140,11 +147,15 @@ animation:pulse 2s infinite;
 
 }
 
+/* hover effect */
+
 .book-btn:hover{
 
-transform:scale(1.08);
+background:orange;
 
-box-shadow:0 12px 35px rgba(0,0,0,0.6);
+transform:translateY(-4px) scale(1.05);
+
+box-shadow:0 15px 35px rgba(0,0,0,0.7);
 
 }
 
