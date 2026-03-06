@@ -86,23 +86,38 @@ nav a:hover{
     text-align:left;
 }
 
-/* ICON STYLE */
-
-.logo-area{
-    position:absolute;
-    top:20px;
-    right:20px;   /* moves logo to right side */
-    text-align:right;
-}
+/* ================= ICON (TOP LEFT) ================= */
 
 .site-icon{
-    width:50px;
-    display:block;
-    margin-left:auto;
+    position:absolute;
+    top:20px;
+    left:20px;
+    width:45px;
+    border-radius:12px; /* rounded square */
 }
 
+/* ================= FOOTER LOGO AREA ================= */
+
+.footer-brand{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    text-align:center;
+}
+
+/* Logo */
+
 .site-logo{
-    width:180px;
+    width:160px;
     display:block;
-    margin-right:auto;
+    margin:0 auto;
+}
+
+/* Tagline */
+
+.tagline{
+    font-size:14px;
+    margin-top:8px;
+    color:#ccc;
 }
