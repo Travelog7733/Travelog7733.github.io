@@ -15,7 +15,7 @@ background-repeat:no-repeat;
 background-attachment:fixed;
 }
 
-/* ================= TOP MENU ================= */
+/* ================= TOP MENU (GLASS EFFECT) ================= */
 
 .top-menu{
 
@@ -24,10 +24,16 @@ top:0;
 left:0;
 width:100%;
 
-background:rgba(0,0,0,0.85);
-backdrop-filter:blur(6px);
+padding:16px;
 
-padding:15px;
+/* glass effect */
+background:rgba(0,0,0,0.35);
+backdrop-filter:blur(12px);
+-webkit-backdrop-filter:blur(12px);
+
+/* border + shadow */
+border-bottom:1px solid rgba(255,255,255,0.15);
+box-shadow:0 8px 30px rgba(0,0,0,0.5);
 
 z-index:1000;
 }
@@ -40,34 +46,22 @@ color:white;
 margin:0 15px;
 text-decoration:none;
 font-size:18px;
-padding:6px 12px;
-border-radius:6px;
 
-transition:0.3s;
+padding:8px 14px;
+border-radius:8px;
+
+transition:all 0.3s ease;
 
 }
 
-.top-menu{
+/* HOVER */
 
-position:fixed;
-top:0;
-left:0;
-width:100%;
+.top-menu a:hover{
 
-padding:16px;
+background:rgba(255,255,255,0.15);
+color:orange;
+transform:translateY(-2px);
 
-/* Glass effect */
-background:rgba(0,0,0,0.35);
-backdrop-filter:blur(12px);
--webkit-backdrop-filter:blur(12px);
-
-/* subtle border */
-border-bottom:1px solid rgba(255,255,255,0.15);
-
-/* shadow */
-box-shadow:0 8px 30px rgba(0,0,0,0.5);
-
-z-index:1000;
 }
 
 /* ================= ICON ================= */
@@ -119,6 +113,41 @@ margin-top:20px;
 
 }
 
+/* ================= BOOK BUTTON ================= */
+
+.book-btn{
+
+display:inline-block;
+margin-top:40px;
+
+padding:16px 40px;
+
+font-size:18px;
+font-weight:bold;
+
+color:white;
+text-decoration:none;
+
+background:linear-gradient(45deg,#ff7a00,#ffb300);
+
+border-radius:40px;
+
+box-shadow:0 8px 25px rgba(0,0,0,0.4);
+
+transition:all 0.3s ease;
+
+animation:pulse 2s infinite;
+
+}
+
+.book-btn:hover{
+
+transform:scale(1.08);
+
+box-shadow:0 12px 35px rgba(0,0,0,0.6);
+
+}
+
 /* ================= FOOTER ================= */
 
 footer{
@@ -166,4 +195,20 @@ to{width:100%}
 0%{border-color:orange}
 50%{border-color:transparent}
 100%{border-color:orange}
+}
+
+@keyframes pulse{
+
+0%{
+box-shadow:0 0 0 0 rgba(255,165,0,0.7);
+}
+
+70%{
+box-shadow:0 0 0 20px rgba(255,165,0,0);
+}
+
+100%{
+box-shadow:0 0 0 0 rgba(255,165,0,0);
+}
+
 }
