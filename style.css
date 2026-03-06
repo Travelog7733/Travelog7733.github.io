@@ -32,3 +32,30 @@ nav a {
 nav a:hover {
     color: orange;
 }
+/* Animated Title */
+
+.animated-title{
+    font-size: 48px;
+    margin-top: 120px;
+    letter-spacing: 3px;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 3px solid orange;
+    width: 0;
+    animation: typing 4s steps(30,end) forwards, blink 1s infinite;
+}
+
+/* Typing Animation */
+
+@keyframes typing{
+    from {width:0}
+    to {width:100%}
+}
+
+/* Cursor Blink */
+
+@keyframes blink{
+    0% {border-color:orange}
+    50% {border-color:transparent}
+    100% {border-color:orange}
+}
