@@ -1,61 +1,79 @@
-/* BODY STYLE */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    color: white;
-    text-align: center;
+/* ================= BODY STYLE ================= */
 
-    /* Background */
-    background-color: black;
-    background-image: url("images/BG.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
+    color:white;
+    text-align:center;
+
+    /* Background Image */
+    background-color:black;
+    background-image:url("images/BG.png");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
 }
 
-/* NAVIGATION BAR */
-nav {
-    margin: 20px;
+/* ================= NAVIGATION BAR ================= */
+
+nav{
+    margin:20px;
 }
 
-/* NAVIGATION LINKS */
-nav a {
-    color: white;
-    margin: 10px;
-    text-decoration: none;
-    font-size: 18px;
+/* Navigation Links */
+
+nav a{
+    color:white;
+    margin:10px;
+    text-decoration:none;
+    font-size:18px;
+    padding:8px 14px;
+    border-radius:6px;
+    transition:0.3s;
 }
 
-/* HOVER EFFECT */
-nav a:hover {
-    color: orange;
+/* Hover Effect */
+
+nav a:hover{
+    color:orange;
+    background:rgba(255,255,255,0.1);
 }
-/* Animated Title */
+
+/* ================= HERO TITLE ================= */
 
 .animated-title{
-    font-size: 48px;
-    margin-top: 120px;
-    letter-spacing: 3px;
-    overflow: hidden;
-    white-space: nowrap;
-    border-right: 3px solid orange;
-    width: 0;
-    animation: typing 4s steps(30,end) forwards, blink 1s infinite;
+    font-size:48px;
+    margin-top:120px;
+    letter-spacing:3px;
+    overflow:hidden;
+    white-space:nowrap;
+    border-right:3px solid orange;
+    width:0;
+    animation:typing 4s steps(30,end) forwards, blink 1s infinite;
 }
+
+/* Subtitle */
+
+.subtitle{
+    font-size:20px;
+    margin-top:20px;
+}
+
+/* ================= ANIMATIONS ================= */
 
 /* Typing Animation */
 
 @keyframes typing{
-    from {width:0}
-    to {width:100%}
+    from{width:0}
+    to{width:100%}
 }
 
 /* Cursor Blink */
 
 @keyframes blink{
-    0% {border-color:orange}
-    50% {border-color:transparent}
-    100% {border-color:orange}
+    0%{border-color:orange}
+    50%{border-color:transparent}
+    100%{border-color:orange}
 }
