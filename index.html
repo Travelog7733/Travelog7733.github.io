@@ -7,69 +7,71 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <!-- Navigation -->
-    <nav>
-        <div class="logo">Travel Agency</div>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#destinations">Destinations</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#testimonials">Testimonials</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
-
-    <!-- Hero Section -->
-    <header id="home">
-        <h1>Explore the World with Us</h1>
-        <p>Your adventure starts here.</p>
-        <a href="#destinations" class="btn">Discover More</a>
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Explore the World with Us</h1>
+            <p>Your journey begins here!</p>
+            <a href="#packages" class="btn">Discover Packages</a>
+        </div>
     </header>
 
-    <!-- Destinations Section -->
-    <section id="destinations">
-        <h2>Top Destinations</h2>
-        <div class="destination">
+    <section class="featured-destinations">
+        <h2>Featured Destinations</h2>
+        <div class="destination-card">
+            <img src="icon1.png" alt="Destination 1">
             <h3>Paris</h3>
-            <p>The city of lights and love.</p>
         </div>
-        <div class="destination">
-            <h3>New York</h3>
-            <p>The city that never sleeps.</p>
-        </div>
-        <div class="destination">
+        <div class="destination-card">
+            <img src="icon2.png" alt="Destination 2">
             <h3>Bali</h3>
-            <p>A tropical paradise awaiting your visit.</p>
+        </div>
+        <div class="destination-card">
+            <img src="icon3.png" alt="Destination 3">
+            <h3>New York</h3>
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section id="services">
-        <h2>Our Services</h2>
-        <ul>
-            <li>Customized Travel Packages</li>
-            <li>24/7 Customer Support</li>
-            <li>Luxury Accommodation</li>
-            <li>Group Tours</li>
-        </ul>
+    <section class="travel-packages" id="packages">
+        <h2>Travel Packages</h2>
+        <div class="package">
+            <h3>Beach Getaway</h3>
+            <p>Price: $499</p>
+        </div>
+        <div class="package">
+            <h3>Mountain Adventure</h3>
+            <p>Price: $699</p>
+        </div>
+        <div class="package">
+            <h3>Cultural Experience</h3>
+            <p>Price: $899</p>
+        </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section id="testimonials">
-        <h2>What Our Clients Say</h2>
+    <section class="testimonials">
+        <h2>What Our Customers Say</h2>
         <blockquote>
-            <p>"The best travel experience ever! Highly recommend!" - John Doe</p>
+            <p>"It was the best trip of my life!" - Jane Doe</p>
         </blockquote>
         <blockquote>
-            <p>"Everything was perfect from start to finish!" - Jane Smith</p>
+            <p>"Amazing experience, highly recommend!" - John Smith</p>
         </blockquote>
     </section>
 
-    <!-- Footer -->
+    <section class="contact-form">
+        <h2>Contact Us</h2>
+        <form>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" required></textarea>
+            <button type="submit">Submit</button>
+        </form>
+    </section>
+
     <footer>
-        <p>&copy; 2026 Travel Agency. All Rights Reserved.</p>
+        <p>&copy; 2026 Travel Agency. All rights reserved.</p>
     </footer>
-
 </body>
 </html>
