@@ -223,3 +223,43 @@ box-shadow:0 0 0 0 rgba(255,165,0,0);
 }
 
 }
+
+/* ================= FLOATING WHATSAPP ================= */
+
+.whatsapp-float{
+
+position:fixed;
+
+bottom:90px;
+right:20px;
+
+z-index:999;
+
+animation:float 2s ease-in-out infinite;
+
+}
+
+.whatsapp-float img{
+
+width:60px;
+height:auto;
+
+transition:0.3s;
+
+}
+
+.whatsapp-float img:hover{
+
+transform:scale(1.15);
+
+}
+
+/* floating animation */
+
+@keyframes float{
+
+0%{transform:translateY(0px);}
+50%{transform:translateY(-8px);}
+100%{transform:translateY(0px);}
+
+}
