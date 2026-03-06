@@ -47,11 +47,27 @@ transition:0.3s;
 
 }
 
-.top-menu a:hover{
+.top-menu{
 
-color:orange;
-background:rgba(255,255,255,0.1);
+position:fixed;
+top:0;
+left:0;
+width:100%;
 
+padding:16px;
+
+/* Glass effect */
+background:rgba(0,0,0,0.35);
+backdrop-filter:blur(12px);
+-webkit-backdrop-filter:blur(12px);
+
+/* subtle border */
+border-bottom:1px solid rgba(255,255,255,0.15);
+
+/* shadow */
+box-shadow:0 8px 30px rgba(0,0,0,0.5);
+
+z-index:1000;
 }
 
 /* ================= ICON ================= */
