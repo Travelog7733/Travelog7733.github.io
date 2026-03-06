@@ -1,198 +1,153 @@
-/* ================= BODY STYLE ================= */
+/* ================= BODY ================= */
 
 body{
-    margin:0;
-    padding:0;
-    font-family:Arial, sans-serif;
-    color:white;
-    text-align:center;
-
-    /* Background Image */
-    background-color:black;
-    background-image:url("images/BG.png");
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-    background-attachment:fixed;
-}
-
-/* ================= NAVIGATION BAR ================= */
-
-nav{
-    margin:20px;
-}
-
-/* Navigation Links */
-
-nav a{
-    color:white;
-    margin:10px;
-    text-decoration:none;
-    font-size:18px;
-    padding:8px 14px;
-    border-radius:6px;
-    transition:0.3s;
-}
-
-/* Hover Effect */
-
-nav a:hover{
-    color:orange;
-    background:rgba(255,255,255,0.1);
-}
-
-/* ================= HERO TITLE ================= */
-
-.animated-title{
-    font-size:48px;
-    margin-top:120px;
-    letter-spacing:3px;
-    overflow:hidden;
-    white-space:nowrap;
-    border-right:3px solid orange;
-    width:0;
-    animation:typing 4s steps(30,end) forwards, blink 1s infinite;
-}
-
-/* Subtitle */
-
-.subtitle{
-    font-size:20px;
-    margin-top:20px;
-}
-
-/* ================= ANIMATIONS ================= */
-
-/* Typing Animation */
-
-@keyframes typing{
-    from{width:0}
-    to{width:100%}
-}
-
-/* Cursor Blink */
-
-@keyframes blink{
-    0%{border-color:orange}
-    50%{border-color:transparent}
-    100%{border-color:orange}
-}
-/* BRAND AREA (ICON + LOGO) */
-
-.brand{
-    position:absolute;
-    top:20px;
-    left:20px;
-    text-align:left;
-}
-
-/* ================= ICON (TOP LEFT) ================= */
-
-.site-icon{
-    position:absolute;
-    top:20px;
-    left:20px;
-    width:45px;
-    border-radius:12px; /* rounded square */
-}
-
-/* ================= FOOTER LOGO AREA ================= */
-
-.footer-brand{
-    position:fixed;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    text-align:center;
-}
-
-/* Logo */
-
-.site-logo{
-    width:160px;
-    display:block;
-    margin:0 auto;
-}
-
-/* Tagline */
-
-.tagline{
-    font-size:14px;
-    margin-top:8px;
-    color:#ccc;
-}
-/* HERO SECTION */
-
-.hero{
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
+margin:0;
+padding:0;
+font-family:Arial, sans-serif;
+color:white;
 text-align:center;
 
-background:rgba(0,0,0,0.55);
-backdrop-filter:blur(3px);
+background-color:black;
+background-image:url("images/BG.png");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+background-attachment:fixed;
 }
 
-/* HERO CONTENT */
+/* ================= TOP MENU ================= */
 
-.hero-content{
-max-width:900px;
-padding:20px;
+.top-menu{
+
+position:fixed;
+top:0;
+left:0;
+width:100%;
+
+background:rgba(0,0,0,0.85);
+backdrop-filter:blur(6px);
+
+padding:15px;
+
+z-index:1000;
 }
 
-/* HERO TITLE */
+/* MENU LINKS */
 
-.hero-title{
-font-size:64px;
-font-weight:bold;
-letter-spacing:2px;
-margin-bottom:20px;
+.top-menu a{
 
-animation:fadeUp 2s ease;
+color:white;
+margin:0 15px;
+text-decoration:none;
+font-size:18px;
+padding:6px 12px;
+border-radius:6px;
+
+transition:0.3s;
+
+}
+
+.top-menu a:hover{
+
+color:orange;
+background:rgba(255,255,255,0.1);
+
+}
+
+/* ================= ICON ================= */
+
+.site-icon{
+
+position:fixed;
+top:10px;
+left:10px;
+
+width:40px;
+
+z-index:1100;
+
+}
+
+/* ================= HERO ================= */
+
+.hero{
+
+margin-top:120px;
+
+}
+
+/* TITLE ANIMATION */
+
+.animated-title{
+
+font-size:48px;
+letter-spacing:3px;
+
+overflow:hidden;
+white-space:nowrap;
+
+border-right:3px solid orange;
+
+width:0;
+
+animation:typing 4s steps(30,end) forwards, blink 1s infinite;
+
 }
 
 /* SUBTITLE */
 
-.hero-subtitle{
-font-size:22px;
-margin-bottom:40px;
-opacity:0.9;
+.subtitle{
+
+font-size:20px;
+margin-top:20px;
+
 }
 
-/* BUTTON */
+/* ================= FOOTER ================= */
 
-.hero-button{
-display:inline-block;
-padding:14px 32px;
-font-size:18px;
+footer{
 
-background:orange;
-color:black;
+position:fixed;
+bottom:0;
+left:0;
 
-text-decoration:none;
-border-radius:40px;
+width:100%;
 
-transition:0.3s;
+background:black;
+
+padding:15px;
+
 }
 
-.hero-button:hover{
-background:white;
-transform:scale(1.05);
+/* LOGO */
+
+.site-logo{
+
+width:180px;
+display:block;
+margin:auto;
+
 }
 
-/* FADE ANIMATION */
+/* TAGLINE */
 
-@keyframes fadeUp{
+.tagline{
 
-0%{
-opacity:0;
-transform:translateY(40px);
+font-size:14px;
+margin-top:6px;
+color:#ccc;
+
 }
 
-100%{
-opacity:1;
-transform:translateY(0);
+/* ================= ANIMATIONS ================= */
+
+@keyframes typing{
+from{width:0}
+to{width:100%}
 }
 
+@keyframes blink{
+0%{border-color:orange}
+50%{border-color:transparent}
+100%{border-color:orange}
 }
