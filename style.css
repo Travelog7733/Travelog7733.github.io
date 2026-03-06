@@ -77,3 +77,30 @@ nav a:hover{
     50%{border-color:transparent}
     100%{border-color:orange}
 }
+/* BRAND AREA (ICON + LOGO) */
+
+.brand{
+    position:absolute;
+    top:20px;
+    left:20px;
+    text-align:left;
+}
+
+/* ICON STYLE */
+
+.site-icon{
+    width:60px;
+    height:60px;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.6);
+    background:white;
+    padding:8px;
+}
+
+/* LOGO STYLE */
+
+.site-logo{
+    display:block;
+    width:140px;
+    margin-top:10px;
+}
