@@ -121,3 +121,78 @@ nav a:hover{
     margin-top:8px;
     color:#ccc;
 }
+/* HERO SECTION */
+
+.hero{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+
+background:rgba(0,0,0,0.55);
+backdrop-filter:blur(3px);
+}
+
+/* HERO CONTENT */
+
+.hero-content{
+max-width:900px;
+padding:20px;
+}
+
+/* HERO TITLE */
+
+.hero-title{
+font-size:64px;
+font-weight:bold;
+letter-spacing:2px;
+margin-bottom:20px;
+
+animation:fadeUp 2s ease;
+}
+
+/* SUBTITLE */
+
+.hero-subtitle{
+font-size:22px;
+margin-bottom:40px;
+opacity:0.9;
+}
+
+/* BUTTON */
+
+.hero-button{
+display:inline-block;
+padding:14px 32px;
+font-size:18px;
+
+background:orange;
+color:black;
+
+text-decoration:none;
+border-radius:40px;
+
+transition:0.3s;
+}
+
+.hero-button:hover{
+background:white;
+transform:scale(1.05);
+}
+
+/* FADE ANIMATION */
+
+@keyframes fadeUp{
+
+0%{
+opacity:0;
+transform:translateY(40px);
+}
+
+100%{
+opacity:1;
+transform:translateY(0);
+}
+
+}
