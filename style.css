@@ -85,6 +85,16 @@ url("images/vietnam-hero.png");
 background-size:cover;
 background-position:center;
 background-repeat:no-repeat;
+
+background-attachment:fixed;
+
+transition:background-size 1.2s ease;
+}
+
+/* Scroll zoom */
+
+.hero.zoomed{
+background-size:110%;
 }
 
 /* TITLE CARD */
@@ -240,6 +250,8 @@ url("images/vietnam-hero-mobile.png");
 background-size:120%;
 background-position:center center;
 background-repeat:no-repeat;
+
+background-attachment:scroll;
 
 animation:heroZoomMobile 25s ease-in-out infinite alternate;
 }
