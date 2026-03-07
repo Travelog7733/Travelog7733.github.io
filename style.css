@@ -476,3 +476,19 @@ background:rgba(255,255,255,0.35);
 transform:scale(1.08);
 
 }
+
+.footer-links{
+margin-top:15px;
+font-size:14px;
+}
+
+.footer-links a{
+color:#fff;
+margin:0 10px;
+text-decoration:none;
+opacity:0.8;
+}
+
+.footer-links a:hover{
+opacity:1;
+}
