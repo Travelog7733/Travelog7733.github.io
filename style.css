@@ -34,6 +34,7 @@ z-index:2000;
 .top-menu{
 position:fixed;
 top:0;
+left:0;
 width:100%;
 display:flex;
 justify-content:center;
@@ -49,6 +50,7 @@ z-index:1000;
 
 .menu-links{
 display:flex;
+align-items:center;
 }
 
 .menu-links a{
@@ -56,6 +58,7 @@ margin:0 18px;
 text-decoration:none;
 color:white;
 font-size:16px;
+transition:0.3s;
 }
 
 .menu-links a:hover{
@@ -74,6 +77,8 @@ text-align:center;
 padding:0 20px;
 }
 
+/* title */
+
 .animated-title{
 font-size:52px;
 letter-spacing:4px;
@@ -81,6 +86,8 @@ background:rgba(0,0,0,0.35);
 padding:30px 60px;
 border-radius:14px;
 }
+
+/* subtitle */
 
 .subtitle{
 margin-top:20px;
@@ -160,38 +167,27 @@ right:20px;
 
 @media(max-width:768px){
 
+/* navbar */
+
 .top-menu{
 justify-content:space-between;
-padding:15px 20px;
+padding:14px 20px;
 }
 
-/* hero text resize */
-
-.animated-title{
-font-size:32px;
-padding:20px 25px;
-letter-spacing:2px;
-}
-
-.subtitle{
-font-size:16px;
-padding:0 10px;
-}
-
-/* menu button visible */
+/* hamburger */
 
 .menu-toggle{
 display:block;
 }
 
-/* mobile dropdown */
+/* dropdown menu */
 
 .menu-links{
 display:none;
 flex-direction:column;
 background:black;
 position:absolute;
-top:65px;
+top:60px;
 left:0;
 width:100%;
 text-align:center;
@@ -199,14 +195,48 @@ text-align:center;
 
 .menu-links a{
 padding:14px;
-display:block;
 border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
-/* toggle active */
-
 .menu-links.active{
 display:flex;
+}
+
+/* HERO FIX */
+
+.hero{
+height:auto;
+padding-top:120px;
+padding-bottom:60px;
+}
+
+/* title resize */
+
+.animated-title{
+font-size:30px;
+padding:18px 22px;
+letter-spacing:2px;
+}
+
+/* subtitle */
+
+.subtitle{
+font-size:15px;
+padding:0 15px;
+}
+
+/* button */
+
+.book-btn{
+font-size:15px;
+padding:14px 28px;
+}
+
+/* icon */
+
+.site-icon{
+width:38px;
+top:12px;
 }
 
 }
