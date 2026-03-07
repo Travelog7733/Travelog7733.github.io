@@ -346,3 +346,17 @@ transform:translateY(0);
 }
 
 }
+
+p a{
+    text-decoration: none;
+    color: #333;
+}
+
+p a:hover{
+    color: #0a6cff;
+}
+
+p i{
+    margin-right: 8px;
+    color: #0a6cff;
+}
