@@ -420,3 +420,60 @@ box-shadow:0 15px 35px rgba(0,0,0,0.5);
 opacity:1;
 transform:scale(1);
 }
+
+/* DESTINATION TILE AREA */
+
+.destination-tiles{
+width:360px;
+height:420px;
+position:relative;
+}
+
+/* TILE CARD */
+
+.tile-card{
+position:absolute;
+width:100%;
+text-align:center;
+opacity:0;
+transform:scale(0.9);
+transition:all 1s ease;
+}
+
+/* IMAGE */
+
+.tile-card img{
+width:360px;
+height:360px;
+object-fit:cover;
+border-radius:24px;
+box-shadow:0 15px 35px rgba(0,0,0,0.5);
+}
+
+/* DESTINATION NAME */
+
+.tile-name{
+margin-top:12px;
+padding:10px 22px;
+display:inline-block;
+
+background:rgba(0,0,0,0.45);
+backdrop-filter:blur(8px);
+
+border-radius:14px;
+
+font-size:18px;
+letter-spacing:1px;
+font-weight:600;
+
+font-family: "Trebuchet MS", sans-serif;
+
+border:1px solid rgba(255,255,255,0.2);
+}
+
+/* ACTIVE TILE */
+
+.tile-card.active{
+opacity:1;
+transform:scale(1);
+}
