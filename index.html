@@ -58,25 +58,19 @@ Your trusted travel partner for Vietnam tours
 BOOK YOUR TRIP NOW
 </a>
 
-<!-- TRAVELOG DETAILS -->
+<!-- DESTINATION CHIPS -->
 
 <div class="destination-chips">
 
-<span>Vietnam</span>
-<span>Thailand</span>
-<span>Malaysia</span>
-<span>Bali</span>
-<span>Dubai</span>
-<span>Hong Kong</span>
-<span>Kazakhstan</span>
+<span>Vietnam</span> <span>Thailand</span> <span>Malaysia</span> <span>Bali</span> <span>Dubai</span> <span>Hong Kong</span> <span>Kazakhstan</span>
 
 </div>
 
+<!-- PACKAGE CHIPS -->
+
 <div class="package-chips">
 
-<span>Customized Holidays</span>
-<span>Group Tours</span>
-<span>Honeymoon Packages</span>
+<span>Customized Holidays</span> <span>Group Tours</span> <span>Honeymoon Packages</span>
 
 </div>
 
@@ -212,6 +206,31 @@ hero.classList.remove("zoomed");
 
 </script>
 
+<!-- DESTINATION TILE SLIDER -->
+
+<script>
+
+const tiles = document.querySelectorAll(".tile-card");
+
+let currentTile = 0;
+
+function rotateTiles(){
+
+tiles[currentTile].classList.remove("active");
+
+currentTile++;
+
+if(currentTile >= tiles.length){
+currentTile = 0;
+}
+
+tiles[currentTile].classList.add("active");
+
+}
+
+setInterval(rotateTiles, 3500);
+
+</script>
+
 </body>
 </html>
-
