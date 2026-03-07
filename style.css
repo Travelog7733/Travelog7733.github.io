@@ -447,24 +447,32 @@ gap:12px;
 
 .package-chips span{
 
-padding:9px 20px;
+padding:10px 22px;
 
-background:rgba(255,152,0,0.85);
+background:rgba(255,255,255,0.18);
+
+backdrop-filter:blur(8px);
 
 border-radius:30px;
 
 font-weight:600;
 
-font-size:14px;
+font-size:15px;
 
 color:white;
 
-box-shadow:0 5px 18px rgba(0,0,0,0.4);
+border:1px solid rgba(255,255,255,0.35);
+
+box-shadow:0 8px 20px rgba(0,0,0,0.35);
 
 transition:0.3s;
 
 }
 
 .package-chips span:hover{
-transform:scale(1.06);
+
+background:rgba(255,255,255,0.35);
+
+transform:scale(1.08);
+
 }
