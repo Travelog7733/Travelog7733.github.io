@@ -274,6 +274,7 @@ top:16px;
 }
 
 }
+
 @keyframes heroZoomMobile{
 
 0%{
@@ -286,79 +287,7 @@ background-size:140%;
 
 }
 
-}
-
-.travelog-details{
-margin-top:80px;
-max-width:900px;
-text-align:center;
-}
-
-.travelog-details h2{
-font-size:34px;
-margin-top:20px;
-}
-
-.travelog-details h3{
-margin-top:25px;
-}
-
-.travelog-details p{
-margin-top:12px;
-line-height:1.6;
-}
-
-.destinations{
-font-weight:bold;
-color:#ffb300;
-}
-
-.packages{
-font-style:italic;
-}
-
-.start-btn{
-display:inline-block;
-margin-top:20px;
-padding:12px 26px;
-background:#ff9800;
-color:white;
-text-decoration:none;
-border-radius:8px;
-font-weight:bold;
-}
-
-.services,
-.why{
-margin-top:15px;
-text-align:left;
-display:inline-block;
-}
-
-.destination-slider{
-margin-top:30px;
-width:100%;
-max-width:500px;
-height:300px;
-position:relative;
-overflow:hidden;
-border-radius:14px;
-margin-left:auto;
-margin-right:auto;
-}
-
-.slide{
-position:absolute;
-width:100%;
-height:100%;
-object-fit:cover;
-opacity:0;
-transition:opacity 1.2s;
-}
-
-.slide.active{
-opacity:1;
-}
+/* TRAVELOG CONTENT */
 
 .travelog-layout{
 display:flex;
@@ -385,7 +314,6 @@ margin-bottom:30px;
 margin-bottom:8px;
 }
 
-
 /* RIGHT SIDE */
 
 .travelog-right{
@@ -394,38 +322,11 @@ justify-content:center;
 align-items:center;
 }
 
-/* DESTINATION TILE */
-
-.destination-tiles{
-width:360px;
-height:360px;
-position:relative;
-}
-
-/* IMAGE TILE */
-
-.tile{
-position:absolute;
-width:100%;
-height:100%;
-object-fit:cover;
-border-radius:24px;
-opacity:0;
-transform:scale(0.9);
-transition:all 1s ease;
-box-shadow:0 15px 35px rgba(0,0,0,0.5);
-}
-
-.tile.active{
-opacity:1;
-transform:scale(1);
-}
-
 /* DESTINATION TILE AREA */
 
 .destination-tiles{
 width:360px;
-height:420px;
+height:430px;
 position:relative;
 }
 
@@ -436,7 +337,7 @@ position:absolute;
 width:100%;
 text-align:center;
 opacity:0;
-transform:scale(0.9);
+transform:scale(0.92);
 transition:all 1s ease;
 }
 
@@ -447,28 +348,42 @@ width:360px;
 height:360px;
 object-fit:cover;
 border-radius:24px;
-box-shadow:0 15px 35px rgba(0,0,0,0.5);
+box-shadow:0 20px 45px rgba(0,0,0,0.6);
+transition:transform 6s ease;
+}
+
+/* ZOOM EFFECT */
+
+.tile-card.active img{
+transform:scale(1.08);
 }
 
 /* DESTINATION NAME */
 
 .tile-name{
-margin-top:12px;
-padding:10px 22px;
+
+margin-top:14px;
+
 display:inline-block;
 
-background:rgba(0,0,0,0.45);
-backdrop-filter:blur(8px);
+padding:10px 26px;
 
-border-radius:14px;
+background:rgba(255,255,255,0.12);
 
-font-size:18px;
+backdrop-filter:blur(10px);
+
+border-radius:20px;
+
+font-size:19px;
 letter-spacing:1px;
 font-weight:600;
 
-font-family: "Trebuchet MS", sans-serif;
+font-family:"Trebuchet MS", Arial, sans-serif;
 
-border:1px solid rgba(255,255,255,0.2);
+border:1px solid rgba(255,255,255,0.25);
+
+box-shadow:0 6px 20px rgba(0,0,0,0.4);
+
 }
 
 /* ACTIVE TILE */
