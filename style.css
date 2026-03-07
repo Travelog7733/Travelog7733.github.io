@@ -68,57 +68,90 @@ color:#ffb300;
 /* HERO */
 
 .hero{
-height:75vh;
+
+min-height:80vh;
+
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
+
 text-align:center;
-padding:0 20px;
+
+padding:120px 20px 80px 20px;
+
+background-image:
+linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),
+url("images/vietnam-hero.jpg");
+
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+
 }
 
-/* title */
+/* TITLE CARD */
 
 .animated-title{
+
 font-size:52px;
 letter-spacing:4px;
-background:rgba(0,0,0,0.35);
+
 padding:30px 60px;
-border-radius:14px;
+
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(12px);
+
+border-radius:16px;
+
+border:1px solid rgba(255,255,255,0.2);
+
+box-shadow:0 15px 40px rgba(0,0,0,0.4);
+
 }
 
 /* subtitle */
 
 .subtitle{
-margin-top:20px;
+margin-top:25px;
 font-size:18px;
-opacity:0.9;
+opacity:0.95;
+max-width:600px;
 }
 
 /* BOOK BUTTON */
 
 .book-btn{
-margin-top:30px;
+
+margin-top:35px;
+
 padding:16px 36px;
+
 background:linear-gradient(45deg,#ff9800,#ffb300);
+
 color:white;
 font-weight:bold;
 font-size:16px;
+
 border-radius:10px;
 text-decoration:none;
+
 transition:0.3s;
+
 box-shadow:0 5px 20px rgba(0,0,0,0.4);
-animation:pulse 2s infinite;
+
+animation:pulse 2.2s infinite;
+
 }
 
 .book-btn:hover{
 transform:scale(1.08);
-box-shadow:0 8px 25px rgba(0,0,0,0.5);
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
 @keyframes pulse{
 0%{transform:scale(1);}
-50%{transform:scale(1.05);}
+50%{transform:scale(1.06);}
 100%{transform:scale(1);}
 }
 
@@ -163,24 +196,18 @@ position:absolute;
 right:20px;
 }
 
-/* MOBILE STYLES */
+/* MOBILE */
 
 @media(max-width:768px){
-
-/* navbar */
 
 .top-menu{
 justify-content:space-between;
 padding:14px 20px;
 }
 
-/* hamburger */
-
 .menu-toggle{
 display:block;
 }
-
-/* dropdown menu */
 
 .menu-links{
 display:none;
@@ -202,15 +229,15 @@ border-bottom:1px solid rgba(255,255,255,0.1);
 display:flex;
 }
 
-/* HERO FIX */
+/* hero mobile */
 
 .hero{
-height:auto;
-padding-top:120px;
+min-height:75vh;
+padding-top:110px;
 padding-bottom:60px;
 }
 
-/* title resize */
+/* title */
 
 .animated-title{
 font-size:30px;
