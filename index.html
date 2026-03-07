@@ -12,6 +12,10 @@
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="images/icon.png" type="image/png">
 
+<!-- Google Font -->
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
@@ -139,7 +143,7 @@ BOOK YOUR TRIP NOW
 </div>
 
 <div class="tile-card">
-<img src="images/kazakhstan.png" alt="Kazakhstan Tour" loading="lazy">
+<img src="images/kazakhstan.png" alt="Kazakistan Tour" loading="lazy">
 <div class="tile-name">Kazakistan</div>
 </div>
 
@@ -165,7 +169,7 @@ Travelog © 2026 All Rights Reserved
 
 </footer>
 
-<!-- FLOATING WHATSAPP -->
+<!-- WHATSAPP FLOAT -->
 
 <a href="https://wa.me/917994256121" class="whatsapp-float" target="_blank">
 <img src="images/whatsapp.png" alt="WhatsApp Chat">
@@ -188,13 +192,15 @@ menu.classList.toggle("active");
 
 </script>
 
-<!-- HERO ZOOM ON SCROLL -->
+<!-- HERO ZOOM EFFECT -->
 
 <script>
 
 window.addEventListener("scroll", function(){
 
 const hero = document.querySelector(".hero");
+
+if(!hero) return;
 
 if(window.scrollY > 60){
 hero.classList.add("zoomed");
@@ -209,6 +215,8 @@ hero.classList.remove("zoomed");
 <!-- DESTINATION TILE SLIDER -->
 
 <script>
+
+document.addEventListener("DOMContentLoaded", function(){
 
 const tiles = document.querySelectorAll(".tile-card");
 
@@ -230,7 +238,10 @@ tiles[currentTile].classList.add("active");
 
 setInterval(rotateTiles, 3500);
 
+});
+
 </script>
 
 </body>
 </html>
+
