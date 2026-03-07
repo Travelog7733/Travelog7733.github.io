@@ -237,8 +237,8 @@ background-image:
 linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
 url("images/vietnam-hero-mobile.png");
 
-background-size:105%;
-background-position:center;
+background-size:120%;
+background-position:center center;
 background-repeat:no-repeat;
 
 animation:heroZoomMobile 25s ease-in-out infinite alternate;
@@ -277,11 +277,13 @@ top:12px;
 @keyframes heroZoomMobile{
 
 0%{
-background-size:105%;
+background-size:120%;
 }
 
 100%{
-background-size:120%;
+background-size:140%;
+}
+
 }
 
 }
