@@ -360,3 +360,66 @@ p i{
     margin-right: 8px;
     color: #0a6cff;
 }
+/* ================= MOBILE MENU ================= */
+
+.menu-toggle{
+display:none;
+font-size:28px;
+color:white;
+cursor:pointer;
+position:absolute;
+right:20px;
+top:18px;
+}
+
+/* menu container */
+
+.menu-links{
+display:flex;
+justify-content:center;
+align-items:center;
+flex-wrap:wrap;
+}
+
+/* ================= MOBILE RESPONSIVE ================= */
+
+@media (max-width:768px){
+
+.menu-toggle{
+display:block;
+}
+
+/* hide normal menu */
+
+.menu-links{
+display:none;
+flex-direction:column;
+
+position:absolute;
+top:60px;
+left:0;
+
+width:100%;
+
+background:rgba(0,0,0,0.95);
+
+padding:20px 0;
+}
+
+/* menu links */
+
+.menu-links a{
+
+display:block;
+padding:14px;
+font-size:18px;
+
+}
+
+/* when menu active */
+
+.menu-links.active{
+display:flex;
+}
+
+}
