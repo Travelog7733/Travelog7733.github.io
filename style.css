@@ -221,9 +221,7 @@ box-shadow:0 18px 40px rgba(0,0,0,0.7);
 
 footer{
 
-position:fixed;
-bottom:0;
-left:0;
+position:relative;
 
 width:100%;
 
@@ -234,6 +232,8 @@ backdrop-filter:blur(6px);
 border-top:1px solid rgba(255,255,255,0.1);
 
 padding:18px;
+
+margin-top:60px;
 
 }
 
