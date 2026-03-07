@@ -98,7 +98,6 @@ Customized Holidays | Group Tours | Honeymoon Packages
 
 </div>
 
-
 <div class="travelog-right">
 
 <div class="destination-tiles">
@@ -156,7 +155,6 @@ menu.classList.toggle("active");
 
 </script>
 
-
 <!-- DESTINATION SLIDER SCRIPT -->
 
 <script>
@@ -179,6 +177,31 @@ slides[index].classList.add("active");
 }
 
 setInterval(showSlide, 3500);
+
+</script>
+
+<!-- DESTINATION TILE ANIMATION -->
+
+<script>
+
+let tiles = document.querySelectorAll(".tile");
+let t = 0;
+
+function changeTile(){
+
+tiles.forEach(tile => tile.classList.remove("active"));
+
+t++;
+
+if(t >= tiles.length){
+t = 0;
+}
+
+tiles[t].classList.add("active");
+
+}
+
+setInterval(changeTile, 3500);
 
 </script>
 
