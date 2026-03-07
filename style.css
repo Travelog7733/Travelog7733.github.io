@@ -396,3 +396,75 @@ box-shadow:0 6px 20px rgba(0,0,0,0.4);
 opacity:1;
 transform:scale(1);
 }
+
+/* DESTINATION CHIPS */
+
+.destination-chips{
+margin-top:25px;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:12px;
+}
+
+.destination-chips span{
+
+padding:8px 18px;
+
+background:rgba(255,255,255,0.15);
+
+backdrop-filter:blur(8px);
+
+border-radius:30px;
+
+font-size:14px;
+
+letter-spacing:0.5px;
+
+border:1px solid rgba(255,255,255,0.25);
+
+box-shadow:0 5px 15px rgba(0,0,0,0.35);
+
+transition:0.3s;
+
+}
+
+.destination-chips span:hover{
+background:rgba(255,179,0,0.9);
+color:black;
+transform:scale(1.05);
+}
+
+/* PACKAGE CHIPS */
+
+.package-chips{
+margin-top:18px;
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:12px;
+}
+
+.package-chips span{
+
+padding:9px 20px;
+
+background:rgba(255,152,0,0.85);
+
+border-radius:30px;
+
+font-weight:600;
+
+font-size:14px;
+
+color:white;
+
+box-shadow:0 5px 18px rgba(0,0,0,0.4);
+
+transition:0.3s;
+
+}
+
+.package-chips span:hover{
+transform:scale(1.06);
+}
