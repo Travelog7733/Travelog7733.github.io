@@ -232,6 +232,14 @@ display:flex;
 min-height:75vh;
 padding-top:110px;
 padding-bottom:60px;
+
+background-image:
+linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+url("images/vietnam-hero-mobile.png");
+
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
 }
 
 /* title */
