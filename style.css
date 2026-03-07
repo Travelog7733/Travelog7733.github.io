@@ -1,4 +1,4 @@
-{
+*{
 margin:0;
 padding:0;
 box-sizing:border-box;
@@ -6,14 +6,11 @@ font-family:Arial, sans-serif;
 }
 
 body{
-
 background:linear-gradient(120deg,#052a4f,#a45a2a);
 color:white;
-
 display:flex;
 flex-direction:column;
 min-height:100vh;
-
 }
 
 /* page wrapper pushes footer down */
@@ -25,58 +22,40 @@ flex:1;
 /* SITE ICON */
 
 .site-icon{
-
 position:fixed;
 top:15px;
 left:20px;
 width:45px;
 z-index:2000;
-
 }
 
-/* NAV MENU */
+/* MENU */
 
 .top-menu{
-
 position:fixed;
 top:0;
-left:0;
 width:100%;
-
 display:flex;
 justify-content:center;
 align-items:center;
-
 padding:18px;
-
 background:rgba(0,0,0,0.35);
 backdrop-filter:blur(12px);
-
 border-bottom:1px solid rgba(255,255,255,0.15);
-
 z-index:1000;
-
 }
 
-/* MENU LINKS CONTAINER */
+/* menu links */
 
 .menu-links{
-
 display:flex;
-align-items:center;
-
 }
 
-/* MENU LINKS */
-
 .menu-links a{
-
 margin:0 18px;
 text-decoration:none;
 color:white;
 font-size:16px;
-transition:0.3s;
-
 }
 
 .menu-links a:hover{
@@ -86,87 +65,62 @@ color:#ffb300;
 /* HERO */
 
 .hero{
-
 height:75vh;
-
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-
 text-align:center;
-
-margin-top:80px;
-
+padding:0 20px;
 }
 
 .animated-title{
-
 font-size:52px;
 letter-spacing:4px;
-
 background:rgba(0,0,0,0.35);
 padding:30px 60px;
 border-radius:14px;
-
 }
 
 .subtitle{
-
 margin-top:20px;
 font-size:18px;
 opacity:0.9;
-
 }
 
 /* BOOK BUTTON */
 
 .book-btn{
-
 margin-top:30px;
-
 padding:16px 36px;
-
 background:linear-gradient(45deg,#ff9800,#ffb300);
-
 color:white;
 font-weight:bold;
 font-size:16px;
-
 border-radius:10px;
 text-decoration:none;
-
 transition:0.3s;
 box-shadow:0 5px 20px rgba(0,0,0,0.4);
-
 animation:pulse 2s infinite;
-
 }
 
 .book-btn:hover{
-
 transform:scale(1.08);
 box-shadow:0 8px 25px rgba(0,0,0,0.5);
-
 }
 
 @keyframes pulse{
-
 0%{transform:scale(1);}
 50%{transform:scale(1.05);}
 100%{transform:scale(1);}
-
 }
 
 /* FOOTER */
 
 footer{
-
 background:black;
 text-align:center;
-
 padding:25px 10px;
-
 }
 
 .site-logo{
@@ -182,66 +136,77 @@ opacity:0.8;
 /* WHATSAPP FLOAT */
 
 .whatsapp-float{
-
 position:fixed;
 bottom:20px;
 right:20px;
-
 }
 
 .whatsapp-float img{
 width:55px;
 }
 
-/* HAMBURGER ICON */
+/* MOBILE MENU BUTTON */
 
 .menu-toggle{
 display:none;
-font-size:26px;
+font-size:28px;
 cursor:pointer;
 color:white;
 position:absolute;
 right:20px;
 }
 
-/* MOBILE */
+/* MOBILE STYLES */
 
 @media(max-width:768px){
+
+.top-menu{
+justify-content:space-between;
+padding:15px 20px;
+}
+
+/* hero text resize */
+
+.animated-title{
+font-size:32px;
+padding:20px 25px;
+letter-spacing:2px;
+}
+
+.subtitle{
+font-size:16px;
+padding:0 10px;
+}
+
+/* menu button visible */
+
+.menu-toggle{
+display:block;
+}
+
+/* mobile dropdown */
 
 .menu-links{
 display:none;
 flex-direction:column;
 background:black;
 position:absolute;
-top:60px;
-width:100%;
+top:65px;
 left:0;
+width:100%;
+text-align:center;
 }
 
 .menu-links a{
 padding:14px;
 display:block;
+border-bottom:1px solid rgba(255,255,255,0.1);
 }
+
+/* toggle active */
 
 .menu-links.active{
 display:flex;
-}
-
-.menu-toggle{
-display:block;
-}
-
-.animated-title{
-font-size:32px;
-padding:20px 30px;
-}
-
-.subtitle{
-font-size:16px;
-}
-
-.site-icon{
-width:40px;
 }
 
 }
