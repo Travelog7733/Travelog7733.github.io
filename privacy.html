@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -6,18 +7,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Travelog</title>
+<title>Privacy Policy | Travelog</title>
 
 <link rel="stylesheet" href="style.css">
+<link rel="icon" href="images/icon.png" type="image/png">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 </head>
 
 <body>
 
+<div class="page-wrapper">
+
+<!-- SITE ICON -->
+
+<a href="index.html">
+<img src="images/icon.png" class="site-icon" alt="Travelog Icon">
+</a>
+
 <!-- TOP MENU -->
-<div class="top-menu">
+
+<nav class="top-menu">
+
+<div class="menu-toggle">☰</div>
+
+<div class="menu-links">
 <a href="index.html">Home</a>
 <a href="gallery.html">Gallery</a>
 <a href="packages.html">Packages</a>
@@ -27,21 +42,37 @@
 <a href="privacy.html">Privacy</a>
 </div>
 
-<!-- HERO TITLE -->
-<div class="hero">
-<h1 class="animated-title">Privacy Policy</h1>
-</div>
+</nav>
+
+<!-- HERO -->
+
+<section class="hero">
+
+<h1 class="animated-title">
+Privacy Policy
+</h1>
+
+<p class="subtitle">
+Your privacy and data protection are important to us
+</p>
+
+</section>
 
 <!-- CONTENT -->
-<div style="max-width:900px;margin:auto;padding:40px;text-align:left;line-height:1.8;">
+
+<section class="packages">
+
+<div style="max-width:900px;margin:auto;text-align:left;line-height:1.8;">
 
 <h2>Introduction</h2>
+
 <p>
 Travelog respects your privacy and is committed to protecting your personal information.
 This policy explains how we collect, use, and safeguard your data when you use our website or travel services.
 </p>
 
 <h2>Information We Collect</h2>
+
 <p>We may collect the following information:</p>
 
 <ul>
@@ -53,6 +84,7 @@ This policy explains how we collect, use, and safeguard your data when you use o
 </ul>
 
 <h2>How We Use Your Information</h2>
+
 <p>Your information may be used to:</p>
 
 <ul>
@@ -63,6 +95,7 @@ This policy explains how we collect, use, and safeguard your data when you use o
 </ul>
 
 <h2>Data Protection</h2>
+
 <p>
 Travelog uses appropriate security measures to protect your personal information
 from unauthorized access, misuse, or disclosure.
@@ -81,22 +114,45 @@ Phone: +91 7994256121
 
 </div>
 
+</section>
+
+</div>
+
 <!-- FOOTER -->
 
 <footer>
 
-<img src="images/logo.png" class="site-logo">
+<img src="images/logo.png" class="site-logo" alt="Travelog Logo">
 
-<p class="tagline">Beyond Boundaries</p>
-
-<p style="font-size:14px;margin-top:10px;">
-<a href="privacy.html">Privacy Policy</a> |
-<a href="terms.html">Terms</a> |
-<a href="cancellation.html">Cancellation</a> |
-<a href="refund.html">Refund</a>
-</p>
+<div class="tagline">
+Travelog © 2026 All Rights Reserved
+</div>
 
 </footer>
 
+<!-- WHATSAPP FLOAT -->
+
+<a href="https://wa.me/917994256121" class="whatsapp-float" target="_blank">
+<img src="images/whatsapp.png" alt="WhatsApp Chat">
+</a>
+
+<!-- MOBILE MENU SCRIPT -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+const toggle = document.querySelector(".menu-toggle");
+const menu = document.querySelector(".menu-links");
+
+toggle.addEventListener("click", function(){
+menu.classList.toggle("active");
+});
+
+});
+
+</script>
+
 </body>
 </html>
+
