@@ -186,28 +186,21 @@ menu.classList.toggle("active");
 
 </script>
 
-<!-- DESTINATION TILE ANIMATION -->
+<!-- HERO ZOOM ON SCROLL -->
 
 <script>
 
-let tiles = document.querySelectorAll(".tile-card");
-let t = 0;
+window.addEventListener("scroll", function(){
 
-function changeTile(){
+const hero = document.querySelector(".hero");
 
-tiles.forEach(tile => tile.classList.remove("active"));
-
-t++;
-
-if(t >= tiles.length){
-t = 0;
+if(window.scrollY > 60){
+hero.classList.add("zoomed");
+}else{
+hero.classList.remove("zoomed");
 }
 
-tiles[t].classList.add("active");
-
-}
-
-setInterval(changeTile, 3500);
+});
 
 </script>
 
