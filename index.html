@@ -74,6 +74,8 @@ Customized Holidays | Group Tours | Honeymoon Packages
 
 <div class="travelog-layout">
 
+<!-- LEFT SIDE -->
+
 <div class="travelog-left">
 
 <h3>Our Services</h3>
@@ -97,6 +99,10 @@ Customized Holidays | Group Tours | Honeymoon Packages
 </ul>
 
 </div>
+
+<!-- RIGHT SIDE -->
+
+<div class="travelog-right">
 
 <div class="destination-tiles">
 
@@ -136,7 +142,11 @@ Customized Holidays | Group Tours | Honeymoon Packages
 </div>
 
 </div>
-  
+
+</div>
+
+</div>
+
 </section>
 
 </div>
@@ -173,31 +183,6 @@ menu.classList.toggle("active");
 });
 
 });
-
-</script>
-
-<!-- DESTINATION SLIDER SCRIPT -->
-
-<script>
-
-let slides = document.querySelectorAll(".slide");
-let index = 0;
-
-function showSlide(){
-
-slides.forEach(slide => slide.classList.remove("active"));
-
-index++;
-
-if(index >= slides.length){
-index = 0;
-}
-
-slides[index].classList.add("active");
-
-}
-
-setInterval(showSlide, 3500);
 
 </script>
 
