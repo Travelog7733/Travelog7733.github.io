@@ -69,28 +69,6 @@ transition:0.3s;
 color:#ffb300;
 }
 
-/* HEADER BOOK BUTTON */
-
-.header-book-btn{
-position:absolute;
-right:25px;
-top:50%;
-transform:translateY(-50%);
-background:#ff9800;
-color:white;
-padding:9px 20px;
-border-radius:25px;
-text-decoration:none;
-font-weight:600;
-transition:0.3s;
-box-shadow:0 0 12px rgba(255,152,0,0.5);
-}
-
-.header-book-btn:hover{
-background:#ff7a00;
-transform:translateY(-50%) scale(1.05);
-}
-
 /* HERO */
 
 .hero{
@@ -138,10 +116,13 @@ transform:scale(1.08);
 font-size:52px;
 letter-spacing:4px;
 padding:30px 60px;
+
 background:rgba(255,255,255,0.08);
 backdrop-filter:blur(12px);
+
 border-radius:16px;
 border:1px solid rgba(255,255,255,0.2);
+
 box-shadow:0 15px 40px rgba(0,0,0,0.4);
 }
 
@@ -154,19 +135,25 @@ opacity:0.95;
 max-width:600px;
 }
 
-/* BOOK BUTTON (HOME PAGE) */
+/* BOOK BUTTON */
 
 .book-btn{
 margin-top:35px;
 padding:16px 36px;
+
 background:linear-gradient(45deg,#ff9800,#ffb300);
 color:white;
+
 font-weight:bold;
 font-size:16px;
+
 border-radius:10px;
 text-decoration:none;
+
 transition:0.3s;
+
 box-shadow:0 5px 20px rgba(0,0,0,0.4);
+
 animation:pulse 2.2s infinite;
 }
 
@@ -240,6 +227,175 @@ position:absolute;
 right:20px;
 }
 
+/* TRAVELOG LAYOUT */
+
+.travelog-layout{
+display:flex;
+align-items:flex-start;
+justify-content:center;
+gap:80px;
+margin-top:40px;
+flex-wrap:wrap;
+}
+
+/* LEFT SIDE */
+
+.travelog-left{
+max-width:400px;
+text-align:left;
+}
+
+.travelog-left ul{
+margin-top:10px;
+margin-bottom:30px;
+}
+
+.travelog-left li{
+margin-bottom:8px;
+}
+
+/* RIGHT SIDE */
+
+.travelog-right{
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* DESTINATION TILES */
+
+.destination-tiles{
+width:360px;
+height:430px;
+position:relative;
+}
+
+/* TILE CARD */
+
+.tile-card{
+position:absolute;
+width:100%;
+text-align:center;
+opacity:0;
+transform:scale(0.92);
+transition:all 1s ease;
+}
+
+.tile-card.active{
+opacity:1;
+transform:scale(1);
+}
+
+/* TILE IMAGE */
+
+.tile-card img{
+width:360px;
+height:360px;
+object-fit:cover;
+border-radius:24px;
+box-shadow:0 20px 45px rgba(0,0,0,0.6);
+transition:transform 6s ease;
+}
+
+.tile-card.active img{
+transform:scale(1.08);
+}
+
+/* TILE NAME */
+
+.tile-name{
+margin-top:14px;
+
+display:inline-block;
+
+padding:10px 26px;
+
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(10px);
+
+border-radius:20px;
+
+font-size:19px;
+letter-spacing:1px;
+font-weight:600;
+
+font-family:"Trebuchet MS", Arial, sans-serif;
+
+border:1px solid rgba(255,255,255,0.25);
+
+box-shadow:0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* DESTINATION CHIPS */
+
+.destination-chips{
+margin-top:25px;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:12px;
+}
+
+.destination-chips span{
+padding:8px 18px;
+
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(8px);
+
+border-radius:30px;
+
+font-size:14px;
+
+letter-spacing:0.5px;
+
+border:1px solid rgba(255,255,255,0.25);
+
+box-shadow:0 5px 15px rgba(0,0,0,0.35);
+
+transition:0.3s;
+}
+
+.destination-chips span:hover{
+background:rgba(255,179,0,0.9);
+color:black;
+transform:scale(1.05);
+}
+
+/* PACKAGE CHIPS */
+
+.package-chips{
+margin-top:18px;
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:12px;
+}
+
+.package-chips span{
+padding:10px 22px;
+
+background:rgba(255,255,255,0.18);
+backdrop-filter:blur(8px);
+
+border-radius:30px;
+
+font-weight:600;
+font-size:15px;
+
+color:white;
+
+border:1px solid rgba(255,255,255,0.35);
+
+box-shadow:0 8px 20px rgba(0,0,0,0.35);
+
+transition:0.3s;
+}
+
+.package-chips span:hover{
+background:rgba(255,255,255,0.35);
+transform:scale(1.08);
+}
+
 /* MOBILE */
 
 @media(max-width:768px){
@@ -310,4 +466,20 @@ width:38px;
 top:16px;
 }
 
+}
+
+.header-book-btn{
+background:#ff9800;
+color:white;
+padding:8px 18px;
+border-radius:25px;
+text-decoration:none;
+font-weight:600;
+margin-left:20px;
+transition:0.3s;
+}
+
+.header-book-btn:hover{
+background:#ff7a00;
+transform:translateY(-2px);
 }
