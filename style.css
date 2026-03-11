@@ -467,3 +467,19 @@ top:16px;
 }
 
 }
+
+.header-book-btn{
+background:#ff9800;
+color:white;
+padding:8px 18px;
+border-radius:25px;
+text-decoration:none;
+font-weight:600;
+margin-left:20px;
+transition:0.3s;
+}
+
+.header-book-btn:hover{
+background:#ff7a00;
+transform:translateY(-2px);
+}
