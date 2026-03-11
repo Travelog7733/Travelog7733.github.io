@@ -8,15 +8,15 @@ font-family:Arial, sans-serif;
 body{
 background:linear-gradient(120deg,#052a4f,#a45a2a);
 color:white;
-display:flex;
-flex-direction:column;
 min-height:100vh;
 }
 
-/* PAGE WRAPPER */
+/* page wrapper pushes footer down */
 
 .page-wrapper{
-flex:1;
+min-height:100vh;
+display:flex;
+flex-direction:column;
 }
 
 /* SITE ICON */
@@ -29,7 +29,7 @@ width:45px;
 z-index:2000;
 }
 
-/* TOP MENU */
+/* MENU */
 
 .top-menu{
 position:fixed;
@@ -45,6 +45,8 @@ backdrop-filter:blur(12px);
 border-bottom:1px solid rgba(255,255,255,0.15);
 z-index:1000;
 }
+
+/* menu links */
 
 .menu-links{
 display:flex;
@@ -71,15 +73,15 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 text-align:center;
-padding:120px 20px 80px 20px;
+padding:170px 20px 80px 20px;
 overflow:hidden;
 }
 
-/* BACKGROUND IMAGE */
+/* BACKGROUND */
 
 .hero::before{
 content:"";
-position:fixed;
+position:absolute;
 top:0;
 left:0;
 width:100%;
@@ -97,11 +99,13 @@ z-index:-1;
 transition:transform 1.2s ease;
 }
 
+/* SCROLL ZOOM */
+
 .hero.zoomed::before{
 transform:scale(1.08);
 }
 
-/* HERO TITLE */
+/* TITLE CARD */
 
 .animated-title{
 font-size:52px;
@@ -113,6 +117,8 @@ border-radius:16px;
 border:1px solid rgba(255,255,255,0.2);
 box-shadow:0 15px 40px rgba(0,0,0,0.4);
 }
+
+/* subtitle */
 
 .subtitle{
 margin-top:25px;
@@ -148,12 +154,163 @@ box-shadow:0 10px 30px rgba(0,0,0,0.5);
 100%{transform:scale(1);}
 }
 
+/* TRAVELOG CONTENT */
+
+.travelog-layout{
+display:flex;
+align-items:flex-start;
+justify-content:center;
+gap:80px;
+margin-top:50px;
+flex-wrap:wrap;
+}
+
+/* LEFT SIDE */
+
+.travelog-left{
+max-width:400px;
+text-align:left;
+}
+
+.travelog-left ul{
+margin-top:10px;
+margin-bottom:30px;
+}
+
+.travelog-left li{
+margin-bottom:8px;
+}
+
+/* RIGHT SIDE */
+
+.travelog-right{
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* DESTINATION TILE AREA */
+
+.destination-tiles{
+width:360px;
+height:430px;
+position:relative;
+}
+
+/* TILE CARD */
+
+.tile-card{
+position:absolute;
+width:100%;
+text-align:center;
+opacity:0;
+transform:scale(0.92);
+transition:all 1s ease;
+}
+
+/* IMAGE */
+
+.tile-card img{
+width:100%;
+height:360px;
+object-fit:cover;
+border-radius:24px;
+box-shadow:0 20px 45px rgba(0,0,0,0.6);
+transition:transform 6s ease;
+}
+
+/* ZOOM EFFECT */
+
+.tile-card.active img{
+transform:scale(1.08);
+}
+
+/* DESTINATION NAME */
+
+.tile-name{
+margin-top:14px;
+display:inline-block;
+padding:10px 26px;
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(10px);
+border-radius:20px;
+font-size:19px;
+letter-spacing:1px;
+font-weight:600;
+font-family:"Trebuchet MS", Arial, sans-serif;
+border:1px solid rgba(255,255,255,0.25);
+box-shadow:0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* ACTIVE TILE */
+
+.tile-card.active{
+opacity:1;
+transform:scale(1);
+}
+
+/* DESTINATION CHIPS */
+
+.destination-chips{
+margin-top:25px;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:12px;
+}
+
+.destination-chips span{
+padding:8px 18px;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(8px);
+border-radius:30px;
+font-size:14px;
+letter-spacing:0.5px;
+border:1px solid rgba(255,255,255,0.25);
+box-shadow:0 5px 15px rgba(0,0,0,0.35);
+transition:0.3s;
+}
+
+.destination-chips span:hover{
+background:rgba(255,179,0,0.9);
+color:black;
+transform:scale(1.05);
+}
+
+/* PACKAGE CHIPS */
+
+.package-chips{
+margin-top:18px;
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:12px;
+}
+
+.package-chips span{
+padding:10px 22px;
+background:rgba(255,255,255,0.18);
+backdrop-filter:blur(8px);
+border-radius:30px;
+font-weight:600;
+font-size:15px;
+color:white;
+border:1px solid rgba(255,255,255,0.35);
+box-shadow:0 8px 20px rgba(0,0,0,0.35);
+transition:0.3s;
+}
+
+.package-chips span:hover{
+background:rgba(255,255,255,0.35);
+transform:scale(1.08);
+}
+
 /* FOOTER */
 
 footer{
 background:black;
 text-align:center;
-padding:20px 10px;
+padding:10px 10px;
 }
 
 .site-logo{
@@ -164,6 +321,24 @@ margin-bottom:10px;
 .tagline{
 font-size:14px;
 opacity:0.8;
+}
+
+/* FOOTER LINKS */
+
+.footer-links{
+margin-top:15px;
+font-size:14px;
+}
+
+.footer-links a{
+color:#fff;
+margin:0 10px;
+text-decoration:none;
+opacity:0.8;
+}
+
+.footer-links a:hover{
+opacity:1;
 }
 
 /* WHATSAPP FLOAT */
@@ -178,7 +353,7 @@ right:20px;
 width:55px;
 }
 
-/* MOBILE MENU */
+/* MOBILE MENU BUTTON */
 
 .menu-toggle{
 display:none;
@@ -222,8 +397,6 @@ border-bottom:1px solid rgba(255,255,255,0.1);
 display:flex;
 }
 
-/* MOBILE HERO IMAGE */
-
 .hero::before{
 background-image:
 linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
@@ -251,129 +424,13 @@ width:38px;
 top:16px;
 }
 
-/* FIX PACKAGES SPACING ON MOBILE */
-
-.packages{
-margin:40px auto 60px auto;
+.destination-tiles{
+width:300px;
+height:380px;
 }
 
-.package-grid{
-grid-template-columns:1fr;
+.tile-card img{
+height:300px;
 }
 
-}
-
-/* PACKAGES PAGE */
-
-.packages{
-max-width:1200px;
-margin:-120px auto 60px auto;
-padding:0 20px;
-position:relative;
-z-index:5;
-}
-
-.section-title{
-text-align:center;
-font-size:36px;
-margin-bottom:40px;
-letter-spacing:1px;
-}
-
-.country-title{
-margin-top:40px;
-margin-bottom:25px;
-font-size:24px;
-text-align:left;
-}
-
-/* PACKAGE GRID */
-
-.package-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:35px;
-}
-
-/* PACKAGE CARD */
-
-.package-card{
-background:white;
-border-radius:20px;
-overflow:hidden;
-box-shadow:0 20px 45px rgba(0,0,0,0.35);
-transition:0.35s;
-display:flex;
-flex-direction:column;
-}
-
-.package-card:hover{
-transform:translateY(-10px) scale(1.02);
-box-shadow:0 30px 70px rgba(0,0,0,0.45);
-}
-
-/* SQUARE IMAGE TILE */
-
-.package-card img{
-width:100%;
-aspect-ratio:1/1;
-object-fit:cover;
-}
-
-/* CARD CONTENT */
-
-.package-info{
-padding:20px;
-display:flex;
-flex-direction:column;
-flex:1;
-color:#333;
-text-align:left;
-}
-
-.package-info h3{
-font-size:18px;
-margin-bottom:10px;
-}
-
-.package-info p{
-font-size:14px;
-line-height:1.5;
-margin-bottom:20px;
-}
-
-/* ENQUIRE BUTTON */
-
-.card-btn{
-margin-top:auto;
-background:linear-gradient(45deg,#ff9800,#ffb300);
-color:white;
-text-decoration:none;
-padding:12px;
-border-radius:8px;
-font-weight:600;
-text-align:center;
-transition:0.3s;
-}
-
-.card-btn:hover{
-transform:scale(1.05);
-}
-
-/* FOOTER LINKS */
-
-.footer-links{
-margin-top:15px;
-font-size:14px;
-}
-
-.footer-links a{
-color:#fff;
-margin:0 10px;
-text-decoration:none;
-opacity:0.8;
-}
-
-.footer-links a:hover{
-opacity:1;
 }
