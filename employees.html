@@ -54,14 +54,45 @@ padding:14px 30px;
 background:#ff7a00;
 color:#fff;
 text-decoration:none;
+border:none;
 border-radius:40px;
 font-weight:600;
+font-size:16px;
+cursor:pointer;
 transition:0.3s ease;
 }
 
 .employee-btn:hover{
 background:#e86e00;
 transform:translateY(-2px);
+}
+
+.password-input{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #ccc;
+font-size:16px;
+margin-bottom:15px;
+outline:none;
+box-sizing:border-box;
+}
+
+#error-msg{
+color:red;
+margin-top:15px;
+display:none;
+font-size:14px;
+}
+
+#password-section{
+display:none;
+margin-top:25px;
+}
+
+#itinerary-section{
+display:none;
+margin-top:30px;
 }
 
 </style>
@@ -81,13 +112,72 @@ Welcome to the Travelog Employee Portal.
 Manage operations, bookings, customer support and internal services from one place.
 </p>
 
-<a href="#" class="employee-btn">
+<button class="employee-btn" onclick="showPasswordBox()">
 LOGIN TO PLATFORM
+</button>
+
+<div id="password-section">
+
+<input 
+type="password" 
+id="employeePassword" 
+class="password-input"
+placeholder="Enter Password">
+
+<button class="employee-btn" onclick="validatePassword()">
+SUBMIT
+</button>
+
+<p id="error-msg">
+Incorrect Password
+</p>
+
+</div>
+
+<div id="itinerary-section">
+
+<a 
+href="https://www.travelogdrop.online/Itinerary-Builder/" 
+target="_blank" 
+class="employee-btn">
+OPEN ITINERARY BUILDER
 </a>
 
 </div>
 
 </div>
+
+</div>
+
+<script>
+
+function showPasswordBox(){
+
+document.getElementById("password-section").style.display = "block";
+
+}
+
+function validatePassword(){
+
+const password = document.getElementById("employeePassword").value;
+
+if(password === "7733"){
+
+document.getElementById("itinerary-section").style.display = "block";
+
+document.getElementById("error-msg").style.display = "none";
+
+}else{
+
+document.getElementById("error-msg").style.display = "block";
+
+document.getElementById("itinerary-section").style.display = "none";
+
+}
+
+}
+
+</script>
 
 </body>
 </html>
