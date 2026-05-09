@@ -483,3 +483,20 @@ transition:0.3s;
 background:#ff7a00;
 transform:translateY(-2px);
 }
+.itinerary-btn{
+display:inline-block;
+margin-top:15px;
+padding:14px 28px;
+background:#ff7a00;
+color:#fff;
+text-decoration:none;
+font-weight:600;
+border-radius:40px;
+transition:0.3s ease;
+box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+.itinerary-btn:hover{
+background:#e66d00;
+transform:translateY(-2px);
+}
