@@ -485,17 +485,19 @@ transform:translateY(-2px);
 }
 
 .itinerary-builder-btn{
-background:#ff7a00;
+background:#0b3d91 !important;
 }
 
 .itinerary-builder-btn:hover{
-background:#e86e00;
+background:#082d6b !important;
+transform:translateY(-2px);
 }
 
 .guest-status-btn{
-background:#0077ff;
+background:#0b3d91 !important;
 }
 
 .guest-status-btn:hover{
-background:#0063d6;
+background:#082d6b !important;
+transform:translateY(-2px);
 }
