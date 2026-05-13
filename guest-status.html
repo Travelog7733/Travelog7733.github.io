@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Guest Status | Travelog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:40px 20px;
+}
+
+.status-wrapper{
+max-width:1200px;
+margin:auto;
+}
+
+.page-title{
+text-align:center;
+font-size:36px;
+font-weight:700;
+margin-bottom:10px;
+color:#222;
+}
+
+.page-subtitle{
+text-align:center;
+color:#666;
+margin-bottom:40px;
+}
+
+.status-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:25px;
+}
+
+.status-card{
+background:#fff;
+padding:25px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+transition:0.3s ease;
+}
+
+.status-card:hover{
+transform:translateY(-5px);
+}
+
+.guest-name{
+font-size:22px;
+font-weight:600;
+margin-bottom:15px;
+color:#222;
+}
+
+.status-badge{
+display:inline-block;
+padding:8px 18px;
+border-radius:30px;
+font-size:14px;
+font-weight:600;
+margin-bottom:20px;
+color:#fff;
+}
+
+.confirmed{
+background:#00a86b;
+}
+
+.pending{
+background:#ff9800;
+}
+
+.cancelled{
+background:#e53935;
+}
+
+.detail{
+margin-bottom:10px;
+font-size:15px;
+color:#555;
+line-height:1.6;
+}
+
+.label{
+font-weight:600;
+color:#222;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="status-wrapper">
+
+<h1 class="page-title">
+Guest Status
+</h1>
+
+<p class="page-subtitle">
+Track booking and travel status of guests
+</p>
+
+<div class="status-grid">
+
+<!-- CARD 1 -->
+
+<div class="status-card">
+
+<div class="guest-name">
+Arjun Nair
+</div>
+
+<div class="status-badge confirmed">
+CONFIRMED
+</div>
+
+<div class="detail">
+<span class="label">Destination:</span>
+Vietnam
+</div>
+
+<div class="detail">
+<span class="label">Travel Date:</span>
+15 June 2026
+</div>
+
+<div class="detail">
+<span class="label">Package:</span>
+6 Days Hanoi + Da Nang
+</div>
+
+<div class="detail">
+<span class="label">Payment:</span>
+Completed
+</div>
+
+</div>
+
+<!-- CARD 2 -->
+
+<div class="status-card">
+
+<div class="guest-name">
+Rahul Menon
+</div>
+
+<div class="status-badge pending">
+PENDING
+</div>
+
+<div class="detail">
+<span class="label">Destination:</span>
+Thailand
+</div>
+
+<div class="detail">
+<span class="label">Travel Date:</span>
+22 July 2026
+</div>
+
+<div class="detail">
+<span class="label">Package:</span>
+Bangkok + Phuket
+</div>
+
+<div class="detail">
+<span class="label">Payment:</span>
+Advance Pending
+</div>
+
+</div>
+
+<!-- CARD 3 -->
+
+<div class="status-card">
+
+<div class="guest-name">
+Meera Joseph
+</div>
+
+<div class="status-badge cancelled">
+CANCELLED
+</div>
+
+<div class="detail">
+<span class="label">Destination:</span>
+Bali
+</div>
+
+<div class="detail">
+<span class="label">Travel Date:</span>
+10 August 2026
+</div>
+
+<div class="detail">
+<span class="label">Package:</span>
+Bali Honeymoon
+</div>
+
+<div class="detail">
+<span class="label">Payment:</span>
+Refund Processing
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
