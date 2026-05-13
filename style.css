@@ -484,10 +484,18 @@ background:#ff7a00;
 transform:translateY(-2px);
 }
 
-.itinerary-builder-btn{
-background:#007bff;
+.itinerary-btn{
+background:#ff7a00;
 }
 
-.itinerary-builder-btn:hover{
-background:#0066d6;
+.itinerary-btn:hover{
+background:#e86e00;
+}
+
+.guest-btn{
+background:#0066ff;
+}
+
+.guest-btn:hover{
+background:#0052cc;
 }
