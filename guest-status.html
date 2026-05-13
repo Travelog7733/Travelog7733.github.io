@@ -25,13 +25,13 @@ padding:40px 20px;
 }
 
 .status-wrapper{
-max-width:1200px;
+max-width:1300px;
 margin:auto;
 }
 
 .page-title{
 text-align:center;
-font-size:36px;
+font-size:38px;
 font-weight:700;
 margin-bottom:10px;
 color:#222;
@@ -40,12 +40,78 @@ color:#222;
 .page-subtitle{
 text-align:center;
 color:#666;
-margin-bottom:40px;
+margin-bottom:30px;
+}
+
+.top-bar{
+display:flex;
+justify-content:center;
+margin-bottom:30px;
+}
+
+.add-btn{
+background:#0b3d91;
+color:#fff;
+border:none;
+padding:14px 28px;
+border-radius:40px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:0.3s;
+}
+
+.add-btn:hover{
+background:#082d6b;
+transform:translateY(-2px);
+}
+
+.form-box{
+background:#fff;
+padding:30px;
+border-radius:20px;
+margin-bottom:35px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+display:none;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:18px;
+}
+
+.input-field,
+textarea,
+select{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #ccc;
+font-size:15px;
+outline:none;
+}
+
+textarea{
+min-height:120px;
+resize:vertical;
+}
+
+.save-btn{
+margin-top:25px;
+background:#00a86b;
+color:#fff;
+border:none;
+padding:14px 28px;
+border-radius:35px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
 }
 
 .status-grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
 gap:25px;
 }
 
@@ -62,7 +128,7 @@ transform:translateY(-5px);
 }
 
 .guest-name{
-font-size:22px;
+font-size:24px;
 font-weight:600;
 margin-bottom:15px;
 color:#222;
@@ -86,15 +152,15 @@ background:#00a86b;
 background:#ff9800;
 }
 
-.cancelled{
-background:#e53935;
+.completed{
+background:#0077ff;
 }
 
 .detail{
 margin-bottom:10px;
 font-size:15px;
 color:#555;
-line-height:1.6;
+line-height:1.7;
 }
 
 .label{
@@ -115,117 +181,175 @@ Guest Status
 </h1>
 
 <p class="page-subtitle">
-Track booking and travel status of guests
+Track booking and payment status of guests
 </p>
 
-<div class="status-grid">
+<div class="top-bar">
 
-<!-- CARD 1 -->
+<button class="add-btn" onclick="toggleForm()">
++ ADD NEW GUEST
+</button>
+
+</div>
+
+<div class="form-box" id="guestForm">
+
+<div class="form-grid">
+
+<input type="text" id="guestName" class="input-field" placeholder="Guest Name">
+
+<input type="text" id="destination" class="input-field" placeholder="Destination">
+
+<input type="date" id="travelDate" class="input-field">
+
+<input type="number" id="days" class="input-field" placeholder="No of Days">
+
+<input type="number" id="guests" class="input-field" placeholder="No of Guests">
+
+<select id="travelStatus" class="input-field">
+<option>CONFIRMED</option>
+<option>PENDING FOR CONFIRMATION</option>
+<option>COMPLETED</option>
+</select>
+
+<select id="paymentStatus" class="input-field">
+<option>ADVANCE PAID</option>
+<option>PAYMENT PENDING</option>
+<option>PAYMENT COMPLETED</option>
+</select>
+
+<input type="text" id="amountReceived" class="input-field" placeholder="Amount Received">
+
+<input type="text" id="balanceAmount" class="input-field" placeholder="Balance Receivable">
+
+</div>
+
+<br>
+
+<textarea id="itinerary" placeholder="Day Wise Itinerary"></textarea>
+
+<br><br>
+
+<textarea id="inclusions" placeholder="Inclusions / Notes"></textarea>
+
+<button class="save-btn" onclick="addGuest()">
+SAVE GUEST
+</button>
+
+</div>
+
+<div class="status-grid" id="guestContainer">
+
+</div>
+
+</div>
+
+<script>
+
+function toggleForm(){
+
+const form=document.getElementById("guestForm");
+
+if(form.style.display==="block"){
+form.style.display="none";
+}else{
+form.style.display="block";
+}
+
+}
+
+function addGuest(){
+
+const guestName=document.getElementById("guestName").value;
+const destination=document.getElementById("destination").value;
+const travelDate=document.getElementById("travelDate").value;
+const days=document.getElementById("days").value;
+const guests=document.getElementById("guests").value;
+const itinerary=document.getElementById("itinerary").value;
+const inclusions=document.getElementById("inclusions").value;
+const travelStatus=document.getElementById("travelStatus").value;
+const paymentStatus=document.getElementById("paymentStatus").value;
+const amountReceived=document.getElementById("amountReceived").value;
+const balanceAmount=document.getElementById("balanceAmount").value;
+
+let badgeClass="confirmed";
+
+if(travelStatus==="PENDING FOR CONFIRMATION"){
+badgeClass="pending";
+}
+
+if(travelStatus==="COMPLETED"){
+badgeClass="completed";
+}
+
+const card=`
 
 <div class="status-card">
 
 <div class="guest-name">
-Arjun Nair
+${guestName}
 </div>
 
-<div class="status-badge confirmed">
-CONFIRMED
-</div>
-
-<div class="detail">
-<span class="label">Destination:</span>
-Vietnam
-</div>
-
-<div class="detail">
-<span class="label">Travel Date:</span>
-15 June 2026
-</div>
-
-<div class="detail">
-<span class="label">Package:</span>
-6 Days Hanoi + Da Nang
-</div>
-
-<div class="detail">
-<span class="label">Payment:</span>
-Completed
-</div>
-
-</div>
-
-<!-- CARD 2 -->
-
-<div class="status-card">
-
-<div class="guest-name">
-Rahul Menon
-</div>
-
-<div class="status-badge pending">
-PENDING
+<div class="status-badge ${badgeClass}">
+${travelStatus}
 </div>
 
 <div class="detail">
 <span class="label">Destination:</span>
-Thailand
+${destination}
 </div>
 
 <div class="detail">
 <span class="label">Travel Date:</span>
-22 July 2026
+${travelDate}
 </div>
 
 <div class="detail">
-<span class="label">Package:</span>
-Bangkok + Phuket
+<span class="label">No of Days:</span>
+${days}
 </div>
 
 <div class="detail">
-<span class="label">Payment:</span>
-Advance Pending
-</div>
-
-</div>
-
-<!-- CARD 3 -->
-
-<div class="status-card">
-
-<div class="guest-name">
-Meera Joseph
-</div>
-
-<div class="status-badge cancelled">
-CANCELLED
+<span class="label">No of Guests:</span>
+${guests}
 </div>
 
 <div class="detail">
-<span class="label">Destination:</span>
-Bali
+<span class="label">Payment Status:</span>
+${paymentStatus}
 </div>
 
 <div class="detail">
-<span class="label">Travel Date:</span>
-10 August 2026
+<span class="label">Amount Received:</span>
+${amountReceived}
 </div>
 
 <div class="detail">
-<span class="label">Package:</span>
-Bali Honeymoon
+<span class="label">Balance Receivable:</span>
+${balanceAmount}
 </div>
 
 <div class="detail">
-<span class="label">Payment:</span>
-Refund Processing
+<span class="label">Itinerary:</span>
+<br>${itinerary}
+</div>
+
+<div class="detail">
+<span class="label">Inclusions:</span>
+<br>${inclusions}
 </div>
 
 </div>
 
-</div>
+`;
 
-</div>
+document.getElementById("guestContainer").innerHTML += card;
+
+document.getElementById("guestForm").reset();
+
+}
+
+</script>
 
 </body>
-
 </html>
