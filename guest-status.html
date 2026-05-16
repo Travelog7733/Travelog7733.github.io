@@ -226,6 +226,7 @@ color:#222;
 font-size:14px;
 font-weight:600;
 color:#666;
+text-align:right;
 }
 
 .card-actions{
@@ -286,7 +287,7 @@ color:#1D9E75;
 
 .hotel-grid{
 display:grid;
-grid-template-columns:1fr 1fr;
+grid-template-columns:1fr 1fr 1fr;
 gap:12px;
 }
 
@@ -353,33 +354,97 @@ Guest Details
 
 <div class="form-grid">
 
-<input type="text" id="guestName" class="input-field" placeholder="Guest Name">
+<input
+type="text"
+id="guestName"
+class="input-field"
+placeholder="Guest Name">
 
-<input type="text" id="companyName" class="input-field" placeholder="Company Name (Optional)">
+<input
+type="text"
+id="companyName"
+class="input-field"
+placeholder="Company Name (Optional)">
 
-<input type="text" id="destination" class="input-field" placeholder="Destination">
+<input
+type="text"
+id="salesPerson"
+class="input-field"
+placeholder="Sales Person">
 
-<input type="text" id="travelDate" class="input-field" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDate(this);generateDates()">
+<input
+type="text"
+id="destination"
+class="input-field"
+placeholder="Destination">
 
-<input type="number" id="days" class="input-field" placeholder="No of Days">
+<input
+type="text"
+id="travelDate"
+class="input-field"
+placeholder="DD/MM/YYYY"
+maxlength="10"
+oninput="formatDate(this);generateDates()">
 
-<input type="number" id="guests" class="input-field" placeholder="No of Guests">
+<input
+type="number"
+id="days"
+class="input-field"
+placeholder="No of Days">
 
-<select id="travelStatus" class="input-field">
-<option>CONFIRMED</option>
-<option>PENDING FOR CONFIRMATION</option>
-<option>COMPLETED</option>
+<input
+type="number"
+id="guests"
+class="input-field"
+placeholder="No of Guests">
+
+<select
+id="travelStatus"
+class="input-field">
+
+<option>
+CONFIRMED
+</option>
+
+<option>
+PENDING FOR CONFIRMATION
+</option>
+
+<option>
+COMPLETED
+</option>
+
 </select>
 
-<select id="paymentStatus" class="input-field">
-<option>ADVANCE PAID</option>
-<option>PAYMENT PENDING</option>
-<option>PAYMENT COMPLETED</option>
+<select
+id="paymentStatus"
+class="input-field">
+
+<option>
+ADVANCE PAID
+</option>
+
+<option>
+PAYMENT PENDING
+</option>
+
+<option>
+PAYMENT COMPLETED
+</option>
+
 </select>
 
-<input type="text" id="amountReceived" class="input-field" placeholder="₹ Amount Received">
+<input
+type="text"
+id="amountReceived"
+class="input-field"
+placeholder="₹ Amount Received">
 
-<input type="text" id="balanceAmount" class="input-field" placeholder="₹ Balance Receivable">
+<input
+type="text"
+id="balanceAmount"
+class="input-field"
+placeholder="₹ Balance Receivable">
 
 </div>
 
@@ -432,12 +497,31 @@ Hotel Status
 
 <div class="hotel-grid">
 
-<input type="text" class="input-field hotel-place" placeholder="Place">
+<input
+type="text"
+class="input-field hotel-place"
+placeholder="Place">
 
-<select class="input-field hotel-status">
-<option>BOOKED</option>
-<option>BOOKED BY CUSTOMER</option>
-<option>PENDING FOR BOOKING</option>
+<input
+type="text"
+class="input-field hotel-name"
+placeholder="Hotel Name">
+
+<select
+class="input-field hotel-status">
+
+<option>
+BOOKED
+</option>
+
+<option>
+BOOKED BY CUSTOMER
+</option>
+
+<option>
+PENDING FOR BOOKING
+</option>
+
 </select>
 
 </div>
@@ -446,8 +530,12 @@ Hotel Status
 
 </div>
 
-<button class="add-small-btn" onclick="addHotel()">
+<button
+class="add-small-btn"
+onclick="addHotel()">
+
 + Add Hotel
+
 </button>
 
 </div>
@@ -466,14 +554,20 @@ Day-wise Itinerary
 Day 1 - <span class="auto-date"></span>
 </div>
 
-<textarea class="input-field itinerary-text" placeholder="Activity / Plans"></textarea>
+<textarea
+class="input-field itinerary-text"
+placeholder="Activity / Plans"></textarea>
 
 </div>
 
 </div>
 
-<button class="add-small-btn" onclick="addDay()">
+<button
+class="add-small-btn"
+onclick="addDay()">
+
 + Add Day
+
 </button>
 
 </div>
@@ -484,17 +578,25 @@ Day 1 - <span class="auto-date"></span>
 Notes
 </div>
 
-<textarea id="inclusions" placeholder="Notes / Inclusions"></textarea>
+<textarea
+id="inclusions"
+placeholder="Notes / Inclusions"></textarea>
 
 </div>
 
-<button class="save-btn" onclick="addGuest()">
+<button
+class="save-btn"
+onclick="addGuest()">
+
 SAVE GUEST
+
 </button>
 
 </div>
 
-<div class="status-grid" id="guestContainer"></div>
+<div
+class="status-grid"
+id="guestContainer"></div>
 
 </div>
 
@@ -511,11 +613,7 @@ addDoc,
 deleteDoc,
 doc,
 onSnapshot,
-query,
-orderBy,
-Timestamp,
-updateDoc,
-getDoc
+updateDoc
 }
 from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
@@ -545,11 +643,7 @@ window.addDoc = addDoc;
 window.deleteDoc = deleteDoc;
 window.doc = doc;
 window.onSnapshot = onSnapshot;
-window.query = query;
-window.orderBy = orderBy;
-window.Timestamp = Timestamp;
 window.updateDoc = updateDoc;
-window.getDoc = getDoc;
 
 </script>
 
@@ -640,7 +734,8 @@ document.getElementById("dayContainer")
 Day ${dayCount} - <span class="auto-date"></span>
 </div>
 
-<textarea class="input-field itinerary-text"
+<textarea
+class="input-field itinerary-text"
 placeholder="Activity / Plans"></textarea>
 
 </div>
@@ -662,15 +757,30 @@ document.getElementById("hotelContainer")
 
 <div class="hotel-grid">
 
-<input type="text"
+<input
+type="text"
 class="input-field hotel-place"
 placeholder="Place">
 
-<select class="input-field hotel-status">
+<input
+type="text"
+class="input-field hotel-name"
+placeholder="Hotel Name">
 
-<option>BOOKED</option>
-<option>BOOKED BY CUSTOMER</option>
-<option>PENDING FOR BOOKING</option>
+<select
+class="input-field hotel-status">
+
+<option>
+BOOKED
+</option>
+
+<option>
+BOOKED BY CUSTOMER
+</option>
+
+<option>
+PENDING FOR BOOKING
+</option>
 
 </select>
 
@@ -698,6 +808,9 @@ const hotels =
 place:
 card.querySelector(".hotel-place").value,
 
+hotel:
+card.querySelector(".hotel-name").value,
+
 status:
 card.querySelector(".hotel-status").value
 
@@ -724,6 +837,9 @@ document.getElementById("guestName").value,
 
 companyName:
 document.getElementById("companyName").value,
+
+salesPerson:
+document.getElementById("salesPerson").value,
 
 destination:
 document.getElementById("destination").value,
@@ -757,7 +873,7 @@ notes:
 document.getElementById("inclusions").value,
 
 created:
-Timestamp.now()
+new Date().toISOString()
 
 };
 
@@ -789,19 +905,37 @@ alert("Guest Saved!");
 
 function loadGuests(){
 
-const q =
-query(
+onSnapshot(
 collection(db,"guestStatus"),
-orderBy("travelDate","asc")
-);
+(snapshot)=>{
 
-onSnapshot(q,(snapshot)=>{
-
-let html = "";
+let guests = [];
 
 snapshot.forEach((docItem)=>{
 
-const g = docItem.data();
+guests.push({
+id:docItem.id,
+...docItem.data()
+});
+
+});
+
+guests.sort((a,b)=>{
+
+const parseDate = (str)=>{
+
+const p = str.split('/');
+return new Date(p[2],p[1]-1,p[0]);
+
+};
+
+return parseDate(a.travelDate) - parseDate(b.travelDate);
+
+});
+
+let html = "";
+
+guests.forEach((g)=>{
 
 let badge = "confirmed";
 
@@ -849,7 +983,13 @@ ${g.travelStatus}
 </div>
 
 <div class="card-date">
+
 ${g.travelDate}
+
+<br>
+
+👤 ${g.salesPerson || "-"}
+
 </div>
 
 </div>
@@ -909,9 +1049,20 @@ ${
 <div class="detail">
 
 🏨 ${h.place}
+
 <br>
 
-<b>${h.status}</b>
+Hotel:
+<b>
+${h.hotel}
+</b>
+
+<br>
+
+Status:
+<b>
+${h.status}
+</b>
 
 </div>
 
@@ -970,7 +1121,7 @@ ${g.notes || ""}
 class="edit-btn"
 onclick="
 event.stopPropagation();
-editGuest('${docItem.id}')
+editGuest('${g.id}')
 ">
 
 Edit
@@ -981,7 +1132,7 @@ Edit
 class="delete-btn"
 onclick="
 event.stopPropagation();
-deleteGuest('${docItem.id}')
+deleteGuest('${g.id}')
 ">
 
 Delete
@@ -1021,9 +1172,7 @@ return;
 
 }
 
-alert(
-"Edit loading can be added next. Current version supports secure delete."
-);
+alert("Edit function can be expanded further.");
 
 }
 
