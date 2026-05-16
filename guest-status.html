@@ -647,12 +647,12 @@ window.updateDoc = updateDoc;
 
 </script>
 
+<!-- REPLACE ONLY THIS SCRIPT SECTION IN YOUR CURRENT FILE -->
+
 <script>
 
 let editingId = null;
 let dayCount = 1;
-
-/* DATE FORMAT */
 
 function formatDate(input){
 
@@ -670,8 +670,6 @@ input.value = value;
 
 }
 
-/* TOGGLE FORM */
-
 function toggleForm(){
 
 const form =
@@ -683,8 +681,6 @@ form.style.display==="block"
 : "block";
 
 }
-
-/* GENERATE DATES */
 
 function generateDates(){
 
@@ -719,8 +715,6 @@ card.querySelector(".auto-date").innerText =
 
 }
 
-/* ADD DAY */
-
 function addDay(){
 
 dayCount++;
@@ -731,7 +725,8 @@ document.getElementById("dayContainer")
 <div class="day-card">
 
 <div class="day-title">
-Day ${dayCount} - <span class="auto-date"></span>
+Day ${dayCount} -
+<span class="auto-date"></span>
 </div>
 
 <textarea
@@ -745,8 +740,6 @@ placeholder="Activity / Plans"></textarea>
 generateDates();
 
 }
-
-/* ADD HOTEL */
 
 function addHotel(){
 
@@ -791,8 +784,6 @@ PENDING FOR BOOKING
 `);
 
 }
-
-/* SAVE */
 
 async function addGuest(){
 
@@ -899,9 +890,10 @@ alert("Guest Saved!");
 
 }
 
-}
+document.getElementById("guestFormBox")
+.style.display = "none";
 
-/* LOAD */
+}
 
 function loadGuests(){
 
@@ -920,16 +912,25 @@ id:docItem.id,
 
 });
 
+window.allGuests = guests;
+
 guests.sort((a,b)=>{
 
 const parseDate = (str)=>{
 
 const p = str.split('/');
-return new Date(p[2],p[1]-1,p[0]);
+
+return new Date(
+p[2],
+p[1]-1,
+p[0]
+);
 
 };
 
-return parseDate(a.travelDate) - parseDate(b.travelDate);
+return parseDate(a.travelDate)
+-
+parseDate(b.travelDate);
 
 });
 
@@ -939,7 +940,8 @@ guests.forEach((g)=>{
 
 let badge = "confirmed";
 
-if(g.travelStatus==="PENDING FOR CONFIRMATION"){
+if(g.travelStatus===
+"PENDING FOR CONFIRMATION"){
 badge="pending";
 }
 
@@ -951,8 +953,7 @@ html += `
 
 <div
 class="guest-tile"
-onclick="this.classList.toggle('active')"
->
+onclick="this.classList.toggle('active')">
 
 <div class="tile-head">
 
@@ -997,27 +998,38 @@ ${g.travelDate}
 <div class="tile-details">
 
 <div class="detail">
-<span class="label">Destination:</span>
+<span class="label">
+Destination:
+</span>
 ${g.destination}
 </div>
 
 <div class="detail">
-<span class="label">Visa Status:</span>
+<span class="label">
+Visa Status:
+</span>
 ${g.visaStatus}
 </div>
 
 <div class="detail">
-<span class="label">Guests:</span>
+<span class="label">
+Guests:
+</span>
 ${g.guests}
 </div>
 
 <div class="detail">
-<span class="label">Payment:</span>
+<span class="label">
+Payment:
+</span>
 ${g.paymentStatus}
 </div>
 
 <div class="detail">
-<span class="label">Advance:</span>
+
+<span class="label">
+Advance:
+</span>
 
 <span class="amount">
 ₹ ${g.amountReceived}
@@ -1026,7 +1038,10 @@ ${g.paymentStatus}
 </div>
 
 <div class="detail">
-<span class="label">Balance:</span>
+
+<span class="label">
+Balance:
+</span>
 
 <span class="amount">
 ₹ ${g.balanceAmount}
@@ -1053,16 +1068,12 @@ ${
 <br>
 
 Hotel:
-<b>
-${h.hotel}
-</b>
+<b>${h.hotel}</b>
 
 <br>
 
 Status:
-<b>
-${h.status}
-</b>
+<b>${h.status}</b>
 
 </div>
 
@@ -1157,49 +1168,235 @@ document.getElementById(
 
 }
 
-/* EDIT */
-
 async function editGuest(id){
 
 const password =
 prompt("Enter password");
 
-if(password!=="5655"){
+if(password !== "5655"){
 
 alert("Wrong password");
-
 return;
 
 }
 
-alert("Edit function can be expanded further.");
+editingId = id;
+
+const guest =
+window.allGuests.find(
+g=>g.id===id
+);
+
+if(!guest) return;
+
+document.getElementById(
+"guestFormBox"
+).style.display="block";
+
+document.getElementById(
+"guestName"
+).value =
+guest.guestName || "";
+
+document.getElementById(
+"companyName"
+).value =
+guest.companyName || "";
+
+document.getElementById(
+"salesPerson"
+).value =
+guest.salesPerson || "";
+
+document.getElementById(
+"destination"
+).value =
+guest.destination || "";
+
+document.getElementById(
+"travelDate"
+).value =
+guest.travelDate || "";
+
+document.getElementById(
+"days"
+).value =
+guest.days || "";
+
+document.getElementById(
+"guests"
+).value =
+guest.guests || "";
+
+document.getElementById(
+"travelStatus"
+).value =
+guest.travelStatus || "";
+
+document.getElementById(
+"paymentStatus"
+).value =
+guest.paymentStatus || "";
+
+document.getElementById(
+"amountReceived"
+).value =
+guest.amountReceived || "";
+
+document.getElementById(
+"balanceAmount"
+).value =
+guest.balanceAmount || "";
+
+document.getElementById(
+"inclusions"
+).value =
+guest.notes || "";
+
+document.querySelectorAll(
+'input[name="visaStatus"]'
+).forEach(r=>{
+
+r.checked =
+r.value===guest.visaStatus;
+
+});
+
+document.getElementById(
+"hotelContainer"
+).innerHTML="";
+
+(guest.hotels || [])
+.forEach(h=>{
+
+document.getElementById(
+"hotelContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field hotel-place"
+value="${h.place || ""}">
+
+<input
+class="input-field hotel-name"
+value="${h.hotel || ""}">
+
+<select
+class="input-field hotel-status">
+
+<option ${
+h.status==="BOOKED"
+?"selected":""
+}>
+BOOKED
+</option>
+
+<option ${
+h.status==="BOOKED BY CUSTOMER"
+?"selected":""
+}>
+BOOKED BY CUSTOMER
+</option>
+
+<option ${
+h.status==="PENDING FOR BOOKING"
+?"selected":""
+}>
+PENDING FOR BOOKING
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"dayContainer"
+).innerHTML="";
+
+(guest.itineraryDays || [])
+.forEach(day=>{
+
+document.getElementById(
+"dayContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="day-card">
+
+<div class="day-title">
+
+Day ${day.day}
+
+-
+
+<span class="auto-date">
+
+${day.date}
+
+</span>
+
+</div>
+
+<textarea
+class="input-field itinerary-text">
+
+${day.activity || ""}
+
+</textarea>
+
+</div>
+
+`
+
+);
+
+});
+
+alert(
+"Guest loaded for editing"
+);
 
 }
-
-/* DELETE */
 
 async function deleteGuest(id){
 
 const password =
 prompt("Enter password");
 
-if(password!=="5655"){
+if(password !== "5655"){
 
 alert("Wrong password");
-
 return;
 
 }
 
-if(!confirm("Delete Guest?")) return;
+if(!confirm("Delete Guest?"))
+return;
 
 await deleteDoc(
 doc(db,"guestStatus",id)
 );
 
 }
-
-/* INIT */
 
 window.addEventListener(
 "load",
