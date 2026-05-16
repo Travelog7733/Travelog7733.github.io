@@ -50,7 +50,7 @@ margin-bottom:30px;
 }
 
 .add-btn{
-background:#0b3d91;
+background:#1D9E75;
 color:#fff;
 border:none;
 padding:14px 28px;
@@ -62,7 +62,7 @@ transition:0.3s;
 }
 
 .add-btn:hover{
-background:#082d6b;
+background:#0F6E56;
 transform:translateY(-2px);
 }
 
@@ -71,7 +71,8 @@ background:#fff;
 padding:30px;
 border-radius:20px;
 margin-bottom:35px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
 display:none;
 }
 
@@ -99,7 +100,7 @@ resize:vertical;
 
 .save-btn{
 margin-top:25px;
-background:#00a86b;
+background:#1D9E75;
 color:#fff;
 border:none;
 padding:14px 28px;
@@ -119,7 +120,8 @@ gap:25px;
 background:#fff;
 padding:25px;
 border-radius:20px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
 cursor:pointer;
 transition:.3s;
 overflow:hidden;
@@ -230,6 +232,11 @@ font-size:30px;
 padding:20px;
 }
 
+.tile-head{
+flex-direction:column;
+align-items:flex-start;
+}
+
 }
 
 </style>
@@ -302,9 +309,7 @@ SAVE GUEST
 
 </div>
 
-<div class="status-grid" id="guestContainer">
-
-</div>
+<div class="status-grid" id="guestContainer"></div>
 
 </div>
 
@@ -360,10 +365,16 @@ window.onSnapshot = onSnapshot;
 window.query = query;
 window.orderBy = orderBy;
 window.Timestamp = Timestamp;
+window.updateDoc = updateDoc;
+window.getDoc = getDoc;
 
 </script>
 
 <script>
+
+let editingId = null;
+
+/* TOGGLE FORM */
 
 function toggleForm(){
 
@@ -382,7 +393,7 @@ form.style.display="block";
 
 }
 
-/* SAVE */
+/* SAVE / UPDATE */
 
 async function addGuest(){
 
@@ -426,6 +437,19 @@ Timestamp.now()
 
 };
 
+if(editingId){
+
+await updateDoc(
+doc(db,"guestStatus",editingId),
+guest
+);
+
+alert("Guest Updated!");
+
+editingId = null;
+
+}else{
+
 await addDoc(
 collection(db,"guestStatus"),
 guest
@@ -433,13 +457,20 @@ guest
 
 alert("Guest Saved!");
 
-document.querySelectorAll(
-"#guestFormBox input, #guestFormBox textarea"
-).forEach(i=>i.value="");
+}
+
+document
+.querySelectorAll(
+"#guestFormBox input,#guestFormBox textarea"
+)
+.forEach(i=>i.value="");
+
+document.getElementById("travelStatus").selectedIndex = 0;
+document.getElementById("paymentStatus").selectedIndex = 0;
 
 }
 
-/* LOAD */
+/* LOAD GUESTS */
 
 function loadGuests(){
 
@@ -545,15 +576,21 @@ ${g.inclusions}
 <div class="card-actions">
 
 <button
-class="delete-btn"
+class="edit-btn"
+onclick="
+event.stopPropagation();
+editGuest('${docItem.id}')
+">
+Edit
+</button>
 
+<button
+class="delete-btn"
 onclick="
 event.stopPropagation();
 deleteGuest('${docItem.id}')
 ">
-
 Delete
-
 </button>
 
 </div>
@@ -574,13 +611,90 @@ document.getElementById(
 
 }
 
+/* EDIT */
+
+async function editGuest(id){
+
+const password =
+prompt("Enter password");
+
+if(password!=="5655"){
+
+alert("Wrong password");
+
+return;
+
+}
+
+const snap =
+await getDoc(
+doc(db,"guestStatus",id)
+);
+
+const g = snap.data();
+
+editingId = id;
+
+document.getElementById("guestName").value =
+g.guestName || "";
+
+document.getElementById("destination").value =
+g.destination || "";
+
+document.getElementById("travelDate").value =
+g.travelDate || "";
+
+document.getElementById("days").value =
+g.days || "";
+
+document.getElementById("guests").value =
+g.guests || "";
+
+document.getElementById("travelStatus").value =
+g.travelStatus || "";
+
+document.getElementById("paymentStatus").value =
+g.paymentStatus || "";
+
+document.getElementById("amountReceived").value =
+g.amountReceived || "";
+
+document.getElementById("balanceAmount").value =
+g.balanceAmount || "";
+
+document.getElementById("itinerary").value =
+g.itinerary || "";
+
+document.getElementById("inclusions").value =
+g.inclusions || "";
+
+document.getElementById(
+"guestFormBox"
+).style.display = "block";
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
 /* DELETE */
 
 async function deleteGuest(id){
 
-if(
-!confirm("Delete Guest?")
-)return;
+const password =
+prompt("Enter password");
+
+if(password!=="5655"){
+
+alert("Wrong password");
+
+return;
+
+}
+
+if(!confirm("Delete Guest?")) return;
 
 await deleteDoc(
 doc(db,"guestStatus",id)
