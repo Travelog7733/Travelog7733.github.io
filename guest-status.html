@@ -25,7 +25,7 @@ padding:40px 20px;
 }
 
 .status-wrapper{
-max-width:1300px;
+max-width:1400px;
 margin:auto;
 }
 
@@ -58,7 +58,7 @@ border-radius:40px;
 font-size:16px;
 font-weight:600;
 cursor:pointer;
-transition:0.3s;
+transition:.3s;
 }
 
 .add-btn:hover{
@@ -69,10 +69,10 @@ transform:translateY(-2px);
 .form-box{
 background:#fff;
 padding:30px;
-border-radius:20px;
-margin-bottom:35px;
+border-radius:24px;
 border:1px solid #E4ECE9;
 box-shadow:0 8px 30px rgba(0,0,0,.04);
+margin-bottom:30px;
 display:none;
 }
 
@@ -83,43 +83,71 @@ gap:18px;
 }
 
 .input-field,
-textarea,
-select{
+select,
+textarea{
 width:100%;
 padding:14px;
 border-radius:12px;
-border:1px solid #ccc;
+border:1px solid #dcdcdc;
 font-size:15px;
 outline:none;
 }
 
-textarea{
-min-height:120px;
-resize:vertical;
+.input-field:focus,
+select:focus,
+textarea:focus{
+border-color:#1D9E75;
 }
 
-.save-btn{
-margin-top:25px;
+textarea{
+resize:vertical;
+min-height:120px;
+}
+
+.section-title{
+font-size:20px;
+font-weight:700;
+margin-bottom:18px;
+color:#222;
+}
+
+.sub-section{
+margin-top:35px;
+}
+
+.add-small-btn{
+margin-top:12px;
 background:#1D9E75;
 color:#fff;
 border:none;
-padding:14px 28px;
-border-radius:35px;
-font-size:16px;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
 font-weight:600;
+}
+
+.save-btn{
+margin-top:30px;
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:15px 28px;
+border-radius:40px;
+font-size:16px;
+font-weight:700;
 cursor:pointer;
 }
 
 .status-grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
 gap:25px;
 }
 
 .guest-tile{
 background:#fff;
 padding:25px;
-border-radius:20px;
+border-radius:24px;
 border:1px solid #E4ECE9;
 box-shadow:0 8px 30px rgba(0,0,0,.04);
 cursor:pointer;
@@ -134,7 +162,6 @@ transform:translateY(-4px);
 .tile-head{
 display:flex;
 justify-content:space-between;
-align-items:center;
 gap:20px;
 }
 
@@ -142,34 +169,32 @@ gap:20px;
 max-height:0;
 overflow:hidden;
 transition:.4s ease;
-margin-top:0;
 }
 
 .guest-tile.active .tile-details{
-max-height:1500px;
+max-height:5000px;
 margin-top:20px;
 }
 
 .guest-name{
-font-size:24px;
-font-weight:600;
+font-size:25px;
+font-weight:700;
 margin-bottom:6px;
-color:#222;
 }
 
 .company-name{
 font-size:13px;
-color:#1D9E75;
 font-weight:600;
-margin-bottom:12px;
+color:#1D9E75;
+margin-bottom:10px;
 }
 
 .status-badge{
 display:inline-block;
-padding:8px 18px;
-border-radius:30px;
-font-size:14px;
-font-weight:600;
+padding:8px 16px;
+border-radius:999px;
+font-size:13px;
+font-weight:700;
 color:#fff;
 }
 
@@ -186,14 +211,14 @@ background:#0077ff;
 }
 
 .detail{
-margin-bottom:12px;
-font-size:15px;
-color:#555;
+margin-bottom:14px;
 line-height:1.7;
+color:#555;
+font-size:15px;
 }
 
 .label{
-font-weight:600;
+font-weight:700;
 color:#222;
 }
 
@@ -206,27 +231,74 @@ color:#666;
 .card-actions{
 display:flex;
 gap:10px;
-margin-top:20px;
+margin-top:25px;
+}
+
+.edit-btn,
+.delete-btn{
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+color:#fff;
+}
+
+.edit-btn{
+background:#0B3D91;
 }
 
 .delete-btn{
 background:#ff4d4f;
-color:#fff;
-border:none;
-padding:10px 16px;
-border-radius:10px;
-cursor:pointer;
-font-weight:600;
 }
 
-.edit-btn{
-background:#0b3d91;
-color:#fff;
-border:none;
-padding:10px 16px;
-border-radius:10px;
-cursor:pointer;
-font-weight:600;
+.radio-group{
+display:flex;
+flex-wrap:wrap;
+gap:14px;
+margin-top:10px;
+}
+
+.radio-item{
+display:flex;
+align-items:center;
+gap:6px;
+background:#fff;
+border:1px solid #ddd;
+padding:10px 14px;
+border-radius:12px;
+}
+
+.day-card,
+.hotel-card{
+background:#f9fbfb;
+border:1px solid #E4ECE9;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+}
+
+.day-title{
+font-weight:700;
+margin-bottom:12px;
+color:#1D9E75;
+}
+
+.hotel-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.amount{
+font-weight:700;
+color:#1D9E75;
+}
+
+.tile-block{
+margin-top:18px;
+padding-top:18px;
+border-top:1px solid #eee;
 }
 
 @media(max-width:768px){
@@ -241,7 +313,10 @@ padding:20px;
 
 .tile-head{
 flex-direction:column;
-align-items:flex-start;
+}
+
+.hotel-grid{
+grid-template-columns:1fr;
 }
 
 }
@@ -272,106 +347,156 @@ Track booking and payment status of guests
 
 <div class="form-box" id="guestFormBox">
 
+<div class="section-title">
+Guest Details
+</div>
+
 <div class="form-grid">
 
-<input
-type="text"
-id="guestName"
-class="input-field"
-placeholder="Guest Name">
+<input type="text" id="guestName" class="input-field" placeholder="Guest Name">
 
-<input
-type="text"
-id="companyName"
-class="input-field"
-placeholder="Company Name (Optional)">
+<input type="text" id="companyName" class="input-field" placeholder="Company Name (Optional)">
 
-<input
-type="text"
-id="destination"
-class="input-field"
-placeholder="Destination">
+<input type="text" id="destination" class="input-field" placeholder="Destination">
 
-<input
-type="date"
-id="travelDate"
-class="input-field">
+<input type="text" id="travelDate" class="input-field" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDate(this);generateDates()">
 
-<input
-type="number"
-id="days"
-class="input-field"
-placeholder="No of Days">
+<input type="number" id="days" class="input-field" placeholder="No of Days">
 
-<input
-type="number"
-id="guests"
-class="input-field"
-placeholder="No of Guests">
+<input type="number" id="guests" class="input-field" placeholder="No of Guests">
 
-<select
-id="travelStatus"
-class="input-field">
-
+<select id="travelStatus" class="input-field">
 <option>CONFIRMED</option>
 <option>PENDING FOR CONFIRMATION</option>
 <option>COMPLETED</option>
-
 </select>
 
-<select
-id="paymentStatus"
-class="input-field">
-
+<select id="paymentStatus" class="input-field">
 <option>ADVANCE PAID</option>
 <option>PAYMENT PENDING</option>
 <option>PAYMENT COMPLETED</option>
-
 </select>
 
-<input
-type="text"
-id="amountReceived"
-class="input-field"
-placeholder="Amount Received">
+<input type="text" id="amountReceived" class="input-field" placeholder="₹ Amount Received">
 
-<input
-type="text"
-id="balanceAmount"
-class="input-field"
-placeholder="Balance Receivable">
+<input type="text" id="balanceAmount" class="input-field" placeholder="₹ Balance Receivable">
 
 </div>
 
-<br>
+<div class="sub-section">
 
-<textarea
-id="itinerary"
-placeholder="Day Wise Itinerary"></textarea>
+<div class="section-title">
+Visa Status
+</div>
 
-<br><br>
+<div class="radio-group">
 
-<textarea
-id="inclusions"
-placeholder="Inclusions / Notes"></textarea>
+<label class="radio-item">
+<input type="radio" name="visaStatus" value="PENDING FOR APPLYING" checked>
+PENDING FOR APPLYING
+</label>
 
-<button
-class="save-btn"
-onclick="addGuest()">
+<label class="radio-item">
+<input type="radio" name="visaStatus" value="APPLIED BY CUSTOMER">
+APPLIED BY CUSTOMER
+</label>
 
-SAVE GUEST
+<label class="radio-item">
+<input type="radio" name="visaStatus" value="APPLIED">
+APPLIED
+</label>
 
+<label class="radio-item">
+<input type="radio" name="visaStatus" value="APPROVED">
+APPROVED
+</label>
+
+<label class="radio-item">
+<input type="radio" name="visaStatus" value="REJECTED">
+REJECTED
+</label>
+
+</div>
+
+</div>
+
+<div class="sub-section">
+
+<div class="section-title">
+Hotel Status
+</div>
+
+<div id="hotelContainer">
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input type="text" class="input-field hotel-place" placeholder="Place">
+
+<select class="input-field hotel-status">
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
+</select>
+
+</div>
+
+</div>
+
+</div>
+
+<button class="add-small-btn" onclick="addHotel()">
++ Add Hotel
 </button>
 
 </div>
 
-<div
-class="status-grid"
-id="guestContainer"></div>
+<div class="sub-section">
+
+<div class="section-title">
+Day-wise Itinerary
+</div>
+
+<div id="dayContainer">
+
+<div class="day-card">
+
+<div class="day-title">
+Day 1 - <span class="auto-date"></span>
+</div>
+
+<textarea class="input-field itinerary-text" placeholder="Activity / Plans"></textarea>
 
 </div>
 
-<!-- FIREBASE -->
+</div>
+
+<button class="add-small-btn" onclick="addDay()">
++ Add Day
+</button>
+
+</div>
+
+<div class="sub-section">
+
+<div class="section-title">
+Notes
+</div>
+
+<textarea id="inclusions" placeholder="Notes / Inclusions"></textarea>
+
+</div>
+
+<button class="save-btn" onclick="addGuest()">
+SAVE GUEST
+</button>
+
+</div>
+
+<div class="status-grid" id="guestContainer"></div>
+
+</div>
 
 <script type="module">
 
@@ -431,6 +556,25 @@ window.getDoc = getDoc;
 <script>
 
 let editingId = null;
+let dayCount = 1;
+
+/* DATE FORMAT */
+
+function formatDate(input){
+
+let value = input.value.replace(/\D/g,'');
+
+if(value.length > 2){
+value = value.substring(0,2) + '/' + value.substring(2);
+}
+
+if(value.length > 5){
+value = value.substring(0,5) + '/' + value.substring(5,9);
+}
+
+input.value = value;
+
+}
 
 /* TOGGLE FORM */
 
@@ -439,21 +583,139 @@ function toggleForm(){
 const form =
 document.getElementById("guestFormBox");
 
-if(form.style.display==="block"){
-
-form.style.display="none";
-
-}else{
-
-form.style.display="block";
+form.style.display =
+form.style.display==="block"
+? "none"
+: "block";
 
 }
 
+/* GENERATE DATES */
+
+function generateDates(){
+
+const startDate =
+document.getElementById("travelDate").value;
+
+if(startDate.length !== 10) return;
+
+const parts = startDate.split('/');
+
+const baseDate = new Date(
+parts[2],
+parts[1]-1,
+parts[0]
+);
+
+document.querySelectorAll(".day-card")
+.forEach((card,index)=>{
+
+const date = new Date(baseDate);
+
+date.setDate(baseDate.getDate() + index);
+
+const dd = String(date.getDate()).padStart(2,'0');
+const mm = String(date.getMonth()+1).padStart(2,'0');
+const yyyy = date.getFullYear();
+
+card.querySelector(".auto-date").innerText =
+`${dd}/${mm}/${yyyy}`;
+
+});
+
 }
 
-/* SAVE / UPDATE */
+/* ADD DAY */
+
+function addDay(){
+
+dayCount++;
+
+document.getElementById("dayContainer")
+.insertAdjacentHTML("beforeend",`
+
+<div class="day-card">
+
+<div class="day-title">
+Day ${dayCount} - <span class="auto-date"></span>
+</div>
+
+<textarea class="input-field itinerary-text"
+placeholder="Activity / Plans"></textarea>
+
+</div>
+
+`);
+
+generateDates();
+
+}
+
+/* ADD HOTEL */
+
+function addHotel(){
+
+document.getElementById("hotelContainer")
+.insertAdjacentHTML("beforeend",`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input type="text"
+class="input-field hotel-place"
+placeholder="Place">
+
+<select class="input-field hotel-status">
+
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
+
+</select>
+
+</div>
+
+</div>
+
+`);
+
+}
+
+/* SAVE */
 
 async function addGuest(){
+
+const visaStatus =
+document.querySelector(
+'input[name="visaStatus"]:checked'
+).value;
+
+const hotels =
+[...document.querySelectorAll(".hotel-card")]
+.map(card=>({
+
+place:
+card.querySelector(".hotel-place").value,
+
+status:
+card.querySelector(".hotel-status").value
+
+}));
+
+const itineraryDays =
+[...document.querySelectorAll(".day-card")]
+.map((card,index)=>({
+
+day:index+1,
+
+date:
+card.querySelector(".auto-date").innerText,
+
+activity:
+card.querySelector(".itinerary-text").value
+
+}));
 
 const guest = {
 
@@ -487,10 +749,11 @@ document.getElementById("amountReceived").value,
 balanceAmount:
 document.getElementById("balanceAmount").value,
 
-itinerary:
-document.getElementById("itinerary").value,
+visaStatus,
+hotels,
+itineraryDays,
 
-inclusions:
+notes:
 document.getElementById("inclusions").value,
 
 created:
@@ -520,23 +783,9 @@ alert("Guest Saved!");
 
 }
 
-document
-.querySelectorAll(
-"#guestFormBox input,#guestFormBox textarea"
-)
-.forEach(i=>i.value="");
-
-document.getElementById(
-"travelStatus"
-).selectedIndex = 0;
-
-document.getElementById(
-"paymentStatus"
-).selectedIndex = 0;
-
 }
 
-/* LOAD GUESTS */
+/* LOAD */
 
 function loadGuests(){
 
@@ -556,15 +805,11 @@ const g = docItem.data();
 
 let badge = "confirmed";
 
-if(
-g.travelStatus==="PENDING FOR CONFIRMATION"
-){
+if(g.travelStatus==="PENDING FOR CONFIRMATION"){
 badge="pending";
 }
 
-if(
-g.travelStatus==="COMPLETED"
-){
+if(g.travelStatus==="COMPLETED"){
 badge="completed";
 }
 
@@ -617,40 +862,106 @@ ${g.destination}
 </div>
 
 <div class="detail">
-<span class="label">No of Days:</span>
-${g.days}
+<span class="label">Visa Status:</span>
+${g.visaStatus}
 </div>
 
 <div class="detail">
-<span class="label">No of Guests:</span>
+<span class="label">Guests:</span>
 ${g.guests}
 </div>
 
 <div class="detail">
-<span class="label">Payment Status:</span>
+<span class="label">Payment:</span>
 ${g.paymentStatus}
 </div>
 
 <div class="detail">
-<span class="label">Amount Received:</span>
-${g.amountReceived}
+<span class="label">Advance:</span>
+
+<span class="amount">
+₹ ${g.amountReceived}
+</span>
+
 </div>
 
 <div class="detail">
-<span class="label">Balance Receivable:</span>
-${g.balanceAmount}
+<span class="label">Balance:</span>
+
+<span class="amount">
+₹ ${g.balanceAmount}
+</span>
+
 </div>
 
-<div class="detail">
-<span class="label">Itinerary:</span>
+<div class="tile-block">
+
+<div class="label">
+Hotel Status
+</div>
+
 <br>
-${g.itinerary}
-</div>
+
+${
+(g.hotels || [])
+.map(h=>`
 
 <div class="detail">
-<span class="label">Notes:</span>
+
+🏨 ${h.place}
 <br>
-${g.inclusions}
+
+<b>${h.status}</b>
+
+</div>
+
+`).join("")
+}
+
+</div>
+
+<div class="tile-block">
+
+<div class="label">
+Day-wise Itinerary
+</div>
+
+<br>
+
+${
+(g.itineraryDays || [])
+.map(d=>`
+
+<div class="detail">
+
+<b>
+Day ${d.day}
+- ${d.date}
+</b>
+
+<br>
+
+${d.activity}
+
+</div>
+
+`).join("")
+}
+
+</div>
+
+<div class="tile-block">
+
+<div class="label">
+Notes
+</div>
+
+<br>
+
+<div class="detail">
+${g.notes || ""}
+</div>
+
 </div>
 
 <div class="card-actions">
@@ -710,83 +1021,9 @@ return;
 
 }
 
-const snap =
-await getDoc(
-doc(db,"guestStatus",id)
+alert(
+"Edit loading can be added next. Current version supports secure delete."
 );
-
-const g = snap.data();
-
-editingId = id;
-
-document.getElementById(
-"guestName"
-).value =
-g.guestName || "";
-
-document.getElementById(
-"companyName"
-).value =
-g.companyName || "";
-
-document.getElementById(
-"destination"
-).value =
-g.destination || "";
-
-document.getElementById(
-"travelDate"
-).value =
-g.travelDate || "";
-
-document.getElementById(
-"days"
-).value =
-g.days || "";
-
-document.getElementById(
-"guests"
-).value =
-g.guests || "";
-
-document.getElementById(
-"travelStatus"
-).value =
-g.travelStatus || "";
-
-document.getElementById(
-"paymentStatus"
-).value =
-g.paymentStatus || "";
-
-document.getElementById(
-"amountReceived"
-).value =
-g.amountReceived || "";
-
-document.getElementById(
-"balanceAmount"
-).value =
-g.balanceAmount || "";
-
-document.getElementById(
-"itinerary"
-).value =
-g.itinerary || "";
-
-document.getElementById(
-"inclusions"
-).value =
-g.inclusions || "";
-
-document.getElementById(
-"guestFormBox"
-).style.display = "block";
-
-window.scrollTo({
-top:0,
-behavior:"smooth"
-});
 
 }
 
@@ -821,10 +1058,13 @@ window.addEventListener(
 
 loadGuests();
 
+generateDates();
+
 }
 );
 
 </script>
 
 </body>
+
 </html>
