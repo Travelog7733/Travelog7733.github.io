@@ -111,26 +111,47 @@ cursor:pointer;
 
 .status-grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
 gap:25px;
 }
 
-.status-card{
+.guest-tile{
 background:#fff;
 padding:25px;
 border-radius:20px;
 box-shadow:0 10px 25px rgba(0,0,0,0.08);
-transition:0.3s ease;
+cursor:pointer;
+transition:.3s;
+overflow:hidden;
 }
 
-.status-card:hover{
-transform:translateY(-5px);
+.guest-tile:hover{
+transform:translateY(-4px);
+}
+
+.tile-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+}
+
+.tile-details{
+max-height:0;
+overflow:hidden;
+transition:.4s ease;
+margin-top:0;
+}
+
+.guest-tile.active .tile-details{
+max-height:1500px;
+margin-top:20px;
 }
 
 .guest-name{
 font-size:24px;
 font-weight:600;
-margin-bottom:15px;
+margin-bottom:10px;
 color:#222;
 }
 
@@ -140,7 +161,6 @@ padding:8px 18px;
 border-radius:30px;
 font-size:14px;
 font-weight:600;
-margin-bottom:20px;
 color:#fff;
 }
 
@@ -157,7 +177,7 @@ background:#0077ff;
 }
 
 .detail{
-margin-bottom:10px;
+margin-bottom:12px;
 font-size:15px;
 color:#555;
 line-height:1.7;
@@ -166,6 +186,50 @@ line-height:1.7;
 .label{
 font-weight:600;
 color:#222;
+}
+
+.card-date{
+font-size:14px;
+font-weight:600;
+color:#666;
+}
+
+.card-actions{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+
+.delete-btn{
+background:#ff4d4f;
+color:#fff;
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+}
+
+.edit-btn{
+background:#0b3d91;
+color:#fff;
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+}
+
+@media(max-width:768px){
+
+.page-title{
+font-size:30px;
+}
+
+.form-box{
+padding:20px;
+}
+
 }
 
 </style>
@@ -192,7 +256,7 @@ Track booking and payment status of guests
 
 </div>
 
-<div class="form-box" id="guestForm">
+<div class="form-box" id="guestFormBox">
 
 <div class="form-grid">
 
@@ -244,110 +308,294 @@ SAVE GUEST
 
 </div>
 
+<!-- FIREBASE -->
+
+<script type="module">
+
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+deleteDoc,
+doc,
+onSnapshot,
+query,
+orderBy,
+Timestamp
+}
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+
+authDomain: "travelog-itinerary.firebaseapp.com",
+
+projectId: "travelog-itinerary",
+
+storageBucket: "travelog-itinerary.firebasestorage.app",
+
+messagingSenderId: "33567258851",
+
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+window.onSnapshot = onSnapshot;
+window.query = query;
+window.orderBy = orderBy;
+window.Timestamp = Timestamp;
+
+</script>
+
 <script>
 
 function toggleForm(){
 
-const form=document.getElementById("guestForm");
+const form =
+document.getElementById("guestFormBox");
 
 if(form.style.display==="block"){
+
 form.style.display="none";
+
 }else{
+
 form.style.display="block";
-}
 
 }
 
-function addGuest(){
-
-const guestName=document.getElementById("guestName").value;
-const destination=document.getElementById("destination").value;
-const travelDate=document.getElementById("travelDate").value;
-const days=document.getElementById("days").value;
-const guests=document.getElementById("guests").value;
-const itinerary=document.getElementById("itinerary").value;
-const inclusions=document.getElementById("inclusions").value;
-const travelStatus=document.getElementById("travelStatus").value;
-const paymentStatus=document.getElementById("paymentStatus").value;
-const amountReceived=document.getElementById("amountReceived").value;
-const balanceAmount=document.getElementById("balanceAmount").value;
-
-let badgeClass="confirmed";
-
-if(travelStatus==="PENDING FOR CONFIRMATION"){
-badgeClass="pending";
 }
 
-if(travelStatus==="COMPLETED"){
-badgeClass="completed";
+/* SAVE */
+
+async function addGuest(){
+
+const guest = {
+
+guestName:
+document.getElementById("guestName").value,
+
+destination:
+document.getElementById("destination").value,
+
+travelDate:
+document.getElementById("travelDate").value,
+
+days:
+document.getElementById("days").value,
+
+guests:
+document.getElementById("guests").value,
+
+travelStatus:
+document.getElementById("travelStatus").value,
+
+paymentStatus:
+document.getElementById("paymentStatus").value,
+
+amountReceived:
+document.getElementById("amountReceived").value,
+
+balanceAmount:
+document.getElementById("balanceAmount").value,
+
+itinerary:
+document.getElementById("itinerary").value,
+
+inclusions:
+document.getElementById("inclusions").value,
+
+created:
+Timestamp.now()
+
+};
+
+await addDoc(
+collection(db,"guestStatus"),
+guest
+);
+
+alert("Guest Saved!");
+
+document.querySelectorAll(
+"#guestFormBox input, #guestFormBox textarea"
+).forEach(i=>i.value="");
+
 }
 
-const card=`
+/* LOAD */
 
-<div class="status-card">
+function loadGuests(){
+
+const q =
+query(
+collection(db,"guestStatus"),
+orderBy("travelDate","asc")
+);
+
+onSnapshot(q,(snapshot)=>{
+
+let html = "";
+
+snapshot.forEach((docItem)=>{
+
+const g = docItem.data();
+
+let badge = "confirmed";
+
+if(
+g.travelStatus==="PENDING FOR CONFIRMATION"
+){
+badge="pending";
+}
+
+if(
+g.travelStatus==="COMPLETED"
+){
+badge="completed";
+}
+
+html += `
+
+<div
+class="guest-tile"
+onclick="this.classList.toggle('active')"
+>
+
+<div class="tile-head">
+
+<div>
 
 <div class="guest-name">
-${guestName}
+${g.guestName}
 </div>
 
-<div class="status-badge ${badgeClass}">
-${travelStatus}
+<div class="status-badge ${badge}">
+${g.travelStatus}
 </div>
+
+</div>
+
+<div class="card-date">
+${g.travelDate}
+</div>
+
+</div>
+
+<div class="tile-details">
 
 <div class="detail">
 <span class="label">Destination:</span>
-${destination}
-</div>
-
-<div class="detail">
-<span class="label">Travel Date:</span>
-${travelDate}
+${g.destination}
 </div>
 
 <div class="detail">
 <span class="label">No of Days:</span>
-${days}
+${g.days}
 </div>
 
 <div class="detail">
 <span class="label">No of Guests:</span>
-${guests}
+${g.guests}
 </div>
 
 <div class="detail">
 <span class="label">Payment Status:</span>
-${paymentStatus}
+${g.paymentStatus}
 </div>
 
 <div class="detail">
 <span class="label">Amount Received:</span>
-${amountReceived}
+${g.amountReceived}
 </div>
 
 <div class="detail">
 <span class="label">Balance Receivable:</span>
-${balanceAmount}
+${g.balanceAmount}
 </div>
 
 <div class="detail">
 <span class="label">Itinerary:</span>
-<br>${itinerary}
+<br>
+${g.itinerary}
 </div>
 
 <div class="detail">
-<span class="label">Inclusions:</span>
-<br>${inclusions}
+<span class="label">Notes:</span>
+<br>
+${g.inclusions}
+</div>
+
+<div class="card-actions">
+
+<button
+class="delete-btn"
+
+onclick="
+event.stopPropagation();
+deleteGuest('${docItem.id}')
+">
+
+Delete
+
+</button>
+
+</div>
+
 </div>
 
 </div>
 
 `;
 
-document.getElementById("guestContainer").innerHTML += card;
+});
 
-document.getElementById("guestForm").reset();
+document.getElementById(
+"guestContainer"
+).innerHTML = html;
+
+});
 
 }
+
+/* DELETE */
+
+async function deleteGuest(id){
+
+if(
+!confirm("Delete Guest?")
+)return;
+
+await deleteDoc(
+doc(db,"guestStatus",id)
+);
+
+}
+
+/* INIT */
+
+window.addEventListener(
+"load",
+()=>{
+
+loadGuests();
+
+}
+);
 
 </script>
 
