@@ -153,8 +153,15 @@ margin-top:20px;
 .guest-name{
 font-size:24px;
 font-weight:600;
-margin-bottom:10px;
+margin-bottom:6px;
 color:#222;
+}
+
+.company-name{
+font-size:13px;
+color:#1D9E75;
+font-weight:600;
+margin-bottom:12px;
 }
 
 .status-badge{
@@ -267,49 +274,100 @@ Track booking and payment status of guests
 
 <div class="form-grid">
 
-<input type="text" id="guestName" class="input-field" placeholder="Guest Name">
+<input
+type="text"
+id="guestName"
+class="input-field"
+placeholder="Guest Name">
 
-<input type="text" id="destination" class="input-field" placeholder="Destination">
+<input
+type="text"
+id="companyName"
+class="input-field"
+placeholder="Company Name (Optional)">
 
-<input type="date" id="travelDate" class="input-field">
+<input
+type="text"
+id="destination"
+class="input-field"
+placeholder="Destination">
 
-<input type="number" id="days" class="input-field" placeholder="No of Days">
+<input
+type="date"
+id="travelDate"
+class="input-field">
 
-<input type="number" id="guests" class="input-field" placeholder="No of Guests">
+<input
+type="number"
+id="days"
+class="input-field"
+placeholder="No of Days">
 
-<select id="travelStatus" class="input-field">
+<input
+type="number"
+id="guests"
+class="input-field"
+placeholder="No of Guests">
+
+<select
+id="travelStatus"
+class="input-field">
+
 <option>CONFIRMED</option>
 <option>PENDING FOR CONFIRMATION</option>
 <option>COMPLETED</option>
+
 </select>
 
-<select id="paymentStatus" class="input-field">
+<select
+id="paymentStatus"
+class="input-field">
+
 <option>ADVANCE PAID</option>
 <option>PAYMENT PENDING</option>
 <option>PAYMENT COMPLETED</option>
+
 </select>
 
-<input type="text" id="amountReceived" class="input-field" placeholder="Amount Received">
+<input
+type="text"
+id="amountReceived"
+class="input-field"
+placeholder="Amount Received">
 
-<input type="text" id="balanceAmount" class="input-field" placeholder="Balance Receivable">
+<input
+type="text"
+id="balanceAmount"
+class="input-field"
+placeholder="Balance Receivable">
 
 </div>
 
 <br>
 
-<textarea id="itinerary" placeholder="Day Wise Itinerary"></textarea>
+<textarea
+id="itinerary"
+placeholder="Day Wise Itinerary"></textarea>
 
 <br><br>
 
-<textarea id="inclusions" placeholder="Inclusions / Notes"></textarea>
+<textarea
+id="inclusions"
+placeholder="Inclusions / Notes"></textarea>
 
-<button class="save-btn" onclick="addGuest()">
+<button
+class="save-btn"
+onclick="addGuest()">
+
 SAVE GUEST
+
 </button>
 
 </div>
 
-<div class="status-grid" id="guestContainer"></div>
+<div
+class="status-grid"
+id="guestContainer"></div>
 
 </div>
 
@@ -402,6 +460,9 @@ const guest = {
 guestName:
 document.getElementById("guestName").value,
 
+companyName:
+document.getElementById("companyName").value,
+
 destination:
 document.getElementById("destination").value,
 
@@ -465,8 +526,13 @@ document
 )
 .forEach(i=>i.value="");
 
-document.getElementById("travelStatus").selectedIndex = 0;
-document.getElementById("paymentStatus").selectedIndex = 0;
+document.getElementById(
+"travelStatus"
+).selectedIndex = 0;
+
+document.getElementById(
+"paymentStatus"
+).selectedIndex = 0;
 
 }
 
@@ -516,6 +582,20 @@ onclick="this.classList.toggle('active')"
 <div class="guest-name">
 ${g.guestName}
 </div>
+
+${
+g.companyName
+?
+
+`<div class="company-name">
+🏢 ${g.companyName}
+</div>`
+
+:
+
+""
+
+}
 
 <div class="status-badge ${badge}">
 ${g.travelStatus}
@@ -581,7 +661,9 @@ onclick="
 event.stopPropagation();
 editGuest('${docItem.id}')
 ">
+
 Edit
+
 </button>
 
 <button
@@ -590,7 +672,9 @@ onclick="
 event.stopPropagation();
 deleteGuest('${docItem.id}')
 ">
+
 Delete
+
 </button>
 
 </div>
@@ -635,37 +719,64 @@ const g = snap.data();
 
 editingId = id;
 
-document.getElementById("guestName").value =
+document.getElementById(
+"guestName"
+).value =
 g.guestName || "";
 
-document.getElementById("destination").value =
+document.getElementById(
+"companyName"
+).value =
+g.companyName || "";
+
+document.getElementById(
+"destination"
+).value =
 g.destination || "";
 
-document.getElementById("travelDate").value =
+document.getElementById(
+"travelDate"
+).value =
 g.travelDate || "";
 
-document.getElementById("days").value =
+document.getElementById(
+"days"
+).value =
 g.days || "";
 
-document.getElementById("guests").value =
+document.getElementById(
+"guests"
+).value =
 g.guests || "";
 
-document.getElementById("travelStatus").value =
+document.getElementById(
+"travelStatus"
+).value =
 g.travelStatus || "";
 
-document.getElementById("paymentStatus").value =
+document.getElementById(
+"paymentStatus"
+).value =
 g.paymentStatus || "";
 
-document.getElementById("amountReceived").value =
+document.getElementById(
+"amountReceived"
+).value =
 g.amountReceived || "";
 
-document.getElementById("balanceAmount").value =
+document.getElementById(
+"balanceAmount"
+).value =
 g.balanceAmount || "";
 
-document.getElementById("itinerary").value =
+document.getElementById(
+"itinerary"
+).value =
 g.itinerary || "";
 
-document.getElementById("inclusions").value =
+document.getElementById(
+"inclusions"
+).value =
 g.inclusions || "";
 
 document.getElementById(
