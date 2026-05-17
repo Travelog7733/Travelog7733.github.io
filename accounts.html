@@ -1055,6 +1055,20 @@ ${c.company || ""}
 ${c.notes || ""}
 </div>
 
+<div class="action-row">
+
+<button class="edit-btn"
+onclick="event.stopPropagation();editCustomer('${docItem.id}')">
+Edit
+</button>
+
+<button class="delete-btn"
+onclick="event.stopPropagation();deleteCustomer('${docItem.id}')">
+Delete
+</button>
+
+</div>
+
 </div>
 
 </div>
@@ -1116,6 +1130,20 @@ ${s.terms || ""}
 <div class="detail">
 <span class="label">Notes:</span>
 ${s.notes || ""}
+</div>
+
+<div class="action-row">
+
+<button class="edit-btn"
+onclick="event.stopPropagation();editSupplier('${docItem.id}')">
+Edit
+</button>
+
+<button class="delete-btn"
+onclick="event.stopPropagation();deleteSupplier('${docItem.id}')">
+Delete
+</button>
+
 </div>
 
 </div>
