@@ -10,6 +10,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 
 *{
@@ -542,8 +544,6 @@ SAVE SUPPLIER
 
 </div>
 
-<!-- TAB CONTAINERS -->
-
 <div id="salesTab">
 <div class="data-grid" id="salesContainer"></div>
 </div>
@@ -562,8 +562,6 @@ SAVE SUPPLIER
 
 </div>
 
-<!-- FIREBASE -->
-
 <script type="module">
 
 import { initializeApp }
@@ -575,7 +573,9 @@ collection,
 addDoc,
 onSnapshot,
 deleteDoc,
-doc
+doc,
+updateDoc,
+getDoc
 }
 from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
@@ -600,10 +600,17 @@ window.addDoc = addDoc;
 window.onSnapshot = onSnapshot;
 window.deleteDoc = deleteDoc;
 window.doc = doc;
+window.updateDoc = updateDoc;
+window.getDoc = getDoc;
 
 </script>
 
 <script>
+
+let editingSaleId = null;
+let editingPurchaseId = null;
+let editingCustomerId = null;
+let editingSupplierId = null;
 
 function toggleForm(id){
 
@@ -628,23 +635,13 @@ document.getElementById('purchasesTab').classList.add('hidden');
 document.getElementById('customersTab').classList.add('hidden');
 document.getElementById('suppliersTab').classList.add('hidden');
 
-if(tab==='sales')
-document.getElementById('salesTab').classList.remove('hidden');
-
-if(tab==='purchases')
-document.getElementById('purchasesTab').classList.remove('hidden');
-
-if(tab==='customers')
-document.getElementById('customersTab').classList.remove('hidden');
-
-if(tab==='suppliers')
-document.getElementById('suppliersTab').classList.remove('hidden');
+document.getElementById(tab + 'Tab').classList.remove('hidden');
 
 }
 
 async function saveSale(){
 
-await addDoc(collection(db,"sales"),{
+const data = {
 
 customer:
 document.getElementById('saleCustomer').value,
@@ -670,15 +667,29 @@ document.getElementById('saleNotes').value,
 created:
 new Date().toISOString()
 
-});
+};
+
+if(editingSaleId){
+
+await updateDoc(doc(db,"sales",editingSaleId),data);
+
+editingSaleId = null;
+
+alert("Sale Updated");
+
+}else{
+
+await addDoc(collection(db,"sales"),data);
 
 alert("Sale Saved");
 
 }
 
+}
+
 async function savePurchase(){
 
-await addDoc(collection(db,"purchases"),{
+const data = {
 
 supplier:
 document.getElementById('purchaseSupplier').value,
@@ -701,15 +712,29 @@ document.getElementById('purchaseNotes').value,
 created:
 new Date().toISOString()
 
-});
+};
+
+if(editingPurchaseId){
+
+await updateDoc(doc(db,"purchases",editingPurchaseId),data);
+
+editingPurchaseId = null;
+
+alert("Purchase Updated");
+
+}else{
+
+await addDoc(collection(db,"purchases"),data);
 
 alert("Purchase Saved");
 
 }
 
+}
+
 async function saveCustomer(){
 
-await addDoc(collection(db,"customers"),{
+const data = {
 
 name:
 document.getElementById('customerName').value,
@@ -726,15 +751,29 @@ document.getElementById('customerCompany').value,
 notes:
 document.getElementById('customerNotes').value
 
-});
+};
+
+if(editingCustomerId){
+
+await updateDoc(doc(db,"customers",editingCustomerId),data);
+
+editingCustomerId = null;
+
+alert("Customer Updated");
+
+}else{
+
+await addDoc(collection(db,"customers"),data);
 
 alert("Customer Saved");
 
 }
 
+}
+
 async function saveSupplier(){
 
-await addDoc(collection(db,"suppliers"),{
+const data = {
 
 name:
 document.getElementById('supplierName').value,
@@ -751,9 +790,23 @@ document.getElementById('supplierTerms').value,
 notes:
 document.getElementById('supplierNotes').value
 
-});
+};
+
+if(editingSupplierId){
+
+await updateDoc(doc(db,"suppliers",editingSupplierId),data);
+
+editingSupplierId = null;
+
+alert("Supplier Updated");
+
+}else{
+
+await addDoc(collection(db,"suppliers"),data);
 
 alert("Supplier Saved");
+
+}
 
 }
 
@@ -816,23 +869,17 @@ ${s.salesPerson || ""}
 
 <div class="detail">
 <span class="label">Invoice:</span>
-<span class="amount">
 ₹ ${Number(s.amount || 0).toLocaleString()}
-</span>
 </div>
 
 <div class="detail">
 <span class="label">Received:</span>
-<span class="amount">
 ₹ ${Number(s.received || 0).toLocaleString()}
-</span>
 </div>
 
 <div class="detail">
 <span class="label">Balance:</span>
-<span class="amount">
 ₹ ${balance.toLocaleString()}
-</span>
 </div>
 
 <div class="detail">
@@ -848,12 +895,12 @@ ${s.notes || ""}
 <div class="action-row">
 
 <button class="edit-btn"
-onclick="event.stopPropagation();alert('Edit Coming Soon')">
+onclick="event.stopPropagation();editSale('${docItem.id}')">
 Edit
 </button>
 
 <button class="pdf-btn"
-onclick="event.stopPropagation();downloadSalePDF('${s.customer}')">
+onclick="event.stopPropagation();downloadSalePDF('${s.customer}',${s.amount})">
 PDF
 </button>
 
@@ -938,23 +985,17 @@ ${p.service || ""}
 
 <div class="detail">
 <span class="label">Amount:</span>
-<span class="amount">
 ₫ ${Number(p.amount || 0).toLocaleString()}
-</span>
 </div>
 
 <div class="detail">
 <span class="label">Paid:</span>
-<span class="amount">
 ₫ ${Number(p.paid || 0).toLocaleString()}
-</span>
 </div>
 
 <div class="detail">
 <span class="label">Balance:</span>
-<span class="amount">
 ₫ ${balance.toLocaleString()}
-</span>
 </div>
 
 <div class="detail">
@@ -970,12 +1011,12 @@ ${p.notes || ""}
 <div class="action-row">
 
 <button class="edit-btn"
-onclick="event.stopPropagation();alert('Edit Coming Soon')">
+onclick="event.stopPropagation();editPurchase('${docItem.id}')">
 Edit
 </button>
 
 <button class="pdf-btn"
-onclick="event.stopPropagation();downloadPurchasePDF('${p.supplier}')">
+onclick="event.stopPropagation();downloadPurchasePDF('${p.supplier}',${p.amount})">
 PDF
 </button>
 
@@ -1006,168 +1047,82 @@ document.getElementById('pendingPayable').innerHTML =
 
 }
 
-function loadCustomers(){
+async function editSale(id){
 
-onSnapshot(collection(db,"customers"),snapshot=>{
+const snap = await getDoc(doc(db,"sales",id));
 
-let html = "";
+const s = snap.data();
 
-snapshot.forEach((docItem)=>{
+editingSaleId = id;
 
-const c = docItem.data();
+document.getElementById('salesForm').style.display = "block";
 
-html += `
-
-<div class="list-tile searchable"
-onclick="this.classList.toggle('active')">
-
-<div class="list-head">
-
-<div class="list-name">
-${c.name || ""}
-</div>
-
-<div class="badge customer-badge">
-CUSTOMER
-</div>
-
-</div>
-
-<div class="expand-content">
-
-<div class="detail">
-<span class="label">Phone:</span>
-${c.phone || ""}
-</div>
-
-<div class="detail">
-<span class="label">Email:</span>
-${c.email || ""}
-</div>
-
-<div class="detail">
-<span class="label">Company:</span>
-${c.company || ""}
-</div>
-
-<div class="detail">
-<span class="label">Notes:</span>
-${c.notes || ""}
-</div>
-
-<div class="action-row">
-
-<button class="edit-btn"
-onclick="event.stopPropagation();editCustomer('${docItem.id}')">
-Edit
-</button>
-
-<button class="delete-btn"
-onclick="event.stopPropagation();deleteCustomer('${docItem.id}')">
-Delete
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-document.getElementById('customerContainer').innerHTML = html;
-
-});
+document.getElementById('saleCustomer').value = s.customer || "";
+document.getElementById('salePackage').value = s.package || "";
+document.getElementById('salePerson').value = s.salesPerson || "";
+document.getElementById('saleAmount').value = s.amount || "";
+document.getElementById('saleReceived').value = s.received || "";
+document.getElementById('saleStatus').value = s.status || "";
+document.getElementById('saleNotes').value = s.notes || "";
 
 }
 
-function loadSuppliers(){
+async function editPurchase(id){
 
-onSnapshot(collection(db,"suppliers"),snapshot=>{
+const snap = await getDoc(doc(db,"purchases",id));
 
-let html = "";
+const p = snap.data();
 
-snapshot.forEach((docItem)=>{
+editingPurchaseId = id;
 
-const s = docItem.data();
+document.getElementById('purchaseForm').style.display = "block";
 
-html += `
+document.getElementById('purchaseSupplier').value = p.supplier || "";
+document.getElementById('purchaseService').value = p.service || "";
+document.getElementById('purchaseAmount').value = p.amount || "";
+document.getElementById('purchasePaid').value = p.paid || "";
+document.getElementById('purchaseStatus').value = p.status || "";
+document.getElementById('purchaseNotes').value = p.notes || "";
 
-<div class="list-tile searchable"
-onclick="this.classList.toggle('active')">
+}
 
-<div class="list-head">
+async function editCustomer(id){
 
-<div class="list-name">
-${s.name || ""}
-</div>
+const snap = await getDoc(doc(db,"customers",id));
 
-<div class="badge supplier-badge">
-SUPPLIER
-</div>
+const c = snap.data();
 
-</div>
+editingCustomerId = id;
 
-<div class="expand-content">
+document.getElementById('customerForm').style.display = "block";
 
-<div class="detail">
-<span class="label">Country:</span>
-${s.country || ""}
-</div>
+document.getElementById('customerName').value = c.name || "";
+document.getElementById('customerPhone').value = c.phone || "";
+document.getElementById('customerEmail').value = c.email || "";
+document.getElementById('customerCompany').value = c.company || "";
+document.getElementById('customerNotes').value = c.notes || "";
 
-<div class="detail">
-<span class="label">Contact:</span>
-${s.contact || ""}
-</div>
+}
 
-<div class="detail">
-<span class="label">Payment Terms:</span>
-${s.terms || ""}
-</div>
+async function editSupplier(id){
 
-<div class="detail">
-<span class="label">Notes:</span>
-${s.notes || ""}
-</div>
+const snap = await getDoc(doc(db,"suppliers",id));
 
-<div class="action-row">
+const s = snap.data();
 
-<button class="edit-btn"
-onclick="event.stopPropagation();editSupplier('${docItem.id}')">
-Edit
-</button>
+editingSupplierId = id;
 
-<button class="delete-btn"
-onclick="event.stopPropagation();deleteSupplier('${docItem.id}')">
-Delete
-</button>
+document.getElementById('supplierForm').style.display = "block";
 
-</div>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-document.getElementById('supplierContainer').innerHTML = html;
-
-});
+document.getElementById('supplierName').value = s.name || "";
+document.getElementById('supplierCountry').value = s.country || "";
+document.getElementById('supplierContact').value = s.contact || "";
+document.getElementById('supplierTerms').value = s.terms || "";
+document.getElementById('supplierNotes').value = s.notes || "";
 
 }
 
 async function deleteSale(id){
-
-const password = prompt("Enter password");
-
-if(password !== "5655"){
-alert("Wrong password");
-return;
-}
 
 if(!confirm("Delete Sale?")) return;
 
@@ -1177,28 +1132,53 @@ await deleteDoc(doc(db,"sales",id));
 
 async function deletePurchase(id){
 
-const password = prompt("Enter password");
-
-if(password !== "5655"){
-alert("Wrong password");
-return;
-}
-
 if(!confirm("Delete Purchase?")) return;
 
 await deleteDoc(doc(db,"purchases",id));
 
 }
 
-function downloadSalePDF(name){
+async function deleteCustomer(id){
 
-alert("PDF Download Ready For " + name);
+if(!confirm("Delete Customer?")) return;
+
+await deleteDoc(doc(db,"customers",id));
 
 }
 
-function downloadPurchasePDF(name){
+async function deleteSupplier(id){
 
-alert("PDF Download Ready For " + name);
+if(!confirm("Delete Supplier?")) return;
+
+await deleteDoc(doc(db,"suppliers",id));
+
+}
+
+function downloadSalePDF(name,amount){
+
+const { jsPDF } = window.jspdf;
+
+const docu = new jsPDF();
+
+docu.text("SALE INVOICE",20,20);
+docu.text("Customer: " + name,20,40);
+docu.text("Amount: ₹ " + amount,20,60);
+
+docu.save(name + "-sale.pdf");
+
+}
+
+function downloadPurchasePDF(name,amount){
+
+const { jsPDF } = window.jspdf;
+
+const docu = new jsPDF();
+
+docu.text("PURCHASE INVOICE",20,20);
+docu.text("Supplier: " + name,20,40);
+docu.text("Amount: ₫ " + amount,20,60);
+
+docu.save(name + "-purchase.pdf");
 
 }
 
