@@ -1047,6 +1047,164 @@ document.getElementById('pendingPayable').innerHTML =
 
 }
 
+<script>
+
+function loadCustomers(){
+
+onSnapshot(collection(db,"customers"),snapshot=>{
+
+let html = "";
+
+snapshot.forEach((docItem)=>{
+
+const c = docItem.data();
+
+html += `
+
+<div class="list-tile searchable"
+onclick="this.classList.toggle('active')">
+
+<div class="list-head">
+
+<div class="list-name">
+${c.name || ""}
+</div>
+
+<div class="badge customer-badge">
+CUSTOMER
+</div>
+
+</div>
+
+<div class="expand-content">
+
+<div class="detail">
+<span class="label">Phone:</span>
+${c.phone || ""}
+</div>
+
+<div class="detail">
+<span class="label">Email:</span>
+${c.email || ""}
+</div>
+
+<div class="detail">
+<span class="label">Company:</span>
+${c.company || ""}
+</div>
+
+<div class="detail">
+<span class="label">Notes:</span>
+${c.notes || ""}
+</div>
+
+<div class="action-row">
+
+<button class="edit-btn"
+onclick="event.stopPropagation();editCustomer('${docItem.id}')">
+Edit
+</button>
+
+<button class="delete-btn"
+onclick="event.stopPropagation();deleteCustomer('${docItem.id}')">
+Delete
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('customerContainer').innerHTML = html;
+
+});
+
+}
+
+function loadSuppliers(){
+
+onSnapshot(collection(db,"suppliers"),snapshot=>{
+
+let html = "";
+
+snapshot.forEach((docItem)=>{
+
+const s = docItem.data();
+
+html += `
+
+<div class="list-tile searchable"
+onclick="this.classList.toggle('active')">
+
+<div class="list-head">
+
+<div class="list-name">
+${s.name || ""}
+</div>
+
+<div class="badge supplier-badge">
+SUPPLIER
+</div>
+
+</div>
+
+<div class="expand-content">
+
+<div class="detail">
+<span class="label">Country:</span>
+${s.country || ""}
+</div>
+
+<div class="detail">
+<span class="label">Contact:</span>
+${s.contact || ""}
+</div>
+
+<div class="detail">
+<span class="label">Payment Terms:</span>
+${s.terms || ""}
+</div>
+
+<div class="detail">
+<span class="label">Notes:</span>
+${s.notes || ""}
+</div>
+
+<div class="action-row">
+
+<button class="edit-btn"
+onclick="event.stopPropagation();editSupplier('${docItem.id}')">
+Edit
+</button>
+
+<button class="delete-btn"
+onclick="event.stopPropagation();deleteSupplier('${docItem.id}')">
+Delete
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('supplierContainer').innerHTML = html;
+
+});
+
+}
+
+</script>
+
 async function editSale(id){
 
 const snap = await getDoc(doc(db,"sales",id));
