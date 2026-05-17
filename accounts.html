@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Accounts Platform | Travelog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#f4f7fb;
+padding:30px 20px;
+color:#222;
+}
+
+.wrapper{
+max-width:1600px;
+margin:auto;
+}
+
+.page-title{
+font-size:42px;
+font-weight:700;
+text-align:center;
+margin-bottom:10px;
+}
+
+.page-subtitle{
+text-align:center;
+color:#666;
+margin-bottom:35px;
+}
+
+.dashboard-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+margin-bottom:30px;
+}
+
+.dashboard-card{
+background:#fff;
+padding:28px;
+border-radius:24px;
+border:1px solid #E4ECE9;
+box-shadow:0 8px 25px rgba(0,0,0,.04);
+}
+
+.dashboard-label{
+font-size:14px;
+font-weight:600;
+color:#666;
+margin-bottom:10px;
+}
+
+.dashboard-value{
+font-size:32px;
+font-weight:700;
+color:#1D9E75;
+}
+
+.top-actions{
+display:flex;
+gap:15px;
+justify-content:center;
+flex-wrap:wrap;
+margin-bottom:35px;
+}
+
+.action-btn{
+background:#1D9E75;
+border:none;
+padding:14px 26px;
+border-radius:40px;
+font-size:15px;
+font-weight:600;
+color:#fff;
+cursor:pointer;
+transition:.3s;
+}
+
+.action-btn:hover{
+background:#0F6E56;
+transform:translateY(-2px);
+}
+
+.search-box{
+max-width:500px;
+margin:0 auto 35px;
+}
+
+.search-input{
+width:100%;
+padding:16px;
+border-radius:18px;
+border:1px solid #ddd;
+font-size:15px;
+outline:none;
+}
+
+.search-input:focus{
+border-color:#1D9E75;
+}
+
+.form-box{
+background:#fff;
+padding:30px;
+border-radius:24px;
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
+margin-bottom:35px;
+display:none;
+}
+
+.section-title{
+font-size:22px;
+font-weight:700;
+margin-bottom:20px;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:18px;
+}
+
+.input-field,
+select,
+textarea{
+width:100%;
+padding:14px;
+border-radius:14px;
+border:1px solid #ddd;
+font-size:15px;
+outline:none;
+}
+
+.input-field:focus,
+select:focus,
+textarea:focus{
+border-color:#1D9E75;
+}
+
+textarea{
+resize:vertical;
+min-height:120px;
+}
+
+.save-btn{
+margin-top:25px;
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:15px 28px;
+border-radius:40px;
+font-size:16px;
+font-weight:700;
+cursor:pointer;
+}
+
+.data-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+gap:25px;
+}
+
+.card{
+background:#fff;
+padding:25px;
+border-radius:24px;
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-4px);
+}
+
+.card-header{
+display:flex;
+justify-content:space-between;
+gap:15px;
+margin-bottom:18px;
+}
+
+.card-title{
+font-size:24px;
+font-weight:700;
+}
+
+.card-sub{
+font-size:13px;
+color:#666;
+margin-top:5px;
+}
+
+.badge{
+padding:8px 14px;
+border-radius:999px;
+font-size:12px;
+font-weight:700;
+color:#fff;
+height:fit-content;
+}
+
+.sales-badge{
+background:#0077ff;
+}
+
+.purchase-badge{
+background:#ff9800;
+}
+
+.detail{
+margin-bottom:12px;
+font-size:15px;
+line-height:1.7;
+color:#555;
+}
+
+.label{
+font-weight:700;
+color:#222;
+}
+
+.amount{
+font-weight:700;
+color:#1D9E75;
+}
+
+.card-actions{
+display:flex;
+gap:10px;
+margin-top:20px;
+}
+
+.edit-btn,
+.delete-btn{
+border:none;
+padding:10px 16px;
+border-radius:12px;
+font-weight:600;
+color:#fff;
+cursor:pointer;
+}
+
+.edit-btn{
+background:#0B3D91;
+}
+
+.delete-btn{
+background:#ff4d4f;
+}
+
+.tabs{
+display:flex;
+justify-content:center;
+gap:15px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.tab-btn{
+padding:12px 24px;
+border:none;
+border-radius:999px;
+background:#fff;
+border:1px solid #ddd;
+cursor:pointer;
+font-weight:600;
+}
+
+.tab-btn.active{
+background:#1D9E75;
+color:#fff;
+border-color:#1D9E75;
+}
+
+.hidden{
+display:none;
+}
+
+@media(max-width:768px){
+
+.page-title{
+font-size:32px;
+}
+
+.form-box{
+padding:20px;
+}
+
+.card-header{
+flex-direction:column;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<h1 class="page-title">
+Accounts Platform
+</h1>
+
+<p class="page-subtitle">
+Purchase & Sales Tracker
+</p>
+
+<div class="dashboard-grid">
+
+<div class="dashboard-card">
+<div class="dashboard-label">Total Sales (INR)</div>
+<div class="dashboard-value" id="totalSales">₹ 0</div>
+</div>
+
+<div class="dashboard-card">
+<div class="dashboard-label">Total Purchases (VND)</div>
+<div class="dashboard-value" id="totalPurchases">₫ 0</div>
+</div>
+
+<div class="dashboard-card">
+<div class="dashboard-label">Pending Receivable</div>
+<div class="dashboard-value" id="pendingReceivable">₹ 0</div>
+</div>
+
+<div class="dashboard-card">
+<div class="dashboard-label">Pending Payable</div>
+<div class="dashboard-value" id="pendingPayable">₫ 0</div>
+</div>
+
+</div>
+
+<div class="tabs">
+
+<button class="tab-btn active" onclick="showTab('sales')">
+Sales
+</button>
+
+<button class="tab-btn" onclick="showTab('purchases')">
+Purchases
+</button>
+
+<button class="tab-btn" onclick="showTab('customers')">
+Customers
+</button>
+
+<button class="tab-btn" onclick="showTab('suppliers')">
+Suppliers
+</button>
+
+</div>
+
+<div class="top-actions">
+
+<button class="action-btn" onclick="toggleForm('salesForm')">
++ Add Sale
+</button>
+
+<button class="action-btn" onclick="toggleForm('purchaseForm')">
++ Add Purchase
+</button>
+
+<button class="action-btn" onclick="toggleForm('customerForm')">
++ Add Customer
+</button>
+
+<button class="action-btn" onclick="toggleForm('supplierForm')">
++ Add Supplier
+</button>
+
+</div>
+
+<div class="search-box">
+<input type="text" class="search-input" placeholder="Search..." onkeyup="searchCards(this.value)">
+</div>
+
+<!-- SALES FORM -->
+
+<div class="form-box" id="salesForm">
+
+<div class="section-title">
+Add Sale
+</div>
+
+<div class="form-grid">
+
+<input type="text" id="saleCustomer" class="input-field" placeholder="Customer Name">
+
+<input type="text" id="salePackage" class="input-field" placeholder="Package / Product">
+
+<input type="text" id="salePerson" class="input-field" placeholder="Sales Person">
+
+<input type="number" id="saleAmount" class="input-field" placeholder="Invoice Amount ₹">
+
+<input type="number" id="saleReceived" class="input-field" placeholder="Amount Received ₹">
+
+<select id="saleStatus" class="input-field">
+<option>PAYMENT PENDING</option>
+<option>PARTIAL PAYMENT</option>
+<option>PAYMENT COMPLETED</option>
+</select>
+
+<textarea id="saleNotes" placeholder="Notes"></textarea>
+
+</div>
+
+<button class="save-btn" onclick="saveSale()">
+SAVE SALE
+</button>
+
+</div>
+
+<!-- PURCHASE FORM -->
+
+<div class="form-box" id="purchaseForm">
+
+<div class="section-title">
+Add Purchase
+</div>
+
+<div class="form-grid">
+
+<input type="text" id="purchaseSupplier" class="input-field" placeholder="Supplier Name">
+
+<input type="text" id="purchaseService" class="input-field" placeholder="Service Type">
+
+<input type="number" id="purchaseAmount" class="input-field" placeholder="Purchase Amount ₫">
+
+<input type="number" id="purchasePaid" class="input-field" placeholder="Paid Amount ₫">
+
+<select id="purchaseStatus" class="input-field">
+<option>PAYMENT PENDING</option>
+<option>PARTIAL PAYMENT</option>
+<option>PAYMENT COMPLETED</option>
+</select>
+
+<textarea id="purchaseNotes" placeholder="Notes"></textarea>
+
+</div>
+
+<button class="save-btn" onclick="savePurchase()">
+SAVE PURCHASE
+</button>
+
+</div>
+
+<!-- CUSTOMER FORM -->
+
+<div class="form-box" id="customerForm">
+
+<div class="section-title">
+Add Customer
+</div>
+
+<div class="form-grid">
+
+<input type="text" id="customerName" class="input-field" placeholder="Customer Name">
+
+<input type="text" id="customerPhone" class="input-field" placeholder="Phone">
+
+<input type="email" id="customerEmail" class="input-field" placeholder="Email">
+
+<input type="text" id="customerCompany" class="input-field" placeholder="Company">
+
+<textarea id="customerNotes" placeholder="Notes"></textarea>
+
+</div>
+
+<button class="save-btn" onclick="saveCustomer()">
+SAVE CUSTOMER
+</button>
+
+</div>
+
+<!-- SUPPLIER FORM -->
+
+<div class="form-box" id="supplierForm">
+
+<div class="section-title">
+Add Supplier
+</div>
+
+<div class="form-grid">
+
+<input type="text" id="supplierName" class="input-field" placeholder="Supplier Name">
+
+<input type="text" id="supplierCountry" class="input-field" placeholder="Country">
+
+<input type="text" id="supplierContact" class="input-field" placeholder="Contact">
+
+<input type="text" id="supplierTerms" class="input-field" placeholder="Payment Terms">
+
+<textarea id="supplierNotes" placeholder="Notes"></textarea>
+
+</div>
+
+<button class="save-btn" onclick="saveSupplier()">
+SAVE SUPPLIER
+</button>
+
+</div>
+
+<!-- DATA CONTAINERS -->
+
+<div id="salesTab">
+<div class="data-grid" id="salesContainer"></div>
+</div>
+
+<div id="purchasesTab" class="hidden">
+<div class="data-grid" id="purchaseContainer"></div>
+</div>
+
+<div id="customersTab" class="hidden">
+<div class="data-grid" id="customerContainer"></div>
+</div>
+
+<div id="suppliersTab" class="hidden">
+<div class="data-grid" id="supplierContainer"></div>
+</div>
+
+</div>
+
+<!-- FIREBASE -->
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+onSnapshot,
+deleteDoc,
+doc
+}
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_DOMAIN",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_BUCKET",
+messagingSenderId: "YOUR_SENDER_ID",
+appId: "YOUR_APP_ID"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.onSnapshot = onSnapshot;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+
+</script>
+
+<script>
+
+function toggleForm(id){
+
+const form = document.getElementById(id);
+
+form.style.display =
+form.style.display === "block"
+? "none"
+: "block";
+
+}
+
+function showTab(tab){
+
+document.querySelectorAll('.tab-btn')
+.forEach(btn=>btn.classList.remove('active'));
+
+event.target.classList.add('active');
+
+document.getElementById('salesTab').classList.add('hidden');
+document.getElementById('purchasesTab').classList.add('hidden');
+document.getElementById('customersTab').classList.add('hidden');
+document.getElementById('suppliersTab').classList.add('hidden');
+
+if(tab==='sales')
+document.getElementById('salesTab').classList.remove('hidden');
+
+if(tab==='purchases')
+document.getElementById('purchasesTab').classList.remove('hidden');
+
+if(tab==='customers')
+document.getElementById('customersTab').classList.remove('hidden');
+
+if(tab==='suppliers')
+document.getElementById('suppliersTab').classList.remove('hidden');
+
+}
+
+async function saveSale(){
+
+const data = {
+
+customer:
+document.getElementById('saleCustomer').value,
+
+package:
+document.getElementById('salePackage').value,
+
+salesPerson:
+document.getElementById('salePerson').value,
+
+amount:
+Number(document.getElementById('saleAmount').value),
+
+received:
+Number(document.getElementById('saleReceived').value),
+
+status:
+document.getElementById('saleStatus').value,
+
+notes:
+document.getElementById('saleNotes').value,
+
+created:
+new Date().toISOString()
+
+};
+
+await addDoc(collection(db,"sales"),data);
+
+alert("Sale Saved");
+
+}
+
+async function savePurchase(){
+
+const data = {
+
+supplier:
+document.getElementById('purchaseSupplier').value,
+
+service:
+document.getElementById('purchaseService').value,
+
+amount:
+Number(document.getElementById('purchaseAmount').value),
+
+paid:
+Number(document.getElementById('purchasePaid').value),
+
+status:
+document.getElementById('purchaseStatus').value,
+
+notes:
+document.getElementById('purchaseNotes').value,
+
+created:
+new Date().toISOString()
+
+};
+
+await addDoc(collection(db,"purchases"),data);
+
+alert("Purchase Saved");
+
+}
+
+async function saveCustomer(){
+
+const data = {
+
+name:
+document.getElementById('customerName').value,
+
+phone:
+document.getElementById('customerPhone').value,
+
+email:
+document.getElementById('customerEmail').value,
+
+company:
+document.getElementById('customerCompany').value,
+
+notes:
+document.getElementById('customerNotes').value
+
+};
+
+await addDoc(collection(db,"customers"),data);
+
+alert("Customer Saved");
+
+}
+
+async function saveSupplier(){
+
+const data = {
+
+name:
+document.getElementById('supplierName').value,
+
+country:
+document.getElementById('supplierCountry').value,
+
+contact:
+document.getElementById('supplierContact').value,
+
+terms:
+document.getElementById('supplierTerms').value,
+
+notes:
+document.getElementById('supplierNotes').value
+
+};
+
+await addDoc(collection(db,"suppliers"),data);
+
+alert("Supplier Saved");
+
+}
+
+function loadSales(){
+
+onSnapshot(collection(db,"sales"),snapshot=>{
+
+let html = "";
+let total = 0;
+let pending = 0;
+
+snapshot.forEach(docItem=>{
+
+const s = docItem.data();
+
+total += Number(s.amount || 0);
+
+pending += Number((s.amount || 0) - (s.received || 0));
+
+html += `
+
+<div class="card searchable">
+
+<div class="card-header">
+
+<div>
+<div class="card-title">${s.customer || ""}</div>
+<div class="card-sub">${s.package || ""}</div>
+</div>
+
+<div class="badge sales-badge">
+SALE
+</div>
+
+</div>
+
+<div class="detail">
+<span class="label">Sales Person:</span>
+${s.salesPerson || ""}
+</div>
+
+<div class="detail">
+<span class="label">Invoice:</span>
+<span class="amount">₹ ${s.amount || 0}</span>
+</div>
+
+<div class="detail">
+<span class="label">Received:</span>
+<span class="amount">₹ ${s.received || 0}</span>
+</div>
+
+<div class="detail">
+<span class="label">Balance:</span>
+<span class="amount">₹ ${(s.amount || 0)-(s.received || 0)}</span>
+</div>
+
+<div class="detail">
+<span class="label">Status:</span>
+${s.status || ""}
+</div>
+
+<div class="detail">
+<span class="label">Notes:</span>
+${s.notes || ""}
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('salesContainer').innerHTML = html;
+
+document.getElementById('totalSales').innerHTML =
+`₹ ${total.toLocaleString()}`;
+
+document.getElementById('pendingReceivable').innerHTML =
+`₹ ${pending.toLocaleString()}`;
+
+});
+
+}
+
+function loadPurchases(){
+
+onSnapshot(collection(db,"purchases"),snapshot=>{
+
+let html = "";
+let total = 0;
+let pending = 0;
+
+snapshot.forEach(docItem=>{
+
+const p = docItem.data();
+
+total += Number(p.amount || 0);
+
+pending += Number((p.amount || 0) - (p.paid || 0));
+
+html += `
+
+<div class="card searchable">
+
+<div class="card-header">
+
+<div>
+<div class="card-title">${p.supplier || ""}</div>
+<div class="card-sub">${p.service || ""}</div>
+</div>
+
+<div class="badge purchase-badge">
+PURCHASE
+</div>
+
+</div>
+
+<div class="detail">
+<span class="label">Amount:</span>
+<span class="amount">₫ ${p.amount || 0}</span>
+</div>
+
+<div class="detail">
+<span class="label">Paid:</span>
+<span class="amount">₫ ${p.paid || 0}</span>
+</div>
+
+<div class="detail">
+<span class="label">Balance:</span>
+<span class="amount">₫ ${(p.amount || 0)-(p.paid || 0)}</span>
+</div>
+
+<div class="detail">
+<span class="label">Status:</span>
+${p.status || ""}
+</div>
+
+<div class="detail">
+<span class="label">Notes:</span>
+${p.notes || ""}
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('purchaseContainer').innerHTML = html;
+
+document.getElementById('totalPurchases').innerHTML =
+`₫ ${total.toLocaleString()}`;
+
+document.getElementById('pendingPayable').innerHTML =
+`₫ ${pending.toLocaleString()}`;
+
+});
+
+}
+
+function loadCustomers(){
+
+onSnapshot(collection(db,"customers"),snapshot=>{
+
+let html = "";
+
+snapshot.forEach(docItem=>{
+
+const c = docItem.data();
+
+html += `
+
+<div class="card searchable">
+
+<div class="card-title">${c.name || ""}</div>
+
+<div class="detail">
+<span class="label">Phone:</span>
+${c.phone || ""}
+</div>
+
+<div class="detail">
+<span class="label">Email:</span>
+${c.email || ""}
+</div>
+
+<div class="detail">
+<span class="label">Company:</span>
+${c.company || ""}
+</div>
+
+<div class="detail">
+<span class="label">Notes:</span>
+${c.notes || ""}
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('customerContainer').innerHTML = html;
+
+});
+
+}
+
+function loadSuppliers(){
+
+onSnapshot(collection(db,"suppliers"),snapshot=>{
+
+let html = "";
+
+snapshot.forEach(docItem=>{
+
+const s = docItem.data();
+
+html += `
+
+<div class="card searchable">
+
+<div class="card-title">${s.name || ""}</div>
+
+<div class="detail">
+<span class="label">Country:</span>
+${s.country || ""}
+</div>
+
+<div class="detail">
+<span class="label">Contact:</span>
+${s.contact || ""}
+</div>
+
+<div class="detail">
+<span class="label">Payment Terms:</span>
+${s.terms || ""}
+</div>
+
+<div class="detail">
+<span class="label">Notes:</span>
+${s.notes || ""}
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('supplierContainer').innerHTML = html;
+
+});
+
+}
+
+function searchCards(value){
+
+const cards =
+document.querySelectorAll('.searchable');
+
+cards.forEach(card=>{
+
+card.style.display =
+card.innerText.toLowerCase()
+.includes(value.toLowerCase())
+? "block"
+: "none";
+
+});
+
+}
+
+window.addEventListener('load',()=>{
+
+loadSales();
+loadPurchases();
+loadCustomers();
+loadSuppliers();
+
+});
+
+</script>
+
+</body>
+
+</html>
