@@ -196,7 +196,6 @@ border-radius:999px;
 font-size:13px;
 font-weight:700;
 color:#fff;
-margin-bottom:10px;
 }
 
 .confirmed{
@@ -292,54 +291,15 @@ grid-template-columns:1fr 1fr 1fr;
 gap:12px;
 }
 
+.amount{
+font-weight:700;
+color:#1D9E75;
+}
+
 .tile-block{
 margin-top:18px;
 padding-top:18px;
 border-top:1px solid #eee;
-}
-
-.payment-wrapper{
-display:flex;
-gap:25px;
-flex-wrap:wrap;
-margin-top:20px;
-}
-
-.payment-circle{
-width:130px;
-height:130px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-font-size:13px;
-font-weight:700;
-padding:10px;
-line-height:1.6;
-}
-
-.advance-circle{
-border:10px solid #1D9E75;
-color:#1D9E75;
-}
-
-.balance-circle{
-border:10px solid orange;
-color:orange;
-}
-
-.small-payment{
-margin-top:8px;
-font-size:13px;
-font-weight:600;
-color:#444;
-}
-
-.invoice-small{
-font-size:13px;
-margin-top:5px;
-color:#666;
 }
 
 @media(max-width:768px){
@@ -358,12 +318,6 @@ flex-direction:column;
 
 .hotel-grid{
 grid-template-columns:1fr;
-}
-
-.payment-circle{
-width:110px;
-height:110px;
-font-size:12px;
 }
 
 }
@@ -400,13 +354,29 @@ Guest Details
 
 <div class="form-grid">
 
-<input type="text" id="guestName" class="input-field" placeholder="Guest Name">
+<input
+type="text"
+id="guestName"
+class="input-field"
+placeholder="Guest Name">
 
-<input type="text" id="companyName" class="input-field" placeholder="Company Name (Optional)">
+<input
+type="text"
+id="companyName"
+class="input-field"
+placeholder="Company Name (Optional)">
 
-<input type="text" id="salesPerson" class="input-field" placeholder="Sales Person">
+<input
+type="text"
+id="salesPerson"
+class="input-field"
+placeholder="Sales Person">
 
-<input type="text" id="destination" class="input-field" placeholder="Destination">
+<input
+type="text"
+id="destination"
+class="input-field"
+placeholder="Destination">
 
 <input
 type="text"
@@ -416,53 +386,65 @@ placeholder="DD/MM/YYYY"
 maxlength="10"
 oninput="formatDate(this);generateDates()">
 
-<input type="number" id="days" class="input-field" placeholder="No of Days">
-
-<input type="number" id="guests" class="input-field" placeholder="No of Guests">
-
-<select id="travelStatus" class="input-field">
-
-<option>CONFIRMED</option>
-<option>PENDING FOR CONFIRMATION</option>
-<option>COMPLETED</option>
-
-</select>
-
-<select id="paymentStatus" class="input-field">
-
-<option>ADVANCE PAID</option>
-<option>PAYMENT PENDING</option>
-<option>PAYMENT COMPLETED</option>
-
-</select>
+<input
+type="number"
+id="days"
+class="input-field"
+placeholder="No of Days">
 
 <input
 type="number"
-id="invoiceAmount"
+id="guests"
 class="input-field"
-placeholder="₹ Total Invoice Amount"
-oninput="calculatePayments()">
+placeholder="No of Guests">
 
-<input
-type="number"
-id="amountReceived"
-class="input-field"
-placeholder="₹ Amount Received"
-oninput="calculatePayments()">
+<select
+id="travelStatus"
+class="input-field">
+
+<option>
+CONFIRMED
+</option>
+
+<option>
+PENDING FOR CONFIRMATION
+</option>
+
+<option>
+COMPLETED
+</option>
+
+</select>
+
+<select
+id="paymentStatus"
+class="input-field">
+
+<option>
+ADVANCE PAID
+</option>
+
+<option>
+PAYMENT PENDING
+</option>
+
+<option>
+PAYMENT COMPLETED
+</option>
+
+</select>
 
 <input
 type="text"
-id="advancePending"
+id="amountReceived"
 class="input-field"
-placeholder="Advance Pending"
-readonly>
+placeholder="₹ Amount Received">
 
 <input
 type="text"
 id="balanceAmount"
 class="input-field"
-placeholder="Balance Receivable"
-readonly>
+placeholder="₹ Balance Receivable">
 
 </div>
 
@@ -499,11 +481,6 @@ APPROVED
 REJECTED
 </label>
 
-<label class="radio-item">
-<input type="radio" name="visaStatus" value="NOT REQUIRED">
-NOT REQUIRED
-</label>
-
 </div>
 
 </div>
@@ -520,15 +497,30 @@ Hotel Status
 
 <div class="hotel-grid">
 
-<input type="text" class="input-field hotel-place" placeholder="Place">
+<input
+type="text"
+class="input-field hotel-place"
+placeholder="Place">
 
-<input type="text" class="input-field hotel-name" placeholder="Hotel Name">
+<input
+type="text"
+class="input-field hotel-name"
+placeholder="Hotel Name">
 
-<select class="input-field hotel-status">
+<select
+class="input-field hotel-status">
 
-<option>BOOKED</option>
-<option>BOOKED BY CUSTOMER</option>
-<option>PENDING FOR BOOKING</option>
+<option>
+BOOKED
+</option>
+
+<option>
+BOOKED BY CUSTOMER
+</option>
+
+<option>
+PENDING FOR BOOKING
+</option>
 
 </select>
 
@@ -538,8 +530,12 @@ Hotel Status
 
 </div>
 
-<button class="add-small-btn" onclick="addHotel()">
+<button
+class="add-small-btn"
+onclick="addHotel()">
+
 + Add Hotel
+
 </button>
 
 </div>
@@ -566,8 +562,12 @@ placeholder="Activity / Plans"></textarea>
 
 </div>
 
-<button class="add-small-btn" onclick="addDay()">
+<button
+class="add-small-btn"
+onclick="addDay()">
+
 + Add Day
+
 </button>
 
 </div>
@@ -578,17 +578,25 @@ placeholder="Activity / Plans"></textarea>
 Notes
 </div>
 
-<textarea id="inclusions" placeholder="Notes / Inclusions"></textarea>
+<textarea
+id="inclusions"
+placeholder="Notes / Inclusions"></textarea>
 
 </div>
 
-<button class="save-btn" onclick="addGuest()">
+<button
+class="save-btn"
+onclick="addGuest()">
+
 SAVE GUEST
+
 </button>
 
 </div>
 
-<div class="status-grid" id="guestContainer"></div>
+<div
+class="status-grid"
+id="guestContainer"></div>
 
 </div>
 
@@ -639,78 +647,33 @@ window.updateDoc = updateDoc;
 
 </script>
 
+<!-- REPLACE ONLY THIS SCRIPT SECTION IN YOUR CURRENT FILE -->
+
 <script>
 
 let editingId = null;
 let dayCount = 1;
 
-function calculatePayments(){
-
-let invoice =
-Number(
-document.getElementById(
-"invoiceAmount"
-).value
-) || 0;
-
-let paid =
-Number(
-document.getElementById(
-"amountReceived"
-).value
-) || 0;
-
-let advanceRequired =
-invoice * 0.60;
-
-let balanceRequired =
-invoice * 0.40;
-
-let advancePending =
-Math.max(
-advanceRequired - paid,
-0
-);
-
-document.getElementById(
-"advancePending"
-).value =
-"₹ " +
-advancePending.toLocaleString();
-
-document.getElementById(
-"balanceAmount"
-).value =
-"₹ " +
-balanceRequired.toLocaleString();
-
-}
-
 function formatDate(input){
 
-let value =
-input.value.replace(/\D/g,'');
+let value = input.value.replace(/\D/g,'');
 
-if(value.length>2)
-value=
-value.substring(0,2)+"/"+
-value.substring(2);
+if(value.length > 2){
+value = value.substring(0,2) + '/' + value.substring(2);
+}
 
-if(value.length>5)
-value=
-value.substring(0,5)+"/"+
-value.substring(5,9);
+if(value.length > 5){
+value = value.substring(0,5) + '/' + value.substring(5,9);
+}
 
-input.value=value;
+input.value = value;
 
 }
 
 function toggleForm(){
 
-let form =
-document.getElementById(
-"guestFormBox"
-);
+const form =
+document.getElementById("guestFormBox");
 
 form.style.display =
 form.style.display==="block"
@@ -721,46 +684,32 @@ form.style.display==="block"
 
 function generateDates(){
 
-const start =
-document.getElementById(
-"travelDate"
-).value;
+const startDate =
+document.getElementById("travelDate").value;
 
-if(start.length!==10)
-return;
+if(startDate.length !== 10) return;
 
-const p =
-start.split('/');
+const parts = startDate.split('/');
 
-const base =
-new Date(
-p[2],
-p[1]-1,
-p[0]
+const baseDate = new Date(
+parts[2],
+parts[1]-1,
+parts[0]
 );
 
-document.querySelectorAll(
-".day-card"
-).forEach((card,i)=>{
+document.querySelectorAll(".day-card")
+.forEach((card,index)=>{
 
-let d =
-new Date(base);
+const date = new Date(baseDate);
 
-d.setDate(
-base.getDate()+i
-);
+date.setDate(baseDate.getDate() + index);
 
-card.querySelector(
-".auto-date"
-).innerText=
+const dd = String(date.getDate()).padStart(2,'0');
+const mm = String(date.getMonth()+1).padStart(2,'0');
+const yyyy = date.getFullYear();
 
-`${String(
-d.getDate()
-).padStart(2,'0')}/${
-String(
-d.getMonth()+1
-).padStart(2,'0')
-}/${d.getFullYear()}`;
+card.querySelector(".auto-date").innerText =
+`${dd}/${mm}/${yyyy}`;
 
 });
 
@@ -770,37 +719,23 @@ function addDay(){
 
 dayCount++;
 
-document.getElementById(
-"dayContainer"
-).insertAdjacentHTML(
-"beforeend",
-
-`
+document.getElementById("dayContainer")
+.insertAdjacentHTML("beforeend",`
 
 <div class="day-card">
 
 <div class="day-title">
-
-Day ${dayCount}
-
--
-
-<span class="auto-date">
-
-</span>
-
+Day ${dayCount} -
+<span class="auto-date"></span>
 </div>
 
 <textarea
-class="input-field itinerary-text">
-
-</textarea>
+class="input-field itinerary-text"
+placeholder="Activity / Plans"></textarea>
 
 </div>
 
-`
-
-);
+`);
 
 generateDates();
 
@@ -808,23 +743,20 @@ generateDates();
 
 function addHotel(){
 
-document.getElementById(
-"hotelContainer"
-).insertAdjacentHTML(
-
-"beforeend",
-
-`
+document.getElementById("hotelContainer")
+.insertAdjacentHTML("beforeend",`
 
 <div class="hotel-card">
 
 <div class="hotel-grid">
 
 <input
+type="text"
 class="input-field hotel-place"
 placeholder="Place">
 
 <input
+type="text"
 class="input-field hotel-name"
 placeholder="Hotel Name">
 
@@ -849,62 +781,87 @@ PENDING FOR BOOKING
 
 </div>
 
-`
-
-);
+`);
 
 }
 
 async function addGuest(){
 
-const guest={
-
-guestName:
-guestName.value,
-
-companyName:
-companyName.value,
-
-salesPerson:
-salesPerson.value,
-
-destination:
-destination.value,
-
-travelDate:
-travelDate.value,
-
-days:
-days.value,
-
-guests:
-guests.value,
-
-travelStatus:
-travelStatus.value,
-
-paymentStatus:
-paymentStatus.value,
-
-invoiceAmount:
-invoiceAmount.value,
-
-amountReceived:
-amountReceived.value,
-
-advancePending:
-advancePending.value,
-
-balanceAmount:
-balanceAmount.value,
-
-visaStatus:
+const visaStatus =
 document.querySelector(
 'input[name="visaStatus"]:checked'
-).value,
+).value;
+
+const hotels =
+[...document.querySelectorAll(".hotel-card")]
+.map(card=>({
+
+place:
+card.querySelector(".hotel-place").value,
+
+hotel:
+card.querySelector(".hotel-name").value,
+
+status:
+card.querySelector(".hotel-status").value
+
+}));
+
+const itineraryDays =
+[...document.querySelectorAll(".day-card")]
+.map((card,index)=>({
+
+day:index+1,
+
+date:
+card.querySelector(".auto-date").innerText,
+
+activity:
+card.querySelector(".itinerary-text").value
+
+}));
+
+const guest = {
+
+guestName:
+document.getElementById("guestName").value,
+
+companyName:
+document.getElementById("companyName").value,
+
+salesPerson:
+document.getElementById("salesPerson").value,
+
+destination:
+document.getElementById("destination").value,
+
+travelDate:
+document.getElementById("travelDate").value,
+
+days:
+document.getElementById("days").value,
+
+guests:
+document.getElementById("guests").value,
+
+travelStatus:
+document.getElementById("travelStatus").value,
+
+paymentStatus:
+document.getElementById("paymentStatus").value,
+
+amountReceived:
+document.getElementById("amountReceived").value,
+
+balanceAmount:
+document.getElementById("balanceAmount").value,
+
+visaStatus,
+hotels,
+itineraryDays,
 
 notes:
-inclusions.value,
+document.getElementById("inclusions").value,
 
 created:
 new Date().toISOString()
@@ -914,125 +871,114 @@ new Date().toISOString()
 if(editingId){
 
 await updateDoc(
-doc(
-db,
-"guestStatus",
-editingId
-),
+doc(db,"guestStatus",editingId),
 guest
 );
 
-editingId=null;
+alert("Guest Updated!");
 
-alert(
-"Updated"
-);
+editingId = null;
 
 }else{
 
 await addDoc(
-collection(
-db,
-"guestStatus"
-),
+collection(db,"guestStatus"),
 guest
 );
 
-alert(
-"Saved"
-);
+alert("Guest Saved!");
 
 }
 
-location.reload();
+document.getElementById("guestFormBox")
+.style.display = "none";
 
 }
 
 function loadGuests(){
 
 onSnapshot(
-
-collection(
-db,
-"guestStatus"
-),
-
+collection(db,"guestStatus"),
 (snapshot)=>{
 
-let html="";
+let guests = [];
 
-snapshot.forEach(
-(docItem)=>{
+snapshot.forEach((docItem)=>{
 
-let g={
-id:
-docItem.id,
+guests.push({
+id:docItem.id,
 ...docItem.data()
+});
+
+});
+
+window.allGuests = guests;
+
+guests.sort((a,b)=>{
+
+const parseDate = (str)=>{
+
+const p = str.split('/');
+
+return new Date(
+p[2],
+p[1]-1,
+p[0]
+);
+
 };
 
-let badge=
-"confirmed";
+return parseDate(a.travelDate)
+-
+parseDate(b.travelDate);
 
-if(
-g.travelStatus===
-"PENDING FOR CONFIRMATION"
-)
-badge=
-"pending";
+});
 
-if(
-g.travelStatus===
-"COMPLETED"
-)
-badge=
-"completed";
+let html = "";
+
+guests.forEach((g)=>{
+
+let badge = "confirmed";
+
+if(g.travelStatus===
+"PENDING FOR CONFIRMATION"){
+badge="pending";
+}
+
+if(g.travelStatus==="COMPLETED"){
+badge="completed";
+}
 
 html += `
 
 <div
 class="guest-tile"
-onclick="
-this.classList.toggle(
-'active'
-)
-">
+onclick="this.classList.toggle('active')">
 
 <div class="tile-head">
 
 <div>
 
-<div
-class="guest-name">
-
+<div class="guest-name">
 ${g.guestName}
-
 </div>
 
-<div
-class="status-badge ${badge}">
+${
+g.companyName
+?
 
-${g.travelStatus}
+`<div class="company-name">
+🏢 ${g.companyName}
+</div>`
 
-</div>
+:
 
-<div
-class="small-payment">
+""
 
-💳
-
-${g.paymentStatus}
-
-</div>
-
-<div
-class="invoice-small">
-
-Invoice:
-
-₹ ${
-g.invoiceAmount || 0
 }
 
+<div class="status-badge ${badge}">
+${g.travelStatus}
 </div>
 
 </div>
@@ -1043,9 +989,7 @@ ${g.travelDate}
 
 <br>
 
-👤
-
-${g.salesPerson || "-"}
+👤 ${g.salesPerson || "-"}
 
 </div>
 
@@ -1054,64 +998,157 @@ ${g.salesPerson || "-"}
 <div class="tile-details">
 
 <div class="detail">
-
+<span class="label">
 Destination:
-
+</span>
 ${g.destination}
+</div>
+
+<div class="detail">
+<span class="label">
+Visa Status:
+</span>
+${g.visaStatus}
+</div>
+
+<div class="detail">
+<span class="label">
+Guests:
+</span>
+${g.guests}
+</div>
+
+<div class="detail">
+<span class="label">
+Payment:
+</span>
+${g.paymentStatus}
+</div>
+
+<div class="detail">
+
+<span class="label">
+Advance:
+</span>
+
+<span class="amount">
+₹ ${g.amountReceived}
+</span>
 
 </div>
 
 <div class="detail">
 
-Visa:
+<span class="label">
+Balance:
+</span>
 
-${g.visaStatus}
-
-</div>
-
-<div class="payment-wrapper">
-
-<div
-class="
-payment-circle
-advance-circle
-">
-
-Advance
-
-<br>
-
-₹ ${
-g.amountReceived || 0
-}
-
-<br>
-
-Pending
-
-<br>
-
-₹ ${
-g.advancePending || 0
-}
+<span class="amount">
+₹ ${g.balanceAmount}
+</span>
 
 </div>
 
-<div
-class="
-payment-circle
-balance-circle
-">
+<div class="tile-block">
 
-Balance
+<div class="label">
+Hotel Status
+</div>
 
 <br>
 
 ${
-g.balanceAmount || 0
+(g.hotels || [])
+.map(h=>`
+
+<div class="detail">
+
+🏨 ${h.place}
+
+<br>
+
+Hotel:
+<b>${h.hotel}</b>
+
+<br>
+
+Status:
+<b>${h.status}</b>
+
+</div>
+
+`).join("")
 }
 
 </div>
+
+<div class="tile-block">
+
+<div class="label">
+Day-wise Itinerary
+</div>
+
+<br>
+
+${
+(g.itineraryDays || [])
+.map(d=>`
+
+<div class="detail">
+
+<b>
+Day ${d.day}
+- ${d.date}
+</b>
+
+<br>
+
+${d.activity}
+
+</div>
+
+`).join("")
+}
+
+</div>
+
+<div class="tile-block">
+
+<div class="label">
+Notes
+</div>
+
+<br>
+
+<div class="detail">
+${g.notes || ""}
+</div>
+
+</div>
+
+<div class="card-actions">
+
+<button
+class="edit-btn"
+onclick="
+event.stopPropagation();
+editGuest('${g.id}')
+">
+
+Edit
+
+</button>
+
+<button
+class="delete-btn"
+onclick="
+event.stopPropagation();
+deleteGuest('${g.id}')
+">
+
+Delete
+
+</button>
 
 </div>
 
@@ -1125,22 +1162,251 @@ g.balanceAmount || 0
 
 document.getElementById(
 "guestContainer"
-).innerHTML=
-html;
+).innerHTML = html;
 
 });
 
 }
 
+async function editGuest(id){
+
+const password =
+prompt("Enter password");
+
+if(password !== "5655"){
+
+alert("Wrong password");
+return;
+
+}
+
+editingId = id;
+
+const guest =
+window.allGuests.find(
+g=>g.id===id
+);
+
+if(!guest) return;
+
+document.getElementById(
+"guestFormBox"
+).style.display="block";
+
+document.getElementById(
+"guestName"
+).value =
+guest.guestName || "";
+
+document.getElementById(
+"companyName"
+).value =
+guest.companyName || "";
+
+document.getElementById(
+"salesPerson"
+).value =
+guest.salesPerson || "";
+
+document.getElementById(
+"destination"
+).value =
+guest.destination || "";
+
+document.getElementById(
+"travelDate"
+).value =
+guest.travelDate || "";
+
+document.getElementById(
+"days"
+).value =
+guest.days || "";
+
+document.getElementById(
+"guests"
+).value =
+guest.guests || "";
+
+document.getElementById(
+"travelStatus"
+).value =
+guest.travelStatus || "";
+
+document.getElementById(
+"paymentStatus"
+).value =
+guest.paymentStatus || "";
+
+document.getElementById(
+"amountReceived"
+).value =
+guest.amountReceived || "";
+
+document.getElementById(
+"balanceAmount"
+).value =
+guest.balanceAmount || "";
+
+document.getElementById(
+"inclusions"
+).value =
+guest.notes || "";
+
+document.querySelectorAll(
+'input[name="visaStatus"]'
+).forEach(r=>{
+
+r.checked =
+r.value===guest.visaStatus;
+
+});
+
+document.getElementById(
+"hotelContainer"
+).innerHTML="";
+
+(guest.hotels || [])
+.forEach(h=>{
+
+document.getElementById(
+"hotelContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field hotel-place"
+value="${h.place || ""}">
+
+<input
+class="input-field hotel-name"
+value="${h.hotel || ""}">
+
+<select
+class="input-field hotel-status">
+
+<option ${
+h.status==="BOOKED"
+?"selected":""
+}>
+BOOKED
+</option>
+
+<option ${
+h.status==="BOOKED BY CUSTOMER"
+?"selected":""
+}>
+BOOKED BY CUSTOMER
+</option>
+
+<option ${
+h.status==="PENDING FOR BOOKING"
+?"selected":""
+}>
+PENDING FOR BOOKING
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"dayContainer"
+).innerHTML="";
+
+(guest.itineraryDays || [])
+.forEach(day=>{
+
+document.getElementById(
+"dayContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="day-card">
+
+<div class="day-title">
+
+Day ${day.day}
+
+-
+
+<span class="auto-date">
+
+${day.date}
+
+</span>
+
+</div>
+
+<textarea
+class="input-field itinerary-text">
+
+${day.activity || ""}
+
+</textarea>
+
+</div>
+
+`
+
+);
+
+});
+
+alert(
+"Guest loaded for editing"
+);
+
+}
+
+async function deleteGuest(id){
+
+const password =
+prompt("Enter password");
+
+if(password !== "5655"){
+
+alert("Wrong password");
+return;
+
+}
+
+if(!confirm("Delete Guest?"))
+return;
+
+await deleteDoc(
+doc(db,"guestStatus",id)
+);
+
+}
+
 window.addEventListener(
 "load",
-
 ()=>{
 
 loadGuests();
 
-}
+generateDates();
 
+}
 );
 
 </script>
