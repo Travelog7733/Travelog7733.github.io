@@ -985,30 +985,26 @@ document.getElementById("guestFormBox")
 
 function loadGuests(){
 
-onSnapshot(
-collection(db,"guestStatus"),
-(snapshot)=>{
+onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
 
 let guests = [];
 
 snapshot.forEach((docItem)=>{
-  guests.push({
-    id:docItem.id,
-    ...docItem.data()
-  });
+guests.push({
+id:docItem.id,
+...docItem.data()
+});
 });
 
-// ✅ ONLY ONE SORT HERE
-guests.sort((a, b) => {
-  const parse = (d) => {
-    if (!d || !d.includes('/')) return 0;
+// ✅ SINGLE CLEAN SORT: nearest date first
+const parseDate = (d) => {
+if(!d || !d.includes('/')) return new Date(9999, 11, 31);
 
-    const [dd, mm, yyyy] = d.split('/');
-    return new Date(`${yyyy}-${mm}-${dd}`).getTime();
-  };
+const [dd, mm, yyyy] = d.split('/');
+return new Date(yyyy, mm - 1, dd);
+};
 
-  return parse(b.travelDate) - parse(a.travelDate);
-});
+guests.sort((a, b) => parseDate(a.travelDate) - parseDate(b.travelDate));
 
 window.allGuests = guests;
 
@@ -1018,259 +1014,113 @@ guests.forEach((g)=>{
 
 let badge = "confirmed";
 
-if(g.travelStatus===
-"PENDING FOR CONFIRMATION"){
-badge="pending";
+if(g.travelStatus === "PENDING FOR CONFIRMATION"){
+badge = "pending";
 }
 
-if(g.travelStatus==="COMPLETED"){
-badge="completed";
+if(g.travelStatus === "COMPLETED"){
+badge = "completed";
 }
 
 html += `
-
-<div
-class="guest-tile"
-onclick="this.classList.toggle('active')">
+<div class="guest-tile" onclick="this.classList.toggle('active')">
 
 <div class="tile-head">
 
 <div>
 
 <div class="guest-name">
-${g.guestName}
+${g.guestName || ""}
 </div>
 
 ${
 g.companyName
-?
-
-`<div class="company-name">
-🏢 ${g.companyName}
-</div>`
-
-:
-
-""
-
+? `<div class="company-name">🏢 ${g.companyName}</div>`
+: ""
 }
 
 <div class="status-badge ${badge}">
-${g.travelStatus}
+${g.travelStatus || ""}
 </div>
 
 </div>
 
 <div class="card-date">
-
-${g.travelDate}
-
-<br>
-
+${g.travelDate || "-"} <br>
 👤 ${g.salesPerson || "-"}
-
 </div>
 
 </div>
 
 <div class="tile-details">
 
+<div class="detail"><span class="label">Destination:</span> ${g.destination || ""}</div>
+
+<div class="detail"><span class="label">Visa Status:</span> ${g.visaStatus || ""}</div>
+
+<div class="detail"><span class="label">Guests:</span> ${g.guests || ""}</div>
+
+<div class="detail"><span class="label">Payment:</span> ${g.paymentStatus || ""}</div>
+
+<div class="detail"><span class="label">Invoice Amount:</span> <span class="amount">₹ ${g.invoiceAmount || 0}</span></div>
+
+<div class="detail"><span class="label">Advance:</span> <span class="amount">₹ ${g.amountReceived || 0}</span></div>
+
+<div class="detail"><span class="label">Balance:</span> <span class="amount">₹ ${g.balanceAmount || 0}</span></div>
+
+<div class="tile-block">
+<div class="label">Hotel Status</div><br>
+
+${(g.hotels || []).map(h=>`
 <div class="detail">
-<span class="label">
-Destination:
-</span>
-${g.destination}
+🏨 ${h.place || ""}<br>
+Hotel: <b>${h.hotel || ""}</b><br>
+Status: <b>${h.status || ""}</b>
 </div>
-
-<div class="detail">
-<span class="label">
-Visa Status:
-</span>
-${g.visaStatus}
-</div>
-
-<div class="detail">
-<span class="label">
-Guests:
-</span>
-${g.guests}
-</div>
-
-<div class="detail">
-<span class="label">
-Payment:
-</span>
-${g.paymentStatus}
-</div>
-
-<div class="detail">
-
-<span class="label">
-Invoice Amount:
-</span>
-
-<span class="amount">
-₹ ${g.invoiceAmount || 0}
-</span>
-
-</div>
-
-<div class="detail">
-
-<span class="label">
-Advance:
-</span>
-
-<span class="amount">
-₹ ${g.amountReceived}
-</span>
-
-</div>
-
-<div class="detail">
-
-<span class="label">
-Balance:
-</span>
-
-<span class="amount">
-₹ ${g.balanceAmount}
-</span>
+`).join("")}
 
 </div>
 
 <div class="tile-block">
+<div class="label">Cruise Status</div><br>
 
-<div class="label">
-Hotel Status
-</div>
-
-<br>
-
-${
-(g.hotels || [])
-.map(h=>`
-
+${(g.cruises || []).map(c=>`
 <div class="detail">
-
-🏨 ${h.place}
-
-<br>
-
-Hotel:
-<b>${h.hotel}</b>
-
-<br>
-
-Status:
-<b>${h.status}</b>
-
+🛳️ ${c.place || ""}<br>
+Cruise: <b>${c.name || ""}</b><br>
+Status: <b>${c.status || ""}</b>
 </div>
-
-`).join("")
-}
+`).join("")}
 
 </div>
 
 <div class="tile-block">
+<div class="label">Day-wise Itinerary</div><br>
 
-<div class="label">
-Cruise Status
-</div>
-
-<br>
-
-${
-(g.cruises || [])
-.map(c=>`
-
+${(g.itineraryDays || []).map(d=>`
 <div class="detail">
-
-🛳️ ${c.place}
-
-<br>
-
-Cruise:
-<b>${c.name}</b>
-
-<br>
-
-Status:
-<b>${c.status}</b>
-
+<b>Day ${d.day} - ${d.date}</b><br>
+${d.activity || ""}
 </div>
-
-`).join("")
-}
+`).join("")}
 
 </div>
 
 <div class="tile-block">
-
-<div class="label">
-Day-wise Itinerary
-</div>
-
-<br>
-
-${
-(g.itineraryDays || [])
-.map(d=>`
-
-<div class="detail">
-
-<b>
-Day ${d.day}
-- ${d.date}
-</b>
-
-<br>
-
-${d.activity}
-
-</div>
-
-`).join("")
-}
-
-</div>
-
-<div class="tile-block">
-
-<div class="label">
-Notes
-</div>
-
-<br>
-
-<div class="detail">
-${g.notes || ""}
-</div>
-
+<div class="label">Notes</div><br>
+<div class="detail">${g.notes || ""}</div>
 </div>
 
 <div class="card-actions">
 
-<button
-class="edit-btn"
-onclick="
-event.stopPropagation();
-editGuest('${g.id}')
-">
-
+<button class="edit-btn"
+onclick="event.stopPropagation(); editGuest('${g.id}')">
 Edit
-
 </button>
 
-<button
-class="delete-btn"
-onclick="
-event.stopPropagation();
-deleteGuest('${g.id}')
-">
-
+<button class="delete-btn"
+onclick="event.stopPropagation(); deleteGuest('${g.id}')">
 Delete
-
 </button>
 
 </div>
@@ -1278,14 +1128,11 @@ Delete
 </div>
 
 </div>
-
 `;
 
 });
 
-document.getElementById(
-"guestContainer"
-).innerHTML = html;
+document.getElementById("guestContainer").innerHTML = html;
 
 });
 
