@@ -1236,6 +1236,39 @@ Status:
 <div class="tile-block">
 
 <div class="label">
+Cruise Status
+</div>
+
+<br>
+
+${
+(g.cruises || [])
+.map(c=>`
+
+<div class="detail">
+
+🛳 ${c.place}
+
+<br>
+
+Cruise:
+<b>${c.name}</b>
+
+<br>
+
+Status:
+<b>${c.status}</b>
+
+</div>
+
+`).join("")
+}
+
+</div>
+
+<div class="tile-block">
+
+<div class="label">
 Day-wise Itinerary
 </div>
 
