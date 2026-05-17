@@ -71,22 +71,45 @@ font-weight:700;
 color:#1D9E75;
 }
 
+.tabs{
+display:flex;
+justify-content:center;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:30px;
+}
+
+.tab-btn{
+padding:12px 24px;
+border:none;
+border-radius:999px;
+background:#fff;
+border:1px solid #ddd;
+font-weight:600;
+cursor:pointer;
+}
+
+.tab-btn.active{
+background:#1D9E75;
+color:#fff;
+border-color:#1D9E75;
+}
+
 .top-actions{
 display:flex;
-gap:15px;
 justify-content:center;
+gap:15px;
 flex-wrap:wrap;
-margin-bottom:35px;
+margin-bottom:30px;
 }
 
 .action-btn{
 background:#1D9E75;
-border:none;
-padding:14px 26px;
-border-radius:40px;
-font-size:15px;
-font-weight:600;
 color:#fff;
+border:none;
+padding:14px 24px;
+border-radius:40px;
+font-weight:600;
 cursor:pointer;
 transition:.3s;
 }
@@ -98,20 +121,16 @@ transform:translateY(-2px);
 
 .search-box{
 max-width:500px;
-margin:0 auto 35px;
+margin:0 auto 30px;
 }
 
 .search-input{
 width:100%;
 padding:16px;
-border-radius:18px;
+border-radius:16px;
 border:1px solid #ddd;
 font-size:15px;
 outline:none;
-}
-
-.search-input:focus{
-border-color:#1D9E75;
 }
 
 .form-box{
@@ -147,12 +166,6 @@ font-size:15px;
 outline:none;
 }
 
-.input-field:focus,
-select:focus,
-textarea:focus{
-border-color:#1D9E75;
-}
-
 textarea{
 resize:vertical;
 min-height:120px;
@@ -172,48 +185,61 @@ cursor:pointer;
 
 .data-grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
-gap:25px;
+grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
+gap:24px;
 }
 
-.card{
+.list-tile{
 background:#fff;
-padding:25px;
 border-radius:24px;
+padding:24px;
 border:1px solid #E4ECE9;
-box-shadow:0 8px 30px rgba(0,0,0,.04);
+box-shadow:0 8px 25px rgba(0,0,0,.04);
+cursor:pointer;
+overflow:hidden;
 transition:.3s;
 }
 
-.card:hover{
-transform:translateY(-4px);
+.list-tile:hover{
+transform:translateY(-3px);
 }
 
-.card-header{
+.list-head{
 display:flex;
 justify-content:space-between;
-gap:15px;
-margin-bottom:18px;
+align-items:center;
+gap:20px;
 }
 
-.card-title{
+.invoice-no{
+font-size:13px;
+font-weight:700;
+color:#1D9E75;
+margin-bottom:6px;
+}
+
+.list-name{
 font-size:24px;
 font-weight:700;
 }
 
-.card-sub{
-font-size:13px;
-color:#666;
-margin-top:5px;
+.expand-content{
+max-height:0;
+overflow:hidden;
+transition:.4s ease;
+}
+
+.list-tile.active .expand-content{
+max-height:2000px;
+margin-top:20px;
 }
 
 .badge{
-padding:8px 14px;
+padding:8px 16px;
 border-radius:999px;
 font-size:12px;
 font-weight:700;
 color:#fff;
-height:fit-content;
 }
 
 .sales-badge{
@@ -222,6 +248,14 @@ background:#0077ff;
 
 .purchase-badge{
 background:#ff9800;
+}
+
+.customer-badge{
+background:#673ab7;
+}
+
+.supplier-badge{
+background:#795548;
 }
 
 .detail{
@@ -241,14 +275,16 @@ font-weight:700;
 color:#1D9E75;
 }
 
-.card-actions{
+.action-row{
 display:flex;
 gap:10px;
 margin-top:20px;
+flex-wrap:wrap;
 }
 
 .edit-btn,
-.delete-btn{
+.delete-btn,
+.pdf-btn{
 border:none;
 padding:10px 16px;
 border-radius:12px;
@@ -265,28 +301,8 @@ background:#0B3D91;
 background:#ff4d4f;
 }
 
-.tabs{
-display:flex;
-justify-content:center;
-gap:15px;
-margin-bottom:30px;
-flex-wrap:wrap;
-}
-
-.tab-btn{
-padding:12px 24px;
-border:none;
-border-radius:999px;
-background:#fff;
-border:1px solid #ddd;
-cursor:pointer;
-font-weight:600;
-}
-
-.tab-btn.active{
-background:#1D9E75;
-color:#fff;
-border-color:#1D9E75;
+.pdf-btn{
+background:#ff5722;
 }
 
 .hidden{
@@ -303,8 +319,9 @@ font-size:32px;
 padding:20px;
 }
 
-.card-header{
+.list-head{
 flex-direction:column;
+align-items:flex-start;
 }
 
 }
@@ -328,12 +345,12 @@ Purchase & Sales Tracker
 <div class="dashboard-grid">
 
 <div class="dashboard-card">
-<div class="dashboard-label">Total Sales (INR)</div>
+<div class="dashboard-label">Total Sales</div>
 <div class="dashboard-value" id="totalSales">₹ 0</div>
 </div>
 
 <div class="dashboard-card">
-<div class="dashboard-label">Total Purchases (VND)</div>
+<div class="dashboard-label">Total Purchases</div>
 <div class="dashboard-value" id="totalPurchases">₫ 0</div>
 </div>
 
@@ -351,19 +368,19 @@ Purchase & Sales Tracker
 
 <div class="tabs">
 
-<button class="tab-btn active" onclick="showTab('sales')">
+<button class="tab-btn active" onclick="showTab('sales',this)">
 Sales
 </button>
 
-<button class="tab-btn" onclick="showTab('purchases')">
+<button class="tab-btn" onclick="showTab('purchases',this)">
 Purchases
 </button>
 
-<button class="tab-btn" onclick="showTab('customers')">
+<button class="tab-btn" onclick="showTab('customers',this)">
 Customers
 </button>
 
-<button class="tab-btn" onclick="showTab('suppliers')">
+<button class="tab-btn" onclick="showTab('suppliers',this)">
 Suppliers
 </button>
 
@@ -390,7 +407,13 @@ Suppliers
 </div>
 
 <div class="search-box">
-<input type="text" class="search-input" placeholder="Search..." onkeyup="searchCards(this.value)">
+
+<input
+type="text"
+class="search-input"
+placeholder="Search..."
+onkeyup="searchCards(this.value)">
+
 </div>
 
 <!-- SALES FORM -->
@@ -519,7 +542,7 @@ SAVE SUPPLIER
 
 </div>
 
-<!-- DATA CONTAINERS -->
+<!-- TAB CONTAINERS -->
 
 <div id="salesTab">
 <div class="data-grid" id="salesContainer"></div>
@@ -559,10 +582,10 @@ from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 const firebaseConfig = {
 
 apiKey: "YOUR_API_KEY",
-authDomain: "YOUR_DOMAIN",
+authDomain: "YOUR_AUTH_DOMAIN",
 projectId: "YOUR_PROJECT_ID",
-storageBucket: "YOUR_BUCKET",
-messagingSenderId: "YOUR_SENDER_ID",
+storageBucket: "YOUR_STORAGE_BUCKET",
+messagingSenderId: "YOUR_MESSAGING_ID",
 appId: "YOUR_APP_ID"
 
 };
@@ -593,12 +616,12 @@ form.style.display === "block"
 
 }
 
-function showTab(tab){
+function showTab(tab,btn){
 
 document.querySelectorAll('.tab-btn')
-.forEach(btn=>btn.classList.remove('active'));
+.forEach(b=>b.classList.remove('active'));
 
-event.target.classList.add('active');
+btn.classList.add('active');
 
 document.getElementById('salesTab').classList.add('hidden');
 document.getElementById('purchasesTab').classList.add('hidden');
@@ -621,7 +644,7 @@ document.getElementById('suppliersTab').classList.remove('hidden');
 
 async function saveSale(){
 
-const data = {
+await addDoc(collection(db,"sales"),{
 
 customer:
 document.getElementById('saleCustomer').value,
@@ -647,9 +670,7 @@ document.getElementById('saleNotes').value,
 created:
 new Date().toISOString()
 
-};
-
-await addDoc(collection(db,"sales"),data);
+});
 
 alert("Sale Saved");
 
@@ -657,7 +678,7 @@ alert("Sale Saved");
 
 async function savePurchase(){
 
-const data = {
+await addDoc(collection(db,"purchases"),{
 
 supplier:
 document.getElementById('purchaseSupplier').value,
@@ -680,9 +701,7 @@ document.getElementById('purchaseNotes').value,
 created:
 new Date().toISOString()
 
-};
-
-await addDoc(collection(db,"purchases"),data);
+});
 
 alert("Purchase Saved");
 
@@ -690,7 +709,7 @@ alert("Purchase Saved");
 
 async function saveCustomer(){
 
-const data = {
+await addDoc(collection(db,"customers"),{
 
 name:
 document.getElementById('customerName').value,
@@ -707,9 +726,7 @@ document.getElementById('customerCompany').value,
 notes:
 document.getElementById('customerNotes').value
 
-};
-
-await addDoc(collection(db,"customers"),data);
+});
 
 alert("Customer Saved");
 
@@ -717,7 +734,7 @@ alert("Customer Saved");
 
 async function saveSupplier(){
 
-const data = {
+await addDoc(collection(db,"suppliers"),{
 
 name:
 document.getElementById('supplierName').value,
@@ -734,9 +751,7 @@ document.getElementById('supplierTerms').value,
 notes:
 document.getElementById('supplierNotes').value
 
-};
-
-await addDoc(collection(db,"suppliers"),data);
+});
 
 alert("Supplier Saved");
 
@@ -750,29 +765,48 @@ let html = "";
 let total = 0;
 let pending = 0;
 
-snapshot.forEach(docItem=>{
+snapshot.forEach((docItem,index)=>{
 
 const s = docItem.data();
 
+const balance =
+Number(s.amount || 0) -
+Number(s.received || 0);
+
 total += Number(s.amount || 0);
 
-pending += Number((s.amount || 0) - (s.received || 0));
+pending += balance;
 
 html += `
 
-<div class="card searchable">
+<div class="list-tile searchable"
+onclick="this.classList.toggle('active')">
 
-<div class="card-header">
+<div class="list-head">
 
 <div>
-<div class="card-title">${s.customer || ""}</div>
-<div class="card-sub">${s.package || ""}</div>
+
+<div class="invoice-no">
+INV-${1000 + index}
+</div>
+
+<div class="list-name">
+${s.customer || ""}
+</div>
+
 </div>
 
 <div class="badge sales-badge">
 SALE
 </div>
 
+</div>
+
+<div class="expand-content">
+
+<div class="detail">
+<span class="label">Package:</span>
+${s.package || ""}
 </div>
 
 <div class="detail">
@@ -782,17 +816,23 @@ ${s.salesPerson || ""}
 
 <div class="detail">
 <span class="label">Invoice:</span>
-<span class="amount">₹ ${s.amount || 0}</span>
+<span class="amount">
+₹ ${Number(s.amount || 0).toLocaleString()}
+</span>
 </div>
 
 <div class="detail">
 <span class="label">Received:</span>
-<span class="amount">₹ ${s.received || 0}</span>
+<span class="amount">
+₹ ${Number(s.received || 0).toLocaleString()}
+</span>
 </div>
 
 <div class="detail">
 <span class="label">Balance:</span>
-<span class="amount">₹ ${(s.amount || 0)-(s.received || 0)}</span>
+<span class="amount">
+₹ ${balance.toLocaleString()}
+</span>
 </div>
 
 <div class="detail">
@@ -803,6 +843,27 @@ ${s.status || ""}
 <div class="detail">
 <span class="label">Notes:</span>
 ${s.notes || ""}
+</div>
+
+<div class="action-row">
+
+<button class="edit-btn"
+onclick="event.stopPropagation();alert('Edit Coming Soon')">
+Edit
+</button>
+
+<button class="pdf-btn"
+onclick="event.stopPropagation();downloadSalePDF('${s.customer}')">
+PDF
+</button>
+
+<button class="delete-btn"
+onclick="event.stopPropagation();deleteSale('${docItem.id}')">
+Delete
+</button>
+
+</div>
+
 </div>
 
 </div>
@@ -831,23 +892,35 @@ let html = "";
 let total = 0;
 let pending = 0;
 
-snapshot.forEach(docItem=>{
+snapshot.forEach((docItem,index)=>{
 
 const p = docItem.data();
 
+const balance =
+Number(p.amount || 0) -
+Number(p.paid || 0);
+
 total += Number(p.amount || 0);
 
-pending += Number((p.amount || 0) - (p.paid || 0));
+pending += balance;
 
 html += `
 
-<div class="card searchable">
+<div class="list-tile searchable"
+onclick="this.classList.toggle('active')">
 
-<div class="card-header">
+<div class="list-head">
 
 <div>
-<div class="card-title">${p.supplier || ""}</div>
-<div class="card-sub">${p.service || ""}</div>
+
+<div class="invoice-no">
+PUR-${1000 + index}
+</div>
+
+<div class="list-name">
+${p.supplier || ""}
+</div>
+
 </div>
 
 <div class="badge purchase-badge">
@@ -856,19 +929,32 @@ PURCHASE
 
 </div>
 
+<div class="expand-content">
+
+<div class="detail">
+<span class="label">Service:</span>
+${p.service || ""}
+</div>
+
 <div class="detail">
 <span class="label">Amount:</span>
-<span class="amount">₫ ${p.amount || 0}</span>
+<span class="amount">
+₫ ${Number(p.amount || 0).toLocaleString()}
+</span>
 </div>
 
 <div class="detail">
 <span class="label">Paid:</span>
-<span class="amount">₫ ${p.paid || 0}</span>
+<span class="amount">
+₫ ${Number(p.paid || 0).toLocaleString()}
+</span>
 </div>
 
 <div class="detail">
 <span class="label">Balance:</span>
-<span class="amount">₫ ${(p.amount || 0)-(p.paid || 0)}</span>
+<span class="amount">
+₫ ${balance.toLocaleString()}
+</span>
 </div>
 
 <div class="detail">
@@ -879,6 +965,27 @@ ${p.status || ""}
 <div class="detail">
 <span class="label">Notes:</span>
 ${p.notes || ""}
+</div>
+
+<div class="action-row">
+
+<button class="edit-btn"
+onclick="event.stopPropagation();alert('Edit Coming Soon')">
+Edit
+</button>
+
+<button class="pdf-btn"
+onclick="event.stopPropagation();downloadPurchasePDF('${p.supplier}')">
+PDF
+</button>
+
+<button class="delete-btn"
+onclick="event.stopPropagation();deletePurchase('${docItem.id}')">
+Delete
+</button>
+
+</div>
+
 </div>
 
 </div>
@@ -905,15 +1012,28 @@ onSnapshot(collection(db,"customers"),snapshot=>{
 
 let html = "";
 
-snapshot.forEach(docItem=>{
+snapshot.forEach((docItem)=>{
 
 const c = docItem.data();
 
 html += `
 
-<div class="card searchable">
+<div class="list-tile searchable"
+onclick="this.classList.toggle('active')">
 
-<div class="card-title">${c.name || ""}</div>
+<div class="list-head">
+
+<div class="list-name">
+${c.name || ""}
+</div>
+
+<div class="badge customer-badge">
+CUSTOMER
+</div>
+
+</div>
+
+<div class="expand-content">
 
 <div class="detail">
 <span class="label">Phone:</span>
@@ -937,6 +1057,8 @@ ${c.notes || ""}
 
 </div>
 
+</div>
+
 `;
 
 });
@@ -953,15 +1075,28 @@ onSnapshot(collection(db,"suppliers"),snapshot=>{
 
 let html = "";
 
-snapshot.forEach(docItem=>{
+snapshot.forEach((docItem)=>{
 
 const s = docItem.data();
 
 html += `
 
-<div class="card searchable">
+<div class="list-tile searchable"
+onclick="this.classList.toggle('active')">
 
-<div class="card-title">${s.name || ""}</div>
+<div class="list-head">
+
+<div class="list-name">
+${s.name || ""}
+</div>
+
+<div class="badge supplier-badge">
+SUPPLIER
+</div>
+
+</div>
+
+<div class="expand-content">
 
 <div class="detail">
 <span class="label">Country:</span>
@@ -985,6 +1120,8 @@ ${s.notes || ""}
 
 </div>
 
+</div>
+
 `;
 
 });
@@ -992,6 +1129,48 @@ ${s.notes || ""}
 document.getElementById('supplierContainer').innerHTML = html;
 
 });
+
+}
+
+async function deleteSale(id){
+
+const password = prompt("Enter password");
+
+if(password !== "5655"){
+alert("Wrong password");
+return;
+}
+
+if(!confirm("Delete Sale?")) return;
+
+await deleteDoc(doc(db,"sales",id));
+
+}
+
+async function deletePurchase(id){
+
+const password = prompt("Enter password");
+
+if(password !== "5655"){
+alert("Wrong password");
+return;
+}
+
+if(!confirm("Delete Purchase?")) return;
+
+await deleteDoc(doc(db,"purchases",id));
+
+}
+
+function downloadSalePDF(name){
+
+alert("PDF Download Ready For " + name);
+
+}
+
+function downloadPurchasePDF(name){
+
+alert("PDF Download Ready For " + name);
 
 }
 
