@@ -992,25 +992,11 @@ collection(db,"guestStatus"),
 let guests = [];
 
 snapshot.forEach((docItem)=>{
-
-guests.push({
-id:docItem.id,
-...docItem.data()
+  guests.push({
+    id:docItem.id,
+    ...docItem.data()
+  });
 });
-
-});
-
-guests.sort((a, b) => {
-  const parse = (d) => {
-    if (!d) return new Date(0);
-    const [dd, mm, yyyy] = d.split('/');
-    return new Date(yyyy, mm - 1, dd);
-  };
-
-  return parse(b.travelDate) - parse(a.travelDate);
-});
-
-window.allGuests = guests;
 
 guests.sort((a, b) => {
   const parse = (d) => {
@@ -1022,6 +1008,8 @@ guests.sort((a, b) => {
 
   return parse(b.travelDate) - parse(a.travelDate);
 });
+
+window.allGuests = guests;
 
 let html = "";
 
