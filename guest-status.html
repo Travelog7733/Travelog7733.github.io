@@ -998,6 +998,7 @@ snapshot.forEach((docItem)=>{
   });
 });
 
+// ✅ ONLY ONE SORT HERE
 guests.sort((a, b) => {
   const parse = (d) => {
     if (!d || !d.includes('/')) return 0;
