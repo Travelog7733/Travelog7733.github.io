@@ -272,11 +272,6 @@ font-weight:700;
 color:#222;
 }
 
-.amount{
-font-weight:700;
-color:#1D9E75;
-}
-
 .action-row{
 display:flex;
 gap:10px;
@@ -336,13 +331,9 @@ align-items:flex-start;
 
 <div class="wrapper">
 
-<h1 class="page-title">
-Accounts Platform
-</h1>
+<h1 class="page-title">Accounts Platform</h1>
 
-<p class="page-subtitle">
-Purchase & Sales Tracker
-</p>
+<p class="page-subtitle">Purchase & Sales Tracker</p>
 
 <div class="dashboard-grid">
 
@@ -353,7 +344,7 @@ Purchase & Sales Tracker
 
 <div class="dashboard-card">
 <div class="dashboard-label">Total Purchases</div>
-<div class="dashboard-value" id="totalPurchases">₫ 0</div>
+<div class="dashboard-value" id="totalPurchases">₹ 0</div>
 </div>
 
 <div class="dashboard-card">
@@ -363,48 +354,32 @@ Purchase & Sales Tracker
 
 <div class="dashboard-card">
 <div class="dashboard-label">Pending Payable</div>
-<div class="dashboard-value" id="pendingPayable">₫ 0</div>
+<div class="dashboard-value" id="pendingPayable">₹ 0</div>
 </div>
 
 </div>
 
 <div class="tabs">
 
-<button class="tab-btn active" onclick="showTab('sales',this)">
-Sales
-</button>
+<button class="tab-btn active" onclick="showTab('sales',this)">Sales</button>
 
-<button class="tab-btn" onclick="showTab('purchases',this)">
-Purchases
-</button>
+<button class="tab-btn" onclick="showTab('purchases',this)">Purchases</button>
 
-<button class="tab-btn" onclick="showTab('customers',this)">
-Customers
-</button>
+<button class="tab-btn" onclick="showTab('customers',this)">Customers</button>
 
-<button class="tab-btn" onclick="showTab('suppliers',this)">
-Suppliers
-</button>
+<button class="tab-btn" onclick="showTab('suppliers',this)">Suppliers</button>
 
 </div>
 
 <div class="top-actions">
 
-<button class="action-btn" onclick="toggleForm('salesForm')">
-+ Add Sale
-</button>
+<button class="action-btn" onclick="toggleForm('salesForm')">+ Add Sale</button>
 
-<button class="action-btn" onclick="toggleForm('purchaseForm')">
-+ Add Purchase
-</button>
+<button class="action-btn" onclick="toggleForm('purchaseForm')">+ Add Purchase</button>
 
-<button class="action-btn" onclick="toggleForm('customerForm')">
-+ Add Customer
-</button>
+<button class="action-btn" onclick="toggleForm('customerForm')">+ Add Customer</button>
 
-<button class="action-btn" onclick="toggleForm('supplierForm')">
-+ Add Supplier
-</button>
+<button class="action-btn" onclick="toggleForm('supplierForm')">+ Add Supplier</button>
 
 </div>
 
@@ -422,9 +397,7 @@ onkeyup="searchCards(this.value)">
 
 <div class="form-box" id="salesForm">
 
-<div class="section-title">
-Add Sale
-</div>
+<div class="section-title">Add Sale</div>
 
 <div class="form-grid">
 
@@ -448,9 +421,7 @@ Add Sale
 
 </div>
 
-<button class="save-btn" onclick="saveSale()">
-SAVE SALE
-</button>
+<button class="save-btn" onclick="saveSale()">SAVE SALE</button>
 
 </div>
 
@@ -458,9 +429,7 @@ SAVE SALE
 
 <div class="form-box" id="purchaseForm">
 
-<div class="section-title">
-Add Purchase
-</div>
+<div class="section-title">Add Purchase</div>
 
 <div class="form-grid">
 
@@ -468,9 +437,9 @@ Add Purchase
 
 <input type="text" id="purchaseService" class="input-field" placeholder="Service Type">
 
-<input type="number" id="purchaseAmount" class="input-field" placeholder="Purchase Amount ₫">
+<input type="number" id="purchaseAmount" class="input-field" placeholder="Purchase Amount ₹">
 
-<input type="number" id="purchasePaid" class="input-field" placeholder="Paid Amount ₫">
+<input type="number" id="purchasePaid" class="input-field" placeholder="Paid Amount ₹">
 
 <select id="purchaseStatus" class="input-field">
 <option>PAYMENT PENDING</option>
@@ -482,9 +451,7 @@ Add Purchase
 
 </div>
 
-<button class="save-btn" onclick="savePurchase()">
-SAVE PURCHASE
-</button>
+<button class="save-btn" onclick="savePurchase()">SAVE PURCHASE</button>
 
 </div>
 
@@ -492,9 +459,7 @@ SAVE PURCHASE
 
 <div class="form-box" id="customerForm">
 
-<div class="section-title">
-Add Customer
-</div>
+<div class="section-title">Add Customer</div>
 
 <div class="form-grid">
 
@@ -510,9 +475,7 @@ Add Customer
 
 </div>
 
-<button class="save-btn" onclick="saveCustomer()">
-SAVE CUSTOMER
-</button>
+<button class="save-btn" onclick="saveCustomer()">SAVE CUSTOMER</button>
 
 </div>
 
@@ -520,9 +483,7 @@ SAVE CUSTOMER
 
 <div class="form-box" id="supplierForm">
 
-<div class="section-title">
-Add Supplier
-</div>
+<div class="section-title">Add Supplier</div>
 
 <div class="form-grid">
 
@@ -538,9 +499,7 @@ Add Supplier
 
 </div>
 
-<button class="save-btn" onclick="saveSupplier()">
-SAVE SUPPLIER
-</button>
+<button class="save-btn" onclick="saveSupplier()">SAVE SUPPLIER</button>
 
 </div>
 
@@ -561,6 +520,8 @@ SAVE SUPPLIER
 </div>
 
 </div>
+
+<!-- FIREBASE -->
 
 <script type="module">
 
@@ -605,6 +566,8 @@ window.getDoc = getDoc;
 
 </script>
 
+<!-- MAIN SCRIPT -->
+
 <script>
 
 let editingSaleId = null;
@@ -643,29 +606,14 @@ async function saveSale(){
 
 const data = {
 
-customer:
-document.getElementById('saleCustomer').value,
-
-package:
-document.getElementById('salePackage').value,
-
-salesPerson:
-document.getElementById('salePerson').value,
-
-amount:
-Number(document.getElementById('saleAmount').value),
-
-received:
-Number(document.getElementById('saleReceived').value),
-
-status:
-document.getElementById('saleStatus').value,
-
-notes:
-document.getElementById('saleNotes').value,
-
-created:
-new Date().toISOString()
+customer: document.getElementById('saleCustomer').value,
+package: document.getElementById('salePackage').value,
+salesPerson: document.getElementById('salePerson').value,
+amount: Number(document.getElementById('saleAmount').value),
+received: Number(document.getElementById('saleReceived').value),
+status: document.getElementById('saleStatus').value,
+notes: document.getElementById('saleNotes').value,
+created: new Date().toISOString()
 
 };
 
@@ -691,26 +639,13 @@ async function savePurchase(){
 
 const data = {
 
-supplier:
-document.getElementById('purchaseSupplier').value,
-
-service:
-document.getElementById('purchaseService').value,
-
-amount:
-Number(document.getElementById('purchaseAmount').value),
-
-paid:
-Number(document.getElementById('purchasePaid').value),
-
-status:
-document.getElementById('purchaseStatus').value,
-
-notes:
-document.getElementById('purchaseNotes').value,
-
-created:
-new Date().toISOString()
+supplier: document.getElementById('purchaseSupplier').value,
+service: document.getElementById('purchaseService').value,
+amount: Number(document.getElementById('purchaseAmount').value),
+paid: Number(document.getElementById('purchasePaid').value),
+status: document.getElementById('purchaseStatus').value,
+notes: document.getElementById('purchaseNotes').value,
+created: new Date().toISOString()
 
 };
 
@@ -736,20 +671,11 @@ async function saveCustomer(){
 
 const data = {
 
-name:
-document.getElementById('customerName').value,
-
-phone:
-document.getElementById('customerPhone').value,
-
-email:
-document.getElementById('customerEmail').value,
-
-company:
-document.getElementById('customerCompany').value,
-
-notes:
-document.getElementById('customerNotes').value
+name: document.getElementById('customerName').value,
+phone: document.getElementById('customerPhone').value,
+email: document.getElementById('customerEmail').value,
+company: document.getElementById('customerCompany').value,
+notes: document.getElementById('customerNotes').value
 
 };
 
@@ -775,20 +701,11 @@ async function saveSupplier(){
 
 const data = {
 
-name:
-document.getElementById('supplierName').value,
-
-country:
-document.getElementById('supplierCountry').value,
-
-contact:
-document.getElementById('supplierContact').value,
-
-terms:
-document.getElementById('supplierTerms').value,
-
-notes:
-document.getElementById('supplierNotes').value
+name: document.getElementById('supplierName').value,
+country: document.getElementById('supplierCountry').value,
+contact: document.getElementById('supplierContact').value,
+terms: document.getElementById('supplierTerms').value,
+notes: document.getElementById('supplierNotes').value
 
 };
 
@@ -831,66 +748,34 @@ total += Number(s.amount || 0);
 pending += balance;
 
 html += `
-
-<div class="list-tile searchable"
-onclick="this.classList.toggle('active')">
+<div class="list-tile searchable" onclick="this.classList.toggle('active')">
 
 <div class="list-head">
 
 <div>
-
-<div class="invoice-no">
-INV-${1000 + index}
+<div class="invoice-no">INV-${1000 + index}</div>
+<div class="list-name">${s.customer || ""}</div>
 </div>
 
-<div class="list-name">
-${s.customer || ""}
-</div>
-
-</div>
-
-<div class="badge sales-badge">
-SALE
-</div>
+<div class="badge sales-badge">SALE</div>
 
 </div>
 
 <div class="expand-content">
 
-<div class="detail">
-<span class="label">Package:</span>
-${s.package || ""}
-</div>
+<div class="detail"><span class="label">Package:</span> ${s.package || ""}</div>
 
-<div class="detail">
-<span class="label">Sales Person:</span>
-${s.salesPerson || ""}
-</div>
+<div class="detail"><span class="label">Sales Person:</span> ${s.salesPerson || ""}</div>
 
-<div class="detail">
-<span class="label">Invoice:</span>
-₹ ${Number(s.amount || 0).toLocaleString()}
-</div>
+<div class="detail"><span class="label">Invoice:</span> ₹ ${Number(s.amount || 0).toLocaleString()}</div>
 
-<div class="detail">
-<span class="label">Received:</span>
-₹ ${Number(s.received || 0).toLocaleString()}
-</div>
+<div class="detail"><span class="label">Received:</span> ₹ ${Number(s.received || 0).toLocaleString()}</div>
 
-<div class="detail">
-<span class="label">Balance:</span>
-₹ ${balance.toLocaleString()}
-</div>
+<div class="detail"><span class="label">Balance:</span> ₹ ${balance.toLocaleString()}</div>
 
-<div class="detail">
-<span class="label">Status:</span>
-${s.status || ""}
-</div>
+<div class="detail"><span class="label">Status:</span> ${s.status || ""}</div>
 
-<div class="detail">
-<span class="label">Notes:</span>
-${s.notes || ""}
-</div>
+<div class="detail"><span class="label">Notes:</span> ${s.notes || ""}</div>
 
 <div class="action-row">
 
@@ -914,7 +799,6 @@ Delete
 </div>
 
 </div>
-
 `;
 
 });
@@ -952,61 +836,32 @@ total += Number(p.amount || 0);
 pending += balance;
 
 html += `
-
-<div class="list-tile searchable"
-onclick="this.classList.toggle('active')">
+<div class="list-tile searchable" onclick="this.classList.toggle('active')">
 
 <div class="list-head">
 
 <div>
-
-<div class="invoice-no">
-PUR-${1000 + index}
+<div class="invoice-no">PUR-${1000 + index}</div>
+<div class="list-name">${p.supplier || ""}</div>
 </div>
 
-<div class="list-name">
-${p.supplier || ""}
-</div>
-
-</div>
-
-<div class="badge purchase-badge">
-PURCHASE
-</div>
+<div class="badge purchase-badge">PURCHASE</div>
 
 </div>
 
 <div class="expand-content">
 
-<div class="detail">
-<span class="label">Service:</span>
-${p.service || ""}
-</div>
+<div class="detail"><span class="label">Service:</span> ${p.service || ""}</div>
 
-<div class="detail">
-<span class="label">Amount:</span>
-₫ ${Number(p.amount || 0).toLocaleString()}
-</div>
+<div class="detail"><span class="label">Amount:</span> ₹ ${Number(p.amount || 0).toLocaleString()}</div>
 
-<div class="detail">
-<span class="label">Paid:</span>
-₫ ${Number(p.paid || 0).toLocaleString()}
-</div>
+<div class="detail"><span class="label">Paid:</span> ₹ ${Number(p.paid || 0).toLocaleString()}</div>
 
-<div class="detail">
-<span class="label">Balance:</span>
-₫ ${balance.toLocaleString()}
-</div>
+<div class="detail"><span class="label">Balance:</span> ₹ ${balance.toLocaleString()}</div>
 
-<div class="detail">
-<span class="label">Status:</span>
-${p.status || ""}
-</div>
+<div class="detail"><span class="label">Status:</span> ${p.status || ""}</div>
 
-<div class="detail">
-<span class="label">Notes:</span>
-${p.notes || ""}
-</div>
+<div class="detail"><span class="label">Notes:</span> ${p.notes || ""}</div>
 
 <div class="action-row">
 
@@ -1030,7 +885,6 @@ Delete
 </div>
 
 </div>
-
 `;
 
 });
@@ -1038,16 +892,14 @@ Delete
 document.getElementById('purchaseContainer').innerHTML = html;
 
 document.getElementById('totalPurchases').innerHTML =
-`₫ ${total.toLocaleString()}`;
+`₹ ${total.toLocaleString()}`;
 
 document.getElementById('pendingPayable').innerHTML =
-`₫ ${pending.toLocaleString()}`;
+`₹ ${pending.toLocaleString()}`;
 
 });
 
 }
-
-<script>
 
 function loadCustomers(){
 
@@ -1060,43 +912,25 @@ snapshot.forEach((docItem)=>{
 const c = docItem.data();
 
 html += `
-
-<div class="list-tile searchable"
-onclick="this.classList.toggle('active')">
+<div class="list-tile searchable" onclick="this.classList.toggle('active')">
 
 <div class="list-head">
 
-<div class="list-name">
-${c.name || ""}
-</div>
+<div class="list-name">${c.name || ""}</div>
 
-<div class="badge customer-badge">
-CUSTOMER
-</div>
+<div class="badge customer-badge">CUSTOMER</div>
 
 </div>
 
 <div class="expand-content">
 
-<div class="detail">
-<span class="label">Phone:</span>
-${c.phone || ""}
-</div>
+<div class="detail"><span class="label">Phone:</span> ${c.phone || ""}</div>
 
-<div class="detail">
-<span class="label">Email:</span>
-${c.email || ""}
-</div>
+<div class="detail"><span class="label">Email:</span> ${c.email || ""}</div>
 
-<div class="detail">
-<span class="label">Company:</span>
-${c.company || ""}
-</div>
+<div class="detail"><span class="label">Company:</span> ${c.company || ""}</div>
 
-<div class="detail">
-<span class="label">Notes:</span>
-${c.notes || ""}
-</div>
+<div class="detail"><span class="label">Notes:</span> ${c.notes || ""}</div>
 
 <div class="action-row">
 
@@ -1115,7 +949,6 @@ Delete
 </div>
 
 </div>
-
 `;
 
 });
@@ -1137,43 +970,25 @@ snapshot.forEach((docItem)=>{
 const s = docItem.data();
 
 html += `
-
-<div class="list-tile searchable"
-onclick="this.classList.toggle('active')">
+<div class="list-tile searchable" onclick="this.classList.toggle('active')">
 
 <div class="list-head">
 
-<div class="list-name">
-${s.name || ""}
-</div>
+<div class="list-name">${s.name || ""}</div>
 
-<div class="badge supplier-badge">
-SUPPLIER
-</div>
+<div class="badge supplier-badge">SUPPLIER</div>
 
 </div>
 
 <div class="expand-content">
 
-<div class="detail">
-<span class="label">Country:</span>
-${s.country || ""}
-</div>
+<div class="detail"><span class="label">Country:</span> ${s.country || ""}</div>
 
-<div class="detail">
-<span class="label">Contact:</span>
-${s.contact || ""}
-</div>
+<div class="detail"><span class="label">Contact:</span> ${s.contact || ""}</div>
 
-<div class="detail">
-<span class="label">Payment Terms:</span>
-${s.terms || ""}
-</div>
+<div class="detail"><span class="label">Payment Terms:</span> ${s.terms || ""}</div>
 
-<div class="detail">
-<span class="label">Notes:</span>
-${s.notes || ""}
-</div>
+<div class="detail"><span class="label">Notes:</span> ${s.notes || ""}</div>
 
 <div class="action-row">
 
@@ -1192,166 +1007,11 @@ Delete
 </div>
 
 </div>
-
 `;
 
 });
 
 document.getElementById('supplierContainer').innerHTML = html;
-
-});
-
-}
-
-</script>
-
-async function editSale(id){
-
-const snap = await getDoc(doc(db,"sales",id));
-
-const s = snap.data();
-
-editingSaleId = id;
-
-document.getElementById('salesForm').style.display = "block";
-
-document.getElementById('saleCustomer').value = s.customer || "";
-document.getElementById('salePackage').value = s.package || "";
-document.getElementById('salePerson').value = s.salesPerson || "";
-document.getElementById('saleAmount').value = s.amount || "";
-document.getElementById('saleReceived').value = s.received || "";
-document.getElementById('saleStatus').value = s.status || "";
-document.getElementById('saleNotes').value = s.notes || "";
-
-}
-
-async function editPurchase(id){
-
-const snap = await getDoc(doc(db,"purchases",id));
-
-const p = snap.data();
-
-editingPurchaseId = id;
-
-document.getElementById('purchaseForm').style.display = "block";
-
-document.getElementById('purchaseSupplier').value = p.supplier || "";
-document.getElementById('purchaseService').value = p.service || "";
-document.getElementById('purchaseAmount').value = p.amount || "";
-document.getElementById('purchasePaid').value = p.paid || "";
-document.getElementById('purchaseStatus').value = p.status || "";
-document.getElementById('purchaseNotes').value = p.notes || "";
-
-}
-
-async function editCustomer(id){
-
-const snap = await getDoc(doc(db,"customers",id));
-
-const c = snap.data();
-
-editingCustomerId = id;
-
-document.getElementById('customerForm').style.display = "block";
-
-document.getElementById('customerName').value = c.name || "";
-document.getElementById('customerPhone').value = c.phone || "";
-document.getElementById('customerEmail').value = c.email || "";
-document.getElementById('customerCompany').value = c.company || "";
-document.getElementById('customerNotes').value = c.notes || "";
-
-}
-
-async function editSupplier(id){
-
-const snap = await getDoc(doc(db,"suppliers",id));
-
-const s = snap.data();
-
-editingSupplierId = id;
-
-document.getElementById('supplierForm').style.display = "block";
-
-document.getElementById('supplierName').value = s.name || "";
-document.getElementById('supplierCountry').value = s.country || "";
-document.getElementById('supplierContact').value = s.contact || "";
-document.getElementById('supplierTerms').value = s.terms || "";
-document.getElementById('supplierNotes').value = s.notes || "";
-
-}
-
-async function deleteSale(id){
-
-if(!confirm("Delete Sale?")) return;
-
-await deleteDoc(doc(db,"sales",id));
-
-}
-
-async function deletePurchase(id){
-
-if(!confirm("Delete Purchase?")) return;
-
-await deleteDoc(doc(db,"purchases",id));
-
-}
-
-async function deleteCustomer(id){
-
-if(!confirm("Delete Customer?")) return;
-
-await deleteDoc(doc(db,"customers",id));
-
-}
-
-async function deleteSupplier(id){
-
-if(!confirm("Delete Supplier?")) return;
-
-await deleteDoc(doc(db,"suppliers",id));
-
-}
-
-function downloadSalePDF(name,amount){
-
-const { jsPDF } = window.jspdf;
-
-const docu = new jsPDF();
-
-docu.text("SALE INVOICE",20,20);
-docu.text("Customer: " + name,20,40);
-docu.text("Amount: ₹ " + amount,20,60);
-
-docu.save(name + "-sale.pdf");
-
-}
-
-function downloadPurchasePDF(name,amount){
-
-const { jsPDF } = window.jspdf;
-
-const docu = new jsPDF();
-
-docu.text("PURCHASE INVOICE",20,20);
-docu.text("Supplier: " + name,20,40);
-docu.text("Amount: ₫ " + amount,20,60);
-
-docu.save(name + "-purchase.pdf");
-
-}
-
-function searchCards(value){
-
-const cards =
-document.querySelectorAll('.searchable');
-
-cards.forEach(card=>{
-
-card.style.display =
-card.innerText.toLowerCase()
-.includes(value.toLowerCase())
-? "block"
-: "none";
 
 });
 
@@ -1369,5 +1029,4 @@ loadSuppliers();
 </script>
 
 </body>
-
 </html>
