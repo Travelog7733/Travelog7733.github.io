@@ -402,17 +402,9 @@ placeholder="No of Guests">
 id="travelStatus"
 class="input-field">
 
-<option>
-CONFIRMED
-</option>
-
-<option>
-PENDING FOR CONFIRMATION
-</option>
-
-<option>
-COMPLETED
-</option>
+<option>CONFIRMED</option>
+<option>PENDING FOR CONFIRMATION</option>
+<option>COMPLETED</option>
 
 </select>
 
@@ -420,17 +412,9 @@ COMPLETED
 id="paymentStatus"
 class="input-field">
 
-<option>
-ADVANCE PAID
-</option>
-
-<option>
-PAYMENT PENDING
-</option>
-
-<option>
-PAYMENT COMPLETED
-</option>
+<option>ADVANCE PAID</option>
+<option>PAYMENT PENDING</option>
+<option>PAYMENT COMPLETED</option>
 
 </select>
 
@@ -521,17 +505,9 @@ placeholder="Hotel Name">
 <select
 class="input-field hotel-status">
 
-<option>
-BOOKED
-</option>
-
-<option>
-BOOKED BY CUSTOMER
-</option>
-
-<option>
-PENDING FOR BOOKING
-</option>
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
 
 </select>
 
@@ -551,7 +527,7 @@ onclick="addHotel()">
 
 </div>
 
-  <div class="sub-section">
+<div class="sub-section">
 
 <div class="section-title">
 Cruise Status
@@ -577,14 +553,8 @@ placeholder="Cruise Name">
 class="input-field cruise-status">
 
 <option>BOOKED</option>
-
-<option>
-BOOKED BY CUSTOMER
-</option>
-
-<option>
-PENDING FOR BOOKING
-</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
 
 </select>
 
@@ -825,17 +795,9 @@ placeholder="Hotel Name">
 <select
 class="input-field hotel-status">
 
-<option>
-BOOKED
-</option>
-
-<option>
-BOOKED BY CUSTOMER
-</option>
-
-<option>
-PENDING FOR BOOKING
-</option>
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
 
 </select>
 
@@ -872,17 +834,9 @@ placeholder="Cruise Name">
 <select
 class="input-field cruise-status">
 
-<option>
-BOOKED
-</option>
-
-<option>
-BOOKED BY CUSTOMER
-</option>
-
-<option>
-PENDING FOR BOOKING
-</option>
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
 
 </select>
 
@@ -904,7 +858,7 @@ document.querySelector(
 ).value;
 
 const hotels =
-[...document.querySelectorAll(".hotel-card")]
+[...document.querySelectorAll("#hotelContainer .hotel-card")]
 .map(card=>({
 
 place:
@@ -915,20 +869,6 @@ card.querySelector(".hotel-name").value,
 
 status:
 card.querySelector(".hotel-status").value
-
-}));
-
-const itineraryDays =
-[...document.querySelectorAll(".day-card")]
-.map((card,index)=>({
-
-day:index+1,
-
-date:
-card.querySelector(".auto-date").innerText,
-
-activity:
-card.querySelector(".itinerary-text").value
 
 }));
 
@@ -948,6 +888,20 @@ document.querySelectorAll(
 
 status:
 item.value
+
+}));
+
+const itineraryDays =
+[...document.querySelectorAll(".day-card")]
+.map((card,index)=>({
+
+day:index+1,
+
+date:
+card.querySelector(".auto-date").innerText,
+
+activity:
+card.querySelector(".itinerary-text").value
 
 }));
 
@@ -983,8 +937,6 @@ document.getElementById("paymentStatus").value,
 invoiceAmount:
 document.getElementById("invoiceAmount").value,
 
-cruises,
-
 amountReceived:
 document.getElementById("amountReceived").value,
 
@@ -993,6 +945,7 @@ document.getElementById("balanceAmount").value,
 
 visaStatus,
 hotels,
+cruises,
 itineraryDays,
 
 notes:
@@ -1048,26 +1001,6 @@ id:docItem.id,
 });
 
 window.allGuests = guests;
-
-guests.sort((a,b)=>{
-
-const parseDate = (str)=>{
-
-const p = str.split('/');
-
-return new Date(
-p[2],
-p[1]-1,
-p[0]
-);
-
-};
-
-return parseDate(a.travelDate)
--
-parseDate(b.travelDate);
-
-});
 
 let html = "";
 
@@ -1163,15 +1096,11 @@ ${g.paymentStatus}
 <div class="detail">
 
 <span class="label">
-
 Invoice Amount:
-
 </span>
 
 <span class="amount">
-
 ₹ ${g.invoiceAmount || 0}
-
 </span>
 
 </div>
@@ -1247,7 +1176,7 @@ ${
 
 <div class="detail">
 
-🛳 ${c.place}
+🛳️ ${c.place}
 
 <br>
 
@@ -1423,6 +1352,11 @@ document.getElementById(
 guest.paymentStatus || "";
 
 document.getElementById(
+"invoiceAmount"
+).value =
+guest.invoiceAmount || "";
+
+document.getElementById(
 "amountReceived"
 ).value =
 guest.amountReceived || "";
@@ -1492,6 +1426,69 @@ BOOKED BY CUSTOMER
 
 <option ${
 h.status==="PENDING FOR BOOKING"
+?"selected":""
+}>
+PENDING FOR BOOKING
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"cruiseContainer"
+).innerHTML="";
+
+(guest.cruises || [])
+.forEach(c=>{
+
+document.getElementById(
+"cruiseContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field cruise-place"
+value="${c.place || ""}">
+
+<input
+class="input-field cruise-name"
+value="${c.name || ""}">
+
+<select
+class="input-field cruise-status">
+
+<option ${
+c.status==="BOOKED"
+?"selected":""
+}>
+BOOKED
+</option>
+
+<option ${
+c.status==="BOOKED BY CUSTOMER"
+?"selected":""
+}>
+BOOKED BY CUSTOMER
+</option>
+
+<option ${
+c.status==="PENDING FOR BOOKING"
 ?"selected":""
 }>
 PENDING FOR BOOKING
