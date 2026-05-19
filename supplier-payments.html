@@ -10,6 +10,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 
 *{
@@ -91,6 +93,23 @@ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 gap:14px;
 }
 
+.invoice-headings{
+display:grid;
+grid-template-columns:80px 2fr 1fr 1fr 1fr 80px;
+gap:12px;
+font-size:13px;
+font-weight:700;
+margin:18px 0 10px;
+padding:0 5px;
+color:#555;
+}
+
+.invoice-grid{
+display:grid;
+grid-template-columns:80px 2fr 1fr 1fr 1fr 80px;
+gap:12px;
+}
+
 .input-field,
 select,
 textarea{
@@ -137,11 +156,23 @@ background:#ff4d4f;
 background:#0B3D91;
 }
 
+.btn-orange{
+background:#ff9800;
+}
+
 .btn-row{
 display:flex;
 gap:12px;
 flex-wrap:wrap;
 margin-top:18px;
+}
+
+.invoice-item{
+background:#f9fbfb;
+padding:16px;
+border-radius:14px;
+border:1px solid #E4ECE9;
+margin-bottom:12px;
 }
 
 .tile-grid{
@@ -157,6 +188,7 @@ padding:20px;
 border-radius:18px;
 border:1px solid #E4ECE9;
 box-shadow:0 5px 20px rgba(0,0,0,.04);
+cursor:pointer;
 overflow:hidden;
 transition:.3s;
 }
@@ -183,6 +215,13 @@ color:#666;
 }
 
 .tile-details{
+max-height:0;
+overflow:hidden;
+transition:.4s ease;
+}
+
+.tile.active .tile-details{
+max-height:5000px;
 margin-top:16px;
 }
 
@@ -199,7 +238,63 @@ font-weight:700;
 color:#1D9E75;
 }
 
+.badge{
+display:inline-block;
+padding:7px 12px;
+border-radius:999px;
+font-size:11px;
+font-weight:700;
+color:#fff;
+}
+
+.pending{
+background:#ff9800;
+}
+
+.partial{
+background:#0077ff;
+}
+
+.paid{
+background:#00a86b;
+}
+
+.search-box{
+margin-bottom:18px;
+}
+
+.search-input{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #ddd;
+font-size:14px;
+}
+
+.delete-item-btn{
+border:none;
+background:#ff4d4f;
+color:#fff;
+border-radius:10px;
+cursor:pointer;
+font-weight:700;
+}
+
+.empty-box{
+padding:25px;
+text-align:center;
+color:#999;
+}
+
 @media(max-width:768px){
+
+.invoice-headings{
+display:none;
+}
+
+.invoice-grid{
+grid-template-columns:1fr;
+}
 
 .page-title{
 font-size:28px;
@@ -246,7 +341,111 @@ Travelog Supplier Invoice & Payment Management System
 
 </div>
 
-<!-- PAYMENT ENTRY -->
+<!-- SUPPLIER SECTION -->
+
+<div class="section-box">
+
+<div class="section-title">
+Supplier List
+</div>
+
+<div class="form-grid">
+
+<input type="text" id="supplierName" class="input-field" placeholder="Supplier Name">
+
+<input type="text" id="supplierCountry" class="input-field" placeholder="Country">
+
+<input type="text" id="supplierCompany" class="input-field" placeholder="Company Name">
+
+</div>
+
+<div class="btn-row">
+
+<button class="btn" onclick="saveSupplier()">
+SAVE SUPPLIER
+</button>
+
+</div>
+
+<div class="tile-grid" id="supplierContainer"></div>
+
+</div>
+
+<!-- INVOICE SECTION -->
+
+<div class="section-box">
+
+<div class="section-title">
+Supplier Invoice Input
+</div>
+
+<div class="form-grid">
+
+<select id="invoiceSupplier" class="input-field"></select>
+
+<input type="date" id="invoiceDate" class="input-field">
+
+<input type="date" id="commencementDate" class="input-field">
+
+<input type="text" id="invoiceNo" class="input-field" readonly placeholder="Auto Invoice No">
+
+</div>
+
+<div class="invoice-headings">
+
+<div>NO</div>
+<div>ITEM</div>
+<div>QTY</div>
+<div>RATE</div>
+<div>TOTAL</div>
+<div>DELETE</div>
+
+</div>
+
+<div id="invoiceItems"></div>
+
+<div class="btn-row">
+
+<button class="btn" onclick="addInvoiceItem()">
++ ADD ITEM
+</button>
+
+</div>
+
+<br>
+
+<textarea id="invoiceNotes" placeholder="Invoice Notes"></textarea>
+
+<br><br>
+
+<h3>
+Grand Total :
+<span class="amount" id="grandTotal">
+₫ 0
+</span>
+</h3>
+
+<div class="btn-row">
+
+<button class="btn" onclick="saveInvoice()">
+SAVE INVOICE
+</button>
+
+<button class="btn btn-red" onclick="clearInvoiceForm()">
+CLEAR
+</button>
+
+</div>
+
+<div class="search-box">
+<input type="text" id="invoiceSearch" class="search-input" placeholder="Search Invoice / Supplier..." onkeyup="renderInvoices()">
+</div>
+
+<div class="tile-grid" id="invoiceContainer"></div>
+
+</div>
+
+<!-- PAYMENT SECTION -->
 
 <div class="section-box">
 
@@ -278,6 +477,34 @@ SAVE PAYMENT
 
 <button class="btn btn-red" onclick="clearPaymentForm()">
 CLEAR
+</button>
+
+</div>
+
+</div>
+
+<!-- STATEMENT -->
+
+<div class="section-box">
+
+<div class="section-title">
+Supplier Statement
+</div>
+
+<div class="form-grid">
+
+<select id="statementSupplier" class="input-field"></select>
+
+<input type="date" id="statementFrom" class="input-field">
+
+<input type="date" id="statementTo" class="input-field">
+
+</div>
+
+<div class="btn-row">
+
+<button class="btn btn-blue" onclick="downloadStatementPDF()">
+DOWNLOAD PDF
 </button>
 
 </div>
@@ -316,17 +543,17 @@ doc
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+apiKey: "YOUR_API_KEY",
 
-authDomain: "travelog-itinerary.firebaseapp.com",
+authDomain: "YOUR_AUTH_DOMAIN",
 
-projectId: "travelog-itinerary",
+projectId: "YOUR_PROJECT_ID",
 
-storageBucket: "travelog-itinerary.firebasestorage.app",
+storageBucket: "YOUR_STORAGE_BUCKET",
 
-messagingSenderId: "33567258851",
+messagingSenderId: "YOUR_MESSAGING_ID",
 
-appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+appId: "YOUR_APP_ID"
 
 };
 
@@ -349,6 +576,8 @@ window.doc=doc;
 let allSuppliers=[];
 let allInvoices=[];
 let allPayments=[];
+
+let editingInvoiceId=null;
 let editingPaymentId=null;
 
 function formatCurrency(amount){
@@ -359,81 +588,238 @@ new Intl.NumberFormat('vi-VN')
 
 }
 
-function loadSuppliers(){
+function generateInvoiceNo(){
 
-onSnapshot(collection(db,'suppliers'),snapshot=>{
+const invoiceNo =
+"INV-" +
+new Date().getFullYear() +
+"-" +
+String(Date.now()).slice(-6);
 
-allSuppliers=[];
-
-snapshot.forEach(docItem=>{
-
-allSuppliers.push({
-id:docItem.id,
-...docItem.data()
-});
-
-});
-
-let options='<option value="">Select Supplier</option>';
-
-allSuppliers.forEach(s=>{
-
-options += `
-<option value="${s.name}">
-${s.name}
-</option>
-`;
-
-});
-
-document.getElementById('paymentSupplier').innerHTML=options;
-
-});
+document.getElementById('invoiceNo').value =
+invoiceNo;
 
 }
 
-function loadInvoices(){
+function addInvoiceItem(data={}){
 
-onSnapshot(collection(db,'supplierInvoices'),snapshot=>{
+document.getElementById('invoiceItems')
+.insertAdjacentHTML('beforeend',`
 
-allInvoices=[];
+<div class="invoice-item">
 
-snapshot.forEach(docItem=>{
+<div class="invoice-grid">
 
-allInvoices.push({
-id:docItem.id,
-...docItem.data()
-});
+<input type="number"
+class="input-field line-no"
+value="${data.line || ''}"
+placeholder="No">
 
-});
+<input type="text"
+class="input-field item-name"
+value="${data.item || ''}"
+placeholder="Item">
 
-updateSummary();
+<input type="number"
+class="input-field qty"
+value="${data.qty || ''}"
+placeholder="Qty"
+oninput="calculateTotals()">
 
-});
+<input type="number"
+class="input-field rate"
+value="${data.rate || ''}"
+placeholder="Rate"
+oninput="calculateTotals()">
+
+<input type="number"
+class="input-field total"
+value="${data.total || ''}"
+placeholder="Total"
+readonly>
+
+<button
+class="delete-item-btn"
+onclick="removeInvoiceItem(this)">
+X
+</button>
+
+</div>
+
+</div>
+
+`);
+
+calculateTotals();
 
 }
 
-function loadInvoiceDropdown(){
+function removeInvoiceItem(btn){
+
+btn.closest('.invoice-item').remove();
+
+calculateTotals();
+
+}
+
+function calculateTotals(){
+
+let grandTotal=0;
+
+document.querySelectorAll('.invoice-item')
+.forEach(item=>{
+
+const qty =
+Number(item.querySelector('.qty').value)||0;
+
+const rate =
+Number(item.querySelector('.rate').value)||0;
+
+const total = qty * rate;
+
+item.querySelector('.total').value = total;
+
+grandTotal += total;
+
+});
+
+document.getElementById('grandTotal')
+.innerText = formatCurrency(grandTotal);
+
+}
+
+async function saveSupplier(){
+
+const name =
+document.getElementById('supplierName').value;
+
+if(!name){
+alert('Supplier name required');
+return;
+}
+
+await addDoc(collection(db,'suppliers'),{
+
+name,
+
+country:
+document.getElementById('supplierCountry').value,
+
+company:
+document.getElementById('supplierCompany').value,
+
+created:new Date().toISOString()
+
+});
+
+alert('Supplier Saved');
+
+document.getElementById('supplierName').value='';
+document.getElementById('supplierCountry').value='';
+document.getElementById('supplierCompany').value='';
+
+}
+
+async function saveInvoice(){
 
 const supplier =
-document.getElementById('paymentSupplier').value;
+document.getElementById('invoiceSupplier').value;
 
-const invoices =
-allInvoices.filter(i=>i.supplier===supplier);
+if(!supplier){
+alert('Select supplier');
+return;
+}
 
-let html='<option value="">Select Invoice</option>';
+const items =
+[...document.querySelectorAll('.invoice-item')]
+.map(item=>({
 
-invoices.forEach(inv=>{
+line:item.querySelector('.line-no').value,
 
-html += `
-<option value="${inv.id}">
-${inv.invoiceNo}
-</option>
-`;
+item:item.querySelector('.item-name').value,
 
-});
+qty:item.querySelector('.qty').value,
 
-document.getElementById('paymentInvoice').innerHTML=html;
+rate:item.querySelector('.rate').value,
+
+total:item.querySelector('.total').value
+
+}));
+
+const grandTotal =
+items.reduce((sum,item)=>
+sum + Number(item.total || 0),0);
+
+const invoiceData = {
+
+invoiceNo:
+document.getElementById('invoiceNo').value,
+
+supplier,
+
+invoiceDate:
+document.getElementById('invoiceDate').value,
+
+commencementDate:
+document.getElementById('commencementDate').value,
+
+items,
+
+notes:
+document.getElementById('invoiceNotes').value,
+
+grandTotal
+
+};
+
+if(editingInvoiceId){
+
+await updateDoc(
+doc(db,'supplierInvoices',editingInvoiceId),
+invoiceData
+);
+
+alert('Invoice Updated');
+
+editingInvoiceId=null;
+
+}else{
+
+invoiceData.created =
+new Date().toISOString();
+
+await addDoc(
+collection(db,'supplierInvoices'),
+invoiceData
+);
+
+alert('Invoice Saved');
+
+}
+
+clearInvoiceForm();
+
+}
+
+function clearInvoiceForm(){
+
+document.getElementById('invoiceItems').innerHTML='';
+
+document.getElementById('invoiceNotes').value='';
+
+document.getElementById('invoiceDate').value='';
+
+document.getElementById('commencementDate').value='';
+
+document.getElementById('invoiceSupplier').value='';
+
+addInvoiceItem();
+
+calculateTotals();
+
+generateInvoiceNo();
+
+editingInvoiceId=null;
 
 }
 
@@ -444,7 +830,7 @@ if(
 !document.getElementById('paymentInvoice').value ||
 !document.getElementById('paidAmount').value
 ){
-alert('Please fill all fields');
+alert('Fill all payment fields');
 return;
 }
 
@@ -499,17 +885,312 @@ clearPaymentForm();
 function clearPaymentForm(){
 
 document.getElementById('paymentSupplier').value='';
-
-document.getElementById('paymentInvoice').innerHTML=
-'<option value="">Select Invoice</option>';
-
+document.getElementById('paymentInvoice').innerHTML='<option value="">Select Invoice</option>';
 document.getElementById('paidAmount').value='';
-
 document.getElementById('paymentDate').value='';
-
 document.getElementById('paymentNotes').value='';
 
 editingPaymentId=null;
+
+}
+
+function loadSuppliers(){
+
+onSnapshot(collection(db,'suppliers'),snapshot=>{
+
+allSuppliers=[];
+
+snapshot.forEach(docItem=>{
+
+allSuppliers.push({
+id:docItem.id,
+...docItem.data()
+});
+
+});
+
+let html='';
+let options='<option value="">Select Supplier</option>';
+
+allSuppliers.forEach(s=>{
+
+options += `
+<option value="${s.name}">
+${s.name}
+</option>
+`;
+
+html += `
+
+<div class="tile"
+onclick="this.classList.toggle('active')">
+
+<div class="tile-head">
+
+<div>
+
+<div class="tile-title">
+${s.name}
+</div>
+
+<div class="tile-sub">
+${s.country || ''}
+</div>
+
+</div>
+
+</div>
+
+<div class="tile-details">
+
+<div class="tile-block">
+Company :
+${s.company || '-'}
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('supplierContainer').innerHTML=html;
+
+document.getElementById('invoiceSupplier').innerHTML=options;
+document.getElementById('paymentSupplier').innerHTML=options;
+document.getElementById('statementSupplier').innerHTML=options;
+
+});
+
+}
+
+function renderInvoices(){
+
+const search =
+document.getElementById('invoiceSearch').value.toLowerCase();
+
+let html='';
+
+const filtered =
+allInvoices.filter(inv=>
+
+inv.supplier.toLowerCase().includes(search) ||
+inv.invoiceNo.toLowerCase().includes(search)
+
+);
+
+if(filtered.length===0){
+
+document.getElementById('invoiceContainer').innerHTML=
+'<div class="empty-box">No Invoices Found</div>';
+
+return;
+
+}
+
+filtered.forEach(inv=>{
+
+const totalPaid =
+allPayments
+.filter(p=>p.invoiceId===inv.id)
+.reduce((sum,p)=>
+sum + Number(p.amount || 0),0);
+
+const balance =
+Number(inv.grandTotal || 0) - totalPaid;
+
+let badge='pending';
+let badgeText='PENDING';
+
+if(balance<=0){
+badge='paid';
+badgeText='PAID';
+}else if(totalPaid>0){
+badge='partial';
+badgeText='PARTIAL';
+}
+
+html += `
+
+<div class="tile"
+onclick="this.classList.toggle('active')">
+
+<div class="tile-head">
+
+<div>
+
+<div class="tile-title">
+${inv.supplier}
+</div>
+
+<div class="tile-sub">
+${inv.invoiceNo}
+</div>
+
+</div>
+
+<div>
+<span class="badge ${badge}">
+${badgeText}
+</span>
+</div>
+
+</div>
+
+<div class="tile-details">
+
+<div class="tile-block">
+
+Invoice :
+<span class="amount">
+${formatCurrency(inv.grandTotal)}
+</span>
+<br>
+
+Paid :
+<span class="amount">
+${formatCurrency(totalPaid)}
+</span>
+<br>
+
+Balance :
+<span class="amount">
+${formatCurrency(balance)}
+</span>
+
+</div>
+
+<div class="btn-row">
+
+<button
+class="btn btn-blue"
+onclick="event.stopPropagation();editInvoice('${inv.id}')">
+
+EDIT
+
+</button>
+
+<button
+class="btn btn-red"
+onclick="event.stopPropagation();deleteInvoice('${inv.id}')">
+
+DELETE
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('invoiceContainer').innerHTML=html;
+
+}
+
+function loadInvoices(){
+
+onSnapshot(collection(db,'supplierInvoices'),snapshot=>{
+
+allInvoices=[];
+
+snapshot.forEach(docItem=>{
+
+allInvoices.push({
+id:docItem.id,
+...docItem.data()
+});
+
+});
+
+renderInvoices();
+renderPaymentStatus();
+updateSummary();
+
+});
+
+}
+
+function loadPayments(){
+
+onSnapshot(collection(db,'supplierPayments'),snapshot=>{
+
+allPayments=[];
+
+snapshot.forEach(docItem=>{
+
+allPayments.push({
+id:docItem.id,
+...docItem.data()
+});
+
+});
+
+renderInvoices();
+renderPaymentStatus();
+updateSummary();
+
+});
+
+}
+
+async function editInvoice(id){
+
+const invoice =
+allInvoices.find(i=>i.id===id);
+
+if(!invoice) return;
+
+editingInvoiceId=id;
+
+document.getElementById('invoiceSupplier').value =
+invoice.supplier || '';
+
+document.getElementById('invoiceDate').value =
+invoice.invoiceDate || '';
+
+document.getElementById('commencementDate').value =
+invoice.commencementDate || '';
+
+document.getElementById('invoiceNo').value =
+invoice.invoiceNo || '';
+
+document.getElementById('invoiceNotes').value =
+invoice.notes || '';
+
+document.getElementById('invoiceItems').innerHTML='';
+
+(invoice.items || []).forEach(item=>{
+
+addInvoiceItem(item);
+
+});
+
+calculateTotals();
+
+window.scrollTo({
+top:0,
+behavior:'smooth'
+});
+
+}
+
+async function deleteInvoice(id){
+
+if(!confirm('Delete Invoice?'))
+return;
+
+await deleteDoc(
+doc(db,'supplierInvoices',id)
+);
+
+alert('Invoice Deleted');
 
 }
 
@@ -548,8 +1229,6 @@ top:0,
 behavior:'smooth'
 });
 
-alert('Payment Loaded');
-
 }
 
 async function deletePayment(id){
@@ -565,26 +1244,27 @@ alert('Payment Deleted');
 
 }
 
-function loadPayments(){
+function loadInvoiceDropdown(){
 
-onSnapshot(collection(db,'supplierPayments'),snapshot=>{
+const supplier =
+document.getElementById('paymentSupplier').value;
 
-allPayments=[];
+const invoices =
+allInvoices.filter(i=>i.supplier===supplier);
 
-snapshot.forEach(docItem=>{
+let html='<option value="">Select Invoice</option>';
 
-allPayments.push({
-id:docItem.id,
-...docItem.data()
+invoices.forEach(inv=>{
+
+html += `
+<option value="${inv.id}">
+${inv.invoiceNo}
+</option>
+`;
+
 });
 
-});
-
-renderPaymentStatus();
-
-updateSummary();
-
-});
+document.getElementById('paymentInvoice').innerHTML=html;
 
 }
 
@@ -592,31 +1272,55 @@ function renderPaymentStatus(){
 
 let html='';
 
-allPayments.forEach(pay=>{
+allSuppliers.forEach(supplier=>{
 
-const invoice =
-allInvoices.find(inv=>inv.id===pay.invoiceId);
+const supplierInvoices =
+allInvoices.filter(i=>
+i.supplier===supplier.name
+);
+
+const totalInvoice =
+supplierInvoices.reduce((sum,i)=>
+sum + Number(i.grandTotal || 0),0);
+
+const totalPaid =
+allPayments
+.filter(payment=>{
+
+return supplierInvoices.some(inv=>
+
+payment.invoiceId===inv.id
+
+);
+
+})
+.reduce((sum,p)=>
+sum + Number(p.amount || 0),0);
+
+const balance =
+totalInvoice-totalPaid;
 
 html += `
 
-<div class="tile">
+<div class="tile"
+onclick="this.classList.toggle('active')">
 
 <div class="tile-head">
 
 <div>
 
 <div class="tile-title">
-${pay.supplier}
+${supplier.name}
 </div>
 
 <div class="tile-sub">
-${pay.paymentDate || '-'}
+${supplier.country || ''}
 </div>
 
 </div>
 
 <div class="amount">
-${formatCurrency(pay.amount)}
+${formatCurrency(balance)}
 </div>
 
 </div>
@@ -625,8 +1329,70 @@ ${formatCurrency(pay.amount)}
 
 <div class="tile-block">
 
+Total Invoice :
+<span class="amount">
+${formatCurrency(totalInvoice)}
+</span>
+<br>
+
+Total Paid :
+<span class="amount">
+${formatCurrency(totalPaid)}
+</span>
+<br>
+
+Balance :
+<span class="amount">
+${formatCurrency(balance)}
+</span>
+
+</div>
+
+${supplierInvoices.map(inv=>{
+
+const relatedPayments =
+allPayments.filter(payment=>
+
+payment.invoiceId===inv.id
+
+);
+
+const paid =
+relatedPayments.reduce((sum,p)=>
+sum + Number(p.amount || 0),0);
+
+const pending =
+Number(inv.grandTotal || 0) - paid;
+
+return `
+
+<div class="tile-block">
+
+<b>${inv.invoiceNo}</b>
+<br>
+
 Invoice :
-${invoice?.invoiceNo || '-'}
+${formatCurrency(inv.grandTotal)}
+<br>
+
+Paid :
+${formatCurrency(paid)}
+<br>
+
+Balance :
+${formatCurrency(pending)}
+
+${relatedPayments.map(pay=>`
+
+<div style="
+margin-top:8px;
+padding:8px;
+background:#f8f8f8;
+border-radius:8px;
+">
+
+Date :
+${pay.paymentDate || '-'}
 <br>
 
 Amount :
@@ -634,33 +1400,27 @@ Amount :
 ${formatCurrency(pay.amount)}
 </span>
 
-${pay.notes ? `
-<br><br>
-Note :
-${pay.notes}
-` : ''}
-
 </div>
+
+`).join('')}
 
 <div class="btn-row">
 
 <button
 class="btn btn-blue"
-onclick="editPayment('${pay.id}')">
+onclick="event.stopPropagation();editPayment('${relatedPayments[0]?.id || ''}')">
 
-EDIT
-
-</button>
-
-<button
-class="btn btn-red"
-onclick="deletePayment('${pay.id}')">
-
-DELETE
+EDIT PAYMENT
 
 </button>
 
 </div>
+
+</div>
+
+`;
+
+}).join('')}
 
 </div>
 
@@ -698,7 +1458,120 @@ document.getElementById('totalBalance')
 
 }
 
+async function downloadStatementPDF(){
+
+const supplier =
+document.getElementById('statementSupplier').value;
+
+if(!supplier){
+alert('Select supplier');
+return;
+}
+
+const supplierInvoices =
+allInvoices.filter(inv=>
+inv.supplier === supplier
+);
+
+const { jsPDF } = window.jspdf;
+
+const pdf = new jsPDF();
+
+let y=20;
+
+pdf.setFontSize(18);
+
+pdf.text(
+"SUPPLIER ACCOUNT STATEMENT",
+20,
+y
+);
+
+y += 12;
+
+pdf.setFontSize(11);
+
+pdf.text(
+`Supplier: ${supplier}`,
+20,
+y
+);
+
+y += 15;
+
+let totalInvoice=0;
+let totalPaid=0;
+
+supplierInvoices.forEach(inv=>{
+
+const payments =
+allPayments.filter(
+p=>p.invoiceId===inv.id
+);
+
+const paid =
+payments.reduce((sum,p)=>
+sum + Number(p.amount || 0),0);
+
+const balance =
+Number(inv.grandTotal || 0)-paid;
+
+totalInvoice += Number(inv.grandTotal || 0);
+totalPaid += paid;
+
+pdf.text(
+`${inv.invoiceNo} | Invoice: ${formatCurrency(inv.grandTotal)} | Paid: ${formatCurrency(paid)} | Balance: ${formatCurrency(balance)}`,
+20,
+y
+);
+
+y += 10;
+
+if(y > 260){
+
+pdf.addPage();
+
+y=20;
+
+}
+
+});
+
+y += 10;
+
+pdf.text(
+`Total Invoice : ${formatCurrency(totalInvoice)}`,
+20,
+y
+);
+
+y += 8;
+
+pdf.text(
+`Total Paid : ${formatCurrency(totalPaid)}`,
+20,
+y
+);
+
+y += 8;
+
+pdf.text(
+`Balance : ${formatCurrency(totalInvoice-totalPaid)}`,
+20,
+y
+);
+
+pdf.save(
+supplier + "-statement.pdf"
+);
+
+}
+
 window.addEventListener('load',()=>{
+
+generateInvoiceNo();
+
+addInvoiceItem();
 
 loadSuppliers();
 
