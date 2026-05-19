@@ -33,6 +33,7 @@ text-align:center;
 max-width:500px;
 width:100%;
 box-shadow:0 10px 30px rgba(0,0,0,0.1);
+border-top:5px solid #ff7a00;
 }
 
 .employee-box h1{
@@ -60,6 +61,8 @@ font-weight:600;
 font-size:16px;
 cursor:pointer;
 transition:0.3s ease;
+width:100%;
+max-width:320px;
 }
 
 .employee-btn:hover{
@@ -93,6 +96,23 @@ margin-top:25px;
 #itinerary-section{
 display:none;
 margin-top:30px;
+}
+
+@media(max-width:768px){
+
+.employee-box{
+padding:35px 20px;
+}
+
+.employee-box h1{
+font-size:28px;
+}
+
+.employee-btn{
+font-size:15px;
+padding:13px 20px;
+}
+
 }
 
 </style>
@@ -161,7 +181,16 @@ class="employee-btn accounts-platform-btn">
 ACCOUNTS PLATFORM
 </a>
 
+<br><br>
+
+<button 
+class="employee-btn supplier-payments-btn"
+onclick="openSupplierPayments()">
+SUPPLIER PAYMENTS STATUS
+</button>
+
 </div>
+
 </div>
 
 </div>
@@ -171,6 +200,8 @@ ACCOUNTS PLATFORM
 function showPasswordBox(){
 
 document.getElementById("password-section").style.display = "block";
+
+document.getElementById("employeePassword").focus();
 
 }
 
@@ -193,6 +224,38 @@ document.getElementById("itinerary-section").style.display = "none";
 }
 
 }
+
+function openSupplierPayments(){
+
+const password = prompt(
+"Enter Supplier Payments Password"
+);
+
+if(password === "5655"){
+
+window.open(
+"https://www.travelogdrop.online/supplier-payments.html",
+"_blank"
+);
+
+}else{
+
+alert("Incorrect Password");
+
+}
+
+}
+
+document.getElementById("employeePassword")
+.addEventListener("keypress", function(event){
+
+if(event.key === "Enter"){
+
+validatePassword();
+
+}
+
+});
 
 </script>
 
