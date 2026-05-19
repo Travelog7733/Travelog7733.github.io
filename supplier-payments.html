@@ -95,7 +95,7 @@ gap:14px;
 
 .invoice-headings{
 display:grid;
-grid-template-columns:80px 2fr 1fr 1fr 1fr 80px;
+grid-template-columns:80px 2fr 1fr 1fr 1fr;
 gap:12px;
 font-size:13px;
 font-weight:700;
@@ -106,7 +106,7 @@ color:#555;
 
 .invoice-grid{
 display:grid;
-grid-template-columns:80px 2fr 1fr 1fr 1fr 80px;
+grid-template-columns:80px 2fr 1fr 1fr 1fr;
 gap:12px;
 }
 
@@ -156,10 +156,6 @@ background:#ff4d4f;
 background:#0B3D91;
 }
 
-.btn-orange{
-background:#ff9800;
-}
-
 .btn-row{
 display:flex;
 gap:12px;
@@ -177,7 +173,7 @@ margin-bottom:12px;
 
 .tile-grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:18px;
 margin-top:22px;
 }
@@ -259,31 +255,20 @@ background:#0077ff;
 background:#00a86b;
 }
 
-.search-box{
-margin-bottom:18px;
-}
-
-.search-input{
-width:100%;
-padding:14px;
-border-radius:12px;
-border:1px solid #ddd;
-font-size:14px;
-}
-
-.delete-item-btn{
-border:none;
-background:#ff4d4f;
-color:#fff;
+.payment-card{
+margin-top:8px;
+padding:12px;
+background:#f8f8f8;
 border-radius:10px;
-cursor:pointer;
-font-weight:700;
+border:1px solid #eee;
 }
 
-.empty-box{
-padding:25px;
-text-align:center;
-color:#999;
+.payment-actions{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:10px;
+flex-wrap:wrap;
 }
 
 @media(max-width:768px){
@@ -398,7 +383,6 @@ Supplier Invoice Input
 <div>QTY</div>
 <div>RATE</div>
 <div>TOTAL</div>
-<div>DELETE</div>
 
 </div>
 
@@ -437,10 +421,6 @@ CLEAR
 
 </div>
 
-<div class="search-box">
-<input type="text" id="invoiceSearch" class="search-input" placeholder="Search Invoice / Supplier..." onkeyup="renderInvoices()">
-</div>
-
 <div class="tile-grid" id="invoiceContainer"></div>
 
 </div>
@@ -473,10 +453,6 @@ Payment Entry
 
 <button class="btn" onclick="savePayment()">
 SAVE PAYMENT
-</button>
-
-<button class="btn btn-red" onclick="clearPaymentForm()">
-CLEAR
 </button>
 
 </div>
@@ -551,7 +527,7 @@ projectId: "YOUR_PROJECT_ID",
 
 storageBucket: "YOUR_STORAGE_BUCKET",
 
-messagingSenderId: "YOUR_MESSAGING_ID",
+messagingSenderId: "YOUR_SENDER_ID",
 
 appId: "YOUR_APP_ID"
 
@@ -576,9 +552,7 @@ window.doc=doc;
 let allSuppliers=[];
 let allInvoices=[];
 let allPayments=[];
-
 let editingInvoiceId=null;
-let editingPaymentId=null;
 
 function formatCurrency(amount){
 
@@ -601,7 +575,7 @@ invoiceNo;
 
 }
 
-function addInvoiceItem(data={}){
+function addInvoiceItem(){
 
 document.getElementById('invoiceItems')
 .insertAdjacentHTML('beforeend',`
@@ -612,53 +586,32 @@ document.getElementById('invoiceItems')
 
 <input type="number"
 class="input-field line-no"
-value="${data.line || ''}"
 placeholder="No">
 
 <input type="text"
 class="input-field item-name"
-value="${data.item || ''}"
 placeholder="Item">
 
 <input type="number"
 class="input-field qty"
-value="${data.qty || ''}"
 placeholder="Qty"
 oninput="calculateTotals()">
 
 <input type="number"
 class="input-field rate"
-value="${data.rate || ''}"
 placeholder="Rate"
 oninput="calculateTotals()">
 
 <input type="number"
 class="input-field total"
-value="${data.total || ''}"
 placeholder="Total"
 readonly>
-
-<button
-class="delete-item-btn"
-onclick="removeInvoiceItem(this)">
-X
-</button>
 
 </div>
 
 </div>
 
 `);
-
-calculateTotals();
-
-}
-
-function removeInvoiceItem(btn){
-
-btn.closest('.invoice-item').remove();
-
-calculateTotals();
 
 }
 
@@ -690,17 +643,10 @@ document.getElementById('grandTotal')
 
 async function saveSupplier(){
 
-const name =
-document.getElementById('supplierName').value;
-
-if(!name){
-alert('Supplier name required');
-return;
-}
-
 await addDoc(collection(db,'suppliers'),{
 
-name,
+name:
+document.getElementById('supplierName').value,
 
 country:
 document.getElementById('supplierCountry').value,
@@ -714,21 +660,9 @@ created:new Date().toISOString()
 
 alert('Supplier Saved');
 
-document.getElementById('supplierName').value='';
-document.getElementById('supplierCountry').value='';
-document.getElementById('supplierCompany').value='';
-
 }
 
 async function saveInvoice(){
-
-const supplier =
-document.getElementById('invoiceSupplier').value;
-
-if(!supplier){
-alert('Select supplier');
-return;
-}
 
 const items =
 [...document.querySelectorAll('.invoice-item')]
@@ -750,12 +684,13 @@ const grandTotal =
 items.reduce((sum,item)=>
 sum + Number(item.total || 0),0);
 
-const invoiceData = {
+await addDoc(collection(db,'supplierInvoices'),{
 
 invoiceNo:
 document.getElementById('invoiceNo').value,
 
-supplier,
+supplier:
+document.getElementById('invoiceSupplier').value,
 
 invoiceDate:
 document.getElementById('invoiceDate').value,
@@ -768,34 +703,13 @@ items,
 notes:
 document.getElementById('invoiceNotes').value,
 
-grandTotal
+grandTotal,
 
-};
+created:new Date().toISOString()
 
-if(editingInvoiceId){
-
-await updateDoc(
-doc(db,'supplierInvoices',editingInvoiceId),
-invoiceData
-);
-
-alert('Invoice Updated');
-
-editingInvoiceId=null;
-
-}else{
-
-invoiceData.created =
-new Date().toISOString();
-
-await addDoc(
-collection(db,'supplierInvoices'),
-invoiceData
-);
+});
 
 alert('Invoice Saved');
-
-}
 
 clearInvoiceForm();
 
@@ -807,34 +721,17 @@ document.getElementById('invoiceItems').innerHTML='';
 
 document.getElementById('invoiceNotes').value='';
 
-document.getElementById('invoiceDate').value='';
-
-document.getElementById('commencementDate').value='';
-
-document.getElementById('invoiceSupplier').value='';
-
 addInvoiceItem();
 
 calculateTotals();
 
 generateInvoiceNo();
 
-editingInvoiceId=null;
-
 }
 
 async function savePayment(){
 
-if(
-!document.getElementById('paymentSupplier').value ||
-!document.getElementById('paymentInvoice').value ||
-!document.getElementById('paidAmount').value
-){
-alert('Fill all payment fields');
-return;
-}
-
-const paymentData = {
+await addDoc(collection(db,'supplierPayments'),{
 
 supplier:
 document.getElementById('paymentSupplier').value,
@@ -849,48 +746,26 @@ paymentDate:
 document.getElementById('paymentDate').value,
 
 notes:
-document.getElementById('paymentNotes').value
+document.getElementById('paymentNotes').value,
 
-};
+created:new Date().toISOString()
 
-if(editingPaymentId){
-
-await updateDoc(
-doc(db,'supplierPayments',editingPaymentId),
-paymentData
-);
-
-alert('Payment Updated');
-
-editingPaymentId=null;
-
-}else{
-
-paymentData.created =
-new Date().toISOString();
-
-await addDoc(
-collection(db,'supplierPayments'),
-paymentData
-);
+});
 
 alert('Payment Saved');
 
 }
 
-clearPaymentForm();
+async function deletePayment(id){
 
-}
+if(!confirm('Delete Payment?'))
+return;
 
-function clearPaymentForm(){
+await deleteDoc(
+doc(db,'supplierPayments',id)
+);
 
-document.getElementById('paymentSupplier').value='';
-document.getElementById('paymentInvoice').innerHTML='<option value="">Select Invoice</option>';
-document.getElementById('paidAmount').value='';
-document.getElementById('paymentDate').value='';
-document.getElementById('paymentNotes').value='';
-
-editingPaymentId=null;
+alert('Payment Deleted');
 
 }
 
@@ -966,134 +841,6 @@ document.getElementById('statementSupplier').innerHTML=options;
 
 }
 
-function renderInvoices(){
-
-const search =
-document.getElementById('invoiceSearch').value.toLowerCase();
-
-let html='';
-
-const filtered =
-allInvoices.filter(inv=>
-
-inv.supplier.toLowerCase().includes(search) ||
-inv.invoiceNo.toLowerCase().includes(search)
-
-);
-
-if(filtered.length===0){
-
-document.getElementById('invoiceContainer').innerHTML=
-'<div class="empty-box">No Invoices Found</div>';
-
-return;
-
-}
-
-filtered.forEach(inv=>{
-
-const totalPaid =
-allPayments
-.filter(p=>p.invoiceId===inv.id)
-.reduce((sum,p)=>
-sum + Number(p.amount || 0),0);
-
-const balance =
-Number(inv.grandTotal || 0) - totalPaid;
-
-let badge='pending';
-let badgeText='PENDING';
-
-if(balance<=0){
-badge='paid';
-badgeText='PAID';
-}else if(totalPaid>0){
-badge='partial';
-badgeText='PARTIAL';
-}
-
-html += `
-
-<div class="tile"
-onclick="this.classList.toggle('active')">
-
-<div class="tile-head">
-
-<div>
-
-<div class="tile-title">
-${inv.supplier}
-</div>
-
-<div class="tile-sub">
-${inv.invoiceNo}
-</div>
-
-</div>
-
-<div>
-<span class="badge ${badge}">
-${badgeText}
-</span>
-</div>
-
-</div>
-
-<div class="tile-details">
-
-<div class="tile-block">
-
-Invoice :
-<span class="amount">
-${formatCurrency(inv.grandTotal)}
-</span>
-<br>
-
-Paid :
-<span class="amount">
-${formatCurrency(totalPaid)}
-</span>
-<br>
-
-Balance :
-<span class="amount">
-${formatCurrency(balance)}
-</span>
-
-</div>
-
-<div class="btn-row">
-
-<button
-class="btn btn-blue"
-onclick="event.stopPropagation();editInvoice('${inv.id}')">
-
-EDIT
-
-</button>
-
-<button
-class="btn btn-red"
-onclick="event.stopPropagation();deleteInvoice('${inv.id}')">
-
-DELETE
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-document.getElementById('invoiceContainer').innerHTML=html;
-
-}
-
 function loadInvoices(){
 
 onSnapshot(collection(db,'supplierInvoices'),snapshot=>{
@@ -1109,7 +856,6 @@ id:docItem.id,
 
 });
 
-renderInvoices();
 renderPaymentStatus();
 updateSummary();
 
@@ -1132,115 +878,10 @@ id:docItem.id,
 
 });
 
-renderInvoices();
 renderPaymentStatus();
 updateSummary();
 
 });
-
-}
-
-async function editInvoice(id){
-
-const invoice =
-allInvoices.find(i=>i.id===id);
-
-if(!invoice) return;
-
-editingInvoiceId=id;
-
-document.getElementById('invoiceSupplier').value =
-invoice.supplier || '';
-
-document.getElementById('invoiceDate').value =
-invoice.invoiceDate || '';
-
-document.getElementById('commencementDate').value =
-invoice.commencementDate || '';
-
-document.getElementById('invoiceNo').value =
-invoice.invoiceNo || '';
-
-document.getElementById('invoiceNotes').value =
-invoice.notes || '';
-
-document.getElementById('invoiceItems').innerHTML='';
-
-(invoice.items || []).forEach(item=>{
-
-addInvoiceItem(item);
-
-});
-
-calculateTotals();
-
-window.scrollTo({
-top:0,
-behavior:'smooth'
-});
-
-}
-
-async function deleteInvoice(id){
-
-if(!confirm('Delete Invoice?'))
-return;
-
-await deleteDoc(
-doc(db,'supplierInvoices',id)
-);
-
-alert('Invoice Deleted');
-
-}
-
-async function editPayment(id){
-
-const payment =
-allPayments.find(p=>p.id===id);
-
-if(!payment) return;
-
-editingPaymentId=id;
-
-document.getElementById('paymentSupplier').value =
-payment.supplier || '';
-
-loadInvoiceDropdown();
-
-setTimeout(()=>{
-
-document.getElementById('paymentInvoice').value =
-payment.invoiceId || '';
-
-},200);
-
-document.getElementById('paidAmount').value =
-payment.amount || '';
-
-document.getElementById('paymentDate').value =
-payment.paymentDate || '';
-
-document.getElementById('paymentNotes').value =
-payment.notes || '';
-
-window.scrollTo({
-top:0,
-behavior:'smooth'
-});
-
-}
-
-async function deletePayment(id){
-
-if(!confirm('Delete Payment?'))
-return;
-
-await deleteDoc(
-doc(db,'supplierPayments',id)
-);
-
-alert('Payment Deleted');
 
 }
 
@@ -1257,9 +898,11 @@ let html='<option value="">Select Invoice</option>';
 invoices.forEach(inv=>{
 
 html += `
+
 <option value="${inv.id}">
 ${inv.invoiceNo}
 </option>
+
 `;
 
 });
@@ -1371,6 +1014,10 @@ return `
 <b>${inv.invoiceNo}</b>
 <br>
 
+Invoice Date :
+${inv.invoiceDate || '-'}
+<br>
+
 Invoice :
 ${formatCurrency(inv.grandTotal)}
 <br>
@@ -1382,14 +1029,18 @@ ${formatCurrency(paid)}
 Balance :
 ${formatCurrency(pending)}
 
+${relatedPayments.length ? `
+
+<br><br>
+<b>Payments</b>
+
 ${relatedPayments.map(pay=>`
 
-<div style="
-margin-top:8px;
-padding:8px;
-background:#f8f8f8;
-border-radius:8px;
-">
+<div class="payment-card">
+
+<div class="payment-actions">
+
+<div>
 
 Date :
 ${pay.paymentDate || '-'}
@@ -1400,21 +1051,43 @@ Amount :
 ${formatCurrency(pay.amount)}
 </span>
 
+${pay.notes ? `
+<br>
+Note : ${pay.notes}
+` : ''}
+
 </div>
 
-`).join('')}
-
-<div class="btn-row">
+<div>
 
 <button
-class="btn btn-blue"
-onclick="event.stopPropagation();editPayment('${relatedPayments[0]?.id || ''}')">
+onclick="event.stopPropagation();deletePayment('${pay.id}')"
+class="btn btn-red"
+style="
+padding:8px 14px;
+font-size:12px;
+">
 
-EDIT PAYMENT
+DELETE
 
 </button>
 
 </div>
+
+</div>
+
+</div>
+
+`).join('')}
+
+` : `
+
+<br><br>
+<span style="color:#999;">
+No Payments Added
+</span>
+
+`}
 
 </div>
 
@@ -1463,102 +1136,16 @@ async function downloadStatementPDF(){
 const supplier =
 document.getElementById('statementSupplier').value;
 
-if(!supplier){
-alert('Select supplier');
-return;
-}
-
-const supplierInvoices =
-allInvoices.filter(inv=>
-inv.supplier === supplier
-);
-
 const { jsPDF } = window.jspdf;
 
 const pdf = new jsPDF();
-
-let y=20;
 
 pdf.setFontSize(18);
 
 pdf.text(
 "SUPPLIER ACCOUNT STATEMENT",
 20,
-y
-);
-
-y += 12;
-
-pdf.setFontSize(11);
-
-pdf.text(
-`Supplier: ${supplier}`,
-20,
-y
-);
-
-y += 15;
-
-let totalInvoice=0;
-let totalPaid=0;
-
-supplierInvoices.forEach(inv=>{
-
-const payments =
-allPayments.filter(
-p=>p.invoiceId===inv.id
-);
-
-const paid =
-payments.reduce((sum,p)=>
-sum + Number(p.amount || 0),0);
-
-const balance =
-Number(inv.grandTotal || 0)-paid;
-
-totalInvoice += Number(inv.grandTotal || 0);
-totalPaid += paid;
-
-pdf.text(
-`${inv.invoiceNo} | Invoice: ${formatCurrency(inv.grandTotal)} | Paid: ${formatCurrency(paid)} | Balance: ${formatCurrency(balance)}`,
-20,
-y
-);
-
-y += 10;
-
-if(y > 260){
-
-pdf.addPage();
-
-y=20;
-
-}
-
-});
-
-y += 10;
-
-pdf.text(
-`Total Invoice : ${formatCurrency(totalInvoice)}`,
-20,
-y
-);
-
-y += 8;
-
-pdf.text(
-`Total Paid : ${formatCurrency(totalPaid)}`,
-20,
-y
-);
-
-y += 8;
-
-pdf.text(
-`Balance : ${formatCurrency(totalInvoice-totalPaid)}`,
-20,
-y
+20
 );
 
 pdf.save(
