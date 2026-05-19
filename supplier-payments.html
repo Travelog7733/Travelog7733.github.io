@@ -1178,12 +1178,19 @@ const totalInvoice =
 supplierInvoices.reduce((sum,i)=>
 sum + Number(i.grandTotal || 0),0);
 
-const invoiceIds =
-supplierInvoices.map(i=>i.id);
-
 const totalPaid =
 allPayments
-.filter(p=>invoiceIds.includes(p.invoiceId))
+.filter(payment=>{
+
+return supplierInvoices.some(inv=>
+
+payment.invoiceId===inv.id ||
+payment.invoiceId===inv.invoiceNo ||
+payment.invoiceNo===inv.invoiceNo
+
+);
+
+})
 .reduce((sum,p)=>
 sum + Number(p.amount || 0),0);
 
@@ -1209,12 +1216,8 @@ ${supplier.country || ''}
 
 </div>
 
-<div>
-
 <div class="amount">
 ${formatCurrency(balance)}
-</div>
-
 </div>
 
 </div>
@@ -1223,193 +1226,105 @@ ${formatCurrency(balance)}
 
 <div class="tile-block">
 
-<div style="
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-">
-
-<div>
-<b>Total Invoice</b><br>
+Total Invoice :
 <span class="amount">
 ${formatCurrency(totalInvoice)}
 </span>
-</div>
+<br>
 
-<div>
-<b>Total Paid</b><br>
+Total Paid :
 <span class="amount">
 ${formatCurrency(totalPaid)}
 </span>
-</div>
+<br>
 
-<div>
-<b>Balance</b><br>
+Balance :
 <span class="amount">
 ${formatCurrency(balance)}
 </span>
-</div>
-
-</div>
 
 </div>
 
 ${supplierInvoices.map(inv=>{
 
-const invoicePayments =
-allPayments.filter(p=>p.invoiceId===inv.id);
+const relatedPayments =
+allPayments.filter(payment=>
+
+payment.invoiceId===inv.id ||
+payment.invoiceId===inv.invoiceNo ||
+payment.invoiceNo===inv.invoiceNo
+
+);
 
 const paid =
-invoicePayments.reduce((sum,p)=>
+relatedPayments.reduce((sum,p)=>
 sum + Number(p.amount || 0),0);
 
 const pending =
 Number(inv.grandTotal || 0) - paid;
 
-let badge='pending';
-let badgeText='PENDING';
-
-if(pending <= 0){
-
-badge='paid';
-badgeText='PAID';
-
-}else if(paid > 0){
-
-badge='partial';
-badgeText='PARTIAL';
-
-}
-
 return `
 
 <div class="tile-block">
 
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:12px;
-gap:10px;
-flex-wrap:wrap;
-">
+<b>${inv.invoiceNo}</b>
+<br>
 
-<div>
-
-<b>${inv.invoiceNo || '-'}</b><br>
-
-<span style="
-font-size:12px;
-color:#777;
-">
 Invoice Date :
 ${inv.invoiceDate || '-'}
-</span>
+<br>
 
-</div>
-
-<div>
-
-<span class="badge ${badge}">
-${badgeText}
-</span>
-
-</div>
-
-</div>
-
-<div style="
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-gap:10px;
-margin-bottom:15px;
-">
-
-<div>
-<b>Invoice</b><br>
-<span class="amount">
+Invoice :
 ${formatCurrency(inv.grandTotal)}
-</span>
-</div>
+<br>
 
-<div>
-<b>Paid</b><br>
-<span class="amount">
+Paid :
 ${formatCurrency(paid)}
-</span>
-</div>
+<br>
 
-<div>
-<b>Balance</b><br>
-<span class="amount">
+Balance :
 ${formatCurrency(pending)}
-</span>
-</div>
 
-</div>
-
-${
-invoicePayments.length > 0
-?
-
-`
-
-<div style="
-margin-top:10px;
-border-top:1px solid #eee;
-padding-top:10px;
-">
-
-<b style="
-font-size:13px;
-">
-Payments
-</b>
+${relatedPayments.length ? `
 
 <br><br>
+<b>Payments</b>
 
-${invoicePayments.map(pay=>`
+${relatedPayments.map(pay=>`
 
 <div style="
-display:flex;
-justify-content:space-between;
-padding:8px 10px;
-background:#f7f9fb;
-border-radius:10px;
-margin-bottom:8px;
-font-size:13px;
+margin-top:8px;
+padding:8px;
+background:#f8f8f8;
+border-radius:8px;
 ">
 
-<div>
+Date :
 ${pay.paymentDate || '-'}
-</div>
+<br>
 
-<div class="amount">
+Amount :
+<span class="amount">
 ${formatCurrency(pay.amount)}
-</div>
+</span>
+
+${pay.notes ? `
+<br>
+Note : ${pay.notes}
+` : ''}
 
 </div>
 
 `).join('')}
 
-</div>
+` : `
 
-`
-
-:
-
-`
-
-<div style="
-font-size:13px;
-color:#888;
-">
+<br><br>
+<span style="color:#999;">
 No Payments Added
-</div>
+</span>
 
-`
-
-}
+`}
 
 </div>
 
