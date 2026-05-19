@@ -1092,8 +1092,6 @@ updateSummary();
 
 }
 
-}
-
 async function editInvoice(id){
 
 const invoice =
@@ -1181,45 +1179,6 @@ doc(db,'supplierInvoices',id)
 );
 
 alert('Invoice Deleted');
-
-}
-
-function editPayment(id){
-
-const payment =
-allPayments.find(p=>p.id===id);
-
-if(!payment) return;
-
-editingPaymentId=id;
-
-document.getElementById('paymentSupplier').value =
-payment.supplier || '';
-
-loadInvoiceDropdown();
-
-setTimeout(()=>{
-
-document.getElementById('paymentInvoice').value =
-payment.invoiceId || '';
-
-},200);
-
-document.getElementById('paidAmount').value =
-payment.amount || '';
-
-document.getElementById('paymentDate').value =
-payment.paymentDate || '';
-
-document.getElementById('paymentNotes').value =
-payment.notes || '';
-
-window.scrollTo({
-top:0,
-behavior:'smooth'
-});
-
-alert('Payment Loaded');
 
 }
 
