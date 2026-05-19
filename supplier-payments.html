@@ -22,8 +22,8 @@ font-family:'Poppins',sans-serif;
 }
 
 body{
-background:#f5f7fb;
-padding:24px;
+background:#f4f7fb;
+padding:20px;
 color:#222;
 }
 
@@ -35,8 +35,8 @@ margin:auto;
 .page-title{
 font-size:34px;
 font-weight:700;
-margin-bottom:8px;
 text-align:center;
+margin-bottom:8px;
 }
 
 .page-subtitle{
@@ -46,19 +46,44 @@ margin-bottom:30px;
 font-size:14px;
 }
 
-.section-box{
+.summary-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:18px;
+margin-bottom:25px;
+}
+
+.summary-card{
 background:#fff;
 padding:22px;
+border-radius:18px;
+box-shadow:0 5px 20px rgba(0,0,0,.05);
+}
+
+.summary-title{
+font-size:13px;
+color:#666;
+margin-bottom:8px;
+}
+
+.summary-value{
+font-size:26px;
+font-weight:700;
+color:#1D9E75;
+}
+
+.section-box{
+background:#fff;
+padding:24px;
 border-radius:22px;
 margin-bottom:25px;
-box-shadow:0 8px 30px rgba(0,0,0,.05);
-border:1px solid #E4ECE9;
+box-shadow:0 5px 20px rgba(0,0,0,.05);
 }
 
 .section-title{
 font-size:22px;
 font-weight:700;
-margin-bottom:18px;
+margin-bottom:20px;
 color:#1D9E75;
 }
 
@@ -68,20 +93,32 @@ grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 gap:14px;
 }
 
+.invoice-headings{
+display:grid;
+grid-template-columns:80px 2fr 1fr 1fr 1fr;
+gap:12px;
+font-size:13px;
+font-weight:700;
+margin:18px 0 10px;
+padding:0 5px;
+color:#555;
+}
+
+.invoice-grid{
+display:grid;
+grid-template-columns:80px 2fr 1fr 1fr 1fr;
+gap:12px;
+}
+
 .input-field,
 select,
 textarea{
 width:100%;
 padding:12px;
-border-radius:12px;
-border:1px solid #dcdcdc;
+border-radius:10px;
+border:1px solid #ddd;
 font-size:14px;
 outline:none;
-}
-
-textarea{
-resize:vertical;
-min-height:100px;
 }
 
 .input-field:focus,
@@ -90,11 +127,9 @@ textarea:focus{
 border-color:#1D9E75;
 }
 
-.btn-row{
-display:flex;
-gap:12px;
-flex-wrap:wrap;
-margin-top:18px;
+textarea{
+min-height:100px;
+resize:vertical;
 }
 
 .btn{
@@ -111,7 +146,6 @@ transition:.3s;
 
 .btn:hover{
 transform:translateY(-2px);
-background:#0F6E56;
 }
 
 .btn-red{
@@ -120,6 +154,21 @@ background:#ff4d4f;
 
 .btn-blue{
 background:#0B3D91;
+}
+
+.btn-row{
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+margin-top:18px;
+}
+
+.invoice-item{
+background:#f9fbfb;
+padding:16px;
+border-radius:14px;
+border:1px solid #E4ECE9;
+margin-bottom:12px;
 }
 
 .tile-grid{
@@ -134,7 +183,7 @@ background:#fff;
 padding:20px;
 border-radius:18px;
 border:1px solid #E4ECE9;
-box-shadow:0 6px 20px rgba(0,0,0,.04);
+box-shadow:0 5px 20px rgba(0,0,0,.04);
 cursor:pointer;
 overflow:hidden;
 transition:.3s;
@@ -147,18 +196,18 @@ transform:translateY(-3px);
 .tile-head{
 display:flex;
 justify-content:space-between;
-gap:12px;
+gap:10px;
 }
 
 .tile-title{
 font-size:18px;
 font-weight:700;
+margin-bottom:4px;
 }
 
 .tile-sub{
-font-size:13px;
+font-size:12px;
 color:#666;
-margin-top:4px;
 }
 
 .tile-details{
@@ -169,14 +218,14 @@ transition:.4s ease;
 
 .tile.active .tile-details{
 max-height:5000px;
-margin-top:18px;
+margin-top:16px;
 }
 
 .tile-block{
-padding-top:16px;
-margin-top:16px;
+margin-top:15px;
+padding-top:15px;
 border-top:1px solid #eee;
-font-size:14px;
+font-size:13px;
 line-height:1.8;
 }
 
@@ -187,7 +236,7 @@ color:#1D9E75;
 
 .badge{
 display:inline-block;
-padding:6px 12px;
+padding:7px 12px;
 border-radius:999px;
 font-size:11px;
 font-weight:700;
@@ -206,62 +255,22 @@ background:#0077ff;
 background:#00a86b;
 }
 
-.invoice-grid{
-display:grid;
-grid-template-columns:80px 1.4fr 120px 140px 160px;
-gap:12px;
-margin-bottom:12px;
-}
-
-.summary-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:18px;
-margin-bottom:25px;
-}
-
-.summary-card{
-background:#fff;
-padding:22px;
-border-radius:20px;
-box-shadow:0 6px 20px rgba(0,0,0,.04);
-}
-
-.summary-title{
-font-size:13px;
-color:#666;
-margin-bottom:10px;
-}
-
-.summary-value{
-font-size:28px;
-font-weight:700;
-color:#1D9E75;
-}
-
-label{
-font-size:13px;
-font-weight:600;
-margin-bottom:6px;
-display:block;
-}
-
 @media(max-width:768px){
+
+.invoice-headings{
+display:none;
+}
 
 .invoice-grid{
 grid-template-columns:1fr;
-}
-
-.tile-head{
-flex-direction:column;
 }
 
 .page-title{
 font-size:28px;
 }
 
-body{
-padding:15px;
+.tile-head{
+flex-direction:column;
 }
 
 }
@@ -279,7 +288,7 @@ Supplier Payments Status
 </h1>
 
 <p class="page-subtitle">
-Travelog Supplier Invoice & Payment Management Platform
+Travelog Supplier Invoice & Payment Management System
 </p>
 
 <div class="summary-grid">
@@ -301,7 +310,7 @@ Travelog Supplier Invoice & Payment Management Platform
 
 </div>
 
-<!-- SUPPLIERS -->
+<!-- SUPPLIER SECTION -->
 
 <div class="section-box">
 
@@ -311,25 +320,20 @@ Supplier List
 
 <div class="form-grid">
 
-<div>
-<label>Supplier Name</label>
-<input type="text" id="supplierName" class="input-field">
-</div>
+<input type="text" id="supplierName" class="input-field" placeholder="Supplier Name">
 
-<div>
-<label>Country</label>
-<input type="text" id="supplierCountry" class="input-field">
-</div>
+<input type="text" id="supplierCountry" class="input-field" placeholder="Country">
 
-<div>
-<label>Company Name</label>
-<input type="text" id="supplierCompany" class="input-field">
-</div>
+<input type="text" id="supplierCompany" class="input-field" placeholder="Company Name">
 
 </div>
 
 <div class="btn-row">
-<button class="btn" onclick="saveSupplier()">SAVE SUPPLIER</button>
+
+<button class="btn" onclick="saveSupplier()">
+SAVE SUPPLIER
+</button>
+
 </div>
 
 <div class="tile-grid" id="supplierContainer"></div>
@@ -346,61 +350,47 @@ Supplier Invoice Input
 
 <div class="form-grid">
 
-<div>
-<label>Supplier</label>
 <select id="invoiceSupplier" class="input-field"></select>
-</div>
 
-<div>
-<label>Invoice Date</label>
 <input type="date" id="invoiceDate" class="input-field">
-</div>
 
-<div>
-<label>Service Commencement Date</label>
 <input type="date" id="commencementDate" class="input-field">
-</div>
+
+<input type="text" id="invoiceNo" class="input-field" readonly placeholder="Auto Invoice No">
 
 </div>
 
-<br>
+<div class="invoice-headings">
 
-<div id="invoiceItems">
-
-<div class="invoice-item">
-
-<div class="invoice-grid">
-
-<input type="number" class="input-field line-no" placeholder="No">
-
-<input type="text" class="input-field item-name" placeholder="Item">
-
-<input type="number" class="input-field qty" placeholder="Qty" oninput="calculateTotals()">
-
-<input type="number" class="input-field rate" placeholder="Rate" oninput="calculateTotals()">
-
-<input type="number" class="input-field total" placeholder="Total" readonly>
+<div>NO</div>
+<div>ITEM</div>
+<div>QTY</div>
+<div>RATE</div>
+<div>TOTAL</div>
 
 </div>
 
-</div>
-
-</div>
+<div id="invoiceItems"></div>
 
 <div class="btn-row">
-<button class="btn" onclick="addInvoiceItem()">+ ADD ITEM</button>
+
+<button class="btn" onclick="addInvoiceItem()">
++ ADD ITEM
+</button>
+
 </div>
 
 <br>
 
-<label>Notes</label>
-<textarea id="invoiceNotes"></textarea>
+<textarea id="invoiceNotes" placeholder="Invoice Notes"></textarea>
 
 <br><br>
 
 <h3>
-Grand Total:
-<span class="amount" id="grandTotal">₫ 0</span>
+Grand Total :
+<span class="amount" id="grandTotal">
+₫ 0
+</span>
 </h3>
 
 <div class="btn-row">
@@ -419,7 +409,7 @@ CLEAR
 
 </div>
 
-<!-- PAYMENT ENTRY -->
+<!-- PAYMENT SECTION -->
 
 <div class="section-box">
 
@@ -429,38 +419,26 @@ Payment Entry
 
 <div class="form-grid">
 
-<div>
-<label>Supplier</label>
 <select id="paymentSupplier" class="input-field" onchange="loadInvoiceDropdown()"></select>
-</div>
 
-<div>
-<label>Select Invoice</label>
 <select id="paymentInvoice" class="input-field"></select>
-</div>
 
-<div>
-<label>Paid Amount</label>
-<input type="number" id="paidAmount" class="input-field">
-</div>
+<input type="number" id="paidAmount" class="input-field" placeholder="Paid Amount">
 
-<div>
-<label>Payment Date</label>
 <input type="date" id="paymentDate" class="input-field">
-</div>
 
 </div>
 
 <br>
 
-<label>Payment Notes</label>
-
-<textarea id="paymentNotes"></textarea>
+<textarea id="paymentNotes" placeholder="Payment Notes"></textarea>
 
 <div class="btn-row">
+
 <button class="btn" onclick="savePayment()">
 SAVE PAYMENT
 </button>
+
 </div>
 
 </div>
@@ -470,41 +448,26 @@ SAVE PAYMENT
 <div class="section-box">
 
 <div class="section-title">
-Supplier Account Statement
+Supplier Statement
 </div>
 
 <div class="form-grid">
 
-<div>
-<label>Select Supplier</label>
 <select id="statementSupplier" class="input-field"></select>
-</div>
 
-<div>
-<label>From Date</label>
 <input type="date" id="statementFrom" class="input-field">
-</div>
 
-<div>
-<label>To Date</label>
 <input type="date" id="statementTo" class="input-field">
-</div>
 
 </div>
 
 <div class="btn-row">
-
-<button class="btn" onclick="generateStatement()">
-VIEW STATEMENT
-</button>
 
 <button class="btn btn-blue" onclick="downloadStatementPDF()">
 DOWNLOAD PDF
 </button>
 
 </div>
-
-<div id="statementPreview"></div>
 
 </div>
 
@@ -532,7 +495,10 @@ import {
 getFirestore,
 collection,
 addDoc,
-onSnapshot
+onSnapshot,
+updateDoc,
+deleteDoc,
+doc
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -552,66 +518,99 @@ appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
-window.db = db;
-window.collection = collection;
-window.addDoc = addDoc;
-window.onSnapshot = onSnapshot;
+window.db=db;
+window.collection=collection;
+window.addDoc=addDoc;
+window.onSnapshot=onSnapshot;
+window.updateDoc=updateDoc;
+window.deleteDoc=deleteDoc;
+window.doc=doc;
 
 </script>
 
 <script>
 
-let allSuppliers = [];
-let allInvoices = [];
-let allPayments = [];
+let allSuppliers=[];
+let allInvoices=[];
+let allPayments=[];
+let editingInvoiceId=null;
 
 function formatCurrency(amount){
-return '₫ ' + new Intl.NumberFormat('vi-VN').format(amount || 0);
+
+return '₫ ' +
+new Intl.NumberFormat('vi-VN')
+.format(amount || 0);
+
+}
+
+function generateInvoiceNo(){
+
+const invoiceNo =
+"INV-" +
+new Date().getFullYear() +
+"-" +
+String(Date.now()).slice(-6);
+
+document.getElementById('invoiceNo').value =
+invoiceNo;
+
 }
 
 function addInvoiceItem(){
 
-const html = `
+document.getElementById('invoiceItems')
+.insertAdjacentHTML('beforeend',`
 
 <div class="invoice-item">
 
 <div class="invoice-grid">
 
-<input type="number" class="input-field line-no" placeholder="No">
+<input type="number"
+class="input-field line-no"
+placeholder="No">
 
-<input type="text" class="input-field item-name" placeholder="Item">
+<input type="text"
+class="input-field item-name"
+placeholder="Item">
 
-<input type="number" class="input-field qty" placeholder="Qty" oninput="calculateTotals()">
+<input type="number"
+class="input-field qty"
+placeholder="Qty"
+oninput="calculateTotals()">
 
-<input type="number" class="input-field rate" placeholder="Rate" oninput="calculateTotals()">
+<input type="number"
+class="input-field rate"
+placeholder="Rate"
+oninput="calculateTotals()">
 
-<input type="number" class="input-field total" placeholder="Total" readonly>
+<input type="number"
+class="input-field total"
+placeholder="Total"
+readonly>
 
 </div>
 
 </div>
 
-`;
-
-document.getElementById('invoiceItems')
-.insertAdjacentHTML('beforeend',html);
+`);
 
 }
 
 function calculateTotals(){
 
-let grandTotal = 0;
+let grandTotal=0;
 
 document.querySelectorAll('.invoice-item')
 .forEach(item=>{
 
 const qty =
-Number(item.querySelector('.qty').value) || 0;
+Number(item.querySelector('.qty').value)||0;
 
 const rate =
-Number(item.querySelector('.rate').value) || 0;
+Number(item.querySelector('.rate').value)||0;
 
 const total = qty * rate;
 
@@ -621,8 +620,8 @@ grandTotal += total;
 
 });
 
-document.getElementById('grandTotal').innerText =
-formatCurrency(grandTotal);
+document.getElementById('grandTotal')
+.innerText = formatCurrency(grandTotal);
 
 }
 
@@ -630,11 +629,14 @@ async function saveSupplier(){
 
 await addDoc(collection(db,'suppliers'),{
 
-name:document.getElementById('supplierName').value,
+name:
+document.getElementById('supplierName').value,
 
-country:document.getElementById('supplierCountry').value,
+country:
+document.getElementById('supplierCountry').value,
 
-company:document.getElementById('supplierCompany').value,
+company:
+document.getElementById('supplierCompany').value,
 
 created:new Date().toISOString()
 
@@ -645,12 +647,6 @@ alert('Supplier Saved');
 }
 
 async function saveInvoice(){
-
-const invoiceNo =
-"INV-" +
-new Date().getFullYear() +
-"-" +
-String(Date.now()).slice(-6);
 
 const items =
 [...document.querySelectorAll('.invoice-item')]
@@ -672,9 +668,42 @@ const grandTotal =
 items.reduce((sum,item)=>
 sum + Number(item.total || 0),0);
 
+if(editingInvoiceId){
+
+await updateDoc(
+doc(db,'supplierInvoices',editingInvoiceId),
+{
+
+supplier:
+document.getElementById('invoiceSupplier').value,
+
+invoiceDate:
+document.getElementById('invoiceDate').value,
+
+commencementDate:
+document.getElementById('commencementDate').value,
+
+items,
+
+notes:
+document.getElementById('invoiceNotes').value,
+
+grandTotal
+
+}
+
+);
+
+alert('Invoice Updated');
+
+editingInvoiceId=null;
+
+}else{
+
 await addDoc(collection(db,'supplierInvoices'),{
 
-invoiceNo,
+invoiceNo:
+document.getElementById('invoiceNo').value,
 
 supplier:
 document.getElementById('invoiceSupplier').value,
@@ -698,6 +727,8 @@ created:new Date().toISOString()
 
 alert('Invoice Saved');
 
+}
+
 clearInvoiceForm();
 
 }
@@ -706,11 +737,15 @@ function clearInvoiceForm(){
 
 document.getElementById('invoiceItems').innerHTML='';
 
-addInvoiceItem();
-
 document.getElementById('invoiceNotes').value='';
 
+addInvoiceItem();
+
 calculateTotals();
+
+generateInvoiceNo();
+
+editingInvoiceId=null;
 
 }
 
@@ -775,8 +810,15 @@ onclick="this.classList.toggle('active')">
 <div class="tile-head">
 
 <div>
-<div class="tile-title">${s.name}</div>
-<div class="tile-sub">${s.country || ''}</div>
+
+<div class="tile-title">
+${s.name}
+</div>
+
+<div class="tile-sub">
+${s.country || ''}
+</div>
+
 </div>
 
 </div>
@@ -784,7 +826,8 @@ onclick="this.classList.toggle('active')">
 <div class="tile-details">
 
 <div class="tile-block">
-Company: ${s.company || '-'}
+Company :
+${s.company || '-'}
 </div>
 
 </div>
@@ -800,52 +843,6 @@ document.getElementById('supplierContainer').innerHTML=html;
 document.getElementById('invoiceSupplier').innerHTML=options;
 document.getElementById('paymentSupplier').innerHTML=options;
 document.getElementById('statementSupplier').innerHTML=options;
-
-});
-
-}
-
-function loadInvoices(){
-
-onSnapshot(collection(db,'supplierInvoices'),snapshot=>{
-
-allInvoices=[];
-
-snapshot.forEach(docItem=>{
-
-allInvoices.push({
-id:docItem.id,
-...docItem.data()
-});
-
-});
-
-renderInvoices();
-renderPaymentStatus();
-updateSummary();
-
-});
-
-}
-
-function loadPayments(){
-
-onSnapshot(collection(db,'supplierPayments'),snapshot=>{
-
-allPayments=[];
-
-snapshot.forEach(docItem=>{
-
-allPayments.push({
-id:docItem.id,
-...docItem.data()
-});
-
-});
-
-renderInvoices();
-renderPaymentStatus();
-updateSummary();
 
 });
 
@@ -935,6 +932,59 @@ ${formatCurrency(balance)}
 
 </div>
 
+<div class="tile-block">
+
+<b>Invoice Items</b>
+<br><br>
+
+${inv.items.map(item=>`
+
+<div style="
+margin-bottom:10px;
+padding-bottom:10px;
+border-bottom:1px solid #eee;
+">
+
+${item.line}. ${item.item}
+<br>
+
+Qty: ${item.qty}
+<br>
+
+Rate: ${formatCurrency(item.rate)}
+<br>
+
+Total:
+<span class="amount">
+${formatCurrency(item.total)}
+</span>
+
+</div>
+
+`).join('')}
+
+</div>
+
+<div class="btn-row">
+
+<button
+class="btn btn-blue"
+onclick="event.stopPropagation();editInvoice('${inv.id}')">
+
+EDIT
+
+</button>
+
+<button
+class="btn btn-red"
+onclick="event.stopPropagation();deleteInvoice('${inv.id}')">
+
+DELETE
+
+</button>
+
+</div>
+
 </div>
 
 </div>
@@ -944,6 +994,146 @@ ${formatCurrency(balance)}
 });
 
 document.getElementById('invoiceContainer').innerHTML=html;
+
+}
+
+function loadInvoices(){
+
+onSnapshot(collection(db,'supplierInvoices'),snapshot=>{
+
+allInvoices=[];
+
+snapshot.forEach(docItem=>{
+
+allInvoices.push({
+id:docItem.id,
+...docItem.data()
+});
+
+});
+
+renderInvoices();
+
+renderPaymentStatus();
+
+updateSummary();
+
+});
+
+}
+
+function loadPayments(){
+
+onSnapshot(collection(db,'supplierPayments'),snapshot=>{
+
+allPayments=[];
+
+snapshot.forEach(docItem=>{
+
+allPayments.push({
+id:docItem.id,
+...docItem.data()
+});
+
+});
+
+renderInvoices();
+
+renderPaymentStatus();
+
+updateSummary();
+
+});
+
+}
+
+async function editInvoice(id){
+
+const invoice =
+allInvoices.find(i=>i.id===id);
+
+if(!invoice) return;
+
+editingInvoiceId=id;
+
+document.getElementById('invoiceSupplier').value =
+invoice.supplier || '';
+
+document.getElementById('invoiceDate').value =
+invoice.invoiceDate || '';
+
+document.getElementById('commencementDate').value =
+invoice.commencementDate || '';
+
+document.getElementById('invoiceNo').value =
+invoice.invoiceNo || '';
+
+document.getElementById('invoiceNotes').value =
+invoice.notes || '';
+
+document.getElementById('invoiceItems').innerHTML='';
+
+(invoice.items || []).forEach(item=>{
+
+document.getElementById('invoiceItems')
+.insertAdjacentHTML('beforeend',`
+
+<div class="invoice-item">
+
+<div class="invoice-grid">
+
+<input type="number"
+class="input-field line-no"
+value="${item.line || ''}">
+
+<input type="text"
+class="input-field item-name"
+value="${item.item || ''}">
+
+<input type="number"
+class="input-field qty"
+value="${item.qty || ''}"
+oninput="calculateTotals()">
+
+<input type="number"
+class="input-field rate"
+value="${item.rate || ''}"
+oninput="calculateTotals()">
+
+<input type="number"
+class="input-field total"
+value="${item.total || ''}"
+readonly>
+
+</div>
+
+</div>
+
+`);
+
+});
+
+calculateTotals();
+
+window.scrollTo({
+top:0,
+behavior:'smooth'
+});
+
+alert('Invoice Loaded');
+
+}
+
+async function deleteInvoice(id){
+
+if(!confirm('Delete Invoice?'))
+return;
+
+await deleteDoc(
+doc(db,'supplierInvoices',id)
+);
+
+alert('Invoice Deleted');
 
 }
 
@@ -960,9 +1150,11 @@ let html='<option value="">Select Invoice</option>';
 invoices.forEach(inv=>{
 
 html += `
+
 <option value="${inv.id}">
 ${inv.invoiceNo}
 </option>
+
 `;
 
 });
@@ -979,7 +1171,8 @@ allSuppliers.forEach(supplier=>{
 
 const supplierInvoices =
 allInvoices.filter(i=>
-i.supplier===supplier.name);
+i.supplier===supplier.name
+);
 
 const totalInvoice =
 supplierInvoices.reduce((sum,i)=>
@@ -1005,6 +1198,7 @@ onclick="this.classList.toggle('active')">
 <div class="tile-head">
 
 <div>
+
 <div class="tile-title">
 ${supplier.name}
 </div>
@@ -1012,6 +1206,7 @@ ${supplier.name}
 <div class="tile-sub">
 ${supplier.country || ''}
 </div>
+
 </div>
 
 <div class="amount">
@@ -1024,24 +1219,59 @@ ${formatCurrency(balance)}
 
 <div class="tile-block">
 
-Total Invoice:
+Total Invoice :
 <span class="amount">
 ${formatCurrency(totalInvoice)}
 </span>
 <br>
 
-Total Paid:
+Total Paid :
 <span class="amount">
 ${formatCurrency(totalPaid)}
 </span>
 <br>
 
-Balance:
+Balance :
 <span class="amount">
 ${formatCurrency(balance)}
 </span>
 
 </div>
+
+${supplierInvoices.map(inv=>{
+
+const paid =
+allPayments
+.filter(p=>p.invoiceId===inv.id)
+.reduce((sum,p)=>
+sum + Number(p.amount || 0),0);
+
+const pending =
+Number(inv.grandTotal || 0) - paid;
+
+return `
+
+<div class="tile-block">
+
+<b>${inv.invoiceNo}</b>
+<br>
+
+Invoice :
+${formatCurrency(inv.grandTotal)}
+<br>
+
+Paid :
+${formatCurrency(paid)}
+<br>
+
+Balance :
+${formatCurrency(pending)}
+
+</div>
+
+`;
+
+}).join('')}
 
 </div>
 
@@ -1052,137 +1282,6 @@ ${formatCurrency(balance)}
 });
 
 document.getElementById('paymentStatusContainer').innerHTML=html;
-
-}
-
-function generateStatement(){
-
-const supplier =
-document.getElementById('statementSupplier').value;
-
-const fromDate =
-document.getElementById('statementFrom').value;
-
-const toDate =
-document.getElementById('statementTo').value;
-
-const invoices =
-allInvoices.filter(inv=>{
-
-if(inv.supplier !== supplier)
-return false;
-
-if(fromDate && inv.invoiceDate < fromDate)
-return false;
-
-if(toDate && inv.invoiceDate > toDate)
-return false;
-
-return true;
-
-});
-
-let html=`
-<div class="tile">
-
-<div class="tile-title">
-${supplier} Statement
-</div>
-`;
-
-let totalInvoice=0;
-let totalPaid=0;
-
-invoices.forEach(inv=>{
-
-const paid =
-allPayments
-.filter(p=>p.invoiceId===inv.id)
-.reduce((sum,p)=>
-sum + Number(p.amount || 0),0);
-
-const balance =
-Number(inv.grandTotal || 0)-paid;
-
-totalInvoice += Number(inv.grandTotal || 0);
-totalPaid += paid;
-
-html += `
-
-<div class="tile-block">
-
-<b>${inv.invoiceNo}</b>
-<br><br>
-
-Invoice Date:
-${inv.invoiceDate}
-<br>
-
-Amount:
-${formatCurrency(inv.grandTotal)}
-<br>
-
-Paid:
-${formatCurrency(paid)}
-<br>
-
-Balance:
-${formatCurrency(balance)}
-
-</div>
-
-`;
-
-});
-
-html += `
-
-<div class="tile-block">
-
-<b>Total Invoice:</b>
-${formatCurrency(totalInvoice)}
-<br><br>
-
-<b>Total Paid:</b>
-${formatCurrency(totalPaid)}
-<br><br>
-
-<b>Balance:</b>
-${formatCurrency(totalInvoice-totalPaid)}
-
-</div>
-
-</div>
-
-`;
-
-document.getElementById('statementPreview').innerHTML=html;
-
-}
-
-async function downloadStatementPDF(){
-
-generateStatement();
-
-const supplier =
-document.getElementById('statementSupplier').value;
-
-const preview =
-document.getElementById('statementPreview').innerText;
-
-const { jsPDF } = window.jspdf;
-
-const doc = new jsPDF();
-
-doc.setFontSize(18);
-
-doc.text("Supplier Statement",20,20);
-
-doc.setFontSize(11);
-
-doc.text(preview,20,35);
-
-doc.save(supplier + "-statement.pdf");
 
 }
 
@@ -1199,27 +1298,268 @@ sum + Number(p.amount || 0),0);
 const totalBalance =
 totalInvoice-totalPaid;
 
-document.getElementById('totalInvoice').innerText =
-formatCurrency(totalInvoice);
+document.getElementById('totalInvoice')
+.innerText = formatCurrency(totalInvoice);
 
-document.getElementById('totalPaid').innerText =
-formatCurrency(totalPaid);
+document.getElementById('totalPaid')
+.innerText = formatCurrency(totalPaid);
 
-document.getElementById('totalBalance').innerText =
-formatCurrency(totalBalance);
+document.getElementById('totalBalance')
+.innerText = formatCurrency(totalBalance);
+
+}
+
+async function downloadStatementPDF(){
+
+const supplier =
+document.getElementById('statementSupplier').value;
+
+const fromDate =
+document.getElementById('statementFrom').value;
+
+const toDate =
+document.getElementById('statementTo').value;
+
+const supplierInvoices =
+allInvoices.filter(inv=>{
+
+if(inv.supplier !== supplier)
+return false;
+
+if(fromDate && inv.invoiceDate < fromDate)
+return false;
+
+if(toDate && inv.invoiceDate > toDate)
+return false;
+
+return true;
+
+});
+
+const { jsPDF } = window.jspdf;
+
+const pdf = new jsPDF();
+
+let y=20;
+
+pdf.setFontSize(18);
+
+pdf.text(
+"SUPPLIER ACCOUNT STATEMENT",
+20,
+y
+);
+
+y += 12;
+
+pdf.setFontSize(11);
+
+pdf.text(
+`Supplier: ${supplier}`,
+20,
+y
+);
+
+y += 8;
+
+pdf.text(
+`Period: ${fromDate || '-'} to ${toDate || '-'}`,
+20,
+y
+);
+
+y += 15;
+
+let totalInvoice=0;
+let totalPaid=0;
+
+supplierInvoices.forEach(inv=>{
+
+const payments =
+allPayments.filter(
+p=>p.invoiceId===inv.id
+);
+
+const paid =
+payments.reduce((sum,p)=>
+sum + Number(p.amount || 0),0);
+
+const balance =
+Number(inv.grandTotal || 0)-paid;
+
+totalInvoice += Number(inv.grandTotal || 0);
+totalPaid += paid;
+
+pdf.setFontSize(13);
+
+pdf.text(
+`${inv.invoiceNo}`,
+20,
+y
+);
+
+y += 8;
+
+pdf.setFontSize(10);
+
+pdf.text(
+`Invoice Date: ${inv.invoiceDate}`,
+20,
+y
+);
+
+y += 6;
+
+pdf.text(
+`Commencement: ${inv.commencementDate}`,
+20,
+y
+);
+
+y += 8;
+
+pdf.text("DATE",20,y);
+pdf.text("PARTICULARS",55,y);
+pdf.text("DEBIT",140,y);
+pdf.text("CREDIT",175,y);
+
+y += 6;
+
+pdf.line(20,y,190,y);
+
+y += 8;
+
+pdf.text(
+inv.invoiceDate,
+20,
+y
+);
+
+pdf.text(
+"Invoice Amount",
+55,
+y
+);
+
+pdf.text(
+formatCurrency(inv.grandTotal),
+140,
+y
+);
+
+y += 8;
+
+payments.forEach(pay=>{
+
+pdf.text(
+pay.paymentDate || '-',
+20,
+y
+);
+
+pdf.text(
+"Payment",
+55,
+y
+);
+
+pdf.text(
+formatCurrency(pay.amount),
+175,
+y
+);
+
+y += 8;
+
+});
+
+pdf.text(
+"Balance",
+55,
+y
+);
+
+pdf.text(
+formatCurrency(balance),
+140,
+y
+);
+
+y += 12;
+
+pdf.line(20,y,190,y);
+
+y += 12;
+
+if(y > 260){
+
+pdf.addPage();
+
+y=20;
+
+}
+
+});
+
+const finalBalance =
+totalInvoice-totalPaid;
+
+pdf.setFontSize(13);
+
+pdf.text(
+"SUMMARY",
+20,
+y
+);
+
+y += 10;
+
+pdf.setFontSize(11);
+
+pdf.text(
+`Total Invoice : ${formatCurrency(totalInvoice)}`,
+20,
+y
+);
+
+y += 8;
+
+pdf.text(
+`Total Paid : ${formatCurrency(totalPaid)}`,
+20,
+y
+);
+
+y += 8;
+
+pdf.text(
+`Balance : ${formatCurrency(finalBalance)}`,
+20,
+y
+);
+
+pdf.save(
+supplier + "-statement.pdf"
+);
 
 }
 
 window.addEventListener('load',()=>{
 
+generateInvoiceNo();
+
+addInvoiceItem();
+
 loadSuppliers();
+
 loadInvoices();
+
 loadPayments();
-calculateTotals();
 
 });
 
 </script>
 
 </body>
+
 </html>
