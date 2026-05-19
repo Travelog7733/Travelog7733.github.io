@@ -443,6 +443,20 @@ SAVE PAYMENT
 
 </div>
 
+
+<!-- PAYMENTS LIST -->
+
+<div class="section-box">
+
+<div class="section-title">
+Saved Payments
+</div>
+
+<div class="tile-grid" id="paymentsListContainer"></div>
+
+</div>
+
+
 <!-- STATEMENT -->
 
 <div class="section-box">
@@ -537,6 +551,7 @@ let allSuppliers=[];
 let allInvoices=[];
 let allPayments=[];
 let editingInvoiceId=null;
+let editingPaymentId=null;
 
 function formatCurrency(amount){
 
@@ -751,7 +766,7 @@ editingInvoiceId=null;
 
 async function savePayment(){
 
-await addDoc(collection(db,'supplierPayments'),{
+const paymentData = {
 
 supplier:
 document.getElementById('paymentSupplier').value,
@@ -766,13 +781,36 @@ paymentDate:
 document.getElementById('paymentDate').value,
 
 notes:
-document.getElementById('paymentNotes').value,
+document.getElementById('paymentNotes').value
 
-created:new Date().toISOString()
+};
 
-});
+if(editingPaymentId){
+
+await updateDoc(
+doc(db,'supplierPayments',editingPaymentId),
+paymentData
+);
+
+alert('Payment Updated');
+
+editingPaymentId=null;
+
+}else{
+
+paymentData.created =
+new Date().toISOString();
+
+await addDoc(
+collection(db,'supplierPayments'),
+paymentData
+);
 
 alert('Payment Saved');
+
+}
+
+clearPaymentForm();
 
 }
 
@@ -1014,6 +1052,8 @@ id:docItem.id,
 
 renderInvoices();
 
+renderPaymentsList();
+
 renderPaymentStatus();
 
 updateSummary();
@@ -1038,6 +1078,8 @@ id:docItem.id,
 });
 
 renderInvoices();
+
+renderPaymentsList();
 
 renderPaymentStatus();
 
@@ -1136,6 +1178,204 @@ doc(db,'supplierInvoices',id)
 alert('Invoice Deleted');
 
 }
+
+
+function clearPaymentForm(){
+
+document.getElementById('paymentSupplier').value='';
+
+document.getElementById('paymentInvoice').innerHTML=
+'<option value="">Select Invoice</option>';
+
+document.getElementById('paidAmount').value='';
+
+document.getElementById('paymentDate').value='';
+
+document.getElementById('paymentNotes').value='';
+
+editingPaymentId=null;
+
+}
+
+function editPayment(id){
+
+const payment =
+allPayments.find(p=>p.id===id);
+
+if(!payment) return;
+
+editingPaymentId=id;
+
+document.getElementById('paymentSupplier').value =
+payment.supplier || '';
+
+loadInvoiceDropdown();
+
+setTimeout(()=>{
+
+document.getElementById('paymentInvoice').value =
+payment.invoiceId || '';
+
+},200);
+
+document.getElementById('paidAmount').value =
+payment.amount || '';
+
+document.getElementById('paymentDate').value =
+payment.paymentDate || '';
+
+document.getElementById('paymentNotes').value =
+payment.notes || '';
+
+window.scrollTo({
+top:0,
+behavior:'smooth'
+});
+
+alert('Payment Loaded');
+
+}
+
+async function deletePayment(id){
+
+if(!confirm('Delete Payment?'))
+return;
+
+await deleteDoc(
+doc(db,'supplierPayments',id)
+);
+
+alert('Payment Deleted');
+
+}
+
+function renderPaymentsList(){
+
+let html='';
+
+if(allPayments.length===0){
+
+html=`
+
+<div class="tile">
+
+<div class="tile-head">
+
+<div>
+
+<div class="tile-title">
+No Payments Saved
+</div>
+
+<div class="tile-sub">
+Saved payments will appear here
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+document.getElementById('paymentsListContainer').innerHTML = html;
+
+return;
+
+}
+
+allPayments.forEach(payment=>{
+
+const invoice =
+allInvoices.find(inv=>
+
+inv.id===payment.invoiceId ||
+inv.invoiceNo===payment.invoiceId
+
+);
+
+html += `
+
+<div class="tile"
+onclick="this.classList.toggle('active')">
+
+<div class="tile-head">
+
+<div>
+
+<div class="tile-title">
+${payment.supplier || '-'}
+</div>
+
+<div class="tile-sub">
+${invoice ? invoice.invoiceNo : 'No Invoice'}
+</div>
+
+</div>
+
+<div class="amount">
+${formatCurrency(payment.amount)}
+</div>
+
+</div>
+
+<div class="tile-details">
+
+<div class="tile-block">
+
+<b>Payment Date :</b>
+${payment.paymentDate || '-'}
+<br><br>
+
+<b>Amount :</b>
+<span class="amount">
+${formatCurrency(payment.amount)}
+</span>
+
+${payment.notes ? `
+
+<br><br>
+
+<b>Notes :</b>
+${payment.notes}
+
+` : ''}
+
+</div>
+
+<div class="btn-row">
+
+<button
+class="btn btn-blue"
+onclick="event.stopPropagation();editPayment('${payment.id}')">
+
+EDIT
+
+</button>
+
+<button
+class="btn btn-red"
+onclick="event.stopPropagation();deletePayment('${payment.id}')">
+
+DELETE
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('paymentsListContainer').innerHTML = html;
+
+}
+
 
 function loadInvoiceDropdown(){
 
