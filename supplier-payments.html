@@ -1,0 +1,890 @@
+# Travelog Supplier Payments Platform
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supplier Payments Status | Travelog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#f5f7fb;
+padding:30px 20px;
+color:#222;
+}
+
+.wrapper{
+max-width:1500px;
+margin:auto;
+}
+
+.page-title{
+font-size:38px;
+font-weight:700;
+text-align:center;
+margin-bottom:10px;
+}
+
+.page-subtitle{
+text-align:center;
+color:#666;
+margin-bottom:35px;
+}
+
+.section-box{
+background:#fff;
+padding:28px;
+border-radius:24px;
+margin-bottom:30px;
+box-shadow:0 8px 30px rgba(0,0,0,.05);
+border:1px solid #E4ECE9;
+}
+
+.section-title{
+font-size:24px;
+font-weight:700;
+margin-bottom:20px;
+color:#1D9E75;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:16px;
+}
+
+.input-field,
+select,
+textarea{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #dcdcdc;
+font-size:15px;
+outline:none;
+}
+
+.input-field:focus,
+select:focus,
+textarea:focus{
+border-color:#1D9E75;
+}
+
+textarea{
+resize:vertical;
+min-height:120px;
+}
+
+.btn{
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:14px 26px;
+border-radius:40px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.btn:hover{
+background:#0F6E56;
+transform:translateY(-2px);
+}
+
+.btn-red{
+background:#ff4d4f;
+}
+
+.btn-blue{
+background:#0B3D91;
+}
+
+.btn-row{
+display:flex;
+gap:14px;
+margin-top:20px;
+flex-wrap:wrap;
+}
+
+.item-card{
+background:#f9fbfb;
+padding:18px;
+border-radius:18px;
+border:1px solid #E4ECE9;
+margin-bottom:14px;
+}
+
+.tile-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+gap:22px;
+margin-top:25px;
+}
+
+.tile{
+background:#fff;
+padding:24px;
+border-radius:22px;
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
+cursor:pointer;
+transition:.3s;
+overflow:hidden;
+}
+
+.tile:hover{
+transform:translateY(-3px);
+}
+
+.tile-head{
+display:flex;
+justify-content:space-between;
+gap:15px;
+}
+
+.tile-title{
+font-size:22px;
+font-weight:700;
+margin-bottom:6px;
+}
+
+.tile-sub{
+font-size:14px;
+color:#666;
+}
+
+.tile-details{
+max-height:0;
+overflow:hidden;
+transition:.4s ease;
+}
+
+.tile.active .tile-details{
+max-height:5000px;
+margin-top:20px;
+}
+
+.amount{
+font-weight:700;
+color:#1D9E75;
+}
+
+.badge{
+display:inline-block;
+padding:8px 14px;
+border-radius:999px;
+font-size:12px;
+font-weight:700;
+color:#fff;
+}
+
+.pending{
+background:#ff9800;
+}
+
+.partial{
+background:#0077ff;
+}
+
+.paid{
+background:#00a86b;
+}
+
+.tile-block{
+margin-top:18px;
+padding-top:18px;
+border-top:1px solid #eee;
+}
+
+.invoice-row{
+display:grid;
+grid-template-columns:80px 1fr 120px 150px 150px;
+gap:12px;
+margin-bottom:12px;
+}
+
+.summary-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:18px;
+margin-bottom:30px;
+}
+
+.summary-card{
+background:#fff;
+padding:24px;
+border-radius:22px;
+box-shadow:0 8px 30px rgba(0,0,0,.05);
+}
+
+.summary-title{
+font-size:14px;
+color:#666;
+margin-bottom:10px;
+}
+
+.summary-value{
+font-size:28px;
+font-weight:700;
+color:#1D9E75;
+}
+
+@media(max-width:768px){
+
+.page-title{
+font-size:30px;
+}
+
+.invoice-row{
+grid-template-columns:1fr;
+}
+
+.tile-head{
+flex-direction:column;
+}
+
+.section-box{
+padding:20px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+<h1 class="page-title">Supplier Payments Status</h1>
+<p class="page-subtitle">Travelog Supplier Invoice & Payment Management System</p>
+
+<div class="summary-grid">
+
+<div class="summary-card">
+<div class="summary-title">Total Invoice Amount</div>
+<div class="summary-value" id="totalInvoice">₫ 0</div>
+</div>
+
+<div class="summary-card">
+<div class="summary-title">Total Paid</div>
+<div class="summary-value" id="totalPaid">₫ 0</div>
+</div>
+
+<div class="summary-card">
+<div class="summary-title">Balance Payable</div>
+<div class="summary-value" id="totalBalance">₫ 0</div>
+</div>
+
+</div>
+
+<!-- SUPPLIER LIST -->
+<div class="section-box">
+
+<div class="section-title">Supplier List</div>
+
+<div class="form-grid">
+
+<input type="text" id="supplierName" class="input-field" placeholder="Supplier Name">
+
+<input type="text" id="supplierCountry" class="input-field" placeholder="Country">
+
+<input type="text" id="supplierCompany" class="input-field" placeholder="Company Name (Optional)">
+
+</div>
+
+<div class="btn-row">
+<button class="btn" onclick="saveSupplier()">SAVE SUPPLIER</button>
+</div>
+
+<div class="tile-grid" id="supplierContainer"></div>
+
+</div>
+
+<!-- INVOICE SECTION -->
+<div class="section-box">
+
+<div class="section-title">Supplier Invoice Input</div>
+
+<div class="form-grid">
+
+<select id="invoiceSupplier" class="input-field"></select>
+
+<input type="date" id="invoiceDate" class="input-field">
+
+<input type="date" id="commencementDate" class="input-field">
+
+</div>
+
+<div id="invoiceItems">
+
+<div class="item-card invoice-item">
+
+<div class="invoice-row">
+
+<input type="number" class="input-field line-no" placeholder="No">
+
+<input type="text" class="input-field item-name" placeholder="Item">
+
+<input type="number" class="input-field qty" placeholder="Qty" oninput="calculateTotals()">
+
+<input type="number" class="input-field rate" placeholder="Rate" oninput="calculateTotals()">
+
+<input type="number" class="input-field total" placeholder="Total" readonly>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="btn-row">
+<button class="btn" onclick="addInvoiceItem()">+ ADD ITEM</button>
+</div>
+
+<br>
+
+<textarea id="invoiceNotes" placeholder="Notes"></textarea>
+
+<br><br>
+
+<h3>Grand Total: <span class="amount" id="grandTotal">₫ 0</span></h3>
+
+<div class="btn-row">
+<button class="btn" onclick="saveInvoice()">SAVE INVOICE</button>
+<button class="btn btn-red" onclick="clearInvoiceForm()">CLEAR</button>
+</div>
+
+<div class="tile-grid" id="invoiceContainer"></div>
+
+</div>
+
+<!-- PAYMENT SECTION -->
+<div class="section-box">
+
+<div class="section-title">Payment Entry</div>
+
+<div class="form-grid">
+
+<select id="paymentSupplier" class="input-field" onchange="loadInvoiceDropdown()"></select>
+
+<select id="paymentInvoice" class="input-field"></select>
+
+<input type="number" id="paidAmount" class="input-field" placeholder="Paid Amount (VND)">
+
+<input type="date" id="paymentDate" class="input-field">
+
+</div>
+
+<br>
+
+<textarea id="paymentNotes" placeholder="Payment Notes"></textarea>
+
+<div class="btn-row">
+<button class="btn" onclick="savePayment()">SAVE PAYMENT</button>
+</div>
+
+</div>
+
+<!-- PAYMENT STATUS -->
+<div class="section-box">
+
+<div class="section-title">Payment Status</div>
+
+<div class="tile-grid" id="paymentStatusContainer"></div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+deleteDoc,
+doc,
+onSnapshot,
+updateDoc
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+
+authDomain: "travelog-itinerary.firebaseapp.com",
+
+projectId: "travelog-itinerary",
+
+storageBucket: "travelog-itinerary.firebasestorage.app",
+
+messagingSenderId: "33567258851",
+
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+window.onSnapshot = onSnapshot;
+window.updateDoc = updateDoc;
+
+</script>
+
+<script>
+
+let allSuppliers = [];
+let allInvoices = [];
+let allPayments = [];
+
+function formatCurrency(amount){
+return '₫ ' + new Intl.NumberFormat('vi-VN').format(amount || 0);
+}
+
+function addInvoiceItem(){
+
+const html = `
+
+<div class="item-card invoice-item">
+
+<div class="invoice-row">
+
+<input type="number" class="input-field line-no" placeholder="No">
+
+<input type="text" class="input-field item-name" placeholder="Item">
+
+<input type="number" class="input-field qty" placeholder="Qty" oninput="calculateTotals()">
+
+<input type="number" class="input-field rate" placeholder="Rate" oninput="calculateTotals()">
+
+<input type="number" class="input-field total" placeholder="Total" readonly>
+
+</div>
+
+</div>
+
+`;
+
+document.getElementById('invoiceItems').insertAdjacentHTML('beforeend',html);
+
+}
+
+function calculateTotals(){
+
+let grandTotal = 0;
+
+const items = document.querySelectorAll('.invoice-item');
+
+items.forEach(item=>{
+
+const qty = Number(item.querySelector('.qty').value) || 0;
+const rate = Number(item.querySelector('.rate').value) || 0;
+
+const total = qty * rate;
+
+item.querySelector('.total').value = total;
+
+grandTotal += total;
+
+});
+
+document.getElementById('grandTotal').innerText = formatCurrency(grandTotal);
+
+}
+
+async function saveSupplier(){
+
+const supplier = {
+name:document.getElementById('supplierName').value,
+country:document.getElementById('supplierCountry').value,
+company:document.getElementById('supplierCompany').value,
+created:new Date().toISOString()
+};
+
+await addDoc(collection(db,'suppliers'),supplier);
+
+alert('Supplier Saved');
+
+}
+
+async function saveInvoice(){
+
+const items = [...document.querySelectorAll('.invoice-item')].map(item=>({
+line:item.querySelector('.line-no').value,
+item:item.querySelector('.item-name').value,
+qty:item.querySelector('.qty').value,
+rate:item.querySelector('.rate').value,
+total:item.querySelector('.total').value
+}));
+
+const grandTotal = items.reduce((sum,item)=>sum + Number(item.total || 0),0);
+
+const invoice = {
+supplier:document.getElementById('invoiceSupplier').value,
+invoiceDate:document.getElementById('invoiceDate').value,
+commencementDate:document.getElementById('commencementDate').value,
+items,
+notes:document.getElementById('invoiceNotes').value,
+grandTotal,
+created:new Date().toISOString()
+};
+
+await addDoc(collection(db,'supplierInvoices'),invoice);
+
+alert('Invoice Saved');
+
+clearInvoiceForm();
+
+}
+
+function clearInvoiceForm(){
+
+document.getElementById('invoiceNotes').value='';
+document.getElementById('invoiceItems').innerHTML='';
+addInvoiceItem();
+calculateTotals();
+
+}
+
+async function savePayment(){
+
+const payment = {
+supplier:document.getElementById('paymentSupplier').value,
+invoiceId:document.getElementById('paymentInvoice').value,
+amount:Number(document.getElementById('paidAmount').value),
+paymentDate:document.getElementById('paymentDate').value,
+notes:document.getElementById('paymentNotes').value,
+created:new Date().toISOString()
+};
+
+await addDoc(collection(db,'supplierPayments'),payment);
+
+alert('Payment Saved');
+
+}
+
+function loadSuppliers(){
+
+onSnapshot(collection(db,'suppliers'),snapshot=>{
+
+allSuppliers = [];
+
+snapshot.forEach(docItem=>{
+allSuppliers.push({
+id:docItem.id,
+...docItem.data()
+});
+});
+
+let supplierHTML = '';
+let options = '<option value="">Select Supplier</option>';
+
+allSuppliers.forEach(s=>{
+
+options += `<option value="${s.name}">${s.name}</option>`;
+
+supplierHTML += `
+
+<div class="tile" onclick="this.classList.toggle('active')">
+
+<div class="tile-head">
+<div>
+<div class="tile-title">${s.name}</div>
+<div class="tile-sub">${s.country || ''}</div>
+</div>
+</div>
+
+<div class="tile-details">
+
+<div class="tile-block">
+Company: ${s.company || '-'}
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('supplierContainer').innerHTML = supplierHTML;
+
+document.getElementById('invoiceSupplier').innerHTML = options;
+document.getElementById('paymentSupplier').innerHTML = options;
+
+});
+
+}
+
+function loadInvoices(){
+
+onSnapshot(collection(db,'supplierInvoices'),snapshot=>{
+
+allInvoices = [];
+
+snapshot.forEach(docItem=>{
+allInvoices.push({
+id:docItem.id,
+...docItem.data()
+});
+});
+
+let html = '';
+
+allInvoices.forEach(inv=>{
+
+const totalPaid = allPayments
+.filter(p=>p.invoiceId===inv.id)
+.reduce((sum,p)=>sum + Number(p.amount || 0),0);
+
+const balance = Number(inv.grandTotal || 0) - totalPaid;
+
+let badge = 'pending';
+let badgeText = 'PENDING';
+
+if(balance <= 0){
+badge = 'paid';
+badgeText = 'PAID';
+}else if(totalPaid > 0){
+badge = 'partial';
+badgeText = 'PARTIAL';
+}
+
+html += `
+
+<div class="tile" onclick="this.classList.toggle('active')">
+
+<div class="tile-head">
+
+<div>
+<div class="tile-title">${inv.supplier}</div>
+<div class="tile-sub">Invoice Date: ${inv.invoiceDate}</div>
+</div>
+
+<div>
+<span class="badge ${badge}">${badgeText}</span>
+</div>
+
+</div>
+
+<div class="tile-details">
+
+<div class="tile-block">
+<div>Total Invoice: <span class="amount">${formatCurrency(inv.grandTotal)}</span></div>
+<div>Total Paid: <span class="amount">${formatCurrency(totalPaid)}</span></div>
+<div>Balance: <span class="amount">${formatCurrency(balance)}</span></div>
+</div>
+
+<div class="tile-block">
+<b>Invoice Items</b><br><br>
+
+${inv.items.map(item=>`
+<div style="margin-bottom:12px;">
+${item.line}. ${item.item}<br>
+Qty: ${item.qty} | Rate: ${formatCurrency(item.rate)}<br>
+Total: <span class="amount">${formatCurrency(item.total)}</span>
+</div>
+`).join('')}
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('invoiceContainer').innerHTML = html;
+
+renderPaymentStatus();
+updateSummary();
+
+});
+
+}
+
+function loadPayments(){
+
+onSnapshot(collection(db,'supplierPayments'),snapshot=>{
+
+allPayments = [];
+
+snapshot.forEach(docItem=>{
+allPayments.push({
+id:docItem.id,
+...docItem.data()
+});
+});
+
+renderPaymentStatus();
+updateSummary();
+loadInvoices();
+
+});
+
+}
+
+function loadInvoiceDropdown(){
+
+const supplier = document.getElementById('paymentSupplier').value;
+
+const invoices = allInvoices.filter(i=>i.supplier===supplier);
+
+let html = '<option value="">Select Invoice</option>';
+
+invoices.forEach(inv=>{
+
+html += `
+<option value="${inv.id}">
+${inv.invoiceDate} - ${formatCurrency(inv.grandTotal)}
+</option>
+`;
+
+});
+
+document.getElementById('paymentInvoice').innerHTML = html;
+
+}
+
+function renderPaymentStatus(){
+
+let html = '';
+
+allSuppliers.forEach(supplier=>{
+
+const supplierInvoices = allInvoices.filter(i=>i.supplier===supplier.name);
+
+const totalInvoice = supplierInvoices.reduce((sum,i)=>sum + Number(i.grandTotal || 0),0);
+
+const invoiceIds = supplierInvoices.map(i=>i.id);
+
+const totalPaid = allPayments
+.filter(p=>invoiceIds.includes(p.invoiceId))
+.reduce((sum,p)=>sum + Number(p.amount || 0),0);
+
+const balance = totalInvoice - totalPaid;
+
+html += `
+
+<div class="tile" onclick="this.classList.toggle('active')">
+
+<div class="tile-head">
+<div>
+<div class="tile-title">${supplier.name}</div>
+<div class="tile-sub">${supplier.country || ''}</div>
+</div>
+
+<div>
+<div class="amount">${formatCurrency(balance)}</div>
+</div>
+</div>
+
+<div class="tile-details">
+
+<div class="tile-block">
+<div>Total Invoice: <span class="amount">${formatCurrency(totalInvoice)}</span></div>
+<div>Total Paid: <span class="amount">${formatCurrency(totalPaid)}</span></div>
+<div>Balance: <span class="amount">${formatCurrency(balance)}</span></div>
+</div>
+
+${supplierInvoices.map(inv=>{
+
+const paid = allPayments
+.filter(p=>p.invoiceId===inv.id)
+.reduce((sum,p)=>sum + Number(p.amount || 0),0);
+
+const pending = Number(inv.grandTotal || 0) - paid;
+
+return `
+
+<div class="tile-block">
+
+<b>Invoice:</b> ${inv.invoiceDate}<br><br>
+
+Invoice Amount: <span class="amount">${formatCurrency(inv.grandTotal)}</span><br>
+Paid Amount: <span class="amount">${formatCurrency(paid)}</span><br>
+Balance: <span class="amount">${formatCurrency(pending)}</span>
+
+</div>
+
+`;
+
+}).join('')}
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById('paymentStatusContainer').innerHTML = html;
+
+}
+
+function updateSummary(){
+
+const totalInvoice = allInvoices.reduce((sum,i)=>sum + Number(i.grandTotal || 0),0);
+
+const totalPaid = allPayments.reduce((sum,p)=>sum + Number(p.amount || 0),0);
+
+const totalBalance = totalInvoice - totalPaid;
+
+document.getElementById('totalInvoice').innerText = formatCurrency(totalInvoice);
+document.getElementById('totalPaid').innerText = formatCurrency(totalPaid);
+document.getElementById('totalBalance').innerText = formatCurrency(totalBalance);
+
+}
+
+window.addEventListener('load',()=>{
+
+addInvoiceItem();
+loadSuppliers();
+loadInvoices();
+loadPayments();
+
+});
+
+</script>
+
+</body>
+</html>
+```
+
+Save file name as:
+
+```text
+supplier-payments.html
+```
+
+Upload to:
+
+```text
+https://www.travelogdrop.online/supplier-payments.html
+```
