@@ -537,6 +537,7 @@ let allSuppliers=[];
 let allInvoices=[];
 let allPayments=[];
 let editingInvoiceId=null;
+let editingPaymentId=null;
 
 function formatCurrency(amount){
 
@@ -751,7 +752,7 @@ editingInvoiceId=null;
 
 async function savePayment(){
 
-await addDoc(collection(db,'supplierPayments'),{
+const paymentData = {
 
 supplier:
 document.getElementById('paymentSupplier').value,
@@ -766,13 +767,53 @@ paymentDate:
 document.getElementById('paymentDate').value,
 
 notes:
-document.getElementById('paymentNotes').value,
+document.getElementById('paymentNotes').value
 
-created:new Date().toISOString()
+};
 
-});
+if(editingPaymentId){
+
+await updateDoc(
+doc(db,'supplierPayments',editingPaymentId),
+paymentData
+);
+
+alert('Payment Updated');
+
+editingPaymentId=null;
+
+}else{
+
+paymentData.created =
+new Date().toISOString();
+
+await addDoc(
+collection(db,'supplierPayments'),
+paymentData
+);
 
 alert('Payment Saved');
+
+}
+
+clearPaymentForm();
+
+}
+
+function clearPaymentForm(){
+
+document.getElementById('paymentSupplier').value='';
+
+document.getElementById('paymentInvoice').innerHTML=
+'<option value="">Select Invoice</option>';
+
+document.getElementById('paidAmount').value='';
+
+document.getElementById('paymentDate').value='';
+
+document.getElementById('paymentNotes').value='';
+
+editingPaymentId=null;
 
 }
 
