@@ -1209,8 +1209,12 @@ ${supplier.country || ''}
 
 </div>
 
+<div>
+
 <div class="amount">
 ${formatCurrency(balance)}
+</div>
+
 </div>
 
 </div>
@@ -1219,53 +1223,193 @@ ${formatCurrency(balance)}
 
 <div class="tile-block">
 
-Total Invoice :
+<div style="
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+">
+
+<div>
+<b>Total Invoice</b><br>
 <span class="amount">
 ${formatCurrency(totalInvoice)}
 </span>
-<br>
+</div>
 
-Total Paid :
+<div>
+<b>Total Paid</b><br>
 <span class="amount">
 ${formatCurrency(totalPaid)}
 </span>
-<br>
+</div>
 
-Balance :
+<div>
+<b>Balance</b><br>
 <span class="amount">
 ${formatCurrency(balance)}
 </span>
+</div>
+
+</div>
 
 </div>
 
 ${supplierInvoices.map(inv=>{
 
+const invoicePayments =
+allPayments.filter(p=>p.invoiceId===inv.id);
+
 const paid =
-allPayments
-.filter(p=>p.invoiceId===inv.id)
-.reduce((sum,p)=>
+invoicePayments.reduce((sum,p)=>
 sum + Number(p.amount || 0),0);
 
 const pending =
 Number(inv.grandTotal || 0) - paid;
 
+let badge='pending';
+let badgeText='PENDING';
+
+if(pending <= 0){
+
+badge='paid';
+badgeText='PAID';
+
+}else if(paid > 0){
+
+badge='partial';
+badgeText='PARTIAL';
+
+}
+
 return `
 
 <div class="tile-block">
 
-<b>${inv.invoiceNo}</b>
-<br>
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:12px;
+gap:10px;
+flex-wrap:wrap;
+">
 
-Invoice :
+<div>
+
+<b>${inv.invoiceNo || '-'}</b><br>
+
+<span style="
+font-size:12px;
+color:#777;
+">
+Invoice Date :
+${inv.invoiceDate || '-'}
+</span>
+
+</div>
+
+<div>
+
+<span class="badge ${badge}">
+${badgeText}
+</span>
+
+</div>
+
+</div>
+
+<div style="
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:10px;
+margin-bottom:15px;
+">
+
+<div>
+<b>Invoice</b><br>
+<span class="amount">
 ${formatCurrency(inv.grandTotal)}
-<br>
+</span>
+</div>
 
-Paid :
+<div>
+<b>Paid</b><br>
+<span class="amount">
 ${formatCurrency(paid)}
-<br>
+</span>
+</div>
 
-Balance :
+<div>
+<b>Balance</b><br>
+<span class="amount">
 ${formatCurrency(pending)}
+</span>
+</div>
+
+</div>
+
+${
+invoicePayments.length > 0
+?
+
+`
+
+<div style="
+margin-top:10px;
+border-top:1px solid #eee;
+padding-top:10px;
+">
+
+<b style="
+font-size:13px;
+">
+Payments
+</b>
+
+<br><br>
+
+${invoicePayments.map(pay=>`
+
+<div style="
+display:flex;
+justify-content:space-between;
+padding:8px 10px;
+background:#f7f9fb;
+border-radius:10px;
+margin-bottom:8px;
+font-size:13px;
+">
+
+<div>
+${pay.paymentDate || '-'}
+</div>
+
+<div class="amount">
+${formatCurrency(pay.amount)}
+</div>
+
+</div>
+
+`).join('')}
+
+</div>
+
+`
+
+:
+
+`
+
+<div style="
+font-size:13px;
+color:#888;
+">
+No Payments Added
+</div>
+
+`
+
+}
 
 </div>
 
