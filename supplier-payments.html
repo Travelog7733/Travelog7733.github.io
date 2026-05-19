@@ -441,8 +441,6 @@ SAVE PAYMENT
 
 </div>
 
-<div class="tile-grid" id="paymentsListContainer"></div>
-
 </div>
 
 <!-- STATEMENT -->
@@ -539,7 +537,6 @@ let allSuppliers=[];
 let allInvoices=[];
 let allPayments=[];
 let editingInvoiceId=null;
-let editingPaymentId=null;
 
 function formatCurrency(amount){
 
@@ -754,7 +751,7 @@ editingInvoiceId=null;
 
 async function savePayment(){
 
-const paymentData = {
+await addDoc(collection(db,'supplierPayments'),{
 
 supplier:
 document.getElementById('paymentSupplier').value,
@@ -769,53 +766,13 @@ paymentDate:
 document.getElementById('paymentDate').value,
 
 notes:
-document.getElementById('paymentNotes').value
+document.getElementById('paymentNotes').value,
 
-};
+created:new Date().toISOString()
 
-if(editingPaymentId){
-
-await updateDoc(
-doc(db,'supplierPayments',editingPaymentId),
-paymentData
-);
-
-alert('Payment Updated');
-
-editingPaymentId=null;
-
-}else{
-
-paymentData.created =
-new Date().toISOString();
-
-await addDoc(
-collection(db,'supplierPayments'),
-paymentData
-);
+});
 
 alert('Payment Saved');
-
-}
-
-clearPaymentForm();
-
-}
-
-function clearPaymentForm(){
-
-document.getElementById('paymentSupplier').value='';
-
-document.getElementById('paymentInvoice').innerHTML=
-'<option value="">Select Invoice</option>';
-
-document.getElementById('paidAmount').value='';
-
-document.getElementById('paymentDate').value='';
-
-document.getElementById('paymentNotes').value='';
-
-editingPaymentId=null;
 
 }
 
@@ -1082,8 +1039,6 @@ id:docItem.id,
 
 renderInvoices();
 
-renderPaymentsList();
-
 renderPaymentStatus();
 
 updateSummary();
@@ -1182,58 +1137,6 @@ alert('Invoice Deleted');
 
 }
 
-function editPayment(id){
-
-const payment =
-allPayments.find(p=>p.id===id);
-
-if(!payment) return;
-
-editingPaymentId=id;
-
-document.getElementById('paymentSupplier').value =
-payment.supplier || '';
-
-loadInvoiceDropdown();
-
-setTimeout(()=>{
-
-document.getElementById('paymentInvoice').value =
-payment.invoiceId || '';
-
-},200);
-
-document.getElementById('paidAmount').value =
-payment.amount || '';
-
-document.getElementById('paymentDate').value =
-payment.paymentDate || '';
-
-document.getElementById('paymentNotes').value =
-payment.notes || '';
-
-window.scrollTo({
-top:0,
-behavior:'smooth'
-});
-
-alert('Payment Loaded');
-
-}
-
-async function deletePayment(id){
-
-if(!confirm('Delete Payment?'))
-return;
-
-await deleteDoc(
-doc(db,'supplierPayments',id)
-);
-
-alert('Payment Deleted');
-
-}
-
 function loadInvoiceDropdown(){
 
 const supplier =
@@ -1257,104 +1160,6 @@ ${inv.invoiceNo}
 });
 
 document.getElementById('paymentInvoice').innerHTML=html;
-
-}
-
-function renderPaymentsList(){
-
-let html='';
-
-allPayments.forEach(payment=>{
-
-const invoice =
-allInvoices.find(inv=>
-
-inv.id===payment.invoiceId ||
-inv.invoiceNo===payment.invoiceId
-
-);
-
-html += `
-
-<div class="tile">
-
-<div class="tile-head">
-
-<div>
-
-<div class="tile-title">
-${payment.supplier}
-</div>
-
-<div class="tile-sub">
-${invoice ? invoice.invoiceNo : '-'}
-</div>
-
-</div>
-
-<div class="amount">
-${formatCurrency(payment.amount)}
-</div>
-
-</div>
-
-<div class="tile-details"
-style="
-max-height:500px;
-margin-top:15px;
-">
-
-<div class="tile-block">
-
-Payment Date :
-${payment.paymentDate || '-'}
-<br>
-
-Amount :
-<span class="amount">
-${formatCurrency(payment.amount)}
-</span>
-
-${payment.notes ? `
-
-<br><br>
-Notes :
-${payment.notes}
-
-` : ''}
-
-</div>
-
-<div class="btn-row">
-
-<button
-class="btn btn-blue"
-onclick="editPayment('${payment.id}')">
-
-EDIT
-
-</button>
-
-<button
-class="btn btn-red"
-onclick="deletePayment('${payment.id}')">
-
-DELETE
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-document.getElementById('paymentsListContainer').innerHTML =
-html;
 
 }
 
