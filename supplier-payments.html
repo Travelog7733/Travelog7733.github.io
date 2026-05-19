@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -255,22 +256,6 @@ background:#0077ff;
 background:#00a86b;
 }
 
-.payment-card{
-margin-top:8px;
-padding:12px;
-background:#f8f8f8;
-border-radius:10px;
-border:1px solid #eee;
-}
-
-.payment-actions{
-display:flex;
-justify-content:space-between;
-align-items:flex-start;
-gap:10px;
-flex-wrap:wrap;
-}
-
 @media(max-width:768px){
 
 .invoice-headings{
@@ -326,107 +311,6 @@ Travelog Supplier Invoice & Payment Management System
 
 </div>
 
-<!-- SUPPLIER SECTION -->
-
-<div class="section-box">
-
-<div class="section-title">
-Supplier List
-</div>
-
-<div class="form-grid">
-
-<input type="text" id="supplierName" class="input-field" placeholder="Supplier Name">
-
-<input type="text" id="supplierCountry" class="input-field" placeholder="Country">
-
-<input type="text" id="supplierCompany" class="input-field" placeholder="Company Name">
-
-</div>
-
-<div class="btn-row">
-
-<button class="btn" onclick="saveSupplier()">
-SAVE SUPPLIER
-</button>
-
-</div>
-
-<div class="tile-grid" id="supplierContainer"></div>
-
-</div>
-
-<!-- INVOICE SECTION -->
-
-<div class="section-box">
-
-<div class="section-title">
-Supplier Invoice Input
-</div>
-
-<div class="form-grid">
-
-<select id="invoiceSupplier" class="input-field"></select>
-
-<input type="date" id="invoiceDate" class="input-field">
-
-<input type="date" id="commencementDate" class="input-field">
-
-<input type="text" id="invoiceNo" class="input-field" readonly placeholder="Auto Invoice No">
-
-</div>
-
-<div class="invoice-headings">
-
-<div>NO</div>
-<div>ITEM</div>
-<div>QTY</div>
-<div>RATE</div>
-<div>TOTAL</div>
-
-</div>
-
-<div id="invoiceItems"></div>
-
-<div class="btn-row">
-
-<button class="btn" onclick="addInvoiceItem()">
-+ ADD ITEM
-</button>
-
-</div>
-
-<br>
-
-<textarea id="invoiceNotes" placeholder="Invoice Notes"></textarea>
-
-<br><br>
-
-<h3>
-Grand Total :
-<span class="amount" id="grandTotal">
-₫ 0
-</span>
-</h3>
-
-<div class="btn-row">
-
-<button class="btn" onclick="saveInvoice()">
-SAVE INVOICE
-</button>
-
-<button class="btn btn-red" onclick="clearInvoiceForm()">
-CLEAR
-</button>
-
-</div>
-
-<div class="tile-grid" id="invoiceContainer"></div>
-
-</div>
-
-<!-- PAYMENT SECTION -->
-
 <div class="section-box">
 
 <div class="section-title">
@@ -455,39 +339,13 @@ Payment Entry
 SAVE PAYMENT
 </button>
 
-</div>
-
-</div>
-
-<!-- STATEMENT -->
-
-<div class="section-box">
-
-<div class="section-title">
-Supplier Statement
-</div>
-
-<div class="form-grid">
-
-<select id="statementSupplier" class="input-field"></select>
-
-<input type="date" id="statementFrom" class="input-field">
-
-<input type="date" id="statementTo" class="input-field">
-
-</div>
-
-<div class="btn-row">
-
-<button class="btn btn-blue" onclick="downloadStatementPDF()">
-DOWNLOAD PDF
+<button class="btn btn-red" onclick="clearPaymentForm()">
+CLEAR
 </button>
 
 </div>
 
 </div>
-
-<!-- PAYMENT STATUS -->
 
 <div class="section-box">
 
@@ -519,17 +377,17 @@ doc
 
 const firebaseConfig = {
 
-apiKey: "YOUR_API_KEY",
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
 
-authDomain: "YOUR_AUTH_DOMAIN",
+authDomain: "travelog-itinerary.firebaseapp.com",
 
-projectId: "YOUR_PROJECT_ID",
+projectId: "travelog-itinerary",
 
-storageBucket: "YOUR_STORAGE_BUCKET",
+storageBucket: "travelog-itinerary.firebasestorage.app",
 
-messagingSenderId: "YOUR_SENDER_ID",
+messagingSenderId: "33567258851",
 
-appId: "YOUR_APP_ID"
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
 
 };
 
@@ -553,6 +411,7 @@ let allSuppliers=[];
 let allInvoices=[];
 let allPayments=[];
 let editingInvoiceId=null;
+let editingPaymentId=null;
 
 function formatCurrency(amount){
 
@@ -562,176 +421,9 @@ new Intl.NumberFormat('vi-VN')
 
 }
 
-function generateInvoiceNo(){
-
-const invoiceNo =
-"INV-" +
-new Date().getFullYear() +
-"-" +
-String(Date.now()).slice(-6);
-
-document.getElementById('invoiceNo').value =
-invoiceNo;
-
-}
-
-function addInvoiceItem(){
-
-document.getElementById('invoiceItems')
-.insertAdjacentHTML('beforeend',`
-
-<div class="invoice-item">
-
-<div class="invoice-grid">
-
-<input type="number"
-class="input-field line-no"
-placeholder="No">
-
-<input type="text"
-class="input-field item-name"
-placeholder="Item">
-
-<input type="number"
-class="input-field qty"
-placeholder="Qty"
-oninput="calculateTotals()">
-
-<input type="number"
-class="input-field rate"
-placeholder="Rate"
-oninput="calculateTotals()">
-
-<input type="number"
-class="input-field total"
-placeholder="Total"
-readonly>
-
-</div>
-
-</div>
-
-`);
-
-}
-
-function calculateTotals(){
-
-let grandTotal=0;
-
-document.querySelectorAll('.invoice-item')
-.forEach(item=>{
-
-const qty =
-Number(item.querySelector('.qty').value)||0;
-
-const rate =
-Number(item.querySelector('.rate').value)||0;
-
-const total = qty * rate;
-
-item.querySelector('.total').value = total;
-
-grandTotal += total;
-
-});
-
-document.getElementById('grandTotal')
-.innerText = formatCurrency(grandTotal);
-
-}
-
-async function saveSupplier(){
-
-await addDoc(collection(db,'suppliers'),{
-
-name:
-document.getElementById('supplierName').value,
-
-country:
-document.getElementById('supplierCountry').value,
-
-company:
-document.getElementById('supplierCompany').value,
-
-created:new Date().toISOString()
-
-});
-
-alert('Supplier Saved');
-
-}
-
-async function saveInvoice(){
-
-const items =
-[...document.querySelectorAll('.invoice-item')]
-.map(item=>({
-
-line:item.querySelector('.line-no').value,
-
-item:item.querySelector('.item-name').value,
-
-qty:item.querySelector('.qty').value,
-
-rate:item.querySelector('.rate').value,
-
-total:item.querySelector('.total').value
-
-}));
-
-const grandTotal =
-items.reduce((sum,item)=>
-sum + Number(item.total || 0),0);
-
-await addDoc(collection(db,'supplierInvoices'),{
-
-invoiceNo:
-document.getElementById('invoiceNo').value,
-
-supplier:
-document.getElementById('invoiceSupplier').value,
-
-invoiceDate:
-document.getElementById('invoiceDate').value,
-
-commencementDate:
-document.getElementById('commencementDate').value,
-
-items,
-
-notes:
-document.getElementById('invoiceNotes').value,
-
-grandTotal,
-
-created:new Date().toISOString()
-
-});
-
-alert('Invoice Saved');
-
-clearInvoiceForm();
-
-}
-
-function clearInvoiceForm(){
-
-document.getElementById('invoiceItems').innerHTML='';
-
-document.getElementById('invoiceNotes').value='';
-
-addInvoiceItem();
-
-calculateTotals();
-
-generateInvoiceNo();
-
-}
-
 async function savePayment(){
 
-await addDoc(collection(db,'supplierPayments'),{
+const paymentData = {
 
 supplier:
 document.getElementById('paymentSupplier').value,
@@ -746,13 +438,92 @@ paymentDate:
 document.getElementById('paymentDate').value,
 
 notes:
-document.getElementById('paymentNotes').value,
+document.getElementById('paymentNotes').value
+
+};
+
+if(editingPaymentId){
+
+await updateDoc(
+doc(db,'supplierPayments',editingPaymentId),
+paymentData
+);
+
+alert('Payment Updated');
+
+editingPaymentId=null;
+
+}else{
+
+await addDoc(collection(db,'supplierPayments'),{
+
+...paymentData,
 
 created:new Date().toISOString()
 
 });
 
 alert('Payment Saved');
+
+}
+
+clearPaymentForm();
+
+}
+
+function clearPaymentForm(){
+
+document.getElementById('paymentSupplier').value='';
+
+document.getElementById('paymentInvoice').innerHTML=
+'<option value="">Select Invoice</option>';
+
+document.getElementById('paidAmount').value='';
+
+document.getElementById('paymentDate').value='';
+
+document.getElementById('paymentNotes').value='';
+
+editingPaymentId=null;
+
+}
+
+async function editPayment(id){
+
+const payment =
+allPayments.find(p=>p.id===id);
+
+if(!payment) return;
+
+editingPaymentId=id;
+
+document.getElementById('paymentSupplier').value =
+payment.supplier || '';
+
+loadInvoiceDropdown();
+
+setTimeout(()=>{
+
+document.getElementById('paymentInvoice').value =
+payment.invoiceId || '';
+
+},300);
+
+document.getElementById('paidAmount').value =
+payment.amount || '';
+
+document.getElementById('paymentDate').value =
+payment.paymentDate || '';
+
+document.getElementById('paymentNotes').value =
+payment.notes || '';
+
+window.scrollTo({
+top:0,
+behavior:'smooth'
+});
+
+alert('Payment Loaded');
 
 }
 
@@ -766,122 +537,6 @@ doc(db,'supplierPayments',id)
 );
 
 alert('Payment Deleted');
-
-}
-
-function loadSuppliers(){
-
-onSnapshot(collection(db,'suppliers'),snapshot=>{
-
-allSuppliers=[];
-
-snapshot.forEach(docItem=>{
-
-allSuppliers.push({
-id:docItem.id,
-...docItem.data()
-});
-
-});
-
-let html='';
-let options='<option value="">Select Supplier</option>';
-
-allSuppliers.forEach(s=>{
-
-options += `
-<option value="${s.name}">
-${s.name}
-</option>
-`;
-
-html += `
-
-<div class="tile"
-onclick="this.classList.toggle('active')">
-
-<div class="tile-head">
-
-<div>
-
-<div class="tile-title">
-${s.name}
-</div>
-
-<div class="tile-sub">
-${s.country || ''}
-</div>
-
-</div>
-
-</div>
-
-<div class="tile-details">
-
-<div class="tile-block">
-Company :
-${s.company || '-'}
-</div>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-document.getElementById('supplierContainer').innerHTML=html;
-
-document.getElementById('invoiceSupplier').innerHTML=options;
-document.getElementById('paymentSupplier').innerHTML=options;
-document.getElementById('statementSupplier').innerHTML=options;
-
-});
-
-}
-
-function loadInvoices(){
-
-onSnapshot(collection(db,'supplierInvoices'),snapshot=>{
-
-allInvoices=[];
-
-snapshot.forEach(docItem=>{
-
-allInvoices.push({
-id:docItem.id,
-...docItem.data()
-});
-
-});
-
-renderPaymentStatus();
-updateSummary();
-
-});
-
-}
-
-function loadPayments(){
-
-onSnapshot(collection(db,'supplierPayments'),snapshot=>{
-
-allPayments=[];
-
-snapshot.forEach(docItem=>{
-
-allPayments.push({
-id:docItem.id,
-...docItem.data()
-});
-
-});
-
-renderPaymentStatus();
-updateSummary();
-
-});
 
 }
 
@@ -922,27 +577,6 @@ allInvoices.filter(i=>
 i.supplier===supplier.name
 );
 
-const totalInvoice =
-supplierInvoices.reduce((sum,i)=>
-sum + Number(i.grandTotal || 0),0);
-
-const totalPaid =
-allPayments
-.filter(payment=>{
-
-return supplierInvoices.some(inv=>
-
-payment.invoiceId===inv.id
-
-);
-
-})
-.reduce((sum,p)=>
-sum + Number(p.amount || 0),0);
-
-const balance =
-totalInvoice-totalPaid;
-
 html += `
 
 <div class="tile"
@@ -956,91 +590,33 @@ onclick="this.classList.toggle('active')">
 ${supplier.name}
 </div>
 
-<div class="tile-sub">
-${supplier.country || ''}
-</div>
-
-</div>
-
-<div class="amount">
-${formatCurrency(balance)}
 </div>
 
 </div>
 
 <div class="tile-details">
 
-<div class="tile-block">
-
-Total Invoice :
-<span class="amount">
-${formatCurrency(totalInvoice)}
-</span>
-<br>
-
-Total Paid :
-<span class="amount">
-${formatCurrency(totalPaid)}
-</span>
-<br>
-
-Balance :
-<span class="amount">
-${formatCurrency(balance)}
-</span>
-
-</div>
-
 ${supplierInvoices.map(inv=>{
 
 const relatedPayments =
 allPayments.filter(payment=>
-
 payment.invoiceId===inv.id
-
 );
-
-const paid =
-relatedPayments.reduce((sum,p)=>
-sum + Number(p.amount || 0),0);
-
-const pending =
-Number(inv.grandTotal || 0) - paid;
 
 return `
 
 <div class="tile-block">
 
 <b>${inv.invoiceNo}</b>
-<br>
-
-Invoice Date :
-${inv.invoiceDate || '-'}
-<br>
-
-Invoice :
-${formatCurrency(inv.grandTotal)}
-<br>
-
-Paid :
-${formatCurrency(paid)}
-<br>
-
-Balance :
-${formatCurrency(pending)}
-
-${relatedPayments.length ? `
-
-<br><br>
-<b>Payments</b>
 
 ${relatedPayments.map(pay=>`
 
-<div class="payment-card">
-
-<div class="payment-actions">
-
-<div>
+<div style="
+margin-top:8px;
+padding:8px;
+background:#f8f8f8;
+border-radius:8px;
+">
 
 Date :
 ${pay.paymentDate || '-'}
@@ -1056,17 +632,21 @@ ${pay.notes ? `
 Note : ${pay.notes}
 ` : ''}
 
-</div>
-
-<div>
+<div class="btn-row" style="margin-top:10px;">
 
 <button
-onclick="event.stopPropagation();deletePayment('${pay.id}')"
+class="btn btn-blue"
+style="padding:8px 14px;font-size:12px;"
+onclick="event.stopPropagation();editPayment('${pay.id}')">
+
+EDIT
+
+</button>
+
+<button
 class="btn btn-red"
-style="
-padding:8px 14px;
-font-size:12px;
-">
+style="padding:8px 14px;font-size:12px;"
+onclick="event.stopPropagation();deletePayment('${pay.id}')">
 
 DELETE
 
@@ -1076,18 +656,7 @@ DELETE
 
 </div>
 
-</div>
-
 `).join('')}
-
-` : `
-
-<br><br>
-<span style="color:#999;">
-No Payments Added
-</span>
-
-`}
 
 </div>
 
@@ -1107,62 +676,28 @@ document.getElementById('paymentStatusContainer').innerHTML=html;
 
 }
 
-function updateSummary(){
+function loadPayments(){
 
-const totalInvoice =
-allInvoices.reduce((sum,i)=>
-sum + Number(i.grandTotal || 0),0);
+onSnapshot(collection(db,'supplierPayments'),snapshot=>{
 
-const totalPaid =
-allPayments.reduce((sum,p)=>
-sum + Number(p.amount || 0),0);
+allPayments=[];
 
-const totalBalance =
-totalInvoice-totalPaid;
+snapshot.forEach(docItem=>{
 
-document.getElementById('totalInvoice')
-.innerText = formatCurrency(totalInvoice);
+allPayments.push({
+id:docItem.id,
+...docItem.data()
+});
 
-document.getElementById('totalPaid')
-.innerText = formatCurrency(totalPaid);
+});
 
-document.getElementById('totalBalance')
-.innerText = formatCurrency(totalBalance);
+renderPaymentStatus();
 
-}
-
-async function downloadStatementPDF(){
-
-const supplier =
-document.getElementById('statementSupplier').value;
-
-const { jsPDF } = window.jspdf;
-
-const pdf = new jsPDF();
-
-pdf.setFontSize(18);
-
-pdf.text(
-"SUPPLIER ACCOUNT STATEMENT",
-20,
-20
-);
-
-pdf.save(
-supplier + "-statement.pdf"
-);
+});
 
 }
 
 window.addEventListener('load',()=>{
-
-generateInvoiceNo();
-
-addInvoiceItem();
-
-loadSuppliers();
-
-loadInvoices();
 
 loadPayments();
 
@@ -1171,5 +706,4 @@ loadPayments();
 </script>
 
 </body>
-
 </html>
