@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travelog Holidays Margin Checker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Travelog Holidays</p>
+          <h1>Margin Checker</h1>
+        </div>
+        <div class="rate-card">
+          <label for="exchangeRate">VND to INR exchange rate</label>
+          <div class="rate-input">
+            <span>1 VND =</span>
+            <input id="exchangeRate" type="number" min="0" step="0.000001" value="0.0033" />
+            <span>INR</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="tabs" aria-label="Margin checker sections">
+        <button class="tab-button active" type="button" data-tab="supplier">Supplier Costs</button>
+        <button class="tab-button" type="button" data-tab="sales">Sales Price</button>
+      </section>
+
+      <section class="tab-panel active" id="supplierPanel">
+        <div class="section-heading">
+          <div>
+            <h2>Supplier Costs</h2>
+            <p>Enter purchase amounts in VND. Totals convert to INR using the exchange rate above.</p>
+          </div>
+        </div>
+
+        <div class="entry-section" data-section="tour">
+          <div class="entry-title">
+            <h3>Tour Price</h3>
+            <button class="add-button" type="button" data-add="tour">+ Add tour</button>
+          </div>
+          <div class="entry-list" id="tourList"></div>
+        </div>
+
+        <div class="entry-section" data-section="hotel">
+          <div class="entry-title">
+            <h3>Hotel Price</h3>
+            <button class="add-button" type="button" data-add="hotel">+ Add hotel</button>
+          </div>
+          <div class="entry-list" id="hotelList"></div>
+        </div>
+
+        <div class="entry-section" data-section="expense">
+          <div class="entry-title">
+            <h3>Visa & Other Expense</h3>
+            <button class="add-button" type="button" data-add="expense">+ Add expense</button>
+          </div>
+          <div class="entry-list" id="expenseList"></div>
+        </div>
+
+        <div class="totals-grid">
+          <div class="total-box">
+            <span>Total Supplier Cost</span>
+            <strong id="supplierTotalVnd">VND 0</strong>
+          </div>
+          <div class="total-box accent">
+            <span>Total Supplier Cost in INR</span>
+            <strong id="supplierTotalInr">INR 0</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="salesPanel">
+        <div class="section-heading">
+          <div>
+            <h2>Sales Price</h2>
+            <p>Enter customer selling amounts in INR, then compare against supplier cost.</p>
+          </div>
+        </div>
+
+        <div class="entry-section">
+          <div class="entry-title">
+            <h3>Sales Items</h3>
+            <button class="add-button" type="button" data-add="sales">+ Add sale</button>
+          </div>
+          <div class="entry-list" id="salesList"></div>
+        </div>
+
+        <div class="totals-grid single">
+          <div class="total-box accent">
+            <span>Total Sales Amount</span>
+            <strong id="salesTotalInr">INR 0</strong>
+          </div>
+        </div>
+
+        <button class="compare-button" type="button" id="compareButton">Compare Margin</button>
+      </section>
+
+      <section class="result-panel" id="resultPanel" aria-live="polite">
+        <div>
+          <span>Profit Amount</span>
+          <strong id="profitAmount">INR 0</strong>
+        </div>
+        <div>
+          <span>Profit Percentage</span>
+          <strong id="profitPercent">0%</strong>
+        </div>
+      </section>
+    </main>
+
+    <template id="rowTemplate">
+      <div class="entry-row">
+        <input class="name-input" type="text" />
+        <input class="amount-input" type="number" min="0" step="0.01" />
+        <button class="remove-button" type="button" aria-label="Remove row">x</button>
+      </div>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
