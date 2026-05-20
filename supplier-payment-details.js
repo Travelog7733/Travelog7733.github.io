@@ -28,7 +28,7 @@ let cloudSaveTimer = null;
 const inr = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "VND",
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 0,
 });
 
 const els = {
@@ -212,7 +212,7 @@ function invoiceLabel(id) {
   const invoice = state.invoices.find((item) => item.id === id);
   if (!invoice) return "Not selected";
   const number = invoice.invoiceNo ? `${invoice.invoiceNo} - ` : "";
-  return `${number}${invoice.date || "-"} - ${invoice.particulars || "Invoice"} (${inr.format(invoiceTotal(invoice))})`;
+  return `${number}${invoice.date || "-"} - ${invoice.particulars || "Invoice"} (${vnd.format(invoiceTotal(invoice))})`;
 }
 
 function itemAmount(item) {
@@ -360,7 +360,7 @@ function readInvoiceItems() {
 
 function updateInvoiceDraftTotal() {
   const total = readInvoiceItems().reduce((sum, item) => sum + item.amount, 0);
-  els.invoiceDraftTotal.textContent = inr.format(total);
+  els.invoiceDraftTotal.textContent = vnd.format(total);
 }
 
 function renderInvoiceTable() {
@@ -380,9 +380,9 @@ function renderInvoiceTable() {
           <td>${escapeHtml(supplierName(invoice.supplierId))}</td>
           <td>
             <strong>${escapeHtml(invoice.particulars)}</strong>
-            <div class="muted">${escapeHtml((invoice.items || []).map((item) => `${item.name} (${item.qty || 0} x ${inr.format(toNumber(item.rate))})`).join(", "))}</div>
+            <div class="muted">${escapeHtml((invoice.items || []).map((item) => `${item.name} (${item.qty || 0} x ${vnd.format(toNumber(item.rate))})`).join(", "))}</div>
           </td>
-          <td class="number-col">${inr.format(invoiceTotal(invoice))}</td>
+          <td class="number-col">${vnd.format(invoiceTotal(invoice))}</td>
           <td>
             <div class="action-buttons">
               <button class="row-btn edit" type="button" data-edit-invoice="${invoice.id}">Edit</button>
@@ -411,7 +411,7 @@ function renderPaymentTable() {
           <td>${escapeHtml(supplierName(payment.supplierId))}</td>
           <td>${escapeHtml(payment.invoiceId ? invoiceLabel(payment.invoiceId) : "Not selected")}</td>
           <td>${escapeHtml(payment.particulars)}</td>
-          <td class="number-col">${inr.format(toNumber(payment.amount))}</td>
+          <td class="number-col">${vnd.format(toNumber(payment.amount))}</td>
           <td>
             <div class="action-buttons">
               <button class="row-btn edit" type="button" data-edit-payment="${payment.id}">Edit</button>
@@ -468,9 +468,9 @@ function renderStatus() {
         <article class="status-card">
           <button class="status-toggle" type="button" data-toggle-status>
             <strong>${escapeHtml(supplierDisplay(supplier))}</strong>
-            <span class="status-metrics"><span>Purchase</span><strong>${inr.format(purchase)}</strong></span>
-            <span class="status-metrics"><span>Paid</span><strong>${inr.format(paid)}</strong></span>
-            <span class="status-metrics"><span>Balance</span><strong class="${balanceClass}">${inr.format(balance)}</strong></span>
+            <span class="status-metrics"><span>Purchase</span><strong>${vnd.format(purchase)}</strong></span>
+            <span class="status-metrics"><span>Paid</span><strong>${vnd.format(paid)}</strong></span>
+            <span class="status-metrics"><span>Balance</span><strong class="${balanceClass}">${vnd.format(balance)}</strong></span>
             <strong>+</strong>
           </button>
           <div class="ledger">
@@ -495,8 +495,8 @@ function renderStatus() {
                                 <td>${escapeHtml(row.date)}</td>
                                 <td>${row.type}</td>
                                 <td>${escapeHtml(row.details)}</td>
-                                <td class="number-col">${row.debit ? inr.format(row.debit) : "-"}</td>
-                                <td class="number-col">${row.credit ? inr.format(row.credit) : "-"}</td>
+                                <td class="number-col">${row.debit ? vnd.format(row.debit) : "-"}</td>
+                                <td class="number-col">${row.credit ? vnd.format(row.credit) : "-"}</td>
                               </tr>
                             `,
                           )
@@ -508,7 +508,7 @@ function renderStatus() {
             </div>
             <div class="ledger-total">
               <span>Total Balance</span>
-              <strong class="${balanceClass}">${inr.format(balance)}</strong>
+              <strong class="${balanceClass}">${vnd.format(balance)}</strong>
             </div>
           </div>
         </article>
@@ -520,9 +520,9 @@ function renderStatus() {
 function renderHeaderTotals() {
   const purchase = state.invoices.reduce((total, invoice) => total + invoiceTotal(invoice), 0);
   const paid = state.payments.reduce((total, payment) => total + toNumber(payment.amount), 0);
-  els.headerPurchase.textContent = inr.format(purchase);
-  els.headerPaid.textContent = inr.format(paid);
-  els.headerBalance.textContent = inr.format(purchase - paid);
+  els.headerPurchase.textContent = vnd.format(purchase);
+  els.headerPaid.textContent = vnd.format(paid);
+  els.headerBalance.textContent = vnd.format(purchase - paid);
 }
 
 function renderAll() {
