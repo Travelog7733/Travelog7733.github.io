@@ -1,0 +1,370 @@
+
+<style>
+  :root {
+    --brand: #0F6E56;
+    --brand-light: #E1F5EE;
+    --brand-mid: #1D9E75;
+    --brand-dark: #085041;
+    --accent: #BA7517;
+    --accent-light: #FAEEDA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans, sans-serif); }
+  .app { padding: 1rem; max-width: 720px; margin: 0 auto; }
+
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .logo { width: 40px; height: 40px; border-radius: 10px; background: var(--brand); display: flex; align-items: center; justify-content: center; }
+  .logo i { color: #fff; font-size: 22px; }
+  .brand-name { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .brand-sub { font-size: 12px; color: var(--color-text-secondary); }
+
+  .tabs { display: flex; gap: 4px; background: var(--color-background-secondary); padding: 4px; border-radius: var(--border-radius-md); margin-bottom: 1.5rem; }
+  .tab { flex: 1; padding: 8px 12px; border: none; background: transparent; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s; }
+  .tab.active { background: var(--color-background-primary); color: var(--brand); border: 0.5px solid var(--color-border-tertiary); }
+  .tab i { font-size: 16px; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .section-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+  .section-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); }
+  .section-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+
+  .ex-rate-bar { background: var(--accent-light); border: 0.5px solid #EF9F27; border-radius: var(--border-radius-md); padding: 0.75rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .ex-rate-bar label { font-size: 13px; font-weight: 500; color: #633806; }
+  .ex-rate-bar input { width: 140px; height: 34px; font-size: 14px; border-radius: 6px; padding: 0 10px; border: 0.5px solid #EF9F27; background: #fff; color: var(--color-text-primary); }
+  .ex-rate-info { font-size: 12px; color: #854F0B; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; align-items: end; }
+  .row.triple { grid-template-columns: 1.5fr 1fr 36px; }
+  .field label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; display: block; }
+  .field input { width: 100%; height: 36px; font-size: 14px; border-radius: 6px; padding: 0 10px; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); color: var(--color-text-primary); }
+  .field input:focus { outline: none; border-color: var(--brand); }
+
+  .btn-remove { width: 36px; height: 36px; border: 0.5px solid var(--color-border-tertiary); background: transparent; border-radius: 6px; cursor: pointer; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; margin-top: 16px; }
+  .btn-remove:hover { background: #FCEBEB; border-color: #F09595; color: #A32D2D; }
+  .btn-remove i { font-size: 16px; }
+
+  .btn-add { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 0.5px dashed var(--brand-mid); background: var(--brand-light); border-radius: 6px; color: var(--brand); font-size: 13px; cursor: pointer; margin-top: 4px; }
+  .btn-add:hover { background: #9FE1CB; }
+  .btn-add i { font-size: 15px; }
+
+  .totals-block { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; margin-top: 0.5rem; }
+  .total-line { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+  .total-line:not(:last-child) { border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .total-label { font-size: 13px; color: var(--color-text-secondary); }
+  .total-value { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .total-value.big { font-size: 18px; color: var(--brand-dark); }
+  .currency-tag { font-size: 10px; font-weight: 400; color: var(--color-text-secondary); margin-left: 4px; }
+
+  .compare-btn { width: 100%; padding: 14px; background: var(--brand); color: #fff; border: none; border-radius: var(--border-radius-md); font-size: 16px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 0.5rem; transition: background 0.15s; }
+  .compare-btn:hover { background: var(--brand-dark); }
+  .compare-btn i { font-size: 18px; }
+
+  .result-box { display: none; margin-top: 1.5rem; }
+  .result-box.show { display: block; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  .result-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 1rem; text-align: center; border: 0.5px solid var(--color-border-tertiary); }
+  .result-card.positive { background: #E1F5EE; border-color: #5DCAA5; }
+  .result-card.negative { background: #FCEBEB; border-color: #F09595; }
+  .result-card .r-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .result-card.positive .r-label { color: #085041; }
+  .result-card.negative .r-label { color: #791F1F; }
+  .result-card .r-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .result-card.positive .r-value { color: #085041; }
+  .result-card.negative .r-value { color: #A32D2D; }
+  .result-bar-wrap { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; border: 0.5px solid var(--color-border-tertiary); }
+  .result-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .result-bar-track { height: 8px; border-radius: 4px; background: var(--color-border-tertiary); overflow: hidden; }
+  .result-bar-fill { height: 100%; border-radius: 4px; background: var(--brand); transition: width 0.5s ease; }
+  .result-bar-fill.neg { background: #E24B4A; }
+
+  .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
+  .status-badge.profit { background: #E1F5EE; color: #085041; }
+  .status-badge.loss { background: #FCEBEB; color: #A32D2D; }
+</style>
+
+<div class="app">
+  <h2 class="sr-only">Travelog Holidays — Margin Checker tool for comparing supplier costs and sales prices</h2>
+
+  <div class="header">
+    <div class="logo"><i class="ti ti-plane-tilt" aria-hidden="true"></i></div>
+    <div>
+      <div class="brand-name">Travelog Holidays</div>
+      <div class="brand-sub">Margin Checker</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('supplier')"><i class="ti ti-building-store" aria-hidden="true"></i> Supplier Costs (VND)</button>
+    <button class="tab" onclick="switchTab('sales')"><i class="ti ti-receipt" aria-hidden="true"></i> Sales Price (INR)</button>
+  </div>
+
+  <!-- SUPPLIER TAB -->
+  <div class="panel active" id="tab-supplier">
+
+    <div class="ex-rate-bar">
+      <i class="ti ti-currency-dollar" aria-hidden="true" style="font-size:18px; color:#854F0B;"></i>
+      <label for="exRate">Exchange Rate (1 INR = VND)</label>
+      <input type="number" id="exRate" placeholder="e.g. 290" min="1" oninput="recalc()" />
+      <span class="ex-rate-info">Enter how many VND equals 1 INR</span>
+    </div>
+
+    <!-- Tour Prices -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-dot" style="background:#1D9E75;"></div>
+        <span class="section-title"><i class="ti ti-map-pin" aria-hidden="true" style="font-size:15px; vertical-align:-2px; margin-right:4px;"></i>Tour Prices</span>
+      </div>
+      <div id="tour-items"></div>
+      <button class="btn-add" onclick="addItem('tour')"><i class="ti ti-plus" aria-hidden="true"></i> Add tour</button>
+    </div>
+
+    <!-- Hotel Prices -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-dot" style="background:#378ADD;"></div>
+        <span class="section-title"><i class="ti ti-bed" aria-hidden="true" style="font-size:15px; vertical-align:-2px; margin-right:4px;"></i>Hotel Prices</span>
+      </div>
+      <div id="hotel-items"></div>
+      <button class="btn-add" onclick="addItem('hotel')"><i class="ti ti-plus" aria-hidden="true"></i> Add hotel</button>
+    </div>
+
+    <!-- Visa & Other -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-dot" style="background:#D4537E;"></div>
+        <span class="section-title"><i class="ti ti-file-invoice" aria-hidden="true" style="font-size:15px; vertical-align:-2px; margin-right:4px;"></i>Visa &amp; Other Expenses</span>
+      </div>
+      <div id="visa-items"></div>
+      <button class="btn-add" onclick="addItem('visa')"><i class="ti ti-plus" aria-hidden="true"></i> Add expense</button>
+    </div>
+
+    <!-- Totals -->
+    <div class="section-card" style="border-color: var(--brand);">
+      <div class="section-header">
+        <div class="section-dot"></div>
+        <span class="section-title">Total Supplier Cost</span>
+      </div>
+      <div class="totals-block">
+        <div class="total-line">
+          <span class="total-label">Tour total</span>
+          <span class="total-value" id="tour-sub">₫ 0<span class="currency-tag">VND</span></span>
+        </div>
+        <div class="total-line">
+          <span class="total-label">Hotel total</span>
+          <span class="total-value" id="hotel-sub">₫ 0<span class="currency-tag">VND</span></span>
+        </div>
+        <div class="total-line">
+          <span class="total-label">Visa &amp; other total</span>
+          <span class="total-value" id="visa-sub">₫ 0<span class="currency-tag">VND</span></span>
+        </div>
+        <div class="total-line">
+          <span class="total-label" style="font-weight:500; color:var(--color-text-primary);">Grand total (VND)</span>
+          <span class="total-value big" id="grand-vnd">₫ 0</span>
+        </div>
+        <div class="total-line">
+          <span class="total-label" style="font-weight:500; color:var(--color-text-primary);">Grand total (INR)</span>
+          <span class="total-value big" id="grand-inr">₹ —</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SALES TAB -->
+  <div class="panel" id="tab-sales">
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-dot" style="background: var(--accent);"></div>
+        <span class="section-title"><i class="ti ti-tag" aria-hidden="true" style="font-size:15px; vertical-align:-2px; margin-right:4px;"></i>Sales Items</span>
+      </div>
+      <div id="sales-items"></div>
+      <button class="btn-add" onclick="addItem('sales')"><i class="ti ti-plus" aria-hidden="true"></i> Add item</button>
+    </div>
+
+    <div class="section-card" style="border-color: var(--accent);">
+      <div class="section-header">
+        <div class="section-dot" style="background:var(--accent);"></div>
+        <span class="section-title">Total Sales Amount</span>
+      </div>
+      <div class="totals-block">
+        <div class="total-line">
+          <span class="total-label" style="font-weight:500; color:var(--color-text-primary);">Total (INR)</span>
+          <span class="total-value big" id="sales-total" style="color:#633806;">₹ 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARE BUTTON (always visible) -->
+  <button class="compare-btn" onclick="compare()">
+    <i class="ti ti-calculator" aria-hidden="true"></i> Compare &amp; Calculate Margin
+  </button>
+
+  <!-- RESULT -->
+  <div class="result-box" id="result-box">
+    <div class="section-card" style="border-color: var(--brand);">
+      <div class="section-header" style="justify-content: space-between;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="section-dot"></div>
+          <span class="section-title">Margin Analysis</span>
+        </div>
+        <span class="status-badge" id="status-badge">—</span>
+      </div>
+      <div class="result-grid">
+        <div class="result-card" id="r-cost">
+          <div class="r-label">Total Cost (INR)</div>
+          <div class="r-value" id="r-cost-val">₹0</div>
+        </div>
+        <div class="result-card" id="r-sales">
+          <div class="r-label">Total Sales (INR)</div>
+          <div class="r-value" id="r-sales-val">₹0</div>
+        </div>
+        <div class="result-card" id="r-profit">
+          <div class="r-label">Profit / Loss (INR)</div>
+          <div class="r-value" id="r-profit-val">₹0</div>
+        </div>
+      </div>
+      <div class="result-bar-wrap" style="margin-top: 4px;">
+        <div class="result-bar-label">
+          <span>Cost vs Sales</span>
+          <span id="r-pct-label">—</span>
+        </div>
+        <div class="result-bar-track">
+          <div class="result-bar-fill" id="r-bar" style="width:0%;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--color-text-secondary); margin-top:4px;">
+          <span>Cost</span><span>Sales</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let counters = { tour: 0, hotel: 0, visa: 0, sales: 0 };
+
+function addItem(type) {
+  const id = ++counters[type];
+  const container = document.getElementById(type + '-items');
+  const div = document.createElement('div');
+  div.className = 'row triple';
+  div.id = type + '-row-' + id;
+
+  const namePH = { tour: 'Place / tour name', hotel: 'Hotel name', visa: 'Expense description', sales: 'Tour / package name' };
+  const amtPH = type === 'sales' ? 'Amount (INR)' : 'Amount (VND)';
+
+  div.innerHTML = `
+    <div class="field">
+      <label>${type === 'sales' ? 'Tour / item name' : 'Description'}</label>
+      <input type="text" placeholder="${namePH[type]}" oninput="recalc()" />
+    </div>
+    <div class="field">
+      <label>${amtPH}</label>
+      <input type="number" min="0" placeholder="0" oninput="recalc()" />
+    </div>
+    <button class="btn-remove" onclick="removeItem('${type}', ${id})" aria-label="Remove"><i class="ti ti-trash" aria-hidden="true"></i></button>
+  `;
+  container.appendChild(div);
+  recalc();
+}
+
+function removeItem(type, id) {
+  const el = document.getElementById(type + '-row-' + id);
+  if (el) el.remove();
+  recalc();
+}
+
+function getTotal(type) {
+  const rows = document.querySelectorAll(`#${type}-items .row`);
+  let total = 0;
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input[type="number"]');
+    if (inputs.length) total += parseFloat(inputs[0].value) || 0;
+  });
+  return total;
+}
+
+function fmt(n) {
+  return Math.round(n).toLocaleString('en-IN');
+}
+
+function recalc() {
+  const rate = parseFloat(document.getElementById('exRate').value) || 0;
+
+  const tourVND = getTotal('tour');
+  const hotelVND = getTotal('hotel');
+  const visaVND = getTotal('visa');
+  const grandVND = tourVND + hotelVND + visaVND;
+  const grandINR = rate > 0 ? grandVND / rate : 0;
+
+  document.getElementById('tour-sub').innerHTML = '₫ ' + fmt(tourVND) + '<span class="currency-tag">VND</span>';
+  document.getElementById('hotel-sub').innerHTML = '₫ ' + fmt(hotelVND) + '<span class="currency-tag">VND</span>';
+  document.getElementById('visa-sub').innerHTML = '₫ ' + fmt(visaVND) + '<span class="currency-tag">VND</span>';
+  document.getElementById('grand-vnd').textContent = '₫ ' + fmt(grandVND);
+  document.getElementById('grand-inr').textContent = rate > 0 ? '₹ ' + fmt(grandINR) : '₹ — (set ex rate)';
+
+  const salesINR = getTotal('sales');
+  document.getElementById('sales-total').textContent = '₹ ' + fmt(salesINR);
+}
+
+function compare() {
+  const rate = parseFloat(document.getElementById('exRate').value) || 0;
+  const tourVND = getTotal('tour');
+  const hotelVND = getTotal('hotel');
+  const visaVND = getTotal('visa');
+  const grandVND = tourVND + hotelVND + visaVND;
+  const costINR = rate > 0 ? grandVND / rate : 0;
+  const salesINR = getTotal('sales');
+
+  if (costINR === 0 && salesINR === 0) {
+    alert('Please enter supplier costs and sales amounts before comparing.');
+    return;
+  }
+  if (rate === 0) {
+    alert('Please enter the exchange rate (INR to VND) in the Supplier tab.');
+    return;
+  }
+
+  const profit = salesINR - costINR;
+  const pct = salesINR > 0 ? (profit / salesINR) * 100 : 0;
+  const isProfit = profit >= 0;
+
+  document.getElementById('r-cost-val').textContent = '₹ ' + fmt(costINR);
+  document.getElementById('r-sales-val').textContent = '₹ ' + fmt(salesINR);
+  document.getElementById('r-profit-val').textContent = (isProfit ? '+ ₹ ' : '- ₹ ') + fmt(Math.abs(profit));
+
+  const profitCard = document.getElementById('r-profit');
+  profitCard.className = 'result-card ' + (isProfit ? 'positive' : 'negative');
+
+  const badge = document.getElementById('status-badge');
+  badge.textContent = isProfit ? '✓ Profit' : '✗ Loss';
+  badge.className = 'status-badge ' + (isProfit ? 'profit' : 'loss');
+
+  const barPct = salesINR > 0 ? Math.min((costINR / salesINR) * 100, 100) : 100;
+  const bar = document.getElementById('r-bar');
+  bar.style.width = barPct.toFixed(1) + '%';
+  bar.className = 'result-bar-fill' + (isProfit ? '' : ' neg');
+
+  const sign = isProfit ? '+' : '';
+  document.getElementById('r-pct-label').textContent = 'Profit margin: ' + sign + pct.toFixed(2) + '%';
+
+  const box = document.getElementById('result-box');
+  box.classList.add('show');
+  setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+  recalc();
+}
+
+addItem('tour');
+addItem('hotel');
+addItem('visa');
+addItem('sales');
+</script>
