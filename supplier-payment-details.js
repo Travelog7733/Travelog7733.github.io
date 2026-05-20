@@ -25,7 +25,7 @@ let cloudReady = false;
 let applyingRemoteData = false;
 let cloudSaveTimer = null;
 
-const inr = new Intl.NumberFormat("vi-VN", {
+const vnd = new Intl.NumberFormat("vi-VN", {
   style: "currency",
   currency: "VND",
   maximumFractionDigits: 0,
