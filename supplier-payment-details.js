@@ -27,7 +27,7 @@ let cloudSaveTimer = null;
 
 const inr = new Intl.NumberFormat("en-IN", {
   style: "currency",
-  currency: "INR",
+  currency: "VND",
   maximumFractionDigits: 2,
 });
 
