@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supplier Payment Details | Travelog</title>
+    <link rel="stylesheet" href="supplier-payment-details.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Travelog Holidays</p>
+          <h1>Supplier Payment Details</h1>
+        </div>
+        <div class="summary-strip">
+          <div>
+            <span>Total Purchase</span>
+            <strong id="headerPurchase">INR 0</strong>
+          </div>
+          <div>
+            <span>Total Paid</span>
+            <strong id="headerPaid">INR 0</strong>
+          </div>
+          <div>
+            <span>Balance</span>
+            <strong id="headerBalance">INR 0</strong>
+          </div>
+        </div>
+        <div class="cloud-status" id="cloudStatus">Cloud sync not configured</div>
+      </header>
+
+      <nav class="tabs" aria-label="Supplier payment sections">
+        <button class="tab-button active" type="button" data-tab="suppliers">Supplier List</button>
+        <button class="tab-button" type="button" data-tab="invoices">Purchase Invoices</button>
+        <button class="tab-button" type="button" data-tab="payments">Payments</button>
+        <button class="tab-button" type="button" data-tab="status">Payment Status</button>
+      </nav>
+
+      <section class="panel active" id="suppliersPanel">
+        <div class="panel-title">
+          <div>
+            <h2>Supplier List</h2>
+            <p>Add, edit, or delete suppliers used in invoices and payments.</p>
+          </div>
+        </div>
+
+        <form class="form-grid supplier-form" id="supplierForm">
+          <input type="hidden" id="supplierId" />
+          <label>
+            Supplier code
+            <input id="supplierCode" type="text" placeholder="Manual supplier code" required />
+          </label>
+          <label>
+            Supplier name
+            <input id="supplierName" type="text" placeholder="Supplier name" required />
+          </label>
+          <label>
+            Contact / note
+            <input id="supplierNote" type="text" placeholder="Optional contact or note" />
+          </label>
+          <button class="primary-btn" type="submit" id="supplierSubmit">Save Supplier</button>
+          <button class="ghost-btn" type="button" id="supplierCancel">Cancel Edit</button>
+        </form>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Supplier</th>
+                <th>Contact / Note</th>
+                <th class="action-col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="supplierTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="invoicesPanel">
+        <div class="panel-title">
+          <div>
+            <h2>Purchase Invoice List</h2>
+            <p>Enter invoice date, supplier, particulars, and one or more purchase items.</p>
+          </div>
+        </div>
+
+        <form id="invoiceForm">
+          <input type="hidden" id="invoiceId" />
+          <div class="form-grid three">
+            <label>
+              Supplier
+              <select id="invoiceSupplier" required></select>
+            </label>
+            <label>
+              Invoice no
+              <input id="invoiceNo" type="text" placeholder="Manual invoice no" required />
+            </label>
+            <label>
+              Invoice date
+              <input id="invoiceDate" type="date" required />
+            </label>
+            <label>
+              Particulars
+              <input id="invoiceParticulars" type="text" placeholder="Invoice details" required />
+            </label>
+          </div>
+
+          <div class="line-card">
+            <div class="line-header">
+              <h3>Invoice Items</h3>
+              <button class="small-btn" type="button" id="addInvoiceItem">+ Add item</button>
+            </div>
+            <div class="line-list" id="invoiceItems"></div>
+            <div class="line-total">
+              <span>Invoice total</span>
+              <strong id="invoiceDraftTotal">INR 0</strong>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" type="submit" id="invoiceSubmit">Save Invoice</button>
+            <button class="ghost-btn" type="button" id="invoiceCancel">Cancel Edit</button>
+          </div>
+        </form>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Invoice No</th>
+                <th>Date</th>
+                <th>Supplier</th>
+                <th>Particulars</th>
+                <th class="number-col">Amount</th>
+                <th class="action-col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invoiceTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="paymentsPanel">
+        <div class="panel-title">
+          <div>
+            <h2>Payments</h2>
+            <p>Save payments made to suppliers against purchase invoices.</p>
+          </div>
+        </div>
+
+        <form class="form-grid three" id="paymentForm">
+          <input type="hidden" id="paymentId" />
+          <label>
+            Supplier
+            <select id="paymentSupplier" required></select>
+          </label>
+          <label>
+            Payment date
+            <input id="paymentDate" type="date" required />
+          </label>
+          <label>
+            Against invoice
+            <select id="paymentInvoice"></select>
+          </label>
+          <label>
+            Particulars
+            <input id="paymentParticulars" type="text" placeholder="Payment details" required />
+          </label>
+          <label>
+            Amount
+            <input id="paymentAmount" type="number" min="0" step="0.01" placeholder="0.00" required />
+          </label>
+          <div class="form-actions inline">
+            <button class="primary-btn" type="submit" id="paymentSubmit">Save Payment</button>
+            <button class="ghost-btn" type="button" id="paymentCancel">Cancel Edit</button>
+          </div>
+        </form>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Supplier</th>
+                <th>Against Invoice</th>
+                <th>Particulars</th>
+                <th class="number-col">Amount</th>
+                <th class="action-col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="paymentTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="statusPanel">
+        <div class="panel-title">
+          <div>
+            <h2>Payment Status</h2>
+            <p>Supplier-wise balance after deducting payments from purchase invoices.</p>
+          </div>
+        </div>
+        <div class="status-list" id="statusList"></div>
+      </section>
+    </main>
+
+    <template id="invoiceItemTemplate">
+      <div class="line-row">
+        <input class="item-name" type="text" placeholder="Item particulars" required />
+        <input class="item-qty" type="number" min="0" step="0.01" placeholder="Qty" required />
+        <input class="item-rate" type="number" min="0" step="0.01" placeholder="Rate" required />
+        <input class="item-amount" type="number" min="0" step="0.01" placeholder="Amount" readonly />
+        <button class="remove-line" type="button" aria-label="Remove item">x</button>
+      </div>
+    </template>
+
+    <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore-compat.js"></script>
+    <script src="supplier-payment-details.js?v=20260521"></script>
+  </body>
+</html>
