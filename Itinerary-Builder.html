@@ -1,61 +1,938 @@
 <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travelog — Itinerary Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2137;--navy2:#1a3550;--gold:#c9a84c;--gold2:#e8c97e;
+  --cream:#f8f5f0;--cream2:#ede9e3;--text:#1a1a2e;--text2:#4a5568;--text3:#718096;
+  --white:#fff;--border:#e2d9ce;--success:#2d7a4f;--danger:#c0392b;
+  --r:10px;--r2:6px;--shadow:0 2px 12px rgba(15,33,55,.10);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+.app-header{background:var(--navy);padding:14px 26px;display:flex;align-items:center;border-bottom:2px solid var(--gold);}
+.app-logo{font-family:'Playfair Display',serif;font-size:22px;color:#fff;letter-spacing:1px;}
+.app-logo span{color:var(--gold);}
+.app-tagline{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.tab-bar{display:flex;background:var(--navy2);padding:0 26px;gap:2px;overflow-x:auto;}
+.tab-btn{padding:11px 18px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,.5);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.4px;white-space:nowrap;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-btn:hover:not(.active){color:rgba(255,255,255,.8);}
+.tab-content{display:none;padding:18px 24px;max-width:1080px;margin:0 auto;}
+.tab-content.active{display:block;}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:13px;box-shadow:var(--shadow);}
+.sh{display:flex;align-items:center;gap:9px;margin-bottom:13px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.si{width:30px;height:30px;border-radius:6px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:14px;flex-shrink:0;}
+.st{font-family:'Playfair Display',serif;font-size:14px;color:var(--navy);}
+.ss{font-size:10px;color:var(--text3);margin-top:1px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fl{font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;}
+.fi{height:34px;border:1px solid var(--border);border-radius:var(--r2);padding:0 9px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white);outline:none;transition:border .2s;width:100%;}
+.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.10);}
+.fi[readonly]{background:var(--cream);color:var(--text2);}
+.fs{height:34px;border:1px solid var(--border);border-radius:var(--r2);padding:0 9px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white);outline:none;cursor:pointer;width:100%;}
+.fs:focus{border-color:var(--gold);}
+.fta{border:1px solid var(--border);border-radius:var(--r2);padding:7px 9px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white);outline:none;resize:vertical;min-height:60px;width:100%;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.fw{grid-column:1/-1;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--r2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;}
+.bp{background:var(--navy);color:#fff;}
+.bp:hover{background:var(--navy2);}
+.bg{background:var(--gold);color:var(--navy);}
+.bg:hover{background:var(--gold2);}
+.bo{background:transparent;color:var(--navy);border-color:var(--border);}
+.bo:hover{border-color:var(--gold);color:var(--gold);}
+.bd{background:transparent;color:var(--danger);border-color:rgba(192,57,43,.3);}
+.bd:hover{background:var(--danger);color:#fff;}
+.bsm{padding:4px 8px;font-size:11px;}
+.bic{width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dr{display:flex;gap:6px;align-items:flex-end;}
+.dr .fs{flex:1;}
+.pt{width:100%;border-collapse:collapse;}
+.pt th{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);font-weight:500;padding:8px 10px;border-bottom:2px solid var(--border);text-align:left;}
+.pt td{padding:8px 10px;border-bottom:1px solid var(--cream2);vertical-align:middle;}
+.pt tr:last-child td{border-bottom:none;}
+.pi{height:30px;border:1px solid var(--border);border-radius:var(--r2);padding:0 8px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:100%;}
+.pi:focus{border-color:var(--gold);}
+.pi[readonly]{background:var(--cream);color:var(--text2);}
+.stot{font-size:13px;font-weight:500;color:var(--navy);}
+.gtr{background:var(--navy);border-radius:var(--r2);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.gtl{font-family:'Playfair Display',serif;font-size:13px;color:#fff;}
+.gtv{font-size:19px;font-weight:600;color:var(--gold);}
+.arb{display:flex;align-items:center;gap:5px;padding:6px 10px;border:1px dashed var(--border);border-radius:var(--r2);background:transparent;cursor:pointer;font-size:11px;color:var(--text3);width:100%;margin-top:7px;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.arb:hover{border-color:var(--gold);color:var(--gold);}
+.acr{display:grid;grid-template-columns:1fr 1fr 1fr 30px;gap:7px;align-items:center;margin-bottom:7px;}
+.ach{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:500;}
+.il{display:flex;flex-direction:column;gap:5px;margin-bottom:7px;}
+.ir{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--border);border-radius:var(--r2);background:var(--cream);}
+.ib{padding:2px 7px;border-radius:20px;font-size:10px;font-weight:500;white-space:nowrap;}
+.bii{background:#e6f4ed;color:var(--success);}
+.bie{background:#fde8e8;color:var(--danger);}
+.it{font-size:12px;color:var(--text);flex:1;}
+.dc{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:9px;}
+.dh{background:var(--navy);padding:8px 13px;display:flex;align-items:center;justify-content:space-between;}
+.dl{font-family:'Playfair Display',serif;font-size:13px;color:var(--gold);}
+.db{padding:11px 13px;background:var(--white);}
+.mt{padding:3px 9px;border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;background:var(--cream);color:var(--text2);transition:all .15s;user-select:none;}
+.mt.on{background:var(--navy);color:var(--gold);border-color:var(--navy);}
+.cp{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;background:#e6f4ed;color:var(--success);font-size:10px;font-weight:500;margin-top:3px;}
+.mo{position:fixed;inset:0;background:rgba(15,33,55,.55);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.mb{background:var(--white);border-radius:var(--r);padding:20px;width:460px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;}
+.mt2{font-family:'Playfair Display',serif;font-size:15px;margin-bottom:13px;color:var(--navy);}
+.ma{display:flex;gap:7px;justify-content:flex-end;margin-top:14px;}
+.ta{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.es{text-align:center;padding:28px 20px;color:var(--text3);font-size:12px;}
+.div{height:1px;background:var(--border);margin:12px 0;}
+.bp2{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:500;}
+.bpn{background:var(--navy);color:var(--gold);}
+.al{padding:8px 12px;border-radius:var(--r2);font-size:12px;margin-bottom:11px;display:flex;align-items:center;gap:6px;}
+.als{background:#e6f4ed;color:var(--success);border:1px solid #b7dfcb;}
+.lt{width:100%;border-collapse:collapse;}
+.lt th{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:500;padding:8px 10px;border-bottom:2px solid var(--border);text-align:left;}
+.lt td{padding:8px 10px;border-bottom:1px solid var(--cream2);font-size:12px;vertical-align:middle;}
+.lt tr:hover td{background:var(--cream);}
+.lt tr:last-child td{border-bottom:none;}
+.ltag{display:inline-flex;padding:1px 6px;border-radius:20px;font-size:10px;background:var(--cream2);color:var(--text2);margin:1px;}
+.cc{font-weight:500;color:var(--success);font-size:12px;}
+.sub-label{font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:5px;margin-bottom:4px;}
+.csrow{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 30px;gap:7px;align-items:center;margin-bottom:7px;}
+.cshdr{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 30px;gap:7px;margin-bottom:3px;}
+.price-breakdown{background:var(--cream);border-radius:var(--r2);padding:10px 12px;margin-top:8px;}
+.pb-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.pb-row:last-child{border-bottom:none;}
+.pb-label{color:var(--text2);}
+.pb-val{font-weight:500;color:var(--navy);}
+
+/* Destination group headers in libraries */
+.dest-group{margin-bottom:18px;}
+.dest-group-header{background:linear-gradient(90deg,var(--navy),var(--navy2));color:var(--gold);font-family:'Playfair Display',serif;font-size:13px;padding:8px 14px;border-radius:var(--r2);margin-bottom:0;display:flex;align-items:center;gap:7px;}
+.dest-group-table{width:100%;border-collapse:collapse;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r2) var(--r2);overflow:hidden;}
+.dest-group-table th{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:500;padding:7px 10px;border-bottom:1px solid var(--border);text-align:left;background:var(--cream);}
+.dest-group-table td{padding:8px 10px;border-bottom:1px solid var(--cream2);font-size:12px;vertical-align:middle;}
+.dest-group-table tr:last-child td{border-bottom:none;}
+.dest-group-table tr:hover td{background:#fdfaf6;}
+
+/* Bottom action bar */
+.bottom-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+.bottom-bar-right{display:flex;gap:7px;flex-wrap:wrap;}
+
+/* Hotel/visa prefill pill */
+.prefill-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r2);background:var(--cream);margin-bottom:6px;}
+.prefill-name{font-size:12px;font-weight:500;color:var(--navy);}
+.prefill-dest{font-size:10px;color:var(--text3);}
+.prefill-cost{font-size:12px;font-weight:500;color:var(--success);}
+
+/* PDF template styles (hidden, used for PDF generation) */
+#pdf-template{display:none;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div>
+    <div class="app-logo">Trave<span>log</span></div>
+    <div class="app-tagline">Itinerary Management System</div>
+  </div>
 </div>
 
-<div class="container">
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="sw('create')"><i class="ti ti-file-plus"></i> Create Itinerary</button>
+  <button class="tab-btn" onclick="sw('tours')"><i class="ti ti-map"></i> Tour Library</button>
+  <button class="tab-btn" onclick="sw('hotels')"><i class="ti ti-building"></i> Hotel Library</button>
+  <button class="tab-btn" onclick="sw('visa')"><i class="ti ti-passport"></i> Visa Library</button>
+</div>
 
-  <div class="tab-content active" id="itinerary">
+<!-- ========== TAB 1: CREATE ITINERARY ========== -->
+<div class="tab-content active" id="tab-create">
 
-    <div class="card">
-      <div class="section-head">
-        <div class="section-icon"><i class="ti ti-file-description"></i></div>
-        <div class="section-title">Itinerary Details</div>
-      </div>
+  <!-- S1 Details -->
+  <div class="sc">
+    <div class="sh"><div class="si"><i class="ti ti-id-badge"></i></div><div><div class="st">Itinerary Details</div><div class="ss">Basic info & assignment</div></div></div>
+    <div class="g2">
+      <div class="fg"><label class="fl">Itinerary Number</label><input class="fi" id="itin-num" placeholder="e.g. TRV-2026-001"></div>
+      <div class="fg"><label class="fl">Date</label><input class="fi" id="itin-date" readonly></div>
+      <div class="fg"><label class="fl">Expiry Date <span style="font-size:9px;color:var(--text3)">(Auto +7 days)</span></label><input class="fi" id="itin-expiry" readonly></div>
+      <div class="fg"><label class="fl">Customer Name</label><div class="dr"><select class="fs" id="cust-sel"><option value="">— Select —</option></select><button class="btn bo bsm" onclick="om('customer')"><i class="ti ti-plus"></i> New</button></div></div>
+      <div class="fg"><label class="fl">Sales Person</label><div class="dr"><select class="fs" id="sp-sel"><option value="">— Select —</option></select><button class="btn bo bsm" onclick="om('salesperson')"><i class="ti ti-plus"></i> New</button></div></div>
+    </div>
+  </div>
 
-      <div class="grid-4">
-        <div class="field">
-          <label>Itinerary Number</label>
-          <input id="itinNo" type="text">
-        </div>
+  <!-- S2 Hotels & Cruises -->
+  <div class="sc">
+    <div class="sh"><div class="si"><i class="ti ti-building"></i></div><div><div class="st">Accommodation & Cruise</div></div></div>
+    <div class="sub-label"><i class="ti ti-bed" style="color:var(--gold)"></i> Hotels</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 30px;gap:7px;margin-bottom:3px;"><span class="ach">Hotel Name</span><span class="ach">Destination</span><span class="ach">Category</span><span></span></div>
+    <div id="hotels-list"></div>
+    <button class="arb" onclick="addHotel()"><i class="ti ti-plus"></i> Add Hotel</button>
+    <div class="div"></div>
+    <div class="sub-label"><i class="ti ti-ship" style="color:var(--gold)"></i> Cruises</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 30px;gap:7px;margin-bottom:3px;"><span class="ach">Cruise / Ship Name</span><span class="ach">Destination</span><span class="ach">Category</span><span></span></div>
+    <div id="cruises-list"></div>
+    <button class="arb" onclick="addCruise()"><i class="ti ti-plus"></i> Add Cruise</button>
+  </div>
 
-        <div class="field">
-          <label>Date</label>
-          <input id="todayDate" readonly>
-        </div>
+  <!-- S3 Price Quote -->
+  <div class="sc">
+    <div class="sh"><div class="si"><i class="ti ti-receipt-rupee"></i></div><div><div class="st">Price Quote</div><div class="ss">Auto from tours · Hotel & Visa costs reflected in Grand Total</div></div></div>
+    <table class="pt">
+      <thead><tr><th style="width:120px">Passenger</th><th>Rate (INR)</th><th>Count</th><th>Total (INR)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="bp2 bpn"><i class="ti ti-user"></i> Adult</span></td>
+          <td><input class="pi" id="rate-adult" readonly placeholder="Auto from tours"></td>
+          <td><input class="pi" type="number" id="pax-adult" placeholder="0" oninput="calc()" min="0"></td>
+          <td class="stot" id="tot-adult">₹0</td>
+        </tr>
+        <tr>
+          <td><span class="bp2" style="background:var(--cream2);color:var(--text2)"><i class="ti ti-user-minus"></i> Child</span></td>
+          <td><div style="display:flex;gap:5px;align-items:center"><input class="pi" id="child-pct" type="number" placeholder="% of adult" min="0" max="100" oninput="calc()" style="width:85px"><span style="font-size:10px;color:var(--text3)">%</span><input class="pi" id="rate-child" readonly placeholder="Auto" style="flex:1"></div></td>
+          <td><input class="pi" type="number" id="pax-child" placeholder="0" oninput="calc()" min="0"></td>
+          <td class="stot" id="tot-child">₹0</td>
+        </tr>
+        <tr>
+          <td><span class="bp2" style="background:#fef9ec;color:#a07a10"><i class="ti ti-baby-carriage"></i> Infant</span></td>
+          <td><span style="font-size:11px;color:var(--success);font-weight:500">Free of cost</span></td>
+          <td><input class="pi" type="number" id="pax-infant" placeholder="0" min="0"></td>
+          <td class="stot">₹0</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="price-breakdown" id="price-breakdown" style="display:none">
+      <div style="font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Cost Breakdown</div>
+      <div id="breakdown-rows"></div>
+    </div>
+    <div class="gtr"><div class="gtl">Grand Total</div><div class="gtv" id="grand-total">₹0</div></div>
+  </div>
 
-        <div class="field">
-          <label>Expiry Date</label>
-          <input id="expiryDate" readonly>
-        </div>
+  <!-- S4 Hotel & Visa Costs -->
+  <div class="sc">
+    <div class="sh"><div class="si"><i class="ti ti-hotel-service"></i></div><div><div class="st">Hotel & Visa Costs</div><div class="ss">Pre-fill from library or enter manually — reflected in grand total</div></div></div>
 
-        <div></div>
-
-        <div class="field">
-          <label>Customer Name</label>
-          <div class="input-wrap">
-            <select id="customerSelect"></select>
-            <button class="btn btn-outline" onclick="openSimpleModal('customer')">New</button>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Sales Person</label>
-          <div class="input-wrap">
-            <select id="salesSelect"></select>
-            <button class="btn btn-outline" onclick="openSimpleModal('sales')">New</button>
-          </div>
-        </div>
-      </div>
+    <div class="sub-label" style="margin-bottom:6px"><i class="ti ti-moon" style="color:var(--gold)"></i> Hotel Costs</div>
+    <div class="cshdr"><span class="ach">Hotel Name</span><span class="ach">Destination</span><span class="ach">Rate/Night (INR)</span><span class="ach">Nights</span><span></span></div>
+    <div id="hcost-list"></div>
+    <div style="display:flex;gap:7px;margin-top:7px;flex-wrap:wrap;">
+      <button class="arb" style="flex:1;min-width:160px" onclick="addHotelCost()"><i class="ti ti-plus"></i> Add Manual</button>
+      <button class="arb" style="flex:1;min-width:160px" onclick="om('prefill-hotel')"><i class="ti ti-database"></i> Pre-fill from Library</button>
     </div>
 
-    <div class="card">
-      <div class="section-head">
-        <div class="section-icon"><i class="ti ti-building-skyscraper"></i></div>
-        <div class="section-title">Accommodation & Cruise</div>
-      </div>
+    <div class="div"></div>
 
-      <div class="grid-2">
-        <div>
-          <div class="table-head">
-            <div>Hotel Name</div>
-            <div>Destination</div>
-   
+    <div class="sub-label" style="margin-bottom:6px"><i class="ti ti-passport" style="color:var(--gold)"></i> Visa Costs</div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 30px;gap:7px;margin-bottom:3px;"><span class="ach">Visa Type / Country</span><span class="ach">Cost/Person (INR)</span><span class="ach">Persons</span><span></span></div>
+    <div id="vcost-list"></div>
+    <div style="display:flex;gap:7px;margin-top:7px;flex-wrap:wrap;">
+      <button class="arb" style="flex:1;min-width:160px" onclick="addVisaCost()"><i class="ti ti-plus"></i> Add Manual</button>
+      <button class="arb" style="flex:1;min-width:160px" onclick="om('prefill-visa')"><i class="ti ti-database"></i> Pre-fill from Library</button>
+    </div>
+  </div>
+
+  <!-- S5 Inc/Exc -->
+  <div class="sc">
+    <div class="sh"><div class="si"><i class="ti ti-list-check"></i></div><div><div class="st">Inclusions & Exclusions</div></div></div>
+    <div style="display:flex;gap:7px;align-items:flex-end;margin-bottom:9px;flex-wrap:wrap">
+      <div class="fg" style="flex:1;min-width:150px"><label class="fl">Item</label><select class="fs" id="ie-sel"><option value="">— Choose item —</option></select></div>
+      <div class="fg" style="width:125px"><label class="fl">Type</label><select class="fs" id="ie-type"><option value="inclusion">✓ Inclusion</option><option value="exclusion">✗ Exclusion</option></select></div>
+      <button class="btn bp" onclick="addIE()"><i class="ti ti-plus"></i> Add</button>
+      <button class="btn bo" onclick="om('incexc')"><i class="ti ti-settings"></i> Manage</button>
+    </div>
+    <div class="il" id="ie-list"></div>
+    <div id="ie-empty" style="display:none;font-size:11px;color:var(--text3);text-align:center;padding:8px">No items added yet.</div>
+  </div>
+
+  <!-- S6 Day-wise -->
+  <div class="sc">
+    <div class="sh"><div class="si"><i class="ti ti-calendar-event"></i></div><div><div class="st">Day-wise Itinerary</div><div class="ss">Tours from library · Meals & transfers auto-fill on selection</div></div></div>
+    <div class="ta">
+      <span style="font-size:11px;color:var(--text3)">Select a tour — cost, meals & transfer auto-populate</span>
+      <button class="btn bp bsm" onclick="addDay()"><i class="ti ti-plus"></i> Add Day</button>
+    </div>
+    <div id="days-list"></div>
+    <div id="days-empty" class="es"><i class="ti ti-calendar-plus" style="font-size:24px;display:block;margin-bottom:6px"></i>Click "Add Day" to start building</div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <button class="btn bd" onclick="clearAll()" style="gap:5px"><i class="ti ti-trash"></i> Clear All</button>
+    <div class="bottom-bar-right">
+      <button class="btn bo" onclick="resetForm()"><i class="ti ti-refresh"></i> Reset Form</button>
+      <button class="btn bp" onclick="exportPDF()"><i class="ti ti-file-type-pdf"></i> Export PDF</button>
+      <button class="btn bg" onclick="saveItin()"><i class="ti ti-device-floppy"></i> Save Itinerary</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== TAB 2: TOUR LIBRARY ========== -->
+<div class="tab-content" id="tab-tours">
+  <div class="ta">
+    <div><h2 style="font-family:'Playfair Display',serif;font-size:18px;color:var(--navy)">Tour Library</h2><div style="font-size:11px;color:var(--text3);margin-top:1px">Grouped by destination · Synced to itinerary planner</div></div>
+    <button class="btn bg" onclick="om('newtour')"><i class="ti ti-plus"></i> Add Tour</button>
+  </div>
+  <div id="tour-lib-alert" style="display:none" class="al als"><i class="ti ti-check"></i><span id="tour-lib-msg">Saved!</span></div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;">
+    <input class="fi" type="text" id="tour-search" placeholder="Search tours…" oninput="renderTourLib()" style="max-width:220px">
+  </div>
+  <div id="tour-lib-content"></div>
+  <div id="tour-lib-empty" class="es" style="display:none"><i class="ti ti-map-off" style="font-size:24px;display:block;margin-bottom:6px"></i>No tours yet. Click "Add Tour".</div>
+</div>
+
+<!-- ========== TAB 3: HOTEL LIBRARY ========== -->
+<div class="tab-content" id="tab-hotels">
+  <div class="ta">
+    <div><h2 style="font-family:'Playfair Display',serif;font-size:18px;color:var(--navy)">Hotel Library</h2><div style="font-size:11px;color:var(--text3);margin-top:1px">Grouped by destination · Pre-fill rates in itinerary</div></div>
+    <button class="btn bg" onclick="om('newhotel')"><i class="ti ti-plus"></i> Add Hotel</button>
+  </div>
+  <div id="hotel-lib-alert" style="display:none" class="al als"><i class="ti ti-check"></i><span id="hotel-lib-msg">Saved!</span></div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;">
+    <input class="fi" type="text" id="hotel-search" placeholder="Search hotels…" oninput="renderHotelLib()" style="max-width:220px">
+  </div>
+  <div id="hotel-lib-content"></div>
+  <div id="hotel-lib-empty" class="es" style="display:none"><i class="ti ti-building-off" style="font-size:24px;display:block;margin-bottom:6px"></i>No hotels yet. Click "Add Hotel".</div>
+</div>
+
+<!-- ========== TAB 4: VISA LIBRARY ========== -->
+<div class="tab-content" id="tab-visa">
+  <div class="ta">
+    <div><h2 style="font-family:'Playfair Display',serif;font-size:18px;color:var(--navy)">Visa Library</h2><div style="font-size:11px;color:var(--text3);margin-top:1px">Grouped by country · Pre-fill costs in itinerary</div></div>
+    <button class="btn bg" onclick="om('newvisa')"><i class="ti ti-plus"></i> Add Visa</button>
+  </div>
+  <div id="visa-lib-alert" style="display:none" class="al als"><i class="ti ti-check"></i><span id="visa-lib-msg">Saved!</span></div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;">
+    <input class="fi" type="text" id="visa-search" placeholder="Search visas…" oninput="renderVisaLib()" style="max-width:220px">
+  </div>
+  <div id="visa-lib-content"></div>
+  <div id="visa-lib-empty" class="es" style="display:none"><i class="ti ti-passport-off" style="font-size:24px;display:block;margin-bottom:6px"></i>No visas yet. Click "Add Visa".</div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="mo" style="display:none" onclick="cmo(event)">
+  <div class="mb" onclick="event.stopPropagation()">
+    <div class="mt2" id="modal-title">Add</div>
+    <div id="modal-body"></div>
+    <div class="ma" id="modal-actions">
+      <button class="btn bo" onclick="closeModal()">Cancel</button>
+      <button class="btn bp" id="msave" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF TEMPLATE (hidden) -->
+<div id="pdf-template"></div>
+
+<script>
+const SK='travelog_v6';
+let S={
+  customers:[],salesPersons:[],incExcItems:[],
+  tourLib:[],hotelLib:[],visaLib:[],
+  hotels:[],cruises:[],days:[],incExcSel:[],hotelCosts:[],visaCosts:[]
+};
+let mtype='',editId=null;
+
+function sv(){try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}}
+function ld(){try{const d=localStorage.getItem(SK);if(d){const p=JSON.parse(d);Object.keys(p).forEach(k=>{if(k in S)S[k]=p[k];});}}catch(e){}}
+
+const INR=n=>'₹'+(Math.round(n||0)).toLocaleString('en-IN');
+function tod(off=0){const d=new Date();d.setDate(d.getDate()+off);return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+
+function sw(t){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  const m={create:0,tours:1,hotels:2,visa:3};
+  document.querySelectorAll('.tab-btn')[m[t]].classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='tours')renderTourLib();
+  if(t==='hotels')renderHotelLib();
+  if(t==='visa')renderVisaLib();
+}
+
+function pop(id,arr,ph){const el=document.getElementById(id);if(!el)return;const v=el.value;el.innerHTML=`<option value="">${ph}</option>`;arr.forEach(x=>{el.innerHTML+=`<option value="${x}">${x}</option>`;});el.value=v;}
+function rafresh(){
+  pop('cust-sel',S.customers,'— Select —');
+  pop('sp-sel',S.salesPersons,'— Select —');
+  pop('ie-sel',S.incExcItems,'— Choose item —');
+}
+
+// ---- PRICE CALC ----
+function getTourCostSum(){let t=0;S.days.forEach(d=>{if(d.tour){const r=S.tourLib.find(x=>x.name===d.tour);if(r&&r.cost)t+=parseFloat(r.cost)||0;}});return t;}
+function getHotelCostSum(){let t=0;S.hotelCosts.forEach(h=>{t+=(parseFloat(h.rate)||0)*(parseInt(h.nights)||0);});return t;}
+function getVisaCostSum(){let t=0;S.visaCosts.forEach(v=>{t+=(parseFloat(v.cost)||0)*(parseInt(v.persons)||0);});return t;}
+
+function calc(){
+  const tourRate=getTourCostSum();
+  document.getElementById('rate-adult').value=tourRate>0?tourRate:'';
+  const cp=parseFloat(document.getElementById('child-pct').value)||0;
+  const rc=Math.round(tourRate*cp/100);
+  document.getElementById('rate-child').value=rc>0?rc:'';
+  const pa=parseInt(document.getElementById('pax-adult').value)||0;
+  const pc=parseInt(document.getElementById('pax-child').value)||0;
+  const ta=tourRate*pa,tc=rc*pc;
+  document.getElementById('tot-adult').textContent=INR(ta);
+  document.getElementById('tot-child').textContent=INR(tc);
+  const ht=getHotelCostSum(),vt=getVisaCostSum();
+  const grand=ta+tc+ht+vt;
+  document.getElementById('grand-total').textContent=INR(grand);
+  const bd=document.getElementById('price-breakdown'),br=document.getElementById('breakdown-rows');
+  const rows=[];
+  if(ta>0)rows.push({l:`Adult (${pa} pax × ${INR(tourRate)})`,v:INR(ta)});
+  if(tc>0)rows.push({l:`Child (${pc} pax × ${INR(rc)})`,v:INR(tc)});
+  if(ht>0)rows.push({l:'Hotel costs',v:INR(ht)});
+  if(vt>0)rows.push({l:'Visa costs',v:INR(vt)});
+  if(rows.length){bd.style.display='block';br.innerHTML=rows.map(r=>`<div class="pb-row"><span class="pb-label">${r.l}</span><span class="pb-val">${r.v}</span></div>`).join('');}
+  else bd.style.display='none';
+}
+
+// ---- HOTELS (itinerary) ----
+const CAT=`<option value="">Category</option><option>3 Star</option><option>4 Star</option><option>5 Star</option><option>Budget</option><option>Luxury</option>`;
+function addHotel(){S.hotels.push({name:'',dest:'',cat:''});renderHotels();}
+function removeHotel(i){S.hotels.splice(i,1);renderHotels();sv();}
+function renderHotels(){
+  document.getElementById('hotels-list').innerHTML=S.hotels.map((h,i)=>`
+    <div class="acr">
+      <input class="fi" placeholder="Hotel name" value="${esc(h.name)}" oninput="S.hotels[${i}].name=this.value;sv()">
+      <input class="fi" placeholder="Destination" value="${esc(h.dest)}" oninput="S.hotels[${i}].dest=this.value;sv()">
+      <select class="fs" onchange="S.hotels[${i}].cat=this.value;sv()">${CAT}</select>
+      <button class="btn bd bic" onclick="removeHotel(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+  S.hotels.forEach((h,i)=>{const s=document.querySelectorAll('#hotels-list .acr')[i]?.querySelector('select');if(s)s.value=h.cat||'';});
+}
+function addCruise(){S.cruises.push({name:'',dest:'',cat:''});renderCruises();}
+function removeCruise(i){S.cruises.splice(i,1);renderCruises();sv();}
+function renderCruises(){
+  document.getElementById('cruises-list').innerHTML=S.cruises.map((c,i)=>`
+    <div class="acr">
+      <input class="fi" placeholder="Cruise/ship name" value="${esc(c.name)}" oninput="S.cruises[${i}].name=this.value;sv()">
+      <input class="fi" placeholder="Destination" value="${esc(c.dest)}" oninput="S.cruises[${i}].dest=this.value;sv()">
+      <select class="fs" onchange="S.cruises[${i}].cat=this.value;sv()">${CAT}</select>
+      <button class="btn bd bic" onclick="removeCruise(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+  S.cruises.forEach((c,i)=>{const s=document.querySelectorAll('#cruises-list .acr')[i]?.querySelector('select');if(s)s.value=c.cat||'';});
+}
+
+// ---- HOTEL/VISA COSTS ----
+function addHotelCost(h={}){S.hotelCosts.push({name:h.name||'',dest:h.dest||'',rate:h.rate||'',nights:''});renderHotelCosts();calc();}
+function removeHotelCost(i){S.hotelCosts.splice(i,1);renderHotelCosts();calc();sv();}
+function renderHotelCosts(){
+  document.getElementById('hcost-list').innerHTML=S.hotelCosts.map((h,i)=>`
+    <div class="csrow">
+      <input class="fi" placeholder="Hotel name" value="${esc(h.name)}" oninput="S.hotelCosts[${i}].name=this.value;sv()">
+      <input class="fi" placeholder="Destination" value="${esc(h.dest)}" oninput="S.hotelCosts[${i}].dest=this.value;sv()">
+      <input class="fi" type="number" placeholder="Rate/night" value="${h.rate||''}" oninput="S.hotelCosts[${i}].rate=this.value;calc();sv()" min="0">
+      <input class="fi" type="number" placeholder="Nights" value="${h.nights||''}" oninput="S.hotelCosts[${i}].nights=this.value;calc();sv()" min="1">
+      <button class="btn bd bic" onclick="removeHotelCost(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+function addVisaCost(v={}){S.visaCosts.push({type:v.type||'',cost:v.cost||'',persons:''});renderVisaCosts();calc();}
+function removeVisaCost(i){S.visaCosts.splice(i,1);renderVisaCosts();calc();sv();}
+function renderVisaCosts(){
+  document.getElementById('vcost-list').innerHTML=S.visaCosts.map((v,i)=>`
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 30px;gap:7px;align-items:center;margin-bottom:7px">
+      <input class="fi" placeholder="Visa type/country" value="${esc(v.type)}" oninput="S.visaCosts[${i}].type=this.value;sv()">
+      <input class="fi" type="number" placeholder="Cost/person" value="${v.cost||''}" oninput="S.visaCosts[${i}].cost=this.value;calc();sv()" min="0">
+      <input class="fi" type="number" placeholder="Persons" value="${v.persons||''}" oninput="S.visaCosts[${i}].persons=this.value;calc();sv()" min="1">
+      <button class="btn bd bic" onclick="removeVisaCost(${i})"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+
+// ---- INC/EXC ----
+function addIE(){const s=document.getElementById('ie-sel').value,t=document.getElementById('ie-type').value;if(!s)return;S.incExcSel.push({text:s,type:t});renderIE();sv();}
+function removeIE(i){S.incExcSel.splice(i,1);renderIE();sv();}
+function renderIE(){
+  const el=document.getElementById('ie-list'),em=document.getElementById('ie-empty');
+  if(!S.incExcSel.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  el.innerHTML=S.incExcSel.map((x,i)=>`
+    <div class="ir">
+      <span class="ib ${x.type==='inclusion'?'bii':'bie'}">${x.type==='inclusion'?'✓ Included':'✗ Excluded'}</span>
+      <span class="it">${esc(x.text)}</span>
+      <button class="btn bd bic bsm" onclick="removeIE(${i})"><i class="ti ti-trash"></i></button>
+    </div>`).join('');
+}
+
+// ---- DAYS ----
+function getTOpts(sel){
+  const groups={};
+  S.tourLib.forEach(t=>{const d=t.dest||'Other';if(!groups[d])groups[d]=[];groups[d].push(t);});
+  let o=`<option value="">— Select tour —</option>`;
+  Object.keys(groups).sort().forEach(dest=>{
+    o+=`<optgroup label="${dest}">`;
+    groups[dest].forEach(t=>{o+=`<option value="${t.name}"${t.name===sel?' selected':''}>${t.name}</option>`;});
+    o+=`</optgroup>`;
+  });
+  return o;
+}
+function getTour(name){return S.tourLib.find(x=>x.name===name);}
+function onTourPick(i,val){
+  S.days[i].tour=val;
+  const t=getTour(val);
+  if(t){S.days[i].meals={breakfast:!!(t.meals&&t.meals.breakfast),lunch:!!(t.meals&&t.meals.lunch),dinner:!!(t.meals&&t.meals.dinner)};S.days[i].transfer=t.transfer||'';}
+  renderDays();calc();sv();
+}
+function toggleMeal(i,m){S.days[i].meals[m]=!S.days[i].meals[m];renderDays();sv();}
+function addDay(){S.days.push({tour:'',meals:{breakfast:false,lunch:false,dinner:false},transfer:'',notes:''});renderDays();}
+function removeDay(i){S.days.splice(i,1);renderDays();calc();sv();}
+function renderDays(){
+  const el=document.getElementById('days-list'),em=document.getElementById('days-empty');
+  if(!S.days.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  el.innerHTML=S.days.map((d,i)=>{
+    const t=getTour(d.tour);
+    const cpHtml=t&&t.cost?`<div class="cp"><i class="ti ti-currency-rupee"></i>${INR(t.cost)} / tour</div>`:'';
+    return `<div class="dc">
+      <div class="dh"><span class="dl"><i class="ti ti-calendar"></i> Day ${i+1}</span><button class="btn bd bsm" onclick="removeDay(${i})"><i class="ti ti-trash"></i> Remove</button></div>
+      <div class="db">
+        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:9px;margin-bottom:9px">
+          <div class="fg"><label class="fl">Tour / Activity</label><select class="fs" onchange="onTourPick(${i},this.value)">${getTOpts(d.tour)}</select>${cpHtml}</div>
+          <div class="fg"><label class="fl">Transfer</label><input class="fi" placeholder="e.g. Airport pickup" value="${esc(d.transfer)}" oninput="S.days[${i}].transfer=this.value;sv()"></div>
+          <div class="fg"><label class="fl">Notes</label><input class="fi" placeholder="Optional notes" value="${esc(d.notes)}" oninput="S.days[${i}].notes=this.value;sv()"></div>
+        </div>
+        <div><div class="fl" style="margin-bottom:5px">Meals Included</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <div class="mt ${d.meals.breakfast?'on':''}" onclick="toggleMeal(${i},'breakfast')"><i class="ti ti-coffee"></i> Breakfast</div>
+          <div class="mt ${d.meals.lunch?'on':''}" onclick="toggleMeal(${i},'lunch')"><i class="ti ti-salad"></i> Lunch</div>
+          <div class="mt ${d.meals.dinner?'on':''}" onclick="toggleMeal(${i},'dinner')"><i class="ti ti-moon"></i> Dinner</div>
+        </div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- TOUR LIBRARY ----
+function renderTourLib(){
+  const q=(document.getElementById('tour-search').value||'').toLowerCase();
+  const el=document.getElementById('tour-lib-content'),em=document.getElementById('tour-lib-empty');
+  const tours=S.tourLib.filter(t=>!q||(t.name||'').toLowerCase().includes(q)||(t.dest||'').toLowerCase().includes(q));
+  if(!tours.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  const groups={};
+  tours.forEach(t=>{const d=t.dest||'Other';if(!groups[d])groups[d]=[];groups[d].push(t);});
+  const mStr=m=>{if(!m)return'—';const r=[];if(m.breakfast)r.push('B');if(m.lunch)r.push('L');if(m.dinner)r.push('D');return r.length?r.join(', '):'—';};
+  el.innerHTML=Object.keys(groups).sort().map(dest=>`
+    <div class="dest-group">
+      <div class="dest-group-header"><i class="ti ti-map-pin"></i>${dest}</div>
+      <table class="dest-group-table">
+        <thead><tr><th>Tour Name</th><th>Duration</th><th>Cost (INR)</th><th>Meals</th><th>Transfer</th><th>Tags</th><th style="width:60px">Actions</th></tr></thead>
+        <tbody>${groups[dest].map(t=>`<tr>
+          <td style="font-weight:500;color:var(--navy)">${esc(t.name)}</td>
+          <td>${t.days||'—'} days</td>
+          <td class="cc">${t.cost?INR(t.cost):'—'}</td>
+          <td>${mStr(t.meals)}</td>
+          <td style="font-size:11px;color:var(--text2)">${esc(t.transfer)||'—'}</td>
+          <td>${(t.tags||[]).map(g=>`<span class="ltag">${esc(g)}</span>`).join('')}</td>
+          <td><div style="display:flex;gap:4px">
+            <button class="btn bo bsm bic" onclick="editTour(${t.id})"><i class="ti ti-pencil"></i></button>
+            <button class="btn bd bsm bic" onclick="delTour(${t.id})"><i class="ti ti-trash"></i></button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`).join('');
+}
+function delTour(id){if(!confirm('Delete this tour?'))return;S.tourLib=S.tourLib.filter(t=>t.id!==id);sv();renderTourLib();renderDays();calc();}
+function editTour(id){const t=S.tourLib.find(x=>x.id===id);if(t)om('newtour',t);}
+function libAlertShow(alertId,msgId,msg){const a=document.getElementById(alertId);document.getElementById(msgId).textContent=msg;a.style.display='flex';setTimeout(()=>a.style.display='none',2500);}
+
+// ---- HOTEL LIBRARY ----
+function renderHotelLib(){
+  const q=(document.getElementById('hotel-search').value||'').toLowerCase();
+  const el=document.getElementById('hotel-lib-content'),em=document.getElementById('hotel-lib-empty');
+  const hotels=S.hotelLib.filter(h=>!q||(h.name||'').toLowerCase().includes(q)||(h.dest||'').toLowerCase().includes(q));
+  if(!hotels.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  const groups={};
+  hotels.forEach(h=>{const d=h.dest||'Other';if(!groups[d])groups[d]=[];groups[d].push(h);});
+  el.innerHTML=Object.keys(groups).sort().map(dest=>`
+    <div class="dest-group">
+      <div class="dest-group-header"><i class="ti ti-map-pin"></i>${dest}</div>
+      <table class="dest-group-table">
+        <thead><tr><th>Hotel Name</th><th>Category</th><th>Rate/Night (INR)</th><th>Notes</th><th style="width:60px">Actions</th></tr></thead>
+        <tbody>${groups[dest].map(h=>`<tr>
+          <td style="font-weight:500;color:var(--navy)">${esc(h.name)}</td>
+          <td>${esc(h.cat)||'—'}</td>
+          <td class="cc">${h.rate?INR(h.rate):'—'}</td>
+          <td style="font-size:11px;color:var(--text2)">${esc(h.notes)||'—'}</td>
+          <td><div style="display:flex;gap:4px">
+            <button class="btn bo bsm bic" onclick="editHotel(${h.id})"><i class="ti ti-pencil"></i></button>
+            <button class="btn bd bsm bic" onclick="delHotel(${h.id})"><i class="ti ti-trash"></i></button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`).join('');
+}
+function delHotel(id){if(!confirm('Delete this hotel?'))return;S.hotelLib=S.hotelLib.filter(h=>h.id!==id);sv();renderHotelLib();}
+function editHotel(id){const h=S.hotelLib.find(x=>x.id===id);if(h)om('newhotel',h);}
+
+// ---- VISA LIBRARY ----
+function renderVisaLib(){
+  const q=(document.getElementById('visa-search').value||'').toLowerCase();
+  const el=document.getElementById('visa-lib-content'),em=document.getElementById('visa-lib-empty');
+  const visas=S.visaLib.filter(v=>!q||(v.type||'').toLowerCase().includes(q)||(v.country||'').toLowerCase().includes(q));
+  if(!visas.length){el.innerHTML='';em.style.display='block';return;}
+  em.style.display='none';
+  const groups={};
+  visas.forEach(v=>{const d=v.country||'Other';if(!groups[d])groups[d]=[];groups[d].push(v);});
+  el.innerHTML=Object.keys(groups).sort().map(country=>`
+    <div class="dest-group">
+      <div class="dest-group-header"><i class="ti ti-world"></i>${country}</div>
+      <table class="dest-group-table">
+        <thead><tr><th>Visa Type</th><th>Processing Time</th><th>Cost/Person (INR)</th><th>Notes</th><th style="width:60px">Actions</th></tr></thead>
+        <tbody>${groups[country].map(v=>`<tr>
+          <td style="font-weight:500;color:var(--navy)">${esc(v.type)}</td>
+          <td>${esc(v.processing)||'—'}</td>
+          <td class="cc">${v.cost?INR(v.cost):'—'}</td>
+          <td style="font-size:11px;color:var(--text2)">${esc(v.notes)||'—'}</td>
+          <td><div style="display:flex;gap:4px">
+            <button class="btn bo bsm bic" onclick="editVisa(${v.id})"><i class="ti ti-pencil"></i></button>
+            <button class="btn bd bsm bic" onclick="delVisa(${v.id})"><i class="ti ti-trash"></i></button>
+          </div></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`).join('');
+}
+function delVisa(id){if(!confirm('Delete this visa?'))return;S.visaLib=S.visaLib.filter(v=>v.id!==id);sv();renderVisaLib();}
+function editVisa(id){const v=S.visaLib.find(x=>x.id===id);if(v)om('newvisa',v);}
+
+// ---- MODALS ----
+function om(type,data=null){
+  mtype=type;editId=data?data.id:null;
+  const modal=document.getElementById('modal');
+  const title=document.getElementById('modal-title');
+  const body=document.getElementById('modal-body');
+  const msave=document.getElementById('msave');
+  modal.style.display='flex';msave.style.display='';
+
+  if(type==='customer'){
+    title.textContent='Add Customer';
+    body.innerHTML=`<div class="fg"><label class="fl">Name</label><input class="fi" id="mi" placeholder="Full name"></div>`;
+  } else if(type==='salesperson'){
+    title.textContent='Add Sales Person';
+    body.innerHTML=`<div class="fg"><label class="fl">Name</label><input class="fi" id="mi" placeholder="Full name"></div>`;
+  } else if(type==='incexc'){
+    title.textContent='Manage Inc/Exc Items';msave.style.display='none';
+    body.innerHTML=`<div style="margin-bottom:9px"><div class="fl" style="margin-bottom:4px">Add new item</div><div style="display:flex;gap:6px"><input class="fi" id="mi" placeholder="e.g. Airport transfers" style="flex:1"><button class="btn bp" onclick="addIEItem()"><i class="ti ti-plus"></i></button></div></div><div style="max-height:180px;overflow-y:auto" id="ie-ml"></div>`;
+    renderIEML();return;
+  } else if(type==='newtour'){
+    title.textContent=data?'Edit Tour':'Add Tour';
+    const m=data&&data.meals?data.meals:{};
+    body.innerHTML=`<div style="display:flex;flex-direction:column;gap:9px">
+      <div class="fg"><label class="fl">Tour Name *</label><input class="fi" id="t-name" value="${esc(data?data.name:'')}"></div>
+      <div class="g2">
+        <div class="fg"><label class="fl">Destination</label><input class="fi" id="t-dest" value="${esc(data?data.dest:'')}"></div>
+        <div class="fg"><label class="fl">Duration (days)</label><input class="fi" type="number" id="t-days" value="${data?data.days:''}" min="1"></div>
+      </div>
+      <div class="fg"><label class="fl">Cost per Tour (INR)</label><input class="fi" type="number" id="t-cost" value="${data&&data.cost?data.cost:''}" min="0"></div>
+      <div class="fg"><label class="fl">Transfer included</label><input class="fi" id="t-transfer" placeholder="e.g. AC coach, airport pickup" value="${esc(data?data.transfer||':'')}"></div>
+      <div class="fg"><label class="fl" style="margin-bottom:5px">Meals Included</label>
+        <div style="display:flex;gap:6px">
+          <div class="mt ${m.breakfast?'on':''}" id="tm-b" onclick="this.classList.toggle('on')"><i class="ti ti-coffee"></i> Breakfast</div>
+          <div class="mt ${m.lunch?'on':''}" id="tm-l" onclick="this.classList.toggle('on')"><i class="ti ti-salad"></i> Lunch</div>
+          <div class="mt ${m.dinner?'on':''}" id="tm-d" onclick="this.classList.toggle('on')"><i class="ti ti-moon"></i> Dinner</div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Tags (comma separated)</label><input class="fi" id="t-tags" value="${esc(data&&data.tags?data.tags.join(', '):'')}"></div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fta" id="t-desc">${esc(data?data.desc||'':'')}</textarea></div>
+    </div>`;
+  } else if(type==='newhotel'){
+    title.textContent=data?'Edit Hotel':'Add Hotel to Library';
+    body.innerHTML=`<div style="display:flex;flex-direction:column;gap:9px">
+      <div class="fg"><label class="fl">Hotel Name *</label><input class="fi" id="h-name" value="${esc(data?data.name:'')}"></div>
+      <div class="g2">
+        <div class="fg"><label class="fl">Destination *</label><input class="fi" id="h-dest" placeholder="e.g. Dubai" value="${esc(data?data.dest:'')}"></div>
+        <div class="fg"><label class="fl">Category</label><select class="fs" id="h-cat">${CAT}</select></div>
+      </div>
+      <div class="fg"><label class="fl">Rate per Night (INR)</label><input class="fi" type="number" id="h-rate" value="${data&&data.rate?data.rate:''}" min="0"></div>
+      <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="h-notes" style="min-height:50px">${esc(data?data.notes||'':'')}</textarea></div>
+    </div>`;
+    setTimeout(()=>{const s=document.getElementById('h-cat');if(s&&data)s.value=data.cat||'';},10);
+  } else if(type==='newvisa'){
+    title.textContent=data?'Edit Visa':'Add Visa to Library';
+    body.innerHTML=`<div style="display:flex;flex-direction:column;gap:9px">
+      <div class="fg"><label class="fl">Visa Type *</label><input class="fi" id="v-type" placeholder="e.g. Tourist Visa" value="${esc(data?data.type:'')}"></div>
+      <div class="fg"><label class="fl">Country *</label><input class="fi" id="v-country" placeholder="e.g. UAE" value="${esc(data?data.country:'')}"></div>
+      <div class="g2">
+        <div class="fg"><label class="fl">Cost/Person (INR)</label><input class="fi" type="number" id="v-cost" value="${data&&data.cost?data.cost:''}" min="0"></div>
+        <div class="fg"><label class="fl">Processing Time</label><input class="fi" id="v-proc" placeholder="e.g. 3-5 working days" value="${esc(data?data.processing||'':'')}"></div>
+      </div>
+      <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="v-notes" style="min-height:50px">${esc(data?data.notes||'':'')}</textarea></div>
+    </div>`;
+  } else if(type==='prefill-hotel'){
+    title.textContent='Pre-fill Hotel Costs from Library';msave.style.display='none';
+    const groups={};S.hotelLib.forEach(h=>{const d=h.dest||'Other';if(!groups[d])groups[d]=[];groups[d].push(h);});
+    body.innerHTML=Object.keys(groups).sort().map(dest=>`
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--navy2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)">${dest}</div>
+        ${groups[dest].map(h=>`<div class="prefill-row">
+          <div><div class="prefill-name">${esc(h.name)}</div><div class="prefill-dest">${esc(h.cat)||''}</div></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="prefill-cost">${h.rate?INR(h.rate)+'/night':'No rate'}</span>
+          <button class="btn bp bsm" onclick="addHotelCost({name:'${esc2(h.name)}',dest:'${esc2(h.dest)}',rate:'${h.rate||''}'});closeModal()">Add</button></div>
+        </div>`).join('')}
+      </div>`).join('')||'<div class="es">No hotels in library yet.</div>';
+    return;
+  } else if(type==='prefill-visa'){
+    title.textContent='Pre-fill Visa Costs from Library';msave.style.display='none';
+    const groups={};S.visaLib.forEach(v=>{const d=v.country||'Other';if(!groups[d])groups[d]=[];groups[d].push(v);});
+    body.innerHTML=Object.keys(groups).sort().map(country=>`
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--navy2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)">${country}</div>
+        ${groups[country].map(v=>`<div class="prefill-row">
+          <div><div class="prefill-name">${esc(v.type)}</div><div class="prefill-dest">${esc(v.processing)||''}</div></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="prefill-cost">${v.cost?INR(v.cost)+'/person':'No rate'}</span>
+          <button class="btn bp bsm" onclick="addVisaCost({type:'${esc2(v.type)} - ${esc2(v.country)}',cost:'${v.cost||''}'});closeModal()">Add</button></div>
+        </div>`).join('')}
+      </div>`).join('')||'<div class="es">No visas in library yet.</div>';
+    return;
+  }
+  setTimeout(()=>{const el=document.getElementById('mi')||document.getElementById('t-name')||document.getElementById('h-name')||document.getElementById('v-type');el&&el.focus();},50);
+}
+
+function renderIEML(){
+  const el=document.getElementById('ie-ml');if(!el)return;
+  if(!S.incExcItems.length){el.innerHTML='<div style="font-size:11px;color:var(--text3);padding:5px 0">No items yet.</div>';return;}
+  el.innerHTML=S.incExcItems.map((x,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px">${esc(x)}</span><button class="btn bd bsm bic" onclick="delIEItem(${i})"><i class="ti ti-trash"></i></button></div>`).join('');
+}
+function addIEItem(){const v=(document.getElementById('mi').value||'').trim();if(!v)return;S.incExcItems.push(v);document.getElementById('mi').value='';sv();rafresh();renderIEML();}
+function delIEItem(i){S.incExcItems.splice(i,1);sv();rafresh();renderIEML();}
+
+function saveModal(){
+  if(mtype==='customer'){const v=(document.getElementById('mi').value||'').trim();if(!v)return;S.customers.push(v);sv();rafresh();closeModal();document.getElementById('cust-sel').value=v;}
+  else if(mtype==='salesperson'){const v=(document.getElementById('mi').value||'').trim();if(!v)return;S.salesPersons.push(v);sv();rafresh();closeModal();document.getElementById('sp-sel').value=v;}
+  else if(mtype==='newtour'){
+    const name=(document.getElementById('t-name').value||'').trim();if(!name){alert('Tour name required.');return;}
+    const tour={id:editId||Date.now(),name,dest:(document.getElementById('t-dest').value||'').trim(),days:parseInt(document.getElementById('t-days').value)||0,cost:parseFloat(document.getElementById('t-cost').value)||0,transfer:(document.getElementById('t-transfer').value||'').trim(),meals:{breakfast:document.getElementById('tm-b').classList.contains('on'),lunch:document.getElementById('tm-l').classList.contains('on'),dinner:document.getElementById('tm-d').classList.contains('on')},tags:(document.getElementById('t-tags').value||'').split(',').map(t=>t.trim()).filter(Boolean),desc:(document.getElementById('t-desc').value||'').trim()};
+    if(editId)S.tourLib=S.tourLib.map(t=>t.id===editId?tour:t);else S.tourLib.push(tour);
+    sv();renderTourLib();renderDays();calc();libAlertShow('tour-lib-alert','tour-lib-msg',editId?'Tour updated!':'Tour added!');closeModal();
+  } else if(mtype==='newhotel'){
+    const name=(document.getElementById('h-name').value||'').trim(),dest=(document.getElementById('h-dest').value||'').trim();
+    if(!name||!dest){alert('Hotel name and destination required.');return;}
+    const h={id:editId||Date.now(),name,dest,cat:document.getElementById('h-cat').value,rate:parseFloat(document.getElementById('h-rate').value)||0,notes:(document.getElementById('h-notes').value||'').trim()};
+    if(editId)S.hotelLib=S.hotelLib.map(x=>x.id===editId?h:x);else S.hotelLib.push(h);
+    sv();renderHotelLib();libAlertShow('hotel-lib-alert','hotel-lib-msg',editId?'Hotel updated!':'Hotel added!');closeModal();
+  } else if(mtype==='newvisa'){
+    const type=(document.getElementById('v-type').value||'').trim(),country=(document.getElementById('v-country').value||'').trim();
+    if(!type||!country){alert('Visa type and country required.');return;}
+    const v={id:editId||Date.now(),type,country,cost:parseFloat(document.getElementById('v-cost').value)||0,processing:(document.getElementById('v-proc').value||'').trim(),notes:(document.getElementById('v-notes').value||'').trim()};
+    if(editId)S.visaLib=S.visaLib.map(x=>x.id===editId?v:x);else S.visaLib.push(v);
+    sv();renderVisaLib();libAlertShow('visa-lib-alert','visa-lib-msg',editId?'Visa updated!':'Visa added!');closeModal();
+  }
+}
+function closeModal(){document.getElementById('modal').style.display='none';}
+function cmo(e){if(e.target===document.getElementById('modal'))closeModal();}
+
+// ---- ACTIONS ----
+function saveItin(){sv();alert('Itinerary saved successfully!');}
+function clearAll(){if(!confirm('Clear ALL data including libraries? This cannot be undone.'))return;S={customers:[],salesPersons:[],incExcItems:[],tourLib:[],hotelLib:[],visaLib:[],hotels:[],cruises:[],days:[],incExcSel:[],hotelCosts:[],visaCosts:[]};sv();init();}
+function resetForm(){
+  if(!confirm('Reset the itinerary form?'))return;
+  S.hotels=[];S.cruises=[];S.days=[];S.incExcSel=[];S.hotelCosts=[];S.visaCosts=[];
+  ['rate-adult','rate-child','child-pct','pax-adult','pax-child','pax-infant','itin-num'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('itin-date').value=tod();
+  document.getElementById('itin-expiry').value=tod(7);
+  renderHotels();renderCruises();renderDays();renderIE();renderHotelCosts();renderVisaCosts();calc();sv();
+}
+
+// ---- HELPERS ----
+function esc(s){return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function esc2(s){return (s||'').toString().replace(/'/g,"\\'").replace(/"/g,'\\"');}
+
+// ---- PDF EXPORT ----
+function exportPDF(){
+  const {jsPDF}=window.jspdf;
+  if(!jsPDF){alert('PDF library not loaded.');return;}
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,M=18,CW=W-M*2;
+  let y=M;
+
+  const navy=[15,33,55],gold=[201,168,76],cream=[248,245,240],border=[226,217,206],text=[26,26,46],text2=[74,85,104],white=[255,255,255],success=[45,122,79];
+
+  function rect(x,yy,w,h,color,r=0){doc.setFillColor(...color);doc.roundedRect(x,yy,w,h,r,r,'F');}
+  function line(x1,y1,x2,y2,color=[226,217,206],lw=0.3){doc.setDrawColor(...color);doc.setLineWidth(lw);doc.line(x1,y1,x2,y2);}
+  function txt(t,x,yy,size=10,color=text,bold=false,align='left'){doc.setFontSize(size);doc.setTextColor(...color);doc.setFont('helvetica',bold?'bold':'normal');if(align==='right')doc.text(t,x,yy,{align:'right'});else if(align==='center')doc.text(t,x,yy,{align:'center'});else doc.text(t,x,yy);}
+  function sectionHead(label,icon,yy){
+    rect(M,yy,CW,8,navy,2);
+    txt(label,M+4,yy+5.5,10,gold,true);
+    return yy+12;
+  }
+  function checkNewPage(needed=20){
+    if(y+needed>280){doc.addPage();y=M;drawHeader();y+=18;}
+  }
+
+  function drawHeader(){
+    // Header band
+    rect(0,0,W,28,navy);
+    rect(0,26,W,2,gold);
+    txt('TRAVELOG',M,12,18,white,true);
+    txt('ITINERARY',M,19,9,gold,false);
+    const itNum=document.getElementById('itin-num').value||'';
+    const itDate=document.getElementById('itin-date').value||'';
+    const itExp=document.getElementById('itin-expiry').value||'';
+    if(itNum)txt(itNum,W-M,12,10,gold,true,'right');
+    txt('Date: '+itDate,W-M,18,8,white,false,'right');
+    txt('Valid till: '+itExp,W-M,23,8,[180,200,220],false,'right');
+  }
+
+  drawHeader();
+  y=34;
+
+  // Customer info box
+  const custName=document.getElementById('cust-sel').value||'—';
+  const spName=document.getElementById('sp-sel').value||'—';
+  rect(M,y,CW,14,cream,2);
+  doc.setDrawColor(...border);doc.setLineWidth(0.3);doc.roundedRect(M,y,CW,14,2,2,'S');
+  txt('Customer:',M+4,y+5.5,9,text2);txt(custName,M+26,y+5.5,9,text,true);
+  txt('Sales Executive:',M+4,y+11,9,text2);txt(spName,M+34,y+11,9,text,true);
+  txt('Itinerary No:',W-M-60,y+5.5,9,text2,'right');txt(document.getElementById('itin-num').value||'—',W-M,y+5.5,9,text,true,'right');
+  y+=19;
+
+  // Hotels & Cruises
+  const hasHotels=S.hotels.some(h=>h.name);
+  const hasCruises=S.cruises.some(c=>c.name);
+  if(hasHotels||hasCruises){
+    checkNewPage(30);
+    y=sectionHead('ACCOMMODATION & CRUISE',null,y);
+    if(hasHotels){
+      txt('Hotels',M,y,9,text2,true);y+=5;
+      S.hotels.filter(h=>h.name).forEach(h=>{
+        checkNewPage(8);
+        rect(M,y,CW,7,[252,250,247],1);
+        txt(h.name||'',M+4,y+4.8,9,text,true);
+        txt(h.dest||'',M+80,y+4.8,9,text2);
+        txt(h.cat||'',W-M-2,y+4.8,9,gold,false,'right');
+        y+=8;
+      });
+    }
+    if(hasCruises){
+      y+=2;txt('Cruises',M,y,9,text2,true);y+=5;
+      S.cruises.filter(c=>c.name).forEach(c=>{
+        checkNewPage(8);
+        rect(M,y,CW,7,[252,250,247],1);
+        txt(c.name||'',M+4,y+4.8,9,text,true);
+        txt(c.dest||'',M+80,y+4.8,9,text2);
+        txt(c.cat||'',W-M-2,y+4.8,9,gold,false,'right');
+        y+=8;
+      });
+    }
+    y+=4;
+  }
+
+  // Price Quote
+  checkNewPage(50);
+  y=sectionHead('PRICE QUOTE',null,y);
+  const rateA=parseFloat(document.getElementById('rate-adult').value)||0;
+  const rateC=parseFloat(document.getElementById('rate-child').value)||0;
+  const paxA=parseInt(document.getElementById('pax-adult').value)||0;
+  const paxC=parseInt(document.getElementById('pax-child').value)||0;
+  const paxI=parseInt(document.getElementById('pax-infant').value)||0;
+  const totA=rateA*paxA,totC=rateC*paxC;
+  const hotelT=getHotelCostSum(),visaT=getVisaCostSum();
+  const grand=totA+totC+hotelT+visaT;
+
+  // Table header
+  const cols=[M,M+45,M+95,M+135];
+  rect(M,y,CW,8,[230,220,205],1);
+  ['Passenger','Rate (INR)','Count','Total (INR)'].forEach((h,i)=>txt(h,cols[i]+2,y+5.5,8,navy,true));
+  y+=8;
+
+  function priceRow(label,rate,count,total,bg=white){
+    checkNewPage(9);
+    rect(M,y,CW,8,bg,0);
+    line(M,y+8,M+CW,y+8);
+    txt(label,cols[0]+2,y+5.5,9,text);
+    txt(rate?INR(rate):'—',cols[1]+2,y+5.5,9,text);
+    txt(count?count.toString():'—',cols[2]+2,y+5.5,9,text);
+    txt(INR(total),cols[3]+2,y+5.5,9,text,true);
+    y+=8;
+  }
+  priceRow('Adult',rateA,paxA,totA,white);
+  priceRow('Child',rateC,paxC,totC,cream);
+  priceRow('Infant','Free',paxI,0,white);
+  if(hotelT>0)priceRow('Hotel Costs','','',hotelT,cream);
+  if(visaT>0)priceRow('Visa Costs','','',visaT,white);
+
+  y+=2;
+  rect(M,y,CW,10,navy,2);
+  txt('GRAND TOTAL',M+4,y+7,10,white,true);
+  txt(INR(grand),W-M-2,y+7,11,gold,true,'right');
+  y+=15;
+
+  // Inc/Exc
+  const incs=S.incExcSel.filter(x=>x.type==='inclusion');
+  const excs=S.incExcSel.filter(x=>x.type==='exclusion');
+  if(incs.length||excs.length){
+    checkNewPage(30);
+    y=sectionHead('INCLUSIONS & EXCLUSIONS',null,y);
+    const half=CW/2-2;
+    const yStart=y;
+    // Inclusions left
+    if(incs.length){
+      txt('INCLUSIONS',M,y,8,[45,122,79],true);y+=5;
+      incs.forEach(x=>{
+        checkNewPage(7);
+        doc.setFontSize(8);doc.setTextColor(40,80,60);
+        doc.text('✓  '+x.text,M+2,y);y+=5.5;
+      });
+    }
+    // Exclusions right (reset y to yStart)
+    if(excs.length){
+      let ey=yStart;
+      txt('EXCLUSIONS',M+half+4,ey,8,[192,57,43],true);ey+=5;
+      excs.forEach(x=>{
+        doc.setFontSize(8);doc.setTextColor(140,40,30);
+        doc.text('✗  '+x.text,M+half+6,ey);ey+=5.5;
+      });
+      if(ey>y)y=ey;
+    }
+    y+=6;
+  }
+
+  // Day-wise
+  const activeDays=S.days.filter(d=>d.tour||d.notes);
+  if(activeDays.length){
+    checkNewPage(20);
+    y=sectionHead('DAY-WISE ITINERARY',null,y);
+    activeDays.forEach((d,i)=>{
+      checkNewPage(22);
+      const t=getTour(d.tour);
+      // Day header
+      rect(M,y,CW,7,[20,50,80],1);
+      txt('Day '+(i+1),M+4,y+5,9,gold,true);
+      if(d.tour)txt(d.tour,M+20,y+5,9,white);
+      y+=7;
+      // Day body
+      rect(M,y,CW,14,white,0);
+      doc.setDrawColor(...border);doc.setLineWidth(0.2);doc.rect(M,y,CW,14,'S');
+      if(d.transfer)txt('Transfer: '+d.transfer,M+4,y+5,8,text2);
+      const meals=[];if(d.meals&&d.meals.breakfast)meals.push('Breakfast');if(d.meals&&d.meals.lunch)meals.push('Lunch');if(d.meals&&d.meals.dinner)meals.push('Dinner');
+      if(meals.length)txt('Meals: '+meals.join(' · '),M+4,y+10,8,success);
+      if(d.notes)txt('Note: '+d.notes,M+4,y+14.5,7,text2);
+      y+=16;
+    });
+  }
+
+  // Footer
+  const pageCount=doc.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    rect(0,287,W,10,navy);
+    txt('Travelog — Confidential Itinerary',M,293,7,gold);
+    txt('Page '+i+' of '+pageCount,W-M,293,7,white,false,'right');
+  }
+
+  const custSlug=(custName||'itinerary').replace(/\s+/g,'-').toLowerCase();
+  doc.save(`Travelog-${custSlug}-${document.getElementById('itin-num').value||'draft'}.pdf`);
+}
+
+function init(){
+  ld();
+  document.getElementById('itin-date').value=tod();
+  document.getElementById('itin-expiry').value=tod(7);
+  rafresh();renderHotels();renderCruises();renderDays();renderIE();renderHotelCosts();renderVisaCosts();calc();
+}
+init();
+</script>
+</body>
+</html>
