@@ -618,33 +618,48 @@ Day-wise Itinerary
 
 <div class="card">
 
-<div class="section-title">
-Pricing
-</div>
+  <div class="section-title">
+    Pricing
+  </div>
 
-<div class="grid grid-4">
+  <div class="grid grid-4">
 
-<div>
-<label>Adult Price</label>
-<input type="number" id="adultPrice">
-</div>
+    <div>
+      <label>Adult Price</label>
+      <input type="number" id="adultPrice">
+    </div>
 
-<div>
-<label>Child Price</label>
-<input type="number" id="childPrice">
-</div>
+    <div>
+      <label>Adult Pax</label>
+      <input type="number" id="adultQty" value="0">
+    </div>
 
-<div>
-<label>Infant Price</label>
-<input type="number" id="infantPrice">
-</div>
+    <div>
+      <label>Child Price</label>
+      <input type="number" id="childPrice">
+    </div>
 
-<div>
-<label>Grand Total</label>
-<input type="number" id="grandTotal">
-</div>
+    <div>
+      <label>Child Pax</label>
+      <input type="number" id="childQty" value="0">
+    </div>
 
-</div>
+    <div>
+      <label>Infant Price</label>
+      <input type="number" id="infantPrice">
+    </div>
+
+    <div>
+      <label>Infant Pax</label>
+      <input type="number" id="infantQty" value="0">
+    </div>
+
+    <div>
+      <label>Grand Total</label>
+      <input type="number" id="grandTotal" readonly>
+    </div>
+
+  </div>
 
 </div>
 
@@ -1715,6 +1730,31 @@ reader.readAsDataURL(file);
 
 });
 
+<script>
+function calculateTotal() {
+  const adultPrice = Number(document.getElementById("adultPrice").value) || 0;
+  const childPrice = Number(document.getElementById("childPrice").value) || 0;
+  const infantPrice = Number(document.getElementById("infantPrice").value) || 0;
+
+  const adultQty = Number(document.getElementById("adultQty").value) || 0;
+  const childQty = Number(document.getElementById("childQty").value) || 0;
+  const infantQty = Number(document.getElementById("infantQty").value) || 0;
+
+  const total =
+    (adultPrice * adultQty) +
+    (childPrice * childQty) +
+    (infantPrice * infantQty);
+
+  document.getElementById("grandTotal").value = total;
+}
+
+// attach events after page loads
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", calculateTotal);
+  });
+});
 </script>
+
 </body>
 </html>
