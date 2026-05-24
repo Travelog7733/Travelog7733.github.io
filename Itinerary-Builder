@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+</div>
+
+<div class="container">
+
+  <div class="tab-content active" id="itinerary">
+
+    <div class="card">
+      <div class="section-head">
+        <div class="section-icon"><i class="ti ti-file-description"></i></div>
+        <div class="section-title">Itinerary Details</div>
+      </div>
+
+      <div class="grid-4">
+        <div class="field">
+          <label>Itinerary Number</label>
+          <input id="itinNo" type="text">
+        </div>
+
+        <div class="field">
+          <label>Date</label>
+          <input id="todayDate" readonly>
+        </div>
+
+        <div class="field">
+          <label>Expiry Date</label>
+          <input id="expiryDate" readonly>
+        </div>
+
+        <div></div>
+
+        <div class="field">
+          <label>Customer Name</label>
+          <div class="input-wrap">
+            <select id="customerSelect"></select>
+            <button class="btn btn-outline" onclick="openSimpleModal('customer')">New</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Sales Person</label>
+          <div class="input-wrap">
+            <select id="salesSelect"></select>
+            <button class="btn btn-outline" onclick="openSimpleModal('sales')">New</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <div class="section-icon"><i class="ti ti-building-skyscraper"></i></div>
+        <div class="section-title">Accommodation & Cruise</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="table-head">
+            <div>Hotel Name</div>
+            <div>Destination</div>
+   
