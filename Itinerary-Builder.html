@@ -1113,6 +1113,18 @@ days:[]
 customerName.value = "";
 destination.value = "";
 travelDate.value = "";
+ 
+const today = new Date();
+
+const current = today.toISOString().split("T")[0];
+
+const expiry = new Date(
+today.getTime() + (7 * 24 * 60 * 60 * 1000)
+).toISOString().split("T")[0];
+
+currentDate.value = current;
+
+expiryDate.value = expiry;
 adultPrice.value = "";
 childPrice.value = "";
 infantPrice.value = "";
@@ -1245,8 +1257,12 @@ const data = {
 customer:customerName.value,
 destination:destination.value,
 travelDate:travelDate.value,
-status:itineraryStatus.value,
+ 
+currentDate:currentDate.value,
+expiryDate:expiryDate.value,
 
+status:itineraryStatus.value,
+ 
 adultPrice:adultPrice.value,
 childPrice:childPrice.value,
 infantPrice:infantPrice.value,
@@ -1310,6 +1326,10 @@ state.editingId = id;
 customerName.value = item.customer || "";
 destination.value = item.destination || "";
 travelDate.value = item.travelDate || "";
+
+currentDate.value = item.currentDate || "";
+expiryDate.value = item.expiryDate || "";
+ 
 itineraryStatus.value = item.status || "Draft";
 
 adultPrice.value = item.adultPrice || "";
