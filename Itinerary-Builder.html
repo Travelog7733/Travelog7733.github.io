@@ -822,11 +822,26 @@ appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
 
 };
 
-const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+/* FIREBASE */
 
-const db = getFirestore(app);
+const firebaseApp = initializeApp(firebaseConfig);
+
+const auth = getAuth(firebaseApp);
+
+const db = getFirestore(firebaseApp);
+
+/* ELEMENTS */
+
+const authScreen = document.getElementById("authScreen");
+
+const appScreen = document.getElementById("app");
+
+/* INITIAL STATE */
+
+appScreen.classList.add("hidden");
+
+authScreen.classList.remove("hidden");
 
 /* GLOBAL STATE */
 
@@ -845,39 +860,6 @@ days:[]
 
 };
 
-/* HELPERS */
-
-function toast(message){
-
-const t = document.getElementById("toast");
-
-t.innerText = message;
-
-t.classList.add("show");
-
-setTimeout(()=>{
-t.classList.remove("show");
-},2500);
-
-}
-
-function switchPage(page,btn){
-
-document.querySelectorAll(".page")
-.forEach(p=>p.classList.add("hidden"));
-
-document.getElementById(page+"Page")
-.classList.remove("hidden");
-
-document.querySelectorAll(".nav button")
-.forEach(b=>b.classList.remove("active"));
-
-btn.classList.add("active");
-
-}
-
-window.switchPage = switchPage;
-
 /* AUTH */
 
 window.login = async()=>{
@@ -886,9 +868,11 @@ try{
 
 await signInWithEmailAndPassword(
 auth,
-authEmail.value,
-authPassword.value
+authEmail.value.trim(),
+authPassword.value.trim()
 );
+
+toast("Login successful");
 
 }catch(err){
 
@@ -904,8 +888,8 @@ try{
 
 await createUserWithEmailAndPassword(
 auth,
-authEmail.value,
-authPassword.value
+authEmail.value.trim(),
+authPassword.value.trim()
 );
 
 toast("Account created");
@@ -920,9 +904,21 @@ alert(err.message);
 
 window.logout = async()=>{
 
+try{
+
 await signOut(auth);
 
+toast("Logged out");
+
+}catch(err){
+
+alert(err.message);
+
+}
+
 };
+
+/* AUTH STATE */
 
 onAuthStateChanged(auth,(user)=>{
 
@@ -932,7 +928,7 @@ state.user = user;
 
 authScreen.classList.add("hidden");
 
-app.classList.remove("hidden");
+appScreen.classList.remove("hidden");
 
 loadCollections();
 
@@ -940,7 +936,7 @@ loadCollections();
 
 authScreen.classList.remove("hidden");
 
-app.classList.add("hidden");
+appScreen.classList.add("hidden");
 
 }
 
