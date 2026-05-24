@@ -1731,29 +1731,7 @@ reader.readAsDataURL(file);
 });
 
 <script>
-function calculateTotal() {
-  const adultPrice = Number(document.getElementById("adultPrice").value) || 0;
-  const childPrice = Number(document.getElementById("childPrice").value) || 0;
-  const infantPrice = Number(document.getElementById("infantPrice").value) || 0;
 
-  const adultQty = Number(document.getElementById("adultQty").value) || 0;
-  const childQty = Number(document.getElementById("childQty").value) || 0;
-  const infantQty = Number(document.getElementById("infantQty").value) || 0;
-
-  const total =
-    (adultPrice * adultQty) +
-    (childPrice * childQty) +
-    (infantPrice * infantQty);
-
-  document.getElementById("grandTotal").value = total;
-}
-
-// attach events after page loads
-document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll("input").forEach(input => {
-    input.addEventListener("input", calculateTotal);
-  });
-});
 </script>
 
 </body>
