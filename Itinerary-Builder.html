@@ -779,8 +779,6 @@ Visa Library
 
 <script type="module">
 
-/* FIREBASE */
-
 import {
 initializeApp
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
@@ -800,11 +798,12 @@ addDoc,
 doc,
 deleteDoc,
 updateDoc,
+getDoc,
 onSnapshot,
 serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-/* CONFIG */
+/* FIREBASE */
 
 const firebaseConfig = {
 
@@ -822,9 +821,6 @@ appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
 
 };
 
-
-/* FIREBASE */
-
 const firebaseApp = initializeApp(firebaseConfig);
 
 const auth = getAuth(firebaseApp);
@@ -837,17 +833,21 @@ const authScreen = document.getElementById("authScreen");
 
 const appScreen = document.getElementById("app");
 
-/* INITIAL STATE */
-
-appScreen.classList.add("hidden");
+/* INITIAL */
 
 authScreen.classList.remove("hidden");
 
-/* GLOBAL STATE */
+appScreen.classList.add("hidden");
 
-const state = {
+/* STATE */
+
+window.state = {
 
 user:null,
+
+logo:null,
+
+editingId:null,
 
 itineraries:[],
 tours:[],
@@ -856,6 +856,41 @@ visas:[],
 
 currentItinerary:{
 days:[]
+}
+
+};
+
+/* TOAST */
+
+function toast(message){
+
+const t = document.getElementById("toast");
+
+t.innerText = message;
+
+t.classList.add("show");
+
+setTimeout(()=>{
+t.classList.remove("show");
+},2500);
+
+}
+
+/* PAGE SWITCH */
+
+window.switchPage = (page,btn)=>{
+
+document.querySelectorAll(".page")
+.forEach(p=>p.classList.add("hidden"));
+
+document.getElementById(page+"Page")
+.classList.remove("hidden");
+
+document.querySelectorAll(".nav button")
+.forEach(b=>b.classList.remove("active"));
+
+if(btn){
+btn.classList.add("active");
 }
 
 };
@@ -892,7 +927,7 @@ authEmail.value.trim(),
 authPassword.value.trim()
 );
 
-toast("Account created");
+toast("Account created successfully");
 
 }catch(err){
 
@@ -904,17 +939,7 @@ alert(err.message);
 
 window.logout = async()=>{
 
-try{
-
 await signOut(auth);
-
-toast("Logged out");
-
-}catch(err){
-
-alert(err.message);
-
-}
 
 };
 
@@ -934,6 +959,8 @@ loadCollections();
 
 }else{
 
+state.user = null;
+
 authScreen.classList.remove("hidden");
 
 appScreen.classList.add("hidden");
@@ -942,7 +969,7 @@ appScreen.classList.add("hidden");
 
 });
 
-/* REALTIME LOADERS */
+/* REALTIME */
 
 function loadCollections(){
 
@@ -968,10 +995,12 @@ onSnapshot(collection(db,"tours"),(snap)=>{
 state.tours = [];
 
 snap.forEach(d=>{
+
 state.tours.push({
 id:d.id,
 ...d.data()
 });
+
 });
 
 renderTours();
@@ -983,10 +1012,12 @@ onSnapshot(collection(db,"hotels"),(snap)=>{
 state.hotels = [];
 
 snap.forEach(d=>{
+
 state.hotels.push({
 id:d.id,
 ...d.data()
 });
+
 });
 
 renderHotels();
@@ -998,10 +1029,12 @@ onSnapshot(collection(db,"visas"),(snap)=>{
 state.visas = [];
 
 snap.forEach(d=>{
+
 state.visas.push({
 id:d.id,
 ...d.data()
 });
+
 });
 
 renderVisas();
@@ -1057,23 +1090,44 @@ Delete
 
 }
 
-/* BUILDER */
+/* NEW */
 
 window.newItinerary = ()=>{
+
+state.editingId = null;
 
 state.currentItinerary = {
 days:[]
 };
 
-switchPage("builder",document.querySelectorAll(".nav button")[1]);
+customerName.value = "";
+destination.value = "";
+travelDate.value = "";
+adultPrice.value = "";
+childPrice.value = "";
+infantPrice.value = "";
+grandTotal.value = "";
+
+daysContainer.innerHTML = "";
+
+switchPage(
+"builder",
+document.querySelectorAll(".nav button")[1]
+);
 
 };
+
+/* DAY */
 
 window.addDay = ()=>{
 
 state.currentItinerary.days.push({
+
 title:"",
-activity:""
+activity:"",
+hotel:"",
+visa:""
+
 });
 
 renderDays();
@@ -1097,6 +1151,60 @@ state.currentItinerary.days.map((d,index)=>`
 value="${d.title || ""}"
 oninput="state.currentItinerary.days[${index}].title=this.value"
 >
+
+</div>
+
+<div>
+
+<label>Hotel</label>
+
+<select
+onchange="state.currentItinerary.days[${index}].hotel=this.value"
+>
+
+<option value="">Select Hotel</option>
+
+${state.hotels.map(h=>`
+
+<option
+value="${h.name}"
+${d.hotel===h.name ? "selected" : ""}
+>
+
+${h.name}
+
+</option>
+
+`).join("")}
+
+</select>
+
+</div>
+
+<div>
+
+<label>Visa</label>
+
+<select
+onchange="state.currentItinerary.days[${index}].visa=this.value"
+>
+
+<option value="">Select Visa</option>
+
+${state.visas.map(v=>`
+
+<option
+value="${v.country}"
+${d.visa===v.country ? "selected" : ""}
+>
+
+${v.country}
+
+</option>
+
+`).join("")}
+
+</select>
 
 </div>
 
@@ -1136,79 +1244,119 @@ grandTotal:grandTotal.value,
 
 days:state.currentItinerary.days,
 
+logo:state.logo || "",
+
 updatedBy:state.user.email,
 updatedAt:serverTimestamp()
 
 };
 
-await addDoc(collection(db,"itineraries"),data);
+try{
+
+if(state.editingId){
+
+await updateDoc(
+doc(db,"itineraries",state.editingId),
+data
+);
+
+toast("Itinerary updated");
+
+}else{
+
+await addDoc(
+collection(db,"itineraries"),
+data
+);
 
 toast("Itinerary saved");
 
-};
+}
 
-/* PDF */
+switchPage(
+"dashboard",
+document.querySelectorAll(".nav button")[0]
+);
 
-window.exportPDF = ()=>{
+}catch(err){
 
-const { jsPDF } = window.jspdf;
+alert(err.message);
 
-const doc = new jsPDF();
-
-doc.setFontSize(26);
-
-doc.text("Travelog",20,25);
-
-doc.setFontSize(14);
-
-doc.text("Travel Itinerary",20,35);
-
-doc.autoTable({
-
-startY:50,
-
-head:[["Passenger","Price"]],
-
-body:[
-
-["Adult",adultPrice.value || 0],
-["Child",childPrice.value || 0],
-["Infant",infantPrice.value || 0],
-["Grand Total",grandTotal.value || 0]
-
-]
-
-});
-
-let y = doc.lastAutoTable.finalY + 20;
-
-doc.setFontSize(18);
-
-doc.text("Day-wise Itinerary",20,y);
-
-y += 10;
-
-state.currentItinerary.days.forEach((d,index)=>{
-
-doc.setFontSize(14);
-
-doc.text(`Day ${index+1}: ${d.title}`,20,y);
-
-y += 8;
-
-doc.setFontSize(11);
-
-doc.text(d.activity || "",20,y);
-
-y += 20;
-
-});
-
-doc.save("travelog-itinerary.pdf");
+}
 
 };
 
-/* TOURS */
+/* OPEN */
+
+window.openItinerary = async(id)=>{
+
+const item =
+state.itineraries.find(i=>i.id===id);
+
+if(!item) return;
+
+state.editingId = id;
+
+customerName.value = item.customer || "";
+destination.value = item.destination || "";
+travelDate.value = item.travelDate || "";
+itineraryStatus.value = item.status || "Draft";
+
+adultPrice.value = item.adultPrice || "";
+childPrice.value = item.childPrice || "";
+infantPrice.value = item.infantPrice || "";
+grandTotal.value = item.grandTotal || "";
+
+state.logo = item.logo || null;
+
+if(item.logo){
+
+logoPreview.innerHTML =
+`<img src="${item.logo}">`;
+
+}
+
+state.currentItinerary.days =
+item.days || [];
+
+renderDays();
+
+switchPage(
+"builder",
+document.querySelectorAll(".nav button")[1]
+);
+
+};
+
+/* DELETE */
+
+window.deleteItinerary = async(id)=>{
+
+if(!confirm("Delete itinerary?"))
+return;
+
+await deleteDoc(
+doc(db,"itineraries",id)
+);
+
+toast("Deleted");
+
+};
+
+window.deleteItem = async(collectionName,id)=>{
+
+if(!confirm("Delete item?"))
+return;
+
+await deleteDoc(
+doc(db,collectionName,id)
+);
+
+toast("Deleted");
+
+};
+
+/* TOUR */
 
 window.addTour = async()=>{
 
@@ -1216,9 +1364,16 @@ const name = prompt("Tour Name");
 
 if(!name) return;
 
+const destination = prompt("Destination");
+
+const duration = prompt("Duration");
+
 await addDoc(collection(db,"tours"),{
 
 name,
+destination,
+duration,
+
 createdBy:state.user.email
 
 });
@@ -1242,14 +1397,13 @@ state.tours.map(t=>`
 
 <td>
 
-<div class="actions">
-
-<button class="btn btn-danger"
+<button
+class="btn btn-danger"
 onclick="deleteItem('tours','${t.id}')">
-Delete
-</button>
 
-</div>
+Delete
+
+</button>
 
 </td>
 
@@ -1259,7 +1413,7 @@ Delete
 
 }
 
-/* HOTELS */
+/* HOTEL */
 
 window.addHotel = async()=>{
 
@@ -1267,9 +1421,19 @@ const name = prompt("Hotel Name");
 
 if(!name) return;
 
+const place = prompt("Place");
+
+const category = prompt("Category");
+
+const costAdult = prompt("Cost Per Adult");
+
 await addDoc(collection(db,"hotels"),{
 
 name,
+place,
+category,
+costAdult,
+
 createdBy:state.user.email
 
 });
@@ -1293,14 +1457,13 @@ state.hotels.map(h=>`
 
 <td>
 
-<div class="actions">
-
-<button class="btn btn-danger"
+<button
+class="btn btn-danger"
 onclick="deleteItem('hotels','${h.id}')">
-Delete
-</button>
 
-</div>
+Delete
+
+</button>
 
 </td>
 
@@ -1310,7 +1473,7 @@ Delete
 
 }
 
-/* VISAS */
+/* VISA */
 
 window.addVisa = async()=>{
 
@@ -1318,9 +1481,16 @@ const country = prompt("Country");
 
 if(!country) return;
 
+const visaType = prompt("Visa Type");
+
+const processing = prompt("Processing Days");
+
 await addDoc(collection(db,"visas"),{
 
 country,
+visaType,
+processing,
+
 createdBy:state.user.email
 
 });
@@ -1342,14 +1512,13 @@ state.visas.map(v=>`
 
 <td>
 
-<div class="actions">
-
-<button class="btn btn-danger"
+<button
+class="btn btn-danger"
 onclick="deleteItem('visas','${v.id}')">
-Delete
-</button>
 
-</div>
+Delete
+
+</button>
 
 </td>
 
@@ -1359,27 +1528,137 @@ Delete
 
 }
 
-/* DELETE */
+/* PDF */
 
-window.deleteItem = async(collectionName,id)=>{
+window.exportPDF = ()=>{
 
-if(!confirm("Delete item?"))
-return;
+const { jsPDF } = window.jspdf;
 
-await deleteDoc(doc(db,collectionName,id));
+const pdf = new jsPDF();
 
-toast("Deleted");
+let y = 20;
 
-};
+/* LOGO */
 
-window.deleteItinerary = async(id)=>{
+if(state.logo){
 
-if(!confirm("Delete itinerary?"))
-return;
+pdf.addImage(
+state.logo,
+"PNG",
+15,
+10,
+30,
+30
+);
 
-await deleteDoc(doc(db,"itineraries",id));
+}
 
-toast("Itinerary deleted");
+pdf.setFontSize(24);
+
+pdf.text("Travelog",50,22);
+
+pdf.setFontSize(12);
+
+pdf.text("Premium Travel Itinerary",50,30);
+
+y = 50;
+
+pdf.setFontSize(18);
+
+pdf.text(customerName.value || "",15,y);
+
+y += 8;
+
+pdf.setFontSize(12);
+
+pdf.text(destination.value || "",15,y);
+
+y += 15;
+
+/* PRICING */
+
+pdf.autoTable({
+
+startY:y,
+
+head:[["Pricing","Amount"]],
+
+body:[
+
+["Adult",adultPrice.value || "0"],
+
+["Child",childPrice.value || "0"],
+
+["Infant",infantPrice.value || "0"],
+
+["Grand Total",grandTotal.value || "0"]
+
+]
+
+});
+
+y = pdf.lastAutoTable.finalY + 15;
+
+/* ITINERARY */
+
+pdf.setFontSize(18);
+
+pdf.text("Day-wise Itinerary",15,y);
+
+y += 10;
+
+state.currentItinerary.days.forEach((d,index)=>{
+
+pdf.setFontSize(14);
+
+pdf.text(
+`Day ${index+1} - ${d.title || ""}`,
+15,
+y
+);
+
+y += 8;
+
+pdf.setFontSize(11);
+
+const lines = pdf.splitTextToSize(
+d.activity || "",
+170
+);
+
+pdf.text(lines,15,y);
+
+y += lines.length * 7;
+
+if(d.hotel){
+
+pdf.text(
+`Hotel: ${d.hotel}`,
+15,
+y
+);
+
+y += 7;
+
+}
+
+if(d.visa){
+
+pdf.text(
+`Visa: ${d.visa}`,
+15,
+y
+);
+
+y += 7;
+
+}
+
+y += 10;
+
+});
+
+pdf.save("travelog-itinerary.pdf");
 
 };
 
@@ -1407,6 +1686,5 @@ reader.readAsDataURL(file);
 });
 
 </script>
-
 </body>
 </html>
