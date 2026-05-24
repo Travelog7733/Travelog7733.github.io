@@ -1,1614 +1,1415 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Travelog — Itinerary Builder</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Travelog Pro</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
 <style>
+
 :root{
-  --navy:#0f2137;
-  --navy-2:#132b47;
-  --gold:#c9a84c;
-  --cream:#f8f5f0;
-  --white:#ffffff;
-  --border:#e2d9ce;
-  --muted:#6b7280;
-  --green:#16a34a;
-  --red:#dc2626;
-  --shadow:0 8px 24px rgba(15,33,55,.08);
-  --radius:16px;
+--navy:#0f2137;
+--gold:#c9a84c;
+--cream:#f8f5f0;
+--white:#fff;
+--border:#e2d9ce;
+--green:#16a34a;
+--red:#dc2626;
+--muted:#6b7280;
+--shadow:0 10px 30px rgba(0,0,0,.06);
 }
 
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
 body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--cream);
-  color:var(--navy);
+font-family:'DM Sans',sans-serif;
+background:var(--cream);
+color:var(--navy);
 }
 
-.container{
-  max-width:1400px;
-  margin:auto;
-  padding:24px;
+.hidden{
+display:none!important;
 }
 
-header{
-  background:var(--navy);
-  border-bottom:4px solid var(--gold);
-  border-radius:0 0 20px 20px;
-  padding:28px;
-  color:#fff;
+.app{
+display:grid;
+grid-template-columns:280px 1fr;
+min-height:100vh;
+}
+
+.sidebar{
+background:var(--navy);
+color:#fff;
+padding:30px 22px;
 }
 
 .logo{
-  font-family:'Playfair Display',serif;
-  font-size:40px;
-  font-weight:700;
+font-family:'Playfair Display',serif;
+font-size:34px;
+font-weight:700;
+margin-bottom:40px;
 }
 
 .logo span{
-  color:var(--gold);
+color:var(--gold);
 }
 
-.tagline{
-  margin-top:6px;
-  text-transform:uppercase;
-  letter-spacing:2px;
-  font-size:12px;
-  opacity:.75;
+.nav{
+display:flex;
+flex-direction:column;
+gap:10px;
 }
 
-.tabs{
-  display:flex;
-  background:var(--navy-2);
-  margin-top:20px;
-  border-radius:14px;
-  overflow:hidden;
+.nav button{
+border:none;
+background:transparent;
+color:#fff;
+padding:14px 16px;
+border-radius:14px;
+font-size:15px;
+font-weight:600;
+cursor:pointer;
+text-align:left;
+transition:.2s;
 }
 
-.tab{
-  flex:1;
-  padding:16px;
-  text-align:center;
-  cursor:pointer;
-  color:#fff;
-  position:relative;
-  font-weight:600;
+.nav button.active,
+.nav button:hover{
+background:rgba(255,255,255,.08);
 }
 
-.tab.active{
-  background:rgba(255,255,255,.04);
+.main{
+padding:30px;
+overflow:auto;
 }
 
-.tab.active::after{
-  content:'';
-  position:absolute;
-  left:0;
-  bottom:0;
-  width:100%;
-  height:4px;
-  background:var(--gold);
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
 }
 
-.page{
-  display:none;
-  margin-top:24px;
-}
-
-.page.active{
-  display:block;
-}
-
-.card{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:22px;
-  margin-bottom:20px;
-}
-
-.section-title{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  margin-bottom:18px;
-}
-
-.icon-box{
-  width:44px;
-  height:44px;
-  background:var(--navy);
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.icon-box i{
-  color:var(--gold);
-  font-size:20px;
-}
-
-.section-title h2{
-  font-family:'Playfair Display',serif;
-  font-size:24px;
-}
-
-.grid{
-  display:grid;
-  gap:16px;
-}
-
-.grid-2{
-  grid-template-columns:repeat(2,1fr);
-}
-
-.grid-3{
-  grid-template-columns:repeat(3,1fr);
-}
-
-.grid-4{
-  grid-template-columns:repeat(4,1fr);
-}
-
-label{
-  display:block;
-  margin-bottom:6px;
-  font-size:13px;
-  font-weight:600;
-}
-
-input,select,textarea{
-  width:100%;
-  height:40px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:0 12px;
-  font-family:inherit;
-  background:#fff;
-}
-
-textarea{
-  height:120px;
-  padding:12px;
-  resize:vertical;
-}
-
-input:focus,select:focus,textarea:focus{
-  outline:none;
-  border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(201,168,76,.2);
-}
-
-button{
-  border:none;
-  cursor:pointer;
-  font-family:inherit;
-  transition:.2s;
+.page-title{
+font-size:34px;
+font-family:'Playfair Display',serif;
 }
 
 .btn{
-  height:40px;
-  padding:0 18px;
-  border-radius:10px;
-  font-weight:600;
+border:none;
+padding:12px 18px;
+border-radius:12px;
+font-weight:700;
+cursor:pointer;
+transition:.2s;
 }
 
 .btn-primary{
-  background:var(--navy);
-  color:#fff;
+background:var(--navy);
+color:#fff;
 }
 
 .btn-gold{
-  background:var(--gold);
-  color:var(--navy);
-}
-
-.btn-outline{
-  background:transparent;
-  border:1px solid var(--border);
-  color:var(--navy);
+background:var(--gold);
+color:var(--navy);
 }
 
 .btn-danger{
-  background:transparent;
-  border:1px solid var(--red);
-  color:var(--red);
+background:var(--red);
+color:#fff;
 }
 
-.btn-danger:hover{
-  background:var(--red);
-  color:#fff;
+.btn-outline{
+background:#fff;
+border:1px solid var(--border);
 }
 
-.btn:hover{
-  transform:translateY(-1px);
+.card{
+background:#fff;
+border-radius:20px;
+padding:24px;
+box-shadow:var(--shadow);
+border:1px solid var(--border);
+margin-bottom:24px;
 }
 
-.inline-group{
-  display:flex;
-  gap:10px;
-  align-items:end;
+.grid{
+display:grid;
+gap:18px;
 }
 
-.table{
-  width:100%;
-  overflow:auto;
+.grid-2{
+grid-template-columns:repeat(2,1fr);
+}
+
+.grid-3{
+grid-template-columns:repeat(3,1fr);
+}
+
+.grid-4{
+grid-template-columns:repeat(4,1fr);
+}
+
+input,
+select,
+textarea{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid var(--border);
+font-family:inherit;
+font-size:14px;
+}
+
+textarea{
+min-height:120px;
+resize:vertical;
+}
+
+label{
+display:block;
+margin-bottom:8px;
+font-weight:700;
+font-size:13px;
+}
+
+.table-wrap{
+overflow:auto;
 }
 
 table{
-  width:100%;
-  border-collapse:collapse;
+width:100%;
+border-collapse:collapse;
 }
 
 th,td{
-  padding:12px;
-  border-bottom:1px solid var(--border);
-  text-align:left;
+padding:14px;
+border-bottom:1px solid #eee;
+text-align:left;
 }
 
 th{
-  font-size:13px;
-  text-transform:uppercase;
-  color:var(--muted);
-}
-
-.total-bar{
-  background:var(--navy);
-  padding:18px;
-  border-radius:14px;
-  margin-top:16px;
-  display:flex;
-  justify-content:space-between;
-  color:#fff;
-  font-weight:700;
-}
-
-.total-bar span:last-child{
-  color:var(--gold);
-  font-size:24px;
-}
-
-.add-row{
-  border:2px dashed var(--border);
-  background:#faf8f4;
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  margin-top:12px;
-  font-weight:700;
-  color:var(--navy);
-}
-
-.row-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr 40px;
-  gap:10px;
-  margin-bottom:10px;
-}
-
-.day-card{
-  border:1px solid var(--border);
-  border-radius:16px;
-  overflow:hidden;
-  margin-top:18px;
-}
-
-.day-header{
-  background:var(--navy);
-  color:#fff;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.day-header strong{
-  color:var(--gold);
-}
-
-.day-body{
-  padding:18px;
-  background:#fff;
-}
-
-.meals{
-  display:flex;
-  gap:10px;
-  margin-top:18px;
-  flex-wrap:wrap;
-}
-
-.meal{
-  border:1px solid var(--border);
-  background:#fff;
-  padding:10px 16px;
-  border-radius:999px;
-  font-weight:600;
-}
-
-.meal.active{
-  background:var(--navy);
-  color:var(--gold);
-  border-color:var(--navy);
-}
-
-.inc-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border:1px solid var(--border);
-  padding:12px;
-  border-radius:12px;
-  margin-top:10px;
+font-size:13px;
+text-transform:uppercase;
+color:var(--muted);
 }
 
 .badge{
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
+padding:6px 12px;
+border-radius:999px;
+font-size:12px;
+font-weight:700;
+display:inline-block;
 }
 
-.badge.green{
-  background:#dcfce7;
-  color:#166534;
+.badge.draft{
+background:#fef3c7;
+color:#92400e;
 }
 
-.badge.red{
-  background:#fee2e2;
-  color:#991b1b;
+.badge.sent{
+background:#dbeafe;
+color:#1d4ed8;
 }
 
-.flex-between{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.empty{
-  text-align:center;
-  padding:40px 20px;
-  color:var(--muted);
-}
-
-.empty i{
-  font-size:48px;
-  margin-bottom:12px;
-}
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(15,33,55,.7);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:100;
-  padding:20px;
-}
-
-.modal.active{
-  display:flex;
-}
-
-.modal-box{
-  background:#fff;
-  width:100%;
-  max-width:700px;
-  border-radius:20px;
-  padding:24px;
-  max-height:90vh;
-  overflow:auto;
-}
-
-.modal-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:20px;
-}
-
-.close{
-  font-size:24px;
-  cursor:pointer;
-}
-
-.toast{
-  position:fixed;
-  right:20px;
-  top:20px;
-  background:var(--navy);
-  color:#fff;
-  padding:14px 18px;
-  border-radius:12px;
-  z-index:999;
-  opacity:0;
-  transform:translateY(-10px);
-  transition:.3s;
-}
-
-.toast.show{
-  opacity:1;
-  transform:translateY(0);
-}
-
-.cost-pill{
-  display:inline-block;
-  margin-top:8px;
-  background:#dcfce7;
-  color:#166534;
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:13px;
-  font-weight:700;
-}
-
-.tag{
-  display:inline-block;
-  background:#f3f4f6;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  margin:2px;
+.badge.confirmed{
+background:#dcfce7;
+color:#166534;
 }
 
 .actions{
-  display:flex;
-  gap:8px;
+display:flex;
+gap:8px;
 }
 
-.bottom-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:12px;
-  margin-top:24px;
+.day-card{
+border:1px solid var(--border);
+border-radius:16px;
+padding:18px;
+margin-top:18px;
+background:#fff;
 }
 
-@media(max-width:768px){
+.section-title{
+font-size:22px;
+font-family:'Playfair Display',serif;
+margin-bottom:18px;
+}
 
-  .grid-2,
-  .grid-3,
-  .grid-4{
-    grid-template-columns:1fr;
-  }
+.flex{
+display:flex;
+gap:12px;
+align-items:center;
+}
 
-  .row-grid{
-    grid-template-columns:1fr;
-  }
+.flex-between{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-  .inline-group{
-    flex-direction:column;
-    align-items:stretch;
-  }
+.auth-screen{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
 
-  .bottom-actions{
-    flex-direction:column;
-  }
+.auth-box{
+background:#fff;
+padding:40px;
+border-radius:24px;
+box-shadow:var(--shadow);
+width:100%;
+max-width:420px;
+}
+
+.auth-title{
+font-size:32px;
+font-family:'Playfair Display',serif;
+margin-bottom:24px;
+text-align:center;
+}
+
+.toast{
+position:fixed;
+top:20px;
+right:20px;
+background:var(--navy);
+color:#fff;
+padding:14px 18px;
+border-radius:12px;
+z-index:999;
+opacity:0;
+transform:translateY(-10px);
+transition:.3s;
+}
+
+.toast.show{
+opacity:1;
+transform:translateY(0);
+}
+
+.logo-preview{
+width:120px;
+height:120px;
+border-radius:16px;
+border:1px dashed var(--border);
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+background:#fafafa;
+}
+
+.logo-preview img{
+width:100%;
+height:100%;
+object-fit:contain;
+}
+
+@media(max-width:900px){
+
+.app{
+grid-template-columns:1fr;
+}
+
+.sidebar{
+display:flex;
+overflow:auto;
+gap:10px;
+}
+
+.nav{
+flex-direction:row;
+}
+
+.grid-2,
+.grid-3,
+.grid-4{
+grid-template-columns:1fr;
+}
 
 }
+
 </style>
+
 </head>
+
 <body>
 
-<header>
-  <div class="container">
-    <div class="logo">Travel<span>og</span></div>
-    <div class="tagline">Luxury Travel Itinerary Builder</div>
-  </div>
-</header>
+<!-- AUTH -->
 
-<div class="container">
+<div id="authScreen" class="auth-screen">
 
-  <div class="tabs">
-    <div class="tab active" data-tab="builder">Create Itinerary</div>
-    <div class="tab" data-tab="library">Tour Library</div>
-  </div>
+<div class="auth-box">
 
-  <!-- BUILDER -->
-  <div class="page active" id="builder">
+<div class="auth-title">
+Travel<span style="color:#c9a84c">og</span>
+</div>
 
-    <!-- DETAILS -->
-    <div class="card">
-      <div class="section-title">
-        <div class="icon-box">
-          <i class="ti ti-file-description"></i>
-        </div>
-        <h2>Itinerary Details</h2>
-      </div>
+<div class="grid">
 
-      <div class="grid grid-4">
+<div>
+<label>Email</label>
+<input type="email" id="authEmail">
+</div>
 
-        <div>
-          <label>Itinerary Number</label>
-          <input id="itinNo" type="text">
-        </div>
+<div>
+<label>Password</label>
+<input type="password" id="authPassword">
+</div>
 
-        <div>
-          <label>Date</label>
-          <input id="todayDate" readonly>
-        </div>
+<button class="btn btn-primary" onclick="login()">
+Login
+</button>
 
-        <div>
-          <label>Expiry Date</label>
-          <input id="expiryDate" readonly>
-        </div>
-
-        <div></div>
-
-      </div>
-
-      <div class="grid grid-2" style="margin-top:16px">
-
-        <div class="inline-group">
-          <div style="flex:1">
-            <label>Customer</label>
-            <select id="customerSelect"></select>
-          </div>
-          <button class="btn btn-gold" onclick="openSimpleModal('customer')">New</button>
-        </div>
-
-        <div class="inline-group">
-          <div style="flex:1">
-            <label>Sales Person</label>
-            <select id="salesSelect"></select>
-          </div>
-          <button class="btn btn-gold" onclick="openSimpleModal('sales')">New</button>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- HOTEL -->
-    <div class="card">
-
-      <div class="section-title">
-        <div class="icon-box">
-          <i class="ti ti-building-skyscraper"></i>
-        </div>
-        <h2>Hotels & Cruises</h2>
-      </div>
-
-      <h3 style="margin-bottom:12px">Hotels</h3>
-      <div id="hotelRows"></div>
-      <button class="add-row" onclick="addHotel()">+ Add Hotel</button>
-
-      <div style="height:24px"></div>
-
-      <h3 style="margin-bottom:12px">Cruises</h3>
-      <div id="cruiseRows"></div>
-      <button class="add-row" onclick="addCruise()">+ Add Cruise</button>
-
-    </div>
-
-    <!-- PRICE -->
-    <div class="card">
-
-      <div class="section-title">
-        <div class="icon-box">
-          <i class="ti ti-cash"></i>
-        </div>
-        <h2>Price Quote</h2>
-      </div>
-
-      <div class="table">
-        <table>
-          <thead>
-            <tr>
-              <th>Passenger</th>
-              <th>Rate</th>
-              <th>Count</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            <tr>
-              <td>Adult</td>
-              <td><input type="number" class="rate" data-type="adult"></td>
-              <td><input type="number" class="count" data-type="adult"></td>
-              <td id="adultTotal">₹0</td>
-            </tr>
-
-            <tr>
-              <td>Child</td>
-              <td><input type="number" class="rate" data-type="child"></td>
-              <td><input type="number" class="count" data-type="child"></td>
-              <td id="childTotal">₹0</td>
-            </tr>
-
-            <tr>
-              <td>Infant</td>
-              <td><input type="number" class="rate" data-type="infant"></td>
-              <td><input type="number" class="count" data-type="infant"></td>
-              <td id="infantTotal">₹0</td>
-            </tr>
-
-          </tbody>
-        </table>
-      </div>
-
-      <div class="total-bar">
-        <span>Grand Total</span>
-        <span id="grandTotal">₹0</span>
-      </div>
-
-    </div>
-
-    <!-- INC EXC -->
-    <div class="card">
-
-      <div class="section-title">
-        <div class="icon-box">
-          <i class="ti ti-checklist"></i>
-        </div>
-        <h2>Inclusions & Exclusions</h2>
-      </div>
-
-      <div class="inline-group">
-
-        <div style="flex:1">
-          <label>Item</label>
-          <select id="incExcSelect"></select>
-        </div>
-
-        <div>
-          <label>Type</label>
-          <select id="incExcType">
-            <option>Inclusion</option>
-            <option>Exclusion</option>
-          </select>
-        </div>
-
-        <button class="btn btn-primary" onclick="addIncExc()">Add</button>
-        <button class="btn btn-outline" onclick="openManageIncExc()">Manage</button>
-
-      </div>
-
-      <div id="incExcList" style="margin-top:18px"></div>
-
-    </div>
-
-    <!-- DAYS -->
-    <div class="card">
-
-      <div class="flex-between">
-
-        <div class="section-title" style="margin:0">
-          <div class="icon-box">
-            <i class="ti ti-calendar-event"></i>
-          </div>
-          <h2>Day-wise Itinerary</h2>
-        </div>
-
-        <button class="btn btn-gold" onclick="addDay()">+ Add Day</button>
-
-      </div>
-
-      <div id="daysContainer"></div>
-
-      <div class="bottom-actions">
-        <button class="btn btn-outline" onclick="resetAll()">Reset</button>
-        <button class="btn btn-gold" onclick="saveAll()">Save Itinerary</button>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- LIBRARY -->
-  <div class="page" id="library">
-
-    <div class="card">
-
-      <div class="flex-between">
-
-        <div>
-          <h2 style="font-family:'Playfair Display',serif;font-size:30px">
-            Tour Library
-          </h2>
-
-          <p style="margin-top:6px;color:var(--muted)">
-            Manage reusable tours and packages
-          </p>
-        </div>
-
-        <button class="btn btn-gold" onclick="openTourModal()">
-          + Add Tour
-        </button>
-
-      </div>
-
-      <div class="grid grid-2" style="margin-top:20px">
-
-        <input type="text" id="tourSearch" placeholder="Search tours...">
-
-        <select id="destFilter">
-          <option value="">All Destinations</option>
-        </select>
-
-      </div>
-
-      <div id="tourTableWrap" style="margin-top:24px"></div>
-
-    </div>
-
-  </div>
+<button class="btn btn-gold" onclick="register()">
+Register
+</button>
 
 </div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-box">
+</div>
 
-    <div class="modal-header">
-      <h2 id="modalTitle"></h2>
-      <div class="close" onclick="closeModal()">×</div>
-    </div>
+</div>
 
-    <div id="modalBody"></div>
+<!-- APP -->
 
-  </div>
+<div id="app" class="app hidden">
+
+<div class="sidebar">
+
+<div class="logo">
+Travel<span>og</span>
+</div>
+
+<div class="nav">
+
+<button class="active" onclick="switchPage('dashboard',this)">
+<i class="ti ti-layout-dashboard"></i>
+ Dashboard
+</button>
+
+<button onclick="switchPage('builder',this)">
+<i class="ti ti-file-description"></i>
+ Create Itinerary
+</button>
+
+<button onclick="switchPage('tours',this)">
+<i class="ti ti-map"></i>
+ Tour Library
+</button>
+
+<button onclick="switchPage('hotels',this)">
+<i class="ti ti-building"></i>
+ Hotel Library
+</button>
+
+<button onclick="switchPage('visas',this)">
+<i class="ti ti-passport"></i>
+ Visa Library
+</button>
+
+<button onclick="logout()">
+<i class="ti ti-logout"></i>
+ Logout
+</button>
+
+</div>
+
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+
+<div id="dashboardPage" class="page">
+
+<div class="topbar">
+
+<div class="page-title">
+Itineraries
+</div>
+
+<button class="btn btn-gold" onclick="newItinerary()">
++ New Itinerary
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="grid grid-3">
+
+<input type="text" id="searchItinerary" placeholder="Search itineraries...">
+
+<select id="statusFilter">
+<option value="">All Status</option>
+<option>Draft</option>
+<option>Sent</option>
+<option>Confirmed</option>
+</select>
+
+<select id="sortFilter">
+<option value="updated">Recently Updated</option>
+<option value="customer">Customer</option>
+</select>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Customer</th>
+<th>Destination</th>
+<th>Status</th>
+<th>Updated</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="itineraryTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- BUILDER -->
+
+<div id="builderPage" class="page hidden">
+
+<div class="topbar">
+
+<div class="page-title">
+Create Itinerary
+</div>
+
+<div class="flex">
+
+<button class="btn btn-outline" onclick="exportPDF()">
+Export PDF
+</button>
+
+<button class="btn btn-gold" onclick="saveItinerary()">
+Save
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="section-title">
+Itinerary Details
+</div>
+
+<div class="grid grid-4">
+
+<div>
+<label>Customer Name</label>
+<input id="customerName">
+</div>
+
+<div>
+<label>Destination</label>
+<input id="destination">
+</div>
+
+<div>
+<label>Travel Date</label>
+<input type="date" id="travelDate">
+</div>
+
+<div>
+<label>Status</label>
+<select id="itineraryStatus">
+<option>Draft</option>
+<option>Sent</option>
+<option>Confirmed</option>
+</select>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="section-title">
+Logo Upload
+</div>
+
+<div class="flex">
+
+<div class="logo-preview" id="logoPreview">
+LOGO
+</div>
+
+<div>
+
+<input type="file" id="logoInput" accept="image/*">
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="flex-between">
+
+<div class="section-title">
+Day-wise Itinerary
+</div>
+
+<button class="btn btn-primary" onclick="addDay()">
++ Add Day
+</button>
+
+</div>
+
+<div id="daysContainer"></div>
+
+</div>
+
+<div class="card">
+
+<div class="section-title">
+Pricing
+</div>
+
+<div class="grid grid-4">
+
+<div>
+<label>Adult Price</label>
+<input type="number" id="adultPrice">
+</div>
+
+<div>
+<label>Child Price</label>
+<input type="number" id="childPrice">
+</div>
+
+<div>
+<label>Infant Price</label>
+<input type="number" id="infantPrice">
+</div>
+
+<div>
+<label>Grand Total</label>
+<input type="number" id="grandTotal">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- TOURS -->
+
+<div id="toursPage" class="page hidden">
+
+<div class="topbar">
+
+<div class="page-title">
+Tour Library
+</div>
+
+<button class="btn btn-gold" onclick="addTour()">
++ Add Tour
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Name</th>
+<th>Destination</th>
+<th>Duration</th>
+<th>Tags</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="tourTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- HOTELS -->
+
+<div id="hotelsPage" class="page hidden">
+
+<div class="topbar">
+
+<div class="page-title">
+Hotel Library
+</div>
+
+<button class="btn btn-gold" onclick="addHotel()">
++ Add Hotel
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Hotel</th>
+<th>Place</th>
+<th>Category</th>
+<th>Cost / Adult</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="hotelTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- VISAS -->
+
+<div id="visasPage" class="page hidden">
+
+<div class="topbar">
+
+<div class="page-title">
+Visa Library
+</div>
+
+<button class="btn btn-gold" onclick="addVisa()">
++ Add Visa
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Country</th>
+<th>Visa Type</th>
+<th>Processing</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="visaTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script>
-const STORAGE_KEY = 'travelog_v4';
+<script type="module">
 
-let state = {
-  customers:['John Doe'],
-  salesPersons:['Sarah'],
-  incExcItems:['Airport Transfer','Breakfast','Visa'],
-  incExcSelected:[],
-  tours:[],
-  hotels:[],
-  cruises:[],
-  days:[]
+/* FIREBASE */
+
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword,
+signOut,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+doc,
+deleteDoc,
+updateDoc,
+onSnapshot,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+/* CONFIG */
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+
+authDomain: "travelog-itinerary.firebaseapp.com",
+
+projectId: "travelog-itinerary",
+
+storageBucket: "travelog-itinerary.firebasestorage.app",
+
+messagingSenderId: "33567258851",
+
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+
 };
 
-function saveState(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+/* GLOBAL STATE */
+
+const state = {
+
+user:null,
+
+itineraries:[],
+tours:[],
+hotels:[],
+visas:[],
+
+currentItinerary:{
+days:[]
 }
 
-function loadState(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(saved){
-    state = JSON.parse(saved);
-  }
-}
-
-function toast(msg){
-  const t = document.getElementById('toast');
-  t.innerText = msg;
-  t.classList.add('show');
-
-  setTimeout(()=>{
-    t.classList.remove('show');
-  },2500);
-}
-
-function formatDate(date){
-  return date.toLocaleDateString('en-IN',{
-    day:'2-digit',
-    month:'short',
-    year:'numeric'
-  });
-}
-
-function initDates(){
-  const today = new Date();
-
-  const exp = new Date();
-  exp.setDate(today.getDate()+7);
-
-  document.getElementById('todayDate').value = formatDate(today);
-  document.getElementById('expiryDate').value = formatDate(exp);
-}
-
-function renderDropdowns(){
-
-  customerSelect.innerHTML = state.customers.map(c=>`
-    <option>${c}</option>
-  `).join('');
-
-  salesSelect.innerHTML = state.salesPersons.map(s=>`
-    <option>${s}</option>
-  `).join('');
-
-  incExcSelect.innerHTML = state.incExcItems.map(i=>`
-    <option>${i}</option>
-  `).join('');
-
-  const destinations = [...new Set(state.tours.map(t=>t.dest))];
-
-  destFilter.innerHTML = `
-    <option value="">All Destinations</option>
-    ${destinations.map(d=>`<option>${d}</option>`).join('')}
-  `;
-
-}
-
-function addHotel(data={name:'',dest:'',cat:'3 Star'}){
-  state.hotels.push(data);
-  renderHotels();
-  saveState();
-}
-
-function renderHotels(){
-
-  hotelRows.innerHTML = state.hotels.map((h,i)=>`
-    <div class="row-grid">
-
-      <input 
-        placeholder="Hotel Name"
-        value="${h.name}"
-        onchange="state.hotels[${i}].name=this.value;saveState()"
-      >
-
-      <input
-        placeholder="Destination"
-        value="${h.dest}"
-        onchange="state.hotels[${i}].dest=this.value;saveState()"
-      >
-
-      <select
-        onchange="state.hotels[${i}].cat=this.value;saveState()"
-      >
-        <option ${h.cat==='3 Star'?'selected':''}>3 Star</option>
-        <option ${h.cat==='4 Star'?'selected':''}>4 Star</option>
-        <option ${h.cat==='5 Star'?'selected':''}>5 Star</option>
-      </select>
-
-      <button class="btn btn-danger" onclick="removeHotel(${i})">
-        ×
-      </button>
-
-    </div>
-  `).join('');
-
-}
-
-function removeHotel(i){
-  if(confirm('Delete hotel?')){
-    state.hotels.splice(i,1);
-    renderHotels();
-    saveState();
-  }
-}
-
-function addCruise(data={name:'',dest:'',cat:'3 Star'}){
-  state.cruises.push(data);
-  renderCruises();
-  saveState();
-}
-
-function renderCruises(){
-
-  cruiseRows.innerHTML = state.cruises.map((h,i)=>`
-    <div class="row-grid">
-
-      <input 
-        placeholder="Cruise Name"
-        value="${h.name}"
-        onchange="state.cruises[${i}].name=this.value;saveState()"
-      >
-
-      <input
-        placeholder="Destination"
-        value="${h.dest}"
-        onchange="state.cruises[${i}].dest=this.value;saveState()"
-      >
-
-      <select
-        onchange="state.cruises[${i}].cat=this.value;saveState()"
-      >
-        <option ${h.cat==='3 Star'?'selected':''}>3 Star</option>
-        <option ${h.cat==='4 Star'?'selected':''}>4 Star</option>
-        <option ${h.cat==='5 Star'?'selected':''}>5 Star</option>
-      </select>
-
-      <button class="btn btn-danger" onclick="removeCruise(${i})">
-        ×
-      </button>
-
-    </div>
-  `).join('');
-
-}
-
-function removeCruise(i){
-  if(confirm('Delete cruise?')){
-    state.cruises.splice(i,1);
-    renderCruises();
-    saveState();
-  }
-}
-
-document.querySelectorAll('.rate,.count').forEach(el=>{
-  el.addEventListener('input',calculateTotals);
-});
-
-function calculateTotals(){
-
-  let grand = 0;
-
-  ['adult','child','infant'].forEach(type=>{
-
-    const rate = +document.querySelector(`.rate[data-type="${type}"]`).value || 0;
-    const count = +document.querySelector(`.count[data-type="${type}"]`).value || 0;
-
-    const total = rate * count;
-
-    grand += total;
-
-    document.getElementById(type+'Total').innerText = '₹'+total.toLocaleString();
-
-  });
-
-  grandTotal.innerText = '₹'+grand.toLocaleString();
-
-}
-
-function addIncExc(){
-
-  const text = incExcSelect.value;
-  const type = incExcType.value;
-
-  state.incExcSelected.push({text,type});
-
-  renderIncExc();
-
-  saveState();
-
-}
-
-function renderIncExc(){
-
-  if(!state.incExcSelected.length){
-
-    incExcList.innerHTML = `
-      <div class="empty">
-        <i class="ti ti-list"></i>
-        <p>No inclusions or exclusions added</p>
-      </div>
-    `;
-
-    return;
-  }
-
-  incExcList.innerHTML = state.incExcSelected.map((item,i)=>`
-
-    <div class="inc-item">
-
-      <div style="display:flex;gap:12px;align-items:center">
-
-        <div class="badge ${item.type==='Inclusion'?'green':'red'}">
-          ${item.type==='Inclusion'?'✓ Included':'✗ Excluded'}
-        </div>
-
-        <div>${item.text}</div>
-
-      </div>
-
-      <button class="btn btn-danger" onclick="removeIncExc(${i})">
-        <i class="ti ti-trash"></i>
-      </button>
-
-    </div>
-
-  `).join('');
-
-}
-
-function removeIncExc(i){
-
-  state.incExcSelected.splice(i,1);
-
-  renderIncExc();
-
-  saveState();
-
-}
-
-function addDay(){
-
-  state.days.push({
-    tour:'',
-    transfer:'',
-    notes:'',
-    meals:{
-      breakfast:false,
-      lunch:false,
-      dinner:false
-    }
-  });
-
-  renderDays();
-
-  saveState();
-
-}
-
-function renderDays(){
-
-  if(!state.days.length){
-
-    daysContainer.innerHTML = `
-      <div class="empty">
-        <i class="ti ti-calendar"></i>
-        <p>No days added yet</p>
-      </div>
-    `;
-
-    return;
-  }
-
-  daysContainer.innerHTML = state.days.map((d,i)=>{
-
-    const selectedTour = state.tours.find(t=>t.id===d.tour);
-
-    return `
-      <div class="day-card">
-
-        <div class="day-header">
-
-          <div>
-            <strong>Day ${i+1}</strong>
-          </div>
-
-          <button class="btn btn-danger" onclick="removeDay(${i})">
-            Remove
-          </button>
-
-        </div>
-
-        <div class="day-body">
-
-          <div class="grid grid-3">
-
-            <div>
-
-              <label>Tour / Activity</label>
-
-              <select onchange="updateDayTour(${i},this.value)">
-
-                <option value="">Select Tour</option>
-
-                ${state.tours.map(t=>`
-                  <option value="${t.id}" ${d.tour===t.id?'selected':''}>
-                    ${t.name} · ${t.dest}
-                  </option>
-                `).join('')}
-
-              </select>
-
-              ${
-                selectedTour
-                ? `<div class="cost-pill">₹${selectedTour.cost.toLocaleString()} / tour</div>`
-                : ''
-              }
-
-            </div>
-
-            <div>
-
-              <label>Transfer</label>
-
-              <input
-                value="${d.transfer}"
-                onchange="state.days[${i}].transfer=this.value;saveState()"
-              >
-
-            </div>
-
-            <div>
-
-              <label>Notes</label>
-
-              <input
-                value="${d.notes}"
-                onchange="state.days[${i}].notes=this.value;saveState()"
-              >
-
-            </div>
-
-          </div>
-
-          <div class="meals">
-
-            <button class="meal ${d.meals.breakfast?'active':''}"
-              onclick="toggleMeal(${i},'breakfast')">
-              Breakfast
-            </button>
-
-            <button class="meal ${d.meals.lunch?'active':''}"
-              onclick="toggleMeal(${i},'lunch')">
-              Lunch
-            </button>
-
-            <button class="meal ${d.meals.dinner?'active':''}"
-              onclick="toggleMeal(${i},'dinner')">
-              Dinner
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-    `;
-
-  }).join('');
-
-}
-
-function updateDayTour(i,val){
-  state.days[i].tour = val;
-  renderDays();
-  saveState();
-}
-
-function toggleMeal(i,meal){
-
-  state.days[i].meals[meal] = !state.days[i].meals[meal];
-
-  renderDays();
-
-  saveState();
-
-}
-
-function removeDay(i){
-
-  if(confirm('Delete this day?')){
-
-    state.days.splice(i,1);
-
-    renderDays();
-
-    saveState();
-
-  }
-
-}
-
-function openSimpleModal(type){
-
-  modal.classList.add('active');
-
-  modalTitle.innerText = type==='customer'
-    ? 'Add Customer'
-    : 'Add Sales Person';
-
-  modalBody.innerHTML = `
-
-    <div>
-
-      <label>Name</label>
-
-      <input id="simpleInput">
-
-      <div style="margin-top:20px">
-        <button class="btn btn-gold" onclick="saveSimple('${type}')">
-          Save
-        </button>
-      </div>
-
-    </div>
-
-  `;
-
-}
-
-function saveSimple(type){
-
-  const val = document.getElementById('simpleInput').value.trim();
-
-  if(!val) return;
-
-  if(type==='customer'){
-    state.customers.push(val);
-  }else{
-    state.salesPersons.push(val);
-  }
-
-  renderDropdowns();
-
-  saveState();
-
-  closeModal();
-
-  toast('Saved successfully');
-
-}
-
-function openManageIncExc(){
-
-  modal.classList.add('active');
-
-  modalTitle.innerText = 'Manage Items';
-
-  modalBody.innerHTML = `
-
-    <div class="inline-group">
-
-      <input id="newIncExc" placeholder="Add new item">
-
-      <button class="btn btn-gold" onclick="saveIncExcItem()">
-        Add
-      </button>
-
-    </div>
-
-    <div id="manageList" style="margin-top:20px"></div>
-
-  `;
-
-  renderManageList();
-
-}
-
-function renderManageList(){
-
-  manageList.innerHTML = state.incExcItems.map((item,i)=>`
-
-    <div class="inc-item">
-
-      <div>${item}</div>
-
-      <button class="btn btn-danger" onclick="deleteIncExcItem(${i})">
-        Delete
-      </button>
-
-    </div>
-
-  `).join('');
-
-}
-
-function saveIncExcItem(){
-
-  const val = newIncExc.value.trim();
-
-  if(!val) return;
-
-  state.incExcItems.push(val);
-
-  renderDropdowns();
-
-  renderManageList();
-
-  saveState();
-
-}
-
-function deleteIncExcItem(i){
-
-  state.incExcItems.splice(i,1);
-
-  renderDropdowns();
-
-  renderManageList();
-
-  saveState();
-
-}
-
-function openTourModal(editId=null){
-
-  modal.classList.add('active');
-
-  const tour = state.tours.find(t=>t.id===editId);
-
-  modalTitle.innerText = editId
-    ? 'Edit Tour'
-    : 'Add Tour';
-
-  modalBody.innerHTML = `
-
-    <div class="grid grid-2">
-
-      <div>
-
-        <label>Tour Name</label>
-        <input id="tourName" value="${tour?.name||''}">
-
-      </div>
-
-      <div>
-
-        <label>Destination</label>
-        <input id="tourDest" value="${tour?.dest||''}">
-
-      </div>
-
-      <div>
-
-        <label>Duration</label>
-        <input id="tourDays" value="${tour?.days||''}">
-
-      </div>
-
-      <div>
-
-        <label>Cost (INR)</label>
-        <input type="number" id="tourCost" value="${tour?.cost||''}">
-
-      </div>
-
-    </div>
-
-    <div style="margin-top:16px">
-
-      <label>Tags</label>
-      <input id="tourTags" value="${tour?.tags?.join(', ')||''}">
-
-    </div>
-
-    <div style="margin-top:16px">
-
-      <label>Description</label>
-      <textarea id="tourDesc">${tour?.desc||''}</textarea>
-
-    </div>
-
-    <div style="margin-top:24px">
-
-      <button class="btn btn-gold" onclick="saveTour('${editId||''}')">
-        Save Tour
-      </button>
-
-    </div>
-
-  `;
-
-}
-
-function saveTour(editId){
-
-  const tour = {
-    id: editId || Date.now().toString(),
-    name: tourName.value,
-    dest: tourDest.value,
-    days: tourDays.value,
-    cost:+tourCost.value,
-    tags:tourTags.value.split(',').map(t=>t.trim()).filter(Boolean),
-    desc:tourDesc.value
-  };
-
-  if(editId){
-
-    const index = state.tours.findIndex(t=>t.id===editId);
-
-    state.tours[index] = tour;
-
-  }else{
-
-    state.tours.push(tour);
-
-  }
-
-  renderTours();
-
-  renderDays();
-
-  renderDropdowns();
-
-  saveState();
-
-  closeModal();
-
-  toast('Tour saved');
-
-}
-
-function renderTours(){
-
-  const search = tourSearch.value.toLowerCase();
-  const filter = destFilter.value;
-
-  let tours = [...state.tours];
-
-  if(search){
-
-    tours = tours.filter(t=>
-
-      t.name.toLowerCase().includes(search) ||
-      t.dest.toLowerCase().includes(search) ||
-      t.tags.join(' ').toLowerCase().includes(search)
-
-    );
-
-  }
-
-  if(filter){
-
-    tours = tours.filter(t=>t.dest===filter);
-
-  }
-
-  if(!tours.length){
-
-    tourTableWrap.innerHTML = `
-      <div class="empty">
-        <i class="ti ti-map"></i>
-        <p>No tours found</p>
-      </div>
-    `;
-
-    return;
-  }
-
-  tourTableWrap.innerHTML = `
-
-    <div class="table">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>Tour Name</th>
-            <th>Destination</th>
-            <th>Duration</th>
-            <th>Cost</th>
-            <th>Tags</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          ${tours.map(t=>`
-
-            <tr>
-
-              <td>${t.name}</td>
-
-              <td>${t.dest}</td>
-
-              <td>${t.days}</td>
-
-              <td style="color:var(--green);font-weight:700">
-                ₹${t.cost.toLocaleString()}
-              </td>
-
-              <td>
-                ${t.tags.map(tag=>`
-                  <span class="tag">${tag}</span>
-                `).join('')}
-              </td>
-
-              <td>
-
-                <div class="actions">
-
-                  <button class="btn btn-outline"
-                    onclick="openTourModal('${t.id}')">
-                    <i class="ti ti-pencil"></i>
-                  </button>
-
-                  <button class="btn btn-danger"
-                    onclick="deleteTour('${t.id}')">
-                    <i class="ti ti-trash"></i>
-                  </button>
-
-                </div>
-
-              </td>
-
-            </tr>
-
-          `).join('')}
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  `;
-
-}
-
-function deleteTour(id){
-
-  if(confirm('Delete this tour?')){
-
-    state.tours = state.tours.filter(t=>t.id!==id);
-
-    renderTours();
-
-    renderDays();
-
-    renderDropdowns();
-
-    saveState();
-
-    toast('Tour deleted');
-
-  }
-
-}
-
-function closeModal(){
-  modal.classList.remove('active');
-}
-
-window.onclick = e=>{
-  if(e.target===modal){
-    closeModal();
-  }
 };
 
-function resetAll(){
+/* HELPERS */
 
-  if(confirm('Reset all data?')){
+function toast(message){
 
-    localStorage.removeItem(STORAGE_KEY);
+const t = document.getElementById("toast");
 
-    location.reload();
+t.innerText = message;
 
-  }
+t.classList.add("show");
 
-}
-
-function saveAll(){
-
-  saveState();
-
-  toast('Itinerary saved');
+setTimeout(()=>{
+t.classList.remove("show");
+},2500);
 
 }
 
-document.querySelectorAll('.tab').forEach(tab=>{
+function switchPage(page,btn){
 
-  tab.addEventListener('click',()=>{
+document.querySelectorAll(".page")
+.forEach(p=>p.classList.add("hidden"));
 
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(page+"Page")
+.classList.remove("hidden");
 
-    tab.classList.add('active');
+document.querySelectorAll(".nav button")
+.forEach(b=>b.classList.remove("active"));
 
-    document.getElementById(tab.dataset.tab).classList.add('active');
+btn.classList.add("active");
 
-  });
+}
+
+window.switchPage = switchPage;
+
+/* AUTH */
+
+window.login = async()=>{
+
+try{
+
+await signInWithEmailAndPassword(
+auth,
+authEmail.value,
+authPassword.value
+);
+
+}catch(err){
+
+alert(err.message);
+
+}
+
+};
+
+window.register = async()=>{
+
+try{
+
+await createUserWithEmailAndPassword(
+auth,
+authEmail.value,
+authPassword.value
+);
+
+toast("Account created");
+
+}catch(err){
+
+alert(err.message);
+
+}
+
+};
+
+window.logout = async()=>{
+
+await signOut(auth);
+
+};
+
+onAuthStateChanged(auth,(user)=>{
+
+if(user){
+
+state.user = user;
+
+authScreen.classList.add("hidden");
+
+app.classList.remove("hidden");
+
+loadCollections();
+
+}else{
+
+authScreen.classList.remove("hidden");
+
+app.classList.add("hidden");
+
+}
 
 });
 
-tourSearch.addEventListener('input',renderTours);
-destFilter.addEventListener('change',renderTours);
+/* REALTIME LOADERS */
 
-loadState();
+function loadCollections(){
 
-initDates();
+onSnapshot(collection(db,"itineraries"),(snap)=>{
 
-renderDropdowns();
+state.itineraries = [];
+
+snap.forEach(docItem=>{
+
+state.itineraries.push({
+id:docItem.id,
+...docItem.data()
+});
+
+});
+
+renderItineraries();
+
+});
+
+onSnapshot(collection(db,"tours"),(snap)=>{
+
+state.tours = [];
+
+snap.forEach(d=>{
+state.tours.push({
+id:d.id,
+...d.data()
+});
+});
+
+renderTours();
+
+});
+
+onSnapshot(collection(db,"hotels"),(snap)=>{
+
+state.hotels = [];
+
+snap.forEach(d=>{
+state.hotels.push({
+id:d.id,
+...d.data()
+});
+});
 
 renderHotels();
 
-renderCruises();
+});
 
-renderIncExc();
+onSnapshot(collection(db,"visas"),(snap)=>{
+
+state.visas = [];
+
+snap.forEach(d=>{
+state.visas.push({
+id:d.id,
+...d.data()
+});
+});
+
+renderVisas();
+
+});
+
+}
+
+/* DASHBOARD */
+
+function renderItineraries(){
+
+itineraryTable.innerHTML =
+state.itineraries.map(i=>`
+
+<tr>
+
+<td>${i.customer || ""}</td>
+
+<td>${i.destination || ""}</td>
+
+<td>
+<span class="badge ${i.status?.toLowerCase()}">
+${i.status || "Draft"}
+</span>
+</td>
+
+<td>
+${i.updatedBy || "-"}
+</td>
+
+<td>
+
+<div class="actions">
+
+<button class="btn btn-outline"
+onclick="openItinerary('${i.id}')">
+Open
+</button>
+
+<button class="btn btn-danger"
+onclick="deleteItinerary('${i.id}')">
+Delete
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`).join("");
+
+}
+
+/* BUILDER */
+
+window.newItinerary = ()=>{
+
+state.currentItinerary = {
+days:[]
+};
+
+switchPage("builder",document.querySelectorAll(".nav button")[1]);
+
+};
+
+window.addDay = ()=>{
+
+state.currentItinerary.days.push({
+title:"",
+activity:""
+});
 
 renderDays();
 
-renderTours();
+};
+
+function renderDays(){
+
+daysContainer.innerHTML =
+state.currentItinerary.days.map((d,index)=>`
+
+<div class="day-card">
+
+<div class="grid grid-2">
+
+<div>
+
+<label>Day Title</label>
+
+<input
+value="${d.title || ""}"
+oninput="state.currentItinerary.days[${index}].title=this.value"
+>
+
+</div>
+
+<div>
+
+<label>Activity</label>
+
+<textarea
+oninput="state.currentItinerary.days[${index}].activity=this.value"
+>${d.activity || ""}</textarea>
+
+</div>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+/* SAVE */
+
+window.saveItinerary = async()=>{
+
+const data = {
+
+customer:customerName.value,
+destination:destination.value,
+travelDate:travelDate.value,
+status:itineraryStatus.value,
+
+adultPrice:adultPrice.value,
+childPrice:childPrice.value,
+infantPrice:infantPrice.value,
+grandTotal:grandTotal.value,
+
+days:state.currentItinerary.days,
+
+updatedBy:state.user.email,
+updatedAt:serverTimestamp()
+
+};
+
+await addDoc(collection(db,"itineraries"),data);
+
+toast("Itinerary saved");
+
+};
+
+/* PDF */
+
+window.exportPDF = ()=>{
+
+const { jsPDF } = window.jspdf;
+
+const doc = new jsPDF();
+
+doc.setFontSize(26);
+
+doc.text("Travelog",20,25);
+
+doc.setFontSize(14);
+
+doc.text("Travel Itinerary",20,35);
+
+doc.autoTable({
+
+startY:50,
+
+head:[["Passenger","Price"]],
+
+body:[
+
+["Adult",adultPrice.value || 0],
+["Child",childPrice.value || 0],
+["Infant",infantPrice.value || 0],
+["Grand Total",grandTotal.value || 0]
+
+]
+
+});
+
+let y = doc.lastAutoTable.finalY + 20;
+
+doc.setFontSize(18);
+
+doc.text("Day-wise Itinerary",20,y);
+
+y += 10;
+
+state.currentItinerary.days.forEach((d,index)=>{
+
+doc.setFontSize(14);
+
+doc.text(`Day ${index+1}: ${d.title}`,20,y);
+
+y += 8;
+
+doc.setFontSize(11);
+
+doc.text(d.activity || "",20,y);
+
+y += 20;
+
+});
+
+doc.save("travelog-itinerary.pdf");
+
+};
+
+/* TOURS */
+
+window.addTour = async()=>{
+
+const name = prompt("Tour Name");
+
+if(!name) return;
+
+await addDoc(collection(db,"tours"),{
+
+name,
+createdBy:state.user.email
+
+});
+
+};
+
+function renderTours(){
+
+tourTable.innerHTML =
+state.tours.map(t=>`
+
+<tr>
+
+<td>${t.name || ""}</td>
+
+<td>${t.destination || ""}</td>
+
+<td>${t.duration || ""}</td>
+
+<td>${t.tags || ""}</td>
+
+<td>
+
+<div class="actions">
+
+<button class="btn btn-danger"
+onclick="deleteItem('tours','${t.id}')">
+Delete
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`).join("");
+
+}
+
+/* HOTELS */
+
+window.addHotel = async()=>{
+
+const name = prompt("Hotel Name");
+
+if(!name) return;
+
+await addDoc(collection(db,"hotels"),{
+
+name,
+createdBy:state.user.email
+
+});
+
+};
+
+function renderHotels(){
+
+hotelTable.innerHTML =
+state.hotels.map(h=>`
+
+<tr>
+
+<td>${h.name || ""}</td>
+
+<td>${h.place || ""}</td>
+
+<td>${h.category || ""}</td>
+
+<td>${h.costAdult || ""}</td>
+
+<td>
+
+<div class="actions">
+
+<button class="btn btn-danger"
+onclick="deleteItem('hotels','${h.id}')">
+Delete
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`).join("");
+
+}
+
+/* VISAS */
+
+window.addVisa = async()=>{
+
+const country = prompt("Country");
+
+if(!country) return;
+
+await addDoc(collection(db,"visas"),{
+
+country,
+createdBy:state.user.email
+
+});
+
+};
+
+function renderVisas(){
+
+visaTable.innerHTML =
+state.visas.map(v=>`
+
+<tr>
+
+<td>${v.country || ""}</td>
+
+<td>${v.visaType || ""}</td>
+
+<td>${v.processing || ""}</td>
+
+<td>
+
+<div class="actions">
+
+<button class="btn btn-danger"
+onclick="deleteItem('visas','${v.id}')">
+Delete
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`).join("");
+
+}
+
+/* DELETE */
+
+window.deleteItem = async(collectionName,id)=>{
+
+if(!confirm("Delete item?"))
+return;
+
+await deleteDoc(doc(db,collectionName,id));
+
+toast("Deleted");
+
+};
+
+window.deleteItinerary = async(id)=>{
+
+if(!confirm("Delete itinerary?"))
+return;
+
+await deleteDoc(doc(db,"itineraries",id));
+
+toast("Itinerary deleted");
+
+};
+
+/* LOGO */
+
+logoInput.addEventListener("change",(e)=>{
+
+const file = e.target.files[0];
+
+if(!file) return;
+
+const reader = new FileReader();
+
+reader.onload = ()=>{
+
+logoPreview.innerHTML =
+`<img src="${reader.result}">`;
+
+state.logo = reader.result;
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
 </script>
 
 </body>
