@@ -785,7 +785,7 @@ function exportPDF(){
   doc.setDrawColor(...border);doc.setLineWidth(0.3);doc.roundedRect(M,y,CW,14,2,2,'S');
   txt('Customer:',M+4,y+5.5,9,text2);txt(custName,M+26,y+5.5,9,text,true);
   txt('Sales Executive:',M+4,y+11,9,text2);txt(spName,M+34,y+11,9,text,true);
-  txt('Itinerary No:',W-M-60,y+5.5,9,text2,'right');txt(document.getElementById('itin-num').value||'—',W-M,y+5.5,9,text,true,'right');
+  txt('Itinerary No:',W-M-60,y+5.5,9,text2,false,'right');txt(document.getElementById('itin-num').value||'—',W-M,y+5.5,9,text,true,'right');
   y+=19;
 
   // Hotels & Cruises
