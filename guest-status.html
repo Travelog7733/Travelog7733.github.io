@@ -670,10 +670,6 @@ COMPLETED
 <div
 class="status-grid"
 id="guestContainer"></div>  
-  
-<div
-class="status-grid"
-id="guestContainer"></div>
 
 </div>
 
@@ -1074,7 +1070,7 @@ document.getElementById("guestFormBox")
 .style.display = "none";
 
 }
-
+  
 function loadGuests(){
 
 onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
@@ -1099,6 +1095,65 @@ return new Date(yyyy, mm - 1, dd);
 guests.sort((a, b) => parseDate(a.travelDate) - parseDate(b.travelDate));
 
 window.allGuests = guests;
+
+if(currentFilter !== "ALL"){
+
+guests = guests.filter(g=>{
+
+let tripStage = "UPCOMING";
+
+if(g.itineraryDays && g.itineraryDays.length){
+
+const today = new Date();
+
+today.setHours(0,0,0,0);
+
+const parseDate = (dateStr) => {
+
+if(!dateStr || !dateStr.includes('/'))
+return null;
+
+const [dd, mm, yyyy] = dateStr.split('/');
+
+return new Date(yyyy, mm - 1, dd);
+
+};
+
+const firstDay =
+parseDate(g.itineraryDays[0].date);
+
+const lastDay =
+parseDate(
+g.itineraryDays[g.itineraryDays.length - 1].date
+);
+
+if(firstDay && lastDay){
+
+if(today > lastDay){
+
+tripStage = "COMPLETED";
+
+}
+else if(today >= firstDay && today <= lastDay){
+
+tripStage = "ONGOING";
+
+}
+else{
+
+tripStage = "UPCOMING";
+
+}
+
+}
+
+}
+
+return tripStage === currentFilter;
+
+});
+
+}
 
 let html = "";
 
