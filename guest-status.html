@@ -1134,7 +1134,17 @@ tripStageClass = "confirmed";
 }
 else{
 
-tripStage = "UPCOMING";
+const diffTime =
+firstDay - today;
+
+const daysLeft =
+Math.ceil(
+diffTime / (1000 * 60 * 60 * 24)
+);
+
+tripStage =
+`UPCOMING IN ${daysLeft} DAY${daysLeft > 1 ? "S" : ""}`;
+
 tripStageClass = "pending";
 
 }
@@ -1142,7 +1152,7 @@ tripStageClass = "pending";
 }
 
 }
-
+  
 html += `
 <div class="guest-tile" onclick="this.classList.toggle('active')">
 
