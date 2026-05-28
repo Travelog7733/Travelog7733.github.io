@@ -1628,6 +1628,49 @@ generateDates();
 }
 );
 
+function shareWhatsApp(id){
+
+const g = window.allGuests.find(x => x.id === id);
+if(!g){
+alert("Guest not found");
+return;
+}
+
+let message = `
+*🏝️ Guest Status - Travelog*
+
+👤 Name: ${g.guestName || "-"}
+🏢 Company: ${g.companyName || "-"}
+📍 Destination: ${g.destination || "-"}
+📅 Travel Date: ${g.travelDate || "-"}
+📆 Days: ${g.days || "-"}
+👥 Guests: ${g.guests || "-"}
+
+✈️ Visa Status: ${g.visaStatus || "-"}
+📊 Travel Status: ${g.travelStatus || "-"}
+💳 Payment Status: ${g.paymentStatus || "-"}
+
+💰 Invoice: ₹${g.invoiceAmount || 0}
+💵 Received: ₹${g.amountReceived || 0}
+📉 Balance: ₹${g.balanceAmount || 0}
+
+🏨 Hotels:
+${(g.hotels || []).map(h => `- ${h.place || ""} | ${h.hotel || ""} | ${h.status || ""}`).join("\n") || "-"}
+
+🛳️ Cruises:
+${(g.cruises || []).map(c => `- ${c.place || ""} | ${c.name || ""} | ${c.status || ""}`).join("\n") || "-"}
+
+🗓️ Itinerary:
+${(g.itineraryDays || []).map(d => `Day ${d.day} (${d.date}): ${d.activity || ""}`).join("\n") || "-"}
+
+📝 Notes:
+${g.notes || "-"}
+`;
+
+const url = "https://wa.me/?text=" + encodeURIComponent(message);
+window.open(url, "_blank");
+}
+
 </script>
 
 </body>
