@@ -1090,6 +1090,59 @@ if(g.travelStatus === "COMPLETED"){
 badge = "completed";
 }
 
+let tripStage = "UPCOMING";
+let tripStageClass = "pending";
+
+if(g.itineraryDays && g.itineraryDays.length){
+
+const today = new Date();
+
+today.setHours(0,0,0,0);
+
+const parseDate = (dateStr) => {
+
+if(!dateStr || !dateStr.includes('/'))
+return null;
+
+const [dd, mm, yyyy] = dateStr.split('/');
+
+return new Date(yyyy, mm - 1, dd);
+
+};
+
+const firstDay =
+parseDate(g.itineraryDays[0].date);
+
+const lastDay =
+parseDate(
+g.itineraryDays[g.itineraryDays.length - 1].date
+);
+
+if(firstDay && lastDay){
+
+if(today > lastDay){
+
+tripStage = "COMPLETED";
+tripStageClass = "completed";
+
+}
+else if(today >= firstDay && today <= lastDay){
+
+tripStage = "ONGOING";
+tripStageClass = "confirmed";
+
+}
+else{
+
+tripStage = "UPCOMING";
+tripStageClass = "pending";
+
+}
+
+}
+
+}
+
 html += `
 <div class="guest-tile" onclick="this.classList.toggle('active')">
 
@@ -1109,6 +1162,12 @@ g.companyName
 
 <div class="status-badge ${badge}">
 ${g.travelStatus || ""}
+</div>
+
+<div
+class="status-badge ${tripStageClass}"
+style="margin-top:10px;">
+${tripStage}
 </div>
 
 </div>
