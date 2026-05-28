@@ -647,6 +647,30 @@ SAVE GUEST
 
 </div>
 
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:25px;">
+
+<button class="add-small-btn" onclick="filterGuests('ALL')">
+ALL
+</button>
+
+<button class="add-small-btn" onclick="filterGuests('UPCOMING')">
+UPCOMING
+</button>
+
+<button class="add-small-btn" onclick="filterGuests('ONGOING')">
+ONGOING
+</button>
+
+<button class="add-small-btn" onclick="filterGuests('COMPLETED')">
+COMPLETED
+</button>
+
+</div>
+
+<div
+class="status-grid"
+id="guestContainer"></div>  
+  
 <div
 class="status-grid"
 id="guestContainer"></div>
