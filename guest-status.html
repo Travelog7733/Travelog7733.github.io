@@ -969,6 +969,91 @@ class="input-field cruise-status">
 
 }
 
+function addFlight(){
+
+document.getElementById("flightContainer")
+.insertAdjacentHTML("beforeend",`
+
+<div class="hotel-card flight-card">
+
+<div class="hotel-grid">
+
+<select class="input-field flight-type">
+<option>INTERNATIONAL</option>
+<option>DOMESTIC</option>
+</select>
+
+<select class="input-field flight-status">
+<option>PENDING FOR BOOKING</option>
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>NOT REQUIRED</option>
+</select>
+
+<input type="date" class="input-field flight-depart-date">
+<input type="time" class="input-field flight-depart-time">
+
+<input type="date" class="input-field flight-arrival-date">
+<input type="time" class="input-field flight-arrival-time">
+
+</div>
+
+<button type="button" class="remove-btn" onclick="removeFlight(this)">
+Remove Flight
+</button>
+
+</div>
+
+`);
+}
+
+function removeFlight(btn){
+btn.closest(".flight-card").remove();
+}
+
+function addFlight(){
+
+document.getElementById("flightContainer")
+.insertAdjacentHTML("beforeend",`
+
+<div class="hotel-card flight-card">
+
+<div class="hotel-grid">
+
+<select class="input-field flight-type">
+<option>INTERNATIONAL</option>
+<option>DOMESTIC</option>
+</select>
+
+<select class="input-field flight-status">
+<option>PENDING FOR BOOKING</option>
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>NOT REQUIRED</option>
+</select>
+
+<input type="date" class="input-field flight-depart-date">
+<input type="time" class="input-field flight-depart-time">
+
+<input type="date" class="input-field flight-arrival-date">
+<input type="time" class="input-field flight-arrival-time">
+
+</div>
+
+<button type="button" class="remove-btn" onclick="removeFlight(this)">
+Remove Flight
+</button>
+
+</div>
+
+`);
+
+}
+
+function removeFlight(btn){
+btn.closest(".flight-card").remove();
+}
+  
 async function addGuest(){
 
 const visaStatus =
