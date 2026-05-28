@@ -419,22 +419,25 @@ class="input-field">
 </select>
 
 <input
-type="text"
+type="number"
 id="invoiceAmount"
 class="input-field"
-placeholder="₹ Total Invoice Amount">
+placeholder="₹ Total Invoice Amount"
+oninput="calculateBalance()">
 
 <input
-type="text"
+type="number"
 id="amountReceived"
 class="input-field"
-placeholder="₹ Amount Received">
+placeholder="₹ Amount Received"
+oninput="calculateBalance()">
 
 <input
-type="text"
+type="number"
 id="balanceAmount"
 class="input-field"
-placeholder="₹ Balance Receivable">
+placeholder="₹ Balance Receivable"
+readonly>
 
 </div>
 
@@ -701,6 +704,8 @@ value = value.substring(0,5) + '/' + value.substring(5,9);
 input.value = value;
 
 }
+
+
 
 function toggleForm(){
 
