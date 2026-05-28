@@ -1389,8 +1389,13 @@ document.getElementById(
 "dayContainer"
 ).innerHTML="";
 
+dayCount = 0;
+
 (guest.itineraryDays || [])
 .forEach(day=>{
+
+dayCount++;
+
 
 document.getElementById(
 "dayContainer"
