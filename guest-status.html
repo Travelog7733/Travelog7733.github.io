@@ -601,52 +601,6 @@ onclick="addCruise()">
 <div class="sub-section">
 
 <div class="section-title">
-Flight Booking Status
-</div>
-
-<div id="flightContainer">
-
-<div class="hotel-card flight-card">
-
-<div class="hotel-grid">
-
-<select class="input-field flight-type">
-<option>INTERNATIONAL</option>
-<option>DOMESTIC</option>
-</select>
-
-<select class="input-field flight-status">
-<option>PENDING FOR BOOKING</option>
-<option>BOOKED</option>
-<option>BOOKED BY CUSTOMER</option>
-<option>NOT REQUIRED</option>
-</select>
-
-<input type="date" class="input-field flight-depart-date">
-<input type="time" class="input-field flight-depart-time">
-
-<input type="date" class="input-field flight-arrival-date">
-<input type="time" class="input-field flight-arrival-time">
-
-</div>
-
-<button type="button" class="remove-btn" onclick="removeFlight(this)">
-Remove Flight
-</button>
-
-</div>
-
-</div>
-
-<button class="add-small-btn" onclick="addFlight()">
-+ Add Flight
-</button>
-
-</div>
-
-<div class="sub-section">
-
-<div class="section-title">
 Day-wise Itinerary
 </div>
 
@@ -969,91 +923,6 @@ class="input-field cruise-status">
 
 }
 
-function addFlight(){
-
-document.getElementById("flightContainer")
-.insertAdjacentHTML("beforeend",`
-
-<div class="hotel-card flight-card">
-
-<div class="hotel-grid">
-
-<select class="input-field flight-type">
-<option>INTERNATIONAL</option>
-<option>DOMESTIC</option>
-</select>
-
-<select class="input-field flight-status">
-<option>PENDING FOR BOOKING</option>
-<option>BOOKED</option>
-<option>BOOKED BY CUSTOMER</option>
-<option>NOT REQUIRED</option>
-</select>
-
-<input type="date" class="input-field flight-depart-date">
-<input type="time" class="input-field flight-depart-time">
-
-<input type="date" class="input-field flight-arrival-date">
-<input type="time" class="input-field flight-arrival-time">
-
-</div>
-
-<button type="button" class="remove-btn" onclick="removeFlight(this)">
-Remove Flight
-</button>
-
-</div>
-
-`);
-}
-
-function removeFlight(btn){
-btn.closest(".flight-card").remove();
-}
-
-function addFlight(){
-
-document.getElementById("flightContainer")
-.insertAdjacentHTML("beforeend",`
-
-<div class="hotel-card flight-card">
-
-<div class="hotel-grid">
-
-<select class="input-field flight-type">
-<option>INTERNATIONAL</option>
-<option>DOMESTIC</option>
-</select>
-
-<select class="input-field flight-status">
-<option>PENDING FOR BOOKING</option>
-<option>BOOKED</option>
-<option>BOOKED BY CUSTOMER</option>
-<option>NOT REQUIRED</option>
-</select>
-
-<input type="date" class="input-field flight-depart-date">
-<input type="time" class="input-field flight-depart-time">
-
-<input type="date" class="input-field flight-arrival-date">
-<input type="time" class="input-field flight-arrival-time">
-
-</div>
-
-<button type="button" class="remove-btn" onclick="removeFlight(this)">
-Remove Flight
-</button>
-
-</div>
-
-`);
-
-}
-
-function removeFlight(btn){
-btn.closest(".flight-card").remove();
-}
-  
 async function addGuest(){
 
 const visaStatus =
@@ -1107,16 +976,6 @@ card.querySelector(".auto-date").innerText,
 activity:
 card.querySelector(".itinerary-text").value
 
-}));
-
-const flights = [...document.querySelectorAll("#flightContainer .flight-card")]
-.map(card => ({
-    type: card.querySelector(".flight-type").value,
-    status: card.querySelector(".flight-status").value,
-    departDate: card.querySelector(".flight-depart-date").value,
-    departTime: card.querySelector(".flight-depart-time").value,
-    arrivalDate: card.querySelector(".flight-arrival-date").value,
-    arrivalTime: card.querySelector(".flight-arrival-time").value
 }));
 
 const guest = {
@@ -1745,4 +1604,4 @@ generateDates();
 
 </body>
 
-</html>
+</html> - UNDERSTAND
