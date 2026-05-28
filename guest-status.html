@@ -302,6 +302,22 @@ padding-top:18px;
 border-top:1px solid #eee;
 }
 
+.remove-btn{
+background:#ff4d4f;
+color:#fff;
+border:none;
+padding:8px 14px;
+border-radius:10px;
+cursor:pointer;
+font-size:13px;
+font-weight:600;
+margin-top:12px;
+}
+
+.remove-btn:hover{
+opacity:.9;
+}
+  
 @media(max-width:768px){
 
 .page-title{
@@ -787,9 +803,39 @@ Day ${dayCount} -
 class="input-field itinerary-text"
 placeholder="Activity / Plans"></textarea>
 
+<button
+type="button"
+class="remove-btn"
+onclick="removeDay(this)">
+Remove Day
+</button>
+
 </div>
 
 `);
+
+generateDates();
+
+}
+
+function removeDay(button){
+
+button.closest(".day-card").remove();
+
+const allDays =
+document.querySelectorAll(".day-card");
+
+dayCount = 0;
+
+allDays.forEach((card,index)=>{
+
+dayCount++;
+
+card.querySelector(".day-title").innerHTML =
+`Day ${dayCount} -
+<span class="auto-date"></span>`;
+
+});
 
 generateDates();
 
@@ -1044,6 +1090,59 @@ if(g.travelStatus === "COMPLETED"){
 badge = "completed";
 }
 
+let tripStage = "UPCOMING";
+let tripStageClass = "pending";
+
+if(g.itineraryDays && g.itineraryDays.length){
+
+const today = new Date();
+
+today.setHours(0,0,0,0);
+
+const parseDate = (dateStr) => {
+
+if(!dateStr || !dateStr.includes('/'))
+return null;
+
+const [dd, mm, yyyy] = dateStr.split('/');
+
+return new Date(yyyy, mm - 1, dd);
+
+};
+
+const firstDay =
+parseDate(g.itineraryDays[0].date);
+
+const lastDay =
+parseDate(
+g.itineraryDays[g.itineraryDays.length - 1].date
+);
+
+if(firstDay && lastDay){
+
+if(today > lastDay){
+
+tripStage = "COMPLETED";
+tripStageClass = "completed";
+
+}
+else if(today >= firstDay && today <= lastDay){
+
+tripStage = "ONGOING";
+tripStageClass = "confirmed";
+
+}
+else{
+
+tripStage = "UPCOMING";
+tripStageClass = "pending";
+
+}
+
+}
+
+}
+
 html += `
 <div class="guest-tile" onclick="this.classList.toggle('active')">
 
@@ -1063,6 +1162,12 @@ g.companyName
 
 <div class="status-badge ${badge}">
 ${g.travelStatus || ""}
+</div>
+
+<div
+class="status-badge ${tripStageClass}"
+style="margin-top:10px;">
+${tripStage}
 </div>
 
 </div>
@@ -1427,6 +1532,13 @@ class="input-field itinerary-text">
 ${day.activity || ""}
 
 </textarea>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeDay(this)">
+Remove Day
+</button>
 
 </div>
 
