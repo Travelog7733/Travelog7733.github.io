@@ -1109,6 +1109,16 @@ card.querySelector(".itinerary-text").value
 
 }));
 
+const flights = [...document.querySelectorAll("#flightContainer .flight-card")]
+.map(card => ({
+    type: card.querySelector(".flight-type").value,
+    status: card.querySelector(".flight-status").value,
+    departDate: card.querySelector(".flight-depart-date").value,
+    departTime: card.querySelector(".flight-depart-time").value,
+    arrivalDate: card.querySelector(".flight-arrival-date").value,
+    arrivalTime: card.querySelector(".flight-arrival-time").value
+}));
+
 const guest = {
 
 guestName:
