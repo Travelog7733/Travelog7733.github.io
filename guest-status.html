@@ -703,9 +703,7 @@ value = value.substring(0,5) + '/' + value.substring(5,9);
 
 input.value = value;
 
-}
-
-
+}function calculateBalance(){ const invoice = parseFloat( document.getElementById("invoiceAmount").value ) || 0; const received = parseFloat( document.getElementById("amountReceived").value ) || 0; const balance = invoice - received; document.getElementById("balanceAmount").value = balance >= 0 ? balance : 0; }
 
 function toggleForm(){
 
