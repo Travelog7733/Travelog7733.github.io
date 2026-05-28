@@ -302,6 +302,22 @@ padding-top:18px;
 border-top:1px solid #eee;
 }
 
+.remove-btn{
+background:#ff4d4f;
+color:#fff;
+border:none;
+padding:8px 14px;
+border-radius:10px;
+cursor:pointer;
+font-size:13px;
+font-weight:600;
+margin-top:12px;
+}
+
+.remove-btn:hover{
+opacity:.9;
+}
+  
 @media(max-width:768px){
 
 .page-title{
@@ -787,9 +803,39 @@ Day ${dayCount} -
 class="input-field itinerary-text"
 placeholder="Activity / Plans"></textarea>
 
+<button
+type="button"
+class="remove-btn"
+onclick="removeDay(this)">
+Remove Day
+</button>
+
 </div>
 
 `);
+
+generateDates();
+
+}
+
+function removeDay(button){
+
+button.closest(".day-card").remove();
+
+const allDays =
+document.querySelectorAll(".day-card");
+
+dayCount = 0;
+
+allDays.forEach((card,index)=>{
+
+dayCount++;
+
+card.querySelector(".day-title").innerHTML =
+`Day ${dayCount} -
+<span class="auto-date"></span>`;
+
+});
 
 generateDates();
 
