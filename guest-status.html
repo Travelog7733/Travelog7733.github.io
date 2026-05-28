@@ -154,6 +154,7 @@ box-shadow:0 8px 30px rgba(0,0,0,.04);
 cursor:pointer;
 transition:.3s;
 overflow:hidden;
+position:relative;
 }
 
 .guest-tile:hover{
@@ -322,6 +323,28 @@ margin-top:12px;
 
 .remove-btn:hover{
 opacity:.9;
+}
+
+.share-fab{
+position:absolute;
+bottom:15px;
+right:15px;
+width:42px;
+height:42px;
+background:#25D366;
+color:#fff;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:18px;
+cursor:pointer;
+box-shadow:0 6px 15px rgba(0,0,0,0.15);
+transition:0.3s;
+}
+
+.share-fab:hover{
+transform:scale(1.1);
 }
   
 @media(max-width:768px){
@@ -1267,8 +1290,12 @@ Delete
 
 </div>
 
+<div class="share-fab"
+onclick="event.stopPropagation(); shareWhatsApp('${g.id}')">
+📤
 </div>
 
+</div>
 </div>
 `;
 
