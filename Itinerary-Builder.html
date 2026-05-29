@@ -288,28 +288,20 @@ margin-top:20px;
 .edit-btn,
 .delete-btn{
 border:none;
-padding:11px 18px;
-border-radius:14px;
+padding:10px 16px;
+border-radius:12px;
 font-size:13px;
 font-weight:700;
 cursor:pointer;
 color:#fff;
-transition:.3s;
 }
 
 .edit-btn{
-background:linear-gradient(135deg,#0B3D91,#1F6BFF);
-box-shadow:0 8px 20px rgba(31,107,255,0.25);
+background:#0B3D91;
 }
 
 .delete-btn{
-background:linear-gradient(135deg,#ff4d4f,#c91818);
-box-shadow:0 8px 20px rgba(255,77,79,0.25);
-}
-
-.edit-btn:hover,
-.delete-btn:hover{
-transform:translateY(-2px);
+background:#ff4d4f;
 }
 
 /* DAY SECTION */
@@ -393,23 +385,23 @@ font-size:28px;
 <div class="sidebar-menu">
 
 <button class="menu-btn active" onclick="switchPage('itineraryPage',this)">
-CREATE ITINERARY
+📝 Create Itinerary
 </button>
 
 <button class="menu-btn" onclick="switchPage('tourPage',this)">
-TOUR LIBRARY
+🌍 Tour Library
 </button>
 
 <button class="menu-btn" onclick="switchPage('customerPage',this)">
-CUSTOMER LIST
+👥 Customer List
 </button>
 
 <button class="menu-btn" onclick="switchPage('hotelPage',this)">
-HOTEL LIBRARY
+🏨 Hotel Library
 </button>
 
 <button class="menu-btn" onclick="switchPage('visaPage',this)">
-VISA LIBRARY
+🛂 Visa Library
 </button>
 
 </div>
@@ -702,7 +694,7 @@ SAVE VISA
 
 <!-- FIREBASE -->
 
-<script>
+<script type="module">
 
 import {
 initializeApp
@@ -714,8 +706,7 @@ collection,
 addDoc,
 deleteDoc,
 doc,
-onSnapshot,
-updateDoc
+onSnapshot
 }
 from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
@@ -745,17 +736,11 @@ window.addDoc = addDoc;
 window.deleteDoc = deleteDoc;
 window.doc = doc;
 window.onSnapshot = onSnapshot;
-window.updateDoc = updateDoc;
 
 </script>
 
-<script type="module">
+<script>
 
-let editingItineraryId = null;
-let editingTourId = null;
-let editingCustomerId = null;
-let editingHotelId = null;
-let editingVisaId = null;
 let dayCount = 1;
 
 /* PAGE SWITCH */
@@ -813,6 +798,8 @@ placeholder="Activities"></textarea>
 
 }
 
+/* SAVE ITINERARY */
+
 async function saveItinerary(){
 
 const days =
@@ -824,7 +811,9 @@ activity:item.value
 
 }));
 
-const data = {
+await addDoc(
+collection(db,"itineraries"),
+{
 
 tripName:
 document.getElementById("tripName").value,
@@ -848,61 +837,9 @@ itinerary:days,
 
 created:new Date().toISOString()
 
-};
-
-if(editingItineraryId){
-
-await updateDoc(
-doc(db,"itineraries",editingItineraryId),
-data
-);
-
-alert("Itinerary Updated");
-
-editingItineraryId = null;
-
-}else{
-
-await addDoc(
-collection(db,"itineraries"),
-data
-);
+});
 
 alert("Itinerary Saved");
-
-}
-
-document.getElementById("itineraryForm").style.display = "none";
-
-document.getElementById("tripName").value = "";
-
-document.getElementById("tripDestination").value = "";
-
-document.getElementById("tripCustomer").value = "";
-
-document.getElementById("tripDate").value = "";
-
-document.getElementById("tripDays").value = "";
-
-document.getElementById("tripGuests").value = "";
-
-document.getElementById("dayContainer").innerHTML = `
-
-<div class="day-card">
-
-<div class="day-title">
-Day 1
-</div>
-
-<textarea
-class="input-field itinerary-text"
-placeholder="Activities"></textarea>
-
-</div>
-
-`;
-
-dayCount = 1;
 
 }
 
@@ -953,12 +890,6 @@ ${g.days || ""}
 </div>
 
 <div class="card-actions">
-
-<button
-class="edit-btn"
-onclick="editItinerary('${docItem.id}')">
-Edit
-</button>
 
 <button
 class="delete-btn"
@@ -1017,66 +948,6 @@ document.getElementById("tourDescription").value
 });
 
 alert("Tour Saved");
-
-}
-
-function editItinerary(id,data){
-
-editingItineraryId = id;
-
-document.getElementById("itineraryForm")
-.style.display = "block";
-
-document.getElementById("tripName").value =
-data.tripName || "";
-
-document.getElementById("tripDestination").value =
-data.destination || "";
-
-document.getElementById("tripCustomer").value =
-data.customer || "";
-
-document.getElementById("tripDate").value =
-data.travelDate || "";
-
-document.getElementById("tripDays").value =
-data.days || "";
-
-document.getElementById("tripGuests").value =
-data.guests || "";
-
-/* LOAD DAY WISE PLAN */
-
-const container =
-document.getElementById("dayContainer");
-
-container.innerHTML = "";
-
-/* CREATE DAYS AGAIN */
-
-(data.itinerary || []).forEach((d,index)=>{
-
-container.insertAdjacentHTML("beforeend",`
-
-<div class="day-card">
-
-<div class="day-title">
-Day ${index+1}
-</div>
-
-<textarea
-class="input-field itinerary-text"
-placeholder="Activities">${d.activity || ""}</textarea>
-
-</div>
-
-`);
-
-});
-
-/* RESET DAY COUNT */
-
-dayCount = (data.itinerary || []).length;
 
 }
 
