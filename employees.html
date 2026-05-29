@@ -22,6 +22,19 @@ box-sizing:border-box;
 font-family:'Poppins',sans-serif;
 }
 
+.top-logo{
+position:fixed;
+top:25px;
+left:30px;
+z-index:1000;
+}
+
+.top-logo img{
+height:55px;
+width:auto;
+object-fit:contain;
+}
+  
 .employee-page{
 min-height:100vh;
 display:flex;
@@ -179,6 +192,15 @@ margin-top:30px;
 
 @media(max-width:768px){
 
+.top-logo{
+top:18px;
+left:18px;
+}
+
+.top-logo img{
+height:42px;
+}
+  
 .employee-box{
 padding:35px 22px;
 border-radius:20px;
@@ -205,6 +227,10 @@ padding:13px 20px;
 
 <body>
 
+<div class="top-logo">
+<img src="images/logo.png" alt="Travelog Logo">
+</div>  
+  
 <div class="employee-page">
 
 <div class="employee-box">
