@@ -288,20 +288,28 @@ margin-top:20px;
 .edit-btn,
 .delete-btn{
 border:none;
-padding:10px 16px;
-border-radius:12px;
+padding:11px 18px;
+border-radius:14px;
 font-size:13px;
 font-weight:700;
 cursor:pointer;
 color:#fff;
+transition:.3s;
 }
 
 .edit-btn{
-background:#0B3D91;
+background:linear-gradient(135deg,#0B3D91,#1F6BFF);
+box-shadow:0 8px 20px rgba(31,107,255,0.25);
 }
 
 .delete-btn{
-background:#ff4d4f;
+background:linear-gradient(135deg,#ff4d4f,#c91818);
+box-shadow:0 8px 20px rgba(255,77,79,0.25);
+}
+
+.edit-btn:hover,
+.delete-btn:hover{
+transform:translateY(-2px);
 }
 
 /* DAY SECTION */
@@ -750,8 +758,6 @@ let editingHotelId = null;
 let editingVisaId = null;
 let dayCount = 1;
 
-let editingItineraryId = null;
-
 /* PAGE SWITCH */
 
 function switchPage(pageId,btn){
@@ -867,6 +873,36 @@ alert("Itinerary Saved");
 }
 
 document.getElementById("itineraryForm").style.display = "none";
+
+document.getElementById("tripName").value = "";
+
+document.getElementById("tripDestination").value = "";
+
+document.getElementById("tripCustomer").value = "";
+
+document.getElementById("tripDate").value = "";
+
+document.getElementById("tripDays").value = "";
+
+document.getElementById("tripGuests").value = "";
+
+document.getElementById("dayContainer").innerHTML = `
+
+<div class="day-card">
+
+<div class="day-title">
+Day 1
+</div>
+
+<textarea
+class="input-field itinerary-text"
+placeholder="Activities"></textarea>
+
+</div>
+
+`;
+
+dayCount = 1;
 
 }
 
