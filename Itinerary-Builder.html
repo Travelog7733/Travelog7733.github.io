@@ -58,6 +58,45 @@ gap:10px;
 color:#1D9E75;
 }
 
+.logo-img{
+width:180px;
+height:auto;
+object-fit:contain;
+
+filter:
+drop-shadow(0 0 10px rgba(29,158,117,0.25));
+
+animation:
+logoFloat 4s ease-in-out infinite;
+
+transition:.4s ease;
+}
+
+.logo-img:hover{
+
+transform:scale(1.05);
+
+filter:
+drop-shadow(0 0 20px rgba(29,158,117,0.45));
+
+}
+
+@keyframes logoFloat{
+
+0%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(-6px);
+}
+
+100%{
+transform:translateY(0px);
+}
+
+}
+
 .sidebar-menu{
 display:flex;
 flex-direction:column;
@@ -379,7 +418,12 @@ font-size:28px;
 <div class="sidebar">
 
 <div class="logo">
-✈️ <span>Travelog</span>
+
+<img
+src="images/logo.png"
+alt="Travelog Logo"
+class="logo-img">
+
 </div>
 
 <div class="sidebar-menu">
