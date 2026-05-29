@@ -956,10 +956,7 @@ ${g.days || ""}
 
 <button
 class="edit-btn"
-onclick='editItinerary(
-"${docItem.id}",
-JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(g))}"))
-)'>
+onclick="editItinerary('${docItem.id}')">
 Edit
 </button>
 
