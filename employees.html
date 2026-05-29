@@ -21,8 +21,42 @@ display:flex;
 align-items:center;
 justify-content:center;
 padding:40px 20px;
-background:#f5f7fb;
 font-family:'Poppins',sans-serif;
+
+/* DARK BLUE + RED GRADIENT */
+background:
+linear-gradient(135deg,
+#071426 0%,
+#0b1f3a 35%,
+#1b1030 65%,
+#3b0b17 100%);
+
+position:relative;
+overflow:hidden;
+}
+
+.employee-page::before{
+content:'';
+position:absolute;
+width:500px;
+height:500px;
+background:rgba(255,0,60,0.18);
+border-radius:50%;
+top:-150px;
+right:-150px;
+filter:blur(120px);
+}
+
+.employee-page::after{
+content:'';
+position:absolute;
+width:450px;
+height:450px;
+background:rgba(0,140,255,0.15);
+border-radius:50%;
+bottom:-150px;
+left:-150px;
+filter:blur(120px);
 }
 
 .employee-box{
