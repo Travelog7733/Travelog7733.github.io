@@ -781,6 +781,7 @@ window.addDoc = addDoc;
 window.deleteDoc = deleteDoc;
 window.doc = doc;
 window.onSnapshot = onSnapshot;
+window.updateDoc = updateDoc;
 
 </script>
 
@@ -907,38 +908,39 @@ html += `
 <div class="card">
 
 <div class="card-title">
-${g.tripName || ""}
+${t.name || ""}
 </div>
 
 <div class="card-sub">
-${g.destination || ""}
+${t.country || ""}
 </div>
 
 <div class="card-line">
-<span class="label">Customer:</span>
-${g.customer || ""}
+<span class="label">Duration:</span>
+${t.duration || ""} Days
 </div>
 
 <div class="card-line">
-<span class="label">Travel Date:</span>
-${g.travelDate || ""}
-</div>
-
-<div class="card-line">
-<span class="label">Guests:</span>
-${g.guests || ""}
-</div>
-
-<div class="card-line">
-<span class="label">Days:</span>
-${g.days || ""}
+${t.description || ""}
 </div>
 
 <div class="card-actions">
 
 <button
+class="edit-btn"
+onclick="editTour(
+'${docItem.id}',
+'${t.name || ""}',
+'${t.country || ""}',
+'${t.duration || ""}',
+`${t.description || ""}`
+)">
+Edit
+</button>
+
+<button
 class="delete-btn"
-onclick="deleteItinerary('${docItem.id}')">
+onclick="deleteTour('${docItem.id}')">
 Delete
 </button>
 
@@ -993,6 +995,57 @@ document.getElementById("tourDescription").value
 });
 
 alert("Tour Saved");
+
+}
+
+/* DELETE TOUR */
+
+async function deleteTour(id){
+
+if(!confirm("Delete this tour?"))
+return;
+
+await deleteDoc(
+doc(db,"tourLibrary",id)
+);
+
+}
+
+/* EDIT TOUR */
+
+async function editTour(id,name,country,duration,description){
+
+const newName =
+prompt("Edit Tour Name",name);
+
+if(newName===null) return;
+
+const newCountry =
+prompt("Edit Country",country);
+
+if(newCountry===null) return;
+
+const newDuration =
+prompt("Edit Duration",duration);
+
+if(newDuration===null) return;
+
+const newDescription =
+prompt("Edit Description",description);
+
+if(newDescription===null) return;
+
+await updateDoc(
+doc(db,"tourLibrary",id),
+{
+name:newName,
+country:newCountry,
+duration:newDuration,
+description:newDescription
+}
+);
+
+alert("Tour Updated");
 
 }
 
