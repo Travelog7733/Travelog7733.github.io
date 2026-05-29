@@ -1270,7 +1270,7 @@ ${g.travelDate || "-"} <br>
 <div class="detail">
 
 <span class="label">
-⚠️ Advance Pending:
+Advance Pending:
 </span>
 
 <span
@@ -1297,6 +1297,17 @@ Math.max(
 Number(g.amountReceived || 0),
 0
 ).toFixed(0)
+}
+
+${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+) > 0
+? ' ⚠️'
+: ''
 }
 
 </span>
