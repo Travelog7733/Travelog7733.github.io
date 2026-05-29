@@ -706,7 +706,8 @@ collection,
 addDoc,
 deleteDoc,
 doc,
-onSnapshot
+onSnapshot,
+updateDoc
 }
 from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
@@ -736,12 +737,20 @@ window.addDoc = addDoc;
 window.deleteDoc = deleteDoc;
 window.doc = doc;
 window.onSnapshot = onSnapshot;
+window.updateDoc = updateDoc;
 
 </script>
 
 <script>
 
+let editingItineraryId = null;
+let editingTourId = null;
+let editingCustomerId = null;
+let editingHotelId = null;
+let editingVisaId = null;
 let dayCount = 1;
+
+let editingItineraryId = null;
 
 /* PAGE SWITCH */
 
@@ -798,8 +807,6 @@ placeholder="Activities"></textarea>
 
 }
 
-/* SAVE ITINERARY */
-
 async function saveItinerary(){
 
 const days =
@@ -811,9 +818,7 @@ activity:item.value
 
 }));
 
-await addDoc(
-collection(db,"itineraries"),
-{
+const data = {
 
 tripName:
 document.getElementById("tripName").value,
@@ -837,9 +842,31 @@ itinerary:days,
 
 created:new Date().toISOString()
 
-});
+};
+
+if(editingItineraryId){
+
+await updateDoc(
+doc(db,"itineraries",editingItineraryId),
+data
+);
+
+alert("Itinerary Updated");
+
+editingItineraryId = null;
+
+}else{
+
+await addDoc(
+collection(db,"itineraries"),
+data
+);
 
 alert("Itinerary Saved");
+
+}
+
+document.getElementById("itineraryForm").style.display = "none";
 
 }
 
@@ -890,6 +917,15 @@ ${g.days || ""}
 </div>
 
 <div class="card-actions">
+
+<button
+class="edit-btn"
+onclick='editItinerary(
+"${docItem.id}",
+JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(g))}"))
+)'>
+Edit
+</button>
 
 <button
 class="delete-btn"
@@ -948,6 +984,66 @@ document.getElementById("tourDescription").value
 });
 
 alert("Tour Saved");
+
+}
+
+function editItinerary(id,data){
+
+editingItineraryId = id;
+
+document.getElementById("itineraryForm")
+.style.display = "block";
+
+document.getElementById("tripName").value =
+data.tripName || "";
+
+document.getElementById("tripDestination").value =
+data.destination || "";
+
+document.getElementById("tripCustomer").value =
+data.customer || "";
+
+document.getElementById("tripDate").value =
+data.travelDate || "";
+
+document.getElementById("tripDays").value =
+data.days || "";
+
+document.getElementById("tripGuests").value =
+data.guests || "";
+
+/* LOAD DAY WISE PLAN */
+
+const container =
+document.getElementById("dayContainer");
+
+container.innerHTML = "";
+
+/* CREATE DAYS AGAIN */
+
+(data.itinerary || []).forEach((d,index)=>{
+
+container.insertAdjacentHTML("beforeend",`
+
+<div class="day-card">
+
+<div class="day-title">
+Day ${index+1}
+</div>
+
+<textarea
+class="input-field itinerary-text"
+placeholder="Activities">${d.activity || ""}</textarea>
+
+</div>
+
+`);
+
+});
+
+/* RESET DAY COUNT */
+
+dayCount = (data.itinerary || []).length;
 
 }
 
