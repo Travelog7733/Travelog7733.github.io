@@ -429,6 +429,11 @@ Travel<span>og</span>
  Visa Library
 </button>
 
+<button onclick="switchPage('customers',this)">
+<i class="ti ti-users"></i>
+ Customer Library
+</button>
+
 <button onclick="logout()">
 <i class="ti ti-logout"></i>
  Logout
@@ -793,6 +798,50 @@ Visa Library
 </div>
 
 </div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- CUSTOMERS -->
+
+<div id="customersPage" class="page hidden">
+
+<div class="topbar">
+
+<div class="page-title">
+Customer Library
+</div>
+
+<button class="btn btn-gold" onclick="addCustomer()">
++ Add Customer
+</button>
+
+</div>
+
+<div class="card">
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Name</th>
+<th>Phone</th>
+<th>Email</th>
+<th>Passport</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="customerTable"></tbody>
+
+</table>
 
 </div>
 
