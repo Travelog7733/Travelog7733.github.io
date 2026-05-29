@@ -58,45 +58,6 @@ gap:10px;
 color:#1D9E75;
 }
 
-.logo-img{
-width:180px;
-height:auto;
-object-fit:contain;
-
-filter:
-drop-shadow(0 0 10px rgba(29,158,117,0.25));
-
-animation:
-logoFloat 4s ease-in-out infinite;
-
-transition:.4s ease;
-}
-
-.logo-img:hover{
-
-transform:scale(1.05);
-
-filter:
-drop-shadow(0 0 20px rgba(29,158,117,0.45));
-
-}
-
-@keyframes logoFloat{
-
-0%{
-transform:translateY(0px);
-}
-
-50%{
-transform:translateY(-6px);
-}
-
-100%{
-transform:translateY(0px);
-}
-
-}
-
 .sidebar-menu{
 display:flex;
 flex-direction:column;
@@ -418,34 +379,29 @@ font-size:28px;
 <div class="sidebar">
 
 <div class="logo">
-
-<img
-src="images/logo.png"
-alt="Travelog Logo"
-class="logo-img">
-
+✈️ <span>Travelog</span>
 </div>
 
 <div class="sidebar-menu">
 
 <button class="menu-btn active" onclick="switchPage('itineraryPage',this)">
-CREATE ITINERARY
+📝 Create Itinerary
 </button>
 
 <button class="menu-btn" onclick="switchPage('tourPage',this)">
-TOUR LIBRARY
+🌍 Tour Library
 </button>
 
 <button class="menu-btn" onclick="switchPage('customerPage',this)">
-CUSTOMER LIST
+👥 Customer List
 </button>
 
 <button class="menu-btn" onclick="switchPage('hotelPage',this)">
-HOTEL LIBRARY
+🏨 Hotel Library
 </button>
 
 <button class="menu-btn" onclick="switchPage('visaPage',this)">
-VISA LIBRARY
+🛂 Visa Library
 </button>
 
 </div>
@@ -750,8 +706,7 @@ collection,
 addDoc,
 deleteDoc,
 doc,
-onSnapshot,
-updateDoc
+onSnapshot
 }
 from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
@@ -781,7 +736,6 @@ window.addDoc = addDoc;
 window.deleteDoc = deleteDoc;
 window.doc = doc;
 window.onSnapshot = onSnapshot;
-window.updateDoc = updateDoc;
 
 </script>
 
@@ -908,39 +862,38 @@ html += `
 <div class="card">
 
 <div class="card-title">
-${t.name || ""}
+${g.tripName || ""}
 </div>
 
 <div class="card-sub">
-${t.country || ""}
+${g.destination || ""}
 </div>
 
 <div class="card-line">
-<span class="label">Duration:</span>
-${t.duration || ""} Days
+<span class="label">Customer:</span>
+${g.customer || ""}
 </div>
 
 <div class="card-line">
-${t.description || ""}
+<span class="label">Travel Date:</span>
+${g.travelDate || ""}
+</div>
+
+<div class="card-line">
+<span class="label">Guests:</span>
+${g.guests || ""}
+</div>
+
+<div class="card-line">
+<span class="label">Days:</span>
+${g.days || ""}
 </div>
 
 <div class="card-actions">
 
 <button
-class="edit-btn"
-onclick="editTour(
-'${docItem.id}',
-'${t.name || ""}',
-'${t.country || ""}',
-'${t.duration || ""}',
-`${t.description || ""}`
-)">
-Edit
-</button>
-
-<button
 class="delete-btn"
-onclick="deleteTour('${docItem.id}')">
+onclick="deleteItinerary('${docItem.id}')">
 Delete
 </button>
 
@@ -995,57 +948,6 @@ document.getElementById("tourDescription").value
 });
 
 alert("Tour Saved");
-
-}
-
-/* DELETE TOUR */
-
-async function deleteTour(id){
-
-if(!confirm("Delete this tour?"))
-return;
-
-await deleteDoc(
-doc(db,"tourLibrary",id)
-);
-
-}
-
-/* EDIT TOUR */
-
-async function editTour(id,name,country,duration,description){
-
-const newName =
-prompt("Edit Tour Name",name);
-
-if(newName===null) return;
-
-const newCountry =
-prompt("Edit Country",country);
-
-if(newCountry===null) return;
-
-const newDuration =
-prompt("Edit Duration",duration);
-
-if(newDuration===null) return;
-
-const newDescription =
-prompt("Edit Description",description);
-
-if(newDescription===null) return;
-
-await updateDoc(
-doc(db,"tourLibrary",id),
-{
-name:newName,
-country:newCountry,
-duration:newDuration,
-description:newDescription
-}
-);
-
-alert("Tour Updated");
 
 }
 
