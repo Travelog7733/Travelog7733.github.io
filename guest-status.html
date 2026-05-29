@@ -1246,11 +1246,47 @@ ${g.travelDate || "-"} <br>
 
 <div class="detail"><span class="label">Payment:</span> ${g.paymentStatus || ""}</div>
 
-<div class="detail"><span class="label">Invoice Amount:</span> <span class="amount">₹ ${g.invoiceAmount || 0}</span></div>
+<div class="detail">
+<span class="label">Invoice Amount:</span>
+<span class="amount">
+₹ ${g.invoiceAmount || 0}
+</span>
+</div>
 
-<div class="detail"><span class="label">Advance:</span> <span class="amount">₹ ${g.amountReceived || 0}</span></div>
+<div class="detail">
+<span class="label">Advance Required (60%):</span>
+<span class="amount">
+₹ ${((Number(g.invoiceAmount || 0) * 60) / 100).toFixed(0)}
+</span>
+</div>
 
-<div class="detail"><span class="label">Balance:</span> <span class="amount">₹ ${g.balanceAmount || 0}</span></div>
+<div class="detail">
+<span class="label">Advance Received:</span>
+<span class="amount">
+₹ ${g.amountReceived || 0}
+</span>
+</div>
+
+<div class="detail">
+<span class="label">Advance Pending:</span>
+<span class="amount">
+₹ ${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+).toFixed(0)
+}
+</span>
+</div>
+
+<div class="detail">
+<span class="label">Final Balance:</span>
+<span class="amount">
+₹ ${g.balanceAmount || 0}
+</span>
+</div>
 
 <div class="tile-block">
 <div class="label">Hotel Status</div><br>
