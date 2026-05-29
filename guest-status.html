@@ -1268,8 +1268,28 @@ ${g.travelDate || "-"} <br>
 </div>
 
 <div class="detail">
-<span class="label">Advance Pending:</span>
-<span class="amount">
+
+<span class="label">
+⚠️ Advance Pending:
+</span>
+
+<span
+class="amount"
+style="
+color:
+${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+) > 0
+? '#ff3b30'
+: '#1D9E75'
+};
+font-weight:700;
+">
+
 ₹ ${
 Math.max(
 ((Number(g.invoiceAmount || 0) * 60) / 100)
@@ -1278,7 +1298,9 @@ Number(g.amountReceived || 0),
 0
 ).toFixed(0)
 }
+
 </span>
+
 </div>
 
 <div class="detail">
