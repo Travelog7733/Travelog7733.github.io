@@ -331,29 +331,6 @@ cursor:pointer;
 margin-top:10px;
 }
 
-.meal-options{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-margin-top:10px;
-}
-
-.meal-btn{
-padding:10px 14px;
-border-radius:12px;
-border:1px solid rgba(255,255,255,0.2);
-background:rgba(255,255,255,0.08);
-color:#fff;
-cursor:pointer;
-font-weight:600;
-transition:0.2s;
-}
-
-.meal-btn.active{
-background:#1D9E75;
-border-color:#1D9E75;
-}
-
 /* MOBILE */
 
 @media(max-width:900px){
@@ -478,16 +455,6 @@ Itinerary Details
 <input type="number" id="tripDays" class="input-field" placeholder="Days">
 
 <input type="number" id="tripGuests" class="input-field" placeholder="Guests">
-
-<div class="meal-options">
-
-<button type="button" class="meal-btn" data-value="B">B</button>
-<button type="button" class="meal-btn" data-value="BR">BR</button>
-<button type="button" class="meal-btn" data-value="L">L</button>
-<button type="button" class="meal-btn" data-value="D">D</button>
-<button type="button" class="meal-btn" data-value="NO MEALS">NO MEALS</button>
-
-</div>
 
 </div>
 
@@ -961,26 +928,6 @@ doc(db,"itineraries",id)
 );
 
 }
-
-let selectedMeals = [];
-
-document.addEventListener("click", function(e){
-
-if(e.target.classList.contains("meal-btn")){
-
-const val = e.target.dataset.value;
-
-if(selectedMeals.includes(val)){
-selectedMeals = selectedMeals.filter(m => m !== val);
-e.target.classList.remove("active");
-}else{
-selectedMeals.push(val);
-e.target.classList.add("active");
-}
-
-}
-
-});
 
 /* TOUR */
 
