@@ -899,7 +899,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const STORAGE_KEY = "supplier-payment-crm-v1";
     const today = new Date();
     const state = loadState();
     let activeTab = "suppliers";
@@ -950,9 +949,62 @@
 
     render();
 
-    function loadState() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+   const STORAGE_KEY = "supplierCRMData";
+
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error("Invalid saved data", e);
+    }
+  }
+
+  return {
+    suppliers: [
+      {
+        id: uid(),
+        name: "Apex Packaging Co.",
+        contact: "Rina Patel",
+        phone: "+1 212 555 0117",
+        email: "accounts@apexpackaging.com",
+        taxId: "TX-998214",
+        terms: "Net 30",
+        status: "Active",
+        address: "41 Harbor Road, Newark, NJ",
+        notes: "Primary supplier for cartons and labels."
+      },
+      {
+        id: uid(),
+        name: "Metro Office Supplies",
+        contact: "Daniel Kim",
+        phone: "+1 415 555 0184",
+        email: "billing@metrooffice.com",
+        taxId: "TX-441087",
+        terms: "Net 15",
+        status: "Active",
+        address: "520 Market Street, San Francisco, CA",
+        notes: "Office consumables and stationery."
+      },
+      {
+        id: uid(),
+        name: "Prime Industrial Parts",
+        contact: "Laura Gomez",
+        phone: "+1 312 555 0146",
+        email: "finance@primeparts.com",
+        taxId: "TX-772641",
+        terms: "Net 45",
+        status: "On Hold",
+        address: "88 Foundry Avenue, Chicago, IL",
+        notes: "Requires approval before new orders."
+      }
+    ],
+    invoices: [],
+    payments: []
+  };
+}
       return {
         suppliers: [
           { id: uid(), name: "Apex Packaging Co.", contact: "Rina Patel", phone: "+1 212 555 0117", email: "accounts@apexpackaging.com", taxId: "TX-998214", terms: "Net 30", status: "Active", address: "41 Harbor Road, Newark, NJ", notes: "Primary supplier for cartons and labels." },
@@ -1396,9 +1448,9 @@
       return Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
     }
 
-    function persist() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+   function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
 
     function toast(message) {
       els.toast.textContent = message;
