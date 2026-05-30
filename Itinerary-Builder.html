@@ -526,6 +526,8 @@ Reusable destination templates and packages
 
 <input type="text" id="tourCountry" class="input-field" placeholder="Country">
 
+<input type="text" id="tourPlace" class="input-field" placeholder="Place / City">
+
 <input type="number" id="tourDuration" class="input-field" placeholder="Duration (Days)">
 
 <input type="number" id="tourPrice" class="input-field" placeholder="Tour Price (VND)">
@@ -938,6 +940,8 @@ collection(db,"tourLibrary"),
 name: document.getElementById("tourName").value,
 
 country: document.getElementById("tourCountry").value,
+  
+place: document.getElementById("tourPlace").value,
 
 duration: document.getElementById("tourDuration").value,
 
@@ -972,7 +976,7 @@ ${t.name || ""}
 </div>
 
 <div class="card-sub">
-${t.country || ""}
+📍 ${t.place || ""}, ${t.country || ""}
 </div>
 
 <div class="card-line">
