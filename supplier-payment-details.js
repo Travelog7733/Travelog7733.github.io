@@ -294,7 +294,7 @@ function renderPaymentInvoiceOptions() {
     .sort((a, b) => (b.invoice.date || "").localeCompare(a.invoice.date || ""))
     .map((item) => ({
       value: item.invoice.id,
-      label: `${item.invoice.invoiceNo} - Balance: ${vnd.format(item.balance)}`,
+     label: `${item.invoice.invoiceNo} - ${item.invoice.particulars || "Invoice"} - Balance: ${vnd.format(item.balance)}`,
     }));
 
   const selected = select.value;
