@@ -302,11 +302,12 @@ PROFIT CHECKER
 
 <br><br>
 
-<button
-class="employee-btn supplier-payment-details-btn"
-onclick="openSupplierPayments()">
+<a 
+href="https://www.travelogdrop.online/supplier_payment_details.html" 
+target="_blank" 
+class="employee-btn supplier-payment-details-btn">
 SUPPLIER PAYMENT STATUS
-</button>
+</a>
 
 </div>
 
@@ -344,65 +345,6 @@ document.getElementById("itinerary-section").style.display = "none";
 
 }
 
-
-document.getElementById("employeePassword")
-.addEventListener("keypress", function(event){
-
-if(event.key === "Enter"){
-
-validatePassword();
-
-}
-
-});
-
-<script>
-
-function showPasswordBox(){
-
-document.getElementById("password-section").style.display = "block";
-document.getElementById("employeePassword").focus();
-
-}
-
-function validatePassword(){
-
-const password = document.getElementById("employeePassword").value;
-
-if(password === "7733"){
-
-document.getElementById("itinerary-section").style.display = "block";
-document.getElementById("error-msg").style.display = "none";
-
-}else{
-
-document.getElementById("error-msg").style.display = "block";
-document.getElementById("itinerary-section").style.display = "none";
-
-}
-
-}
-
-function openSupplierPayments(){
-
-const supplierPassword = prompt(
-"Enter Supplier Payment Access Password"
-);
-
-if(supplierPassword === "5655"){
-
-window.open(
-"https://www.travelogdrop.online/supplier_payment_details.html",
-"_blank"
-);
-
-}else if(supplierPassword !== null){
-
-alert("Incorrect Password");
-
-}
-
-}
 
 document.getElementById("employeePassword")
 .addEventListener("keypress", function(event){
