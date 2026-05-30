@@ -710,7 +710,8 @@ collection,
 addDoc,
 deleteDoc,
 doc,
-onSnapshot
+onSnapshot,
+updateDoc
 }
 from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
@@ -746,6 +747,7 @@ window.onSnapshot = onSnapshot;
 <script>
 
 let dayCount = 1;
+let editingTourId = null;
 
 /* PAGE SWITCH */
 
@@ -933,25 +935,70 @@ doc(db,"itineraries",id)
 
 async function saveTour(){
 
-await addDoc(
-collection(db,"tourLibrary"),
-{
+const payload = {
 
 name: document.getElementById("tourName").value,
-
 country: document.getElementById("tourCountry").value,
-  
 place: document.getElementById("tourPlace").value,
-
 duration: document.getElementById("tourDuration").value,
-
 price: document.getElementById("tourPrice").value,
-
 description: document.getElementById("tourDescription").value
 
-});
+};
+
+// ✅ EDIT MODE (UPDATE EXISTING TOUR)
+if(editingTourId){
+
+await updateDoc(
+doc(db,"tourLibrary",editingTourId),
+payload
+);
+
+alert("Tour Updated");
+
+// reset edit mode
+editingTourId = null;
+
+}
+
+// ✅ ADD MODE (NEW TOUR)
+else{
+
+await addDoc(
+collection(db,"tourLibrary"),
+payload
+);
 
 alert("Tour Saved");
+
+}
+
+// optional: clear form after save
+document.getElementById("tourForm").style.display = "none";
+
+document.getElementById("tourName").value = "";
+document.getElementById("tourCountry").value = "";
+document.getElementById("tourPlace").value = "";
+document.getElementById("tourDuration").value = "";
+document.getElementById("tourPrice").value = "";
+document.getElementById("tourDescription").value = "";
+
+}
+
+function editTour(id, data){
+
+editingTourId = id;
+
+// open form
+document.getElementById("tourForm").style.display = "block";
+
+// fill form fields
+document.getElementById("tourName").value = data.name || "";
+document.getElementById("tourCountry").value = data.country || "";
+document.getElementById("tourPlace").value = data.place || "";
+document.getElementById("tourDuration").value = data.duration || "";
+document.getElementById("tourPrice").value = data.price || "";
+document.getElementById("tourDescription").value = data.description || "";
 
 }
 
