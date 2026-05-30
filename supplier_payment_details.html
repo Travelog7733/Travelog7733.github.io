@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supplier Payment Details CRM | Travelog</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0b1f3a;color:#fff;margin:0;padding:30px}
+.card{background:#fff;color:#222;padding:20px;border-radius:16px;margin-bottom:20px}
+h1{margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+input,select,button{padding:10px;width:100%;box-sizing:border-box}
+button{background:#1D9E75;color:#fff;border:none;border-radius:8px;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>Travelog Supplier Payment CRM</h1>
+
+<div class="card">
+<h2>Dashboard</h2>
+<div class="grid">
+<div>Total Purchase: VND 0</div>
+<div>Total Paid: VND 0</div>
+<div>Outstanding: VND 0</div>
+<div>Suppliers: 0</div>
+</div>
+</div>
+
+<div class="card">
+<h2>Supplier Master</h2>
+<input placeholder="Supplier Code">
+<input placeholder="Supplier Name">
+<input placeholder="Contact Person">
+<button>Add Supplier</button>
+</div>
+
+<div class="card">
+<h2>Purchase Invoice</h2>
+<p>Ready for Firebase integration and invoice management.</p>
+</div>
+
+<div class="card">
+<h2>Payments</h2>
+<p>Ready for payment tracking and status dashboard.</p>
+</div>
+
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+authDomain:"travelog-itinerary.firebaseapp.com",
+projectId:"travelog-itinerary",
+storageBucket:"travelog-itinerary.firebasestorage.app",
+messagingSenderId:"33567258851",
+appId:"1:33567258851:web:790e8f165a3d917bf7edd6"
+};
+</script>
+</body>
+</html>
