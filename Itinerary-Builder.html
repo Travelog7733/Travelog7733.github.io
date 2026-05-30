@@ -1047,8 +1047,13 @@ ${t.description || ""}
 
 <div class="card-actions">
 
+<button class="edit-btn"
+onclick='editTour("${docItem.id}", ${JSON.stringify(t)})'>
+Edit
+</button>
+
 <button class="delete-btn"
-onclick="deleteTour('${docItem.id}')">
+onclick="deleteTour("${docItem.id}")">
 Delete
 </button>
 
