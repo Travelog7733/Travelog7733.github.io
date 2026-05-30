@@ -1761,6 +1761,52 @@ window.open(url, "_blank");
 
 </script>
 
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+deleteDoc,
+doc,
+onSnapshot,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+
+authDomain: "travelog-itinerary.firebaseapp.com",
+
+projectId: "travelog-itinerary",
+
+storageBucket: "travelog-itinerary.firebasestorage.app",
+
+messagingSenderId: "33567258851",
+
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+window.onSnapshot = onSnapshot;
+window.updateDoc = updateDoc;
+
+</script>
+
 </body>
 
 </html> 
