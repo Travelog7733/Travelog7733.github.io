@@ -1019,6 +1019,8 @@ snapshot.forEach((docItem)=>{
 
 const t = docItem.data();
 
+tourDataCache[docItem.id] = t;
+
 html += `
 
 <div class="card">
@@ -1048,7 +1050,7 @@ ${t.description || ""}
 <div class="card-actions">
 
 <button class="edit-btn"
-onclick='editTour("${docItem.id}", ${JSON.stringify(t)})'>
+onclick="editTour('${docItem.id}')">
 Edit
 </button>
 
