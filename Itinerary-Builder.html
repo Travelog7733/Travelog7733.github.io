@@ -897,9 +897,13 @@ ${g.days || ""}
 
 <div class="card-actions">
 
-<button
-class="delete-btn"
-onclick="deleteItinerary('${docItem.id}')">
+<button class="edit-btn"
+onclick='editTour("${docItem.id}", ${JSON.stringify(t)})'>
+Edit
+</button>
+
+<button class="delete-btn"
+onclick="deleteTour('${docItem.id}')">
 Delete
 </button>
 
