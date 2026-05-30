@@ -710,8 +710,7 @@ collection,
 addDoc,
 deleteDoc,
 doc,
-onSnapshot,
-updateDoc
+onSnapshot
 }
 from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
@@ -741,14 +740,12 @@ window.addDoc = addDoc;
 window.deleteDoc = deleteDoc;
 window.doc = doc;
 window.onSnapshot = onSnapshot;
-window.updateDoc = updateDoc;
 
 </script>
 
 <script>
 
 let dayCount = 1;
-let editingTourId = null;
 
 /* PAGE SWITCH */
 
@@ -898,13 +895,9 @@ ${g.days || ""}
 
 <div class="card-actions">
 
-<button class="edit-btn"
-onclick='editTour("${docItem.id}", ${JSON.stringify(g)})'>
-Edit
-</button>
-
-<button class="delete-btn"
-onclick="deleteTour('${docItem.id}')">
+<button
+class="delete-btn"
+onclick="deleteItinerary('${docItem.id}')">
 Delete
 </button>
 
@@ -940,70 +933,25 @@ doc(db,"itineraries",id)
 
 async function saveTour(){
 
-const payload = {
-
-name: document.getElementById("tourName").value,
-country: document.getElementById("tourCountry").value,
-place: document.getElementById("tourPlace").value,
-duration: document.getElementById("tourDuration").value,
-price: document.getElementById("tourPrice").value,
-description: document.getElementById("tourDescription").value
-
-};
-
-// ✅ EDIT MODE (UPDATE EXISTING TOUR)
-if(editingTourId){
-
-await updateDoc(
-doc(db,"tourLibrary",editingTourId),
-payload
-);
-
-alert("Tour Updated");
-
-// reset edit mode
-editingTourId = null;
-
-}
-
-// ✅ ADD MODE (NEW TOUR)
-else{
-
 await addDoc(
 collection(db,"tourLibrary"),
-payload
-);
+{
+
+name: document.getElementById("tourName").value,
+
+country: document.getElementById("tourCountry").value,
+  
+place: document.getElementById("tourPlace").value,
+
+duration: document.getElementById("tourDuration").value,
+
+price: document.getElementById("tourPrice").value,
+
+description: document.getElementById("tourDescription").value
+
+});
 
 alert("Tour Saved");
-
-}
-
-// optional: clear form after save
-document.getElementById("tourForm").style.display = "none";
-
-document.getElementById("tourName").value = "";
-document.getElementById("tourCountry").value = "";
-document.getElementById("tourPlace").value = "";
-document.getElementById("tourDuration").value = "";
-document.getElementById("tourPrice").value = "";
-document.getElementById("tourDescription").value = "";
-
-}
-
-function editTour(id, data){
-
-editingTourId = id;
-
-// open form
-document.getElementById("tourForm").style.display = "block";
-
-// fill form fields
-document.getElementById("tourName").value = data.name || "";
-document.getElementById("tourCountry").value = data.country || "";
-document.getElementById("tourPlace").value = data.place || "";
-document.getElementById("tourDuration").value = data.duration || "";
-document.getElementById("tourPrice").value = data.price || "";
-document.getElementById("tourDescription").value = data.description || "";
 
 }
 
@@ -1018,8 +966,6 @@ let html = "";
 snapshot.forEach((docItem)=>{
 
 const t = docItem.data();
-
-tourDataCache[docItem.id] = t;
 
 html += `
 
@@ -1048,11 +994,6 @@ ${t.description || ""}
 </div>
 
 <div class="card-actions">
-
-<button class="edit-btn"
-onclick="editTour('${docItem.id}')">
-Edit
-</button>
 
 <button class="delete-btn"
 onclick="deleteTour('${docItem.id}')">
