@@ -528,7 +528,7 @@ Reusable destination templates and packages
 
 <input type="number" id="tourDuration" class="input-field" placeholder="Duration (Days)">
 
-<input type="number" id="tourPrice" class="input-field" placeholder="Tour Price (USD)">
+<input type="number" id="tourPrice" class="input-field" placeholder="Tour Price (VND)">
 
 <textarea id="tourDescription" placeholder="Tour Description"></textarea>
 
@@ -986,7 +986,7 @@ ${t.description || ""}
 
 <div class="card-line">
 <span class="label">Price:</span>
-$${t.price || "0"}
+₫${Number(t.price || 0).toLocaleString("vi-VN")}
 </div>
 
 </div>
