@@ -526,7 +526,9 @@ Reusable destination templates and packages
 
 <input type="text" id="tourCountry" class="input-field" placeholder="Country">
 
-<input type="number" id="tourDuration" class="input-field" placeholder="Duration">
+<input type="number" id="tourDuration" class="input-field" placeholder="Duration (Days)">
+
+<input type="number" id="tourPrice" class="input-field" placeholder="Tour Price (USD)">
 
 <textarea id="tourDescription" placeholder="Tour Description"></textarea>
 
@@ -933,17 +935,15 @@ await addDoc(
 collection(db,"tourLibrary"),
 {
 
-name:
-document.getElementById("tourName").value,
+name: document.getElementById("tourName").value,
 
-country:
-document.getElementById("tourCountry").value,
+country: document.getElementById("tourCountry").value,
 
-duration:
-document.getElementById("tourDuration").value,
+duration: document.getElementById("tourDuration").value,
 
-description:
-document.getElementById("tourDescription").value
+price: document.getElementById("tourPrice").value,
+
+description: document.getElementById("tourDescription").value
 
 });
 
@@ -982,6 +982,11 @@ ${t.duration || ""} Days
 
 <div class="card-line">
 ${t.description || ""}
+</div>
+
+<div class="card-line">
+<span class="label">Price:</span>
+$${t.price || "0"}
 </div>
 
 </div>
