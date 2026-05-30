@@ -272,39 +272,36 @@ function renderSupplierOptions() {
 
 function renderPaymentInvoiceOptions() {
   const supplierId = els.paymentSupplier.value;
+  const select = els.paymentInvoice;
+
   const options = state.invoices
     .filter((invoice) => !supplierId || invoice.supplierId === supplierId)
-    .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
-    .map((invoice) => ({ value: invoice.id, label: invoiceLabel(invoice.id) }));
+    .map((invoice) => {
+      const totalPaid = state.payments
+        .filter((p) => p.invoiceId === invoice.id)
+        .reduce((sum, p) => sum + toNumber(p.amount), 0);
 
-  const selected = els.paymentInvoice.value;
-  setOptions(els.paymentInvoice, options, "Optional");
-  els.paymentInvoice.value = options.some((option) => option.value === selected) ? selected : "";
-}
+      const total = invoiceTotal(invoice);
+      const balance = total - totalPaid;
 
-function renderSupplierTable() {
-  if (!state.suppliers.length) {
-    els.supplierTable.innerHTML = `<tr><td colspan="4" class="empty-state">No suppliers added yet.</td></tr>`;
-    return;
-  }
+      return {
+        invoice,
+        balance,
+      };
+    })
+    // ❌ REMOVE FULLY PAID INVOICES
+    .filter((item) => item.balance > 0)
+    .sort((a, b) => (b.invoice.date || "").localeCompare(a.invoice.date || ""))
+    .map((item) => ({
+      value: item.invoice.id,
+      label: `${item.invoice.invoiceNo} - Balance: ${vnd.format(item.balance)}`,
+    }));
 
-  els.supplierTable.innerHTML = state.suppliers
-    .map(
-      (supplier) => `
-        <tr>
-          <td>${escapeHtml(supplier.code)}</td>
-          <td>${escapeHtml(supplier.name)}</td>
-          <td>${escapeHtml(supplier.note)}</td>
-          <td>
-            <div class="action-buttons">
-              <button class="row-btn edit" type="button" data-edit-supplier="${supplier.id}">Edit</button>
-              <button class="row-btn delete" type="button" data-delete-supplier="${supplier.id}">Delete</button>
-            </div>
-          </td>
-        </tr>
-      `,
-    )
-    .join("");
+  const selected = select.value;
+  setOptions(select, options, "Select Invoice");
+
+  // keep previous selection if still valid
+  select.value = options.some((o) => o.value === selected) ? selected : "";
 }
 
 function calculateLineAmount(row) {
