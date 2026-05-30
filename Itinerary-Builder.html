@@ -993,6 +993,15 @@ ${t.description || ""}
 ₫${Number(t.price || 0).toLocaleString("vi-VN")}
 </div>
 
+<div class="card-actions">
+
+<button class="delete-btn"
+onclick="deleteTour('${docItem.id}')">
+Delete
+</button>
+
+</div>
+
 </div>
 
 `;
@@ -1003,6 +1012,18 @@ document.getElementById("tourGrid")
 .innerHTML = html;
 
 });
+
+}
+
+async function deleteTour(id){
+
+if(!confirm("Delete this tour?")) return;
+
+await deleteDoc(
+doc(db,"tourLibrary",id)
+);
+
+alert("Tour Deleted");
 
 }
 
