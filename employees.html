@@ -293,14 +293,6 @@ ACCOUNTS PLATFORM
 
 <br><br>
 
-<button 
-class="employee-btn supplier-payments-btn"
-onclick="openSupplierPayments()">
-SUPPLIER PAYMENTS STATUS
-</button>
-
-<br><br>
-
 <a 
 href="https://www.travelogdrop.online/travelog_margin_checker.html" 
 target="_blank" 
@@ -353,26 +345,6 @@ document.getElementById("itinerary-section").style.display = "none";
 
 }
 
-function openSupplierPayments(){
-
-const password = prompt(
-"Enter Supplier Payments Password"
-);
-
-if(password === "5655"){
-
-window.open(
-"https://www.travelogdrop.online/supplier-payments.html",
-"_blank"
-);
-
-}else{
-
-alert("Incorrect Password");
-
-}
-
-}
 
 document.getElementById("employeePassword")
 .addEventListener("keypress", function(event){
