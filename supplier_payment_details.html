@@ -1372,9 +1372,13 @@
       return `${prefix}-${number}`;
     }
 
-    function money(value) {
-      return Number(value || 0).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
-    }
+ function money(value) {
+  return Number(value || 0).toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    maximumFractionDigits: 0
+  });
+}
 
     function singular(type) {
       return { suppliers: "Supplier", invoices: "Purchase Invoice", payments: "Payment" }[type];
