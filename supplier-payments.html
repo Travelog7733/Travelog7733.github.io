@@ -356,6 +356,8 @@ Supplier Invoice Input
 
 <input type="date" id="commencementDate" class="input-field">
 
+<input type="date" id="dueDate" class="input-field">
+
 <input type="text" id="invoiceNo" class="input-field" readonly placeholder="Auto Invoice No">
 
 </div>
@@ -698,6 +700,9 @@ document.getElementById('invoiceDate').value,
 commencementDate:
 document.getElementById('commencementDate').value,
 
+dueDate:
+document.getElementById('dueDate').value,
+
 items,
 
 notes:
@@ -753,6 +758,8 @@ function clearInvoiceForm(){
 document.getElementById('invoiceItems').innerHTML='';
 
 document.getElementById('invoiceNotes').value='';
+
+document.getElementById('dueDate').value = '';
 
 addInvoiceItem();
 
@@ -1106,6 +1113,9 @@ invoice.invoiceDate || '';
 
 document.getElementById('commencementDate').value =
 invoice.commencementDate || '';
+
+document.getElementById('dueDate').value =
+invoice.dueDate || '';
 
 document.getElementById('invoiceNo').value =
 invoice.invoiceNo || '';
