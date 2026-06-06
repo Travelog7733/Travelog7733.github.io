@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refund Policy | Travelog | Vietnam Travel Experts</title>
+  <link rel="icon" href="images/icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue-900: #0b3d5c;
+      --blue-700: #0f6fa8;
+      --blue-500: #21a5df;
+      --blue-200: #cdefff;
+      --blue-100: #ecf9ff;
+      --white: #ffffff;
+      --ink: #173044;
+      --muted: #64798a;
+      --line: rgba(18, 107, 153, 0.16);
+      --shadow: 0 24px 70px rgba(15, 111, 168, 0.18);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Poppins", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(33, 165, 223, 0.15), transparent 28%),
+        linear-gradient(180deg, #f7fdff 0%, #ffffff 42%, #eef9ff 100%);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .page-shell {
+      position: relative;
+      isolation: isolate;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.62);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 34px rgba(11, 61, 92, 0.07);
+    }
+
+    .nav-wrap {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 76px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      color: var(--blue-900);
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      color: var(--white);
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      box-shadow: 0 14px 26px rgba(33, 165, 223, 0.28);
+      font-size: 21px;
+    }
+
+    .brand-logo {
+      width: 138px;
+      max-height: 48px;
+      object-fit: contain;
+    }
+
+    .brand-text {
+      font-size: 19px;
+    }
+
+    .menu-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--blue-900);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .menu-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .menu-links a {
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      color: #315268;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 220ms ease, background 220ms ease, transform 220ms ease;
+    }
+
+    .menu-links a:hover {
+      color: var(--blue-900);
+      background: var(--blue-100);
+      transform: translateY(-2px);
+    }
+
+    /* ── Page hero banner ── */
+    .page-hero {
+      position: relative;
+      padding: 72px 0 56px;
+      overflow: hidden;
+    }
+
+    .page-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.88) 50%, rgba(255,255,255,0.60) 100%),
+        url("https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1800&q=80") center / cover;
+    }
+
+    .page-hero-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      width: fit-content;
+      padding: 8px 12px;
+      border: 1px solid rgba(33, 165, 223, 0.26);
+      border-radius: var(--radius);
+      color: var(--blue-700);
+      background: rgba(255, 255, 255, 0.76);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      animation: fadeUp 700ms ease both;
+    }
+
+    .page-hero h1 {
+      max-width: 640px;
+      margin-top: 16px;
+      color: var(--blue-900);
+      font-size: clamp(34px, 5.5vw, 64px);
+      line-height: 1.05;
+      animation: fadeUp 800ms ease 90ms both;
+    }
+
+    .page-hero h1 span {
+      color: var(--blue-500);
+    }
+
+    .page-hero p {
+      max-width: 540px;
+      margin-top: 16px;
+      color: #36566b;
+      font-size: clamp(15px, 1.8vw, 18px);
+      line-height: 1.75;
+      animation: fadeUp 850ms ease 170ms both;
+    }
+
+    /* ── Content section ── */
+    .content-section {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 76px 0;
+    }
+
+    .policy-layout {
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* left sidebar */
+    .info-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .info-box {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 18px 42px rgba(11, 61, 92, 0.08);
+      transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
+    }
+
+    .info-box:hover {
+      transform: translateY(-6px);
+      border-color: rgba(33, 165, 223, 0.36);
+      box-shadow: 0 28px 56px rgba(15, 111, 168, 0.14);
+    }
+
+    .info-box h3 {
+      margin-bottom: 16px;
+      color: var(--blue-900);
+      font-size: 20px;
+    }
+
+    .service-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(18, 107, 153, 0.1);
+      color: #36566b;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .service-item:first-of-type {
+      border-top: 0;
+    }
+
+    .service-item span {
+      width: 11px;
+      height: 11px;
+      flex: 0 0 11px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      box-shadow: 0 0 0 5px rgba(33, 165, 223, 0.1);
+    }
+
+    /* right policy cards */
+    .policy-cards {
+      display: grid;
+      gap: 20px;
+    }
+
+    .policy-card {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 18px 42px rgba(11, 61, 92, 0.08);
+      transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
+      animation: fadeUp 700ms ease both;
+    }
+
+    .policy-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(33, 165, 223, 0.36);
+      box-shadow: 0 28px 56px rgba(15, 111, 168, 0.14);
+    }
+
+    .policy-card-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      color: var(--white);
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      box-shadow: 0 10px 22px rgba(33, 165, 223, 0.28);
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .policy-card h3 {
+      color: var(--blue-900);
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .policy-card p {
+      color: #36566b;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .policy-card strong {
+      color: var(--blue-700);
+    }
+
+    /* contact card */
+    .contact-card {
+      padding: 28px;
+      border: 1px solid rgba(33, 165, 223, 0.22);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(236, 249, 255, 0.96), rgba(255, 255, 255, 0.96));
+      box-shadow: 0 18px 42px rgba(11, 61, 92, 0.08);
+    }
+
+    .contact-card h3 {
+      color: var(--blue-900);
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 12px 0;
+      border-top: 1px solid rgba(18, 107, 153, 0.1);
+      color: #36566b;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .contact-item:first-of-type {
+      border-top: 0;
+    }
+
+    .contact-item a {
+      color: var(--blue-700);
+      transition: color 200ms ease;
+    }
+
+    .contact-item a:hover {
+      color: var(--blue-500);
+    }
+
+    .contact-icon {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: rgba(33, 165, 223, 0.12);
+      color: var(--blue-700);
+      font-size: 16px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 36px 16px;
+      border-top: 1px solid var(--line);
+      color: #45697f;
+      background: var(--white);
+      text-align: center;
+    }
+
+    .site-logo {
+      width: 132px;
+      margin: 0 auto 12px;
+    }
+
+    .tagline {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 14px;
+      color: var(--blue-700);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* ── WhatsApp float ── */
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 60;
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #25d366;
+      box-shadow: 0 18px 34px rgba(37, 211, 102, 0.35);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    .whatsapp-float img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.07); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 980px) {
+      .policy-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .nav-wrap {
+        min-height: 68px;
+      }
+
+      .menu-toggle {
+        display: grid;
+        place-items: center;
+      }
+
+      .menu-links {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        top: 78px;
+        display: none;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: var(--shadow);
+      }
+
+      .menu-links.active {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .menu-links a {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .menu-links.active {
+        grid-template-columns: 1fr;
+      }
+
+      .content-section {
+        padding: 54px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <div class="nav-wrap">
+        <a href="index.html" class="brand" aria-label="Travelog home">
+          <img src="assets/travelog-logo.png" class="brand-logo" alt="Travelog Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'; this.nextElementSibling.nextElementSibling.style.display='inline';">
+          <span class="brand-mark" style="display: none;">T</span>
+          <span class="brand-text" style="display: none;">Travelog</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+
+        <nav class="menu-links" aria-label="Primary navigation">
+          <a href="index.html">Home</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="packages.html">Packages</a>
+          <a href="feedback.html">Feedback</a>
+          <a href="about.html">About Us</a>
+          <a href="contact.html">Contact</a>
+          <a href="employees.html">Employee Platform</a>
+          <a href="connect.html">Connect</a>
+          <a href="privacy.html">Privacy</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- Page Hero -->
+      <section class="page-hero">
+        <div class="page-hero-inner">
+          <div class="eyebrow">Travelog · Policies</div>
+          <h1>Refund <span>Policy</span></h1>
+          <p>Transparent and fair refund guidelines so you can travel with complete confidence.</p>
+        </div>
+      </section>
+
+      <!-- Content -->
+      <section class="content-section">
+        <div class="policy-layout">
+
+          <!-- Left sidebar -->
+          <div class="info-stack">
+            <div class="info-box">
+              <h3>Quick Summary</h3>
+              <div class="service-item"><span></span><p>Refunds after provider confirmation</p></div>
+              <div class="service-item"><span></span><p>7–14 working days processing</p></div>
+              <div class="service-item"><span></span><p>Some bookings non-refundable</p></div>
+              <div class="service-item"><span></span><p>Service charges may not be refunded</p></div>
+              <div class="service-item"><span></span><p>Email or call to raise a request</p></div>
+            </div>
+
+            <div class="info-box">
+              <h3>Other Policies</h3>
+              <div class="service-item"><span></span><p><a href="privacy.html" style="color:var(--blue-700)">Privacy Policy</a></p></div>
+              <div class="service-item"><span></span><p><a href="terms.html" style="color:var(--blue-700)">Terms &amp; Conditions</a></p></div>
+              <div class="service-item"><span></span><p><a href="cancellation.html" style="color:var(--blue-700)">Cancellation Policy</a></p></div>
+            </div>
+          </div>
+
+          <!-- Right policy cards -->
+          <div class="policy-cards">
+
+            <div class="policy-card">
+              <div class="policy-card-icon">💳</div>
+              <h3>Refund Processing</h3>
+              <p>Refunds will be processed only after receiving confirmation from airlines, hotels, or other relevant service providers. Once confirmation is received, we initiate the refund promptly.</p>
+            </div>
+
+            <div class="policy-card">
+              <div class="policy-card-icon">⏱</div>
+              <h3>Processing Time</h3>
+              <p>Refund processing may take between <strong>7–14 working days</strong> depending on your payment method and the policies of the respective service provider. We appreciate your patience during this time.</p>
+            </div>
+
+            <div class="policy-card">
+              <div class="policy-card-icon">🚫</div>
+              <h3>Non-Refundable Items</h3>
+              <p>Certain bookings or promotional packages may be strictly non-refundable. Additionally, service charges paid directly to Travelog may not be eligible for a refund. Please review your booking details carefully before confirming.</p>
+            </div>
+
+            <!-- Contact card -->
+            <div class="contact-card">
+              <h3>Contact Us for Refunds</h3>
+              <div class="contact-item">
+                <div class="contact-icon">✉</div>
+                <a href="mailto:sales@travelogdrop.online">sales@travelogdrop.online</a>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">✉</div>
+                <a href="mailto:support@travelogdrop.online">support@travelogdrop.online</a>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <a href="tel:+917994256121">+91 7994256121</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <img src="assets/travelog-logo.png" class="site-logo" alt="Travelog Logo" onerror="this.style.display='none'">
+    <div class="tagline">Travelog © 2026 All Rights Reserved</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="cancellation.html">Cancellation</a>
+      <a href="refund.html">Refund</a>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/917994256121" class="whatsapp-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <img src="images/whatsapp.png" alt="WhatsApp Chat" onerror="this.style.display='none'">
+  </a>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggle = document.querySelector(".menu-toggle");
+      const menu = document.querySelector(".menu-links");
+
+      toggle.addEventListener("click", function () {
+        const isOpen = menu.classList.toggle("active");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+      });
+    });
+  </script>
+</body>
+</html>
