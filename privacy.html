@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact Us | Travelog</title>
+  <title>Privacy Policy | Travelog</title>
   <link rel="icon" href="images/icon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -152,10 +152,10 @@
 
     .hero {
       position: relative;
-      min-height: calc(74vh - 76px);
+      min-height: calc(62vh - 76px);
       display: grid;
       align-items: center;
-      padding: 86px 0 54px;
+      padding: 82px 0 54px;
       overflow: hidden;
     }
 
@@ -165,8 +165,8 @@
       inset: 0;
       z-index: -2;
       background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 42%, rgba(255, 255, 255, 0.26) 70%, rgba(255, 255, 255, 0.72) 100%),
-        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85") center / cover;
+        linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.9) 46%, rgba(255, 255, 255, 0.36) 72%, rgba(255, 255, 255, 0.74) 100%),
+        url("https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1800&q=85") center / cover;
       transform: scale(1.02);
       transition: transform 900ms ease;
     }
@@ -192,13 +192,6 @@
       margin: 0 auto;
     }
 
-    .hero-inner {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
-      gap: 36px;
-      align-items: center;
-    }
-
     .eyebrow {
       display: inline-flex;
       width: fit-content;
@@ -214,7 +207,7 @@
     }
 
     .hero h1 {
-      max-width: 720px;
+      max-width: 760px;
       margin-top: 18px;
       color: var(--blue-900);
       font-size: clamp(42px, 7vw, 78px);
@@ -227,7 +220,7 @@
     }
 
     .subtitle {
-      max-width: 610px;
+      max-width: 660px;
       margin-top: 22px;
       color: #36566b;
       font-size: clamp(16px, 2.1vw, 21px);
@@ -235,180 +228,50 @@
       animation: fadeUp 850ms ease 170ms both;
     }
 
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 13px;
-      margin-top: 30px;
-      animation: fadeUp 900ms ease 250ms both;
-    }
-
-    .book-btn,
-    .outline-btn,
-    .card-btn {
-      min-height: 50px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 800;
-      transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
-    }
-
-    .book-btn,
-    .card-btn {
-      padding: 0 22px;
-      color: var(--white);
-      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
-      box-shadow: 0 18px 34px rgba(33, 165, 223, 0.3);
-    }
-
-    .outline-btn {
-      padding: 0 18px;
-      border: 1px solid rgba(15, 111, 168, 0.22);
-      color: var(--blue-900);
-      background: rgba(255, 255, 255, 0.78);
-    }
-
-    .book-btn:hover,
-    .outline-btn:hover,
-    .card-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 20px 42px rgba(15, 111, 168, 0.22);
-    }
-
-    .contact-panel {
-      padding: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.78);
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.82);
-      box-shadow: var(--shadow);
-      animation: floatIn 900ms ease 180ms both, gentleFloat 7s ease-in-out 1.3s infinite;
-    }
-
-    .contact-photo {
-      position: relative;
-      min-height: 360px;
-      border-radius: var(--radius);
-      overflow: hidden;
-      background:
-        linear-gradient(180deg, rgba(11, 61, 92, 0.04), rgba(11, 61, 92, 0.54)),
-        url("https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1100&q=85") center / cover;
-    }
-
-    .contact-badge {
-      position: absolute;
-      left: 18px;
-      right: 18px;
-      bottom: 18px;
-      display: grid;
-      gap: 10px;
-      padding: 16px;
-      border-radius: var(--radius);
-      color: var(--white);
-      background: rgba(11, 61, 92, 0.72);
-      backdrop-filter: blur(14px);
-    }
-
-    .contact-badge strong {
-      font-size: 22px;
-    }
-
-    .contact-badge span {
-      color: rgba(255, 255, 255, 0.84);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
     .content-section {
       padding: 76px 0;
     }
 
-    .section-heading {
-      max-width: 760px;
-      margin-bottom: 28px;
-    }
-
-    .section-heading small {
-      color: var(--blue-700);
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .section-heading h2 {
-      margin-top: 8px;
-      color: var(--blue-900);
-      font-size: clamp(28px, 4vw, 48px);
-      line-height: 1.12;
-    }
-
-    .contact-grid {
+    .policy-wrap {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
+      grid-template-columns: minmax(240px, 0.35fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
     }
 
-    .info-box {
-      min-height: 100%;
-      padding: 24px;
+    .policy-aside,
+    .policy-card {
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: rgba(255, 255, 255, 0.88);
       box-shadow: 0 18px 42px rgba(11, 61, 92, 0.08);
-      transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
     }
 
-    .info-box:hover {
-      transform: translateY(-6px);
-      border-color: rgba(33, 165, 223, 0.36);
-      box-shadow: 0 28px 56px rgba(15, 111, 168, 0.14);
-    }
-
-    .info-box h3 {
-      margin-bottom: 14px;
-      color: var(--blue-900);
-      font-size: 20px;
-    }
-
-    .info-box p,
-    .info-box a.text-link {
-      color: #36566b;
-      font-size: 14px;
-      line-height: 1.78;
-      overflow-wrap: anywhere;
-    }
-
-    .info-box a.text-link {
-      display: block;
-      font-weight: 700;
-    }
-
-    .card-btn {
-      margin-top: 18px;
-      width: fit-content;
-    }
-
-    .value-band {
-      margin-top: 24px;
+    .policy-aside {
+      position: sticky;
+      top: 100px;
       padding: 22px;
-      border: 1px solid rgba(33, 165, 223, 0.18);
-      border-radius: var(--radius);
-      background: linear-gradient(135deg, rgba(236, 249, 255, 0.96), rgba(255, 255, 255, 0.96));
-      box-shadow: 0 18px 42px rgba(11, 61, 92, 0.07);
     }
 
-    .value-band h3 {
+    .policy-aside h2,
+    .policy-card h2 {
       color: var(--blue-900);
       font-size: 22px;
+      line-height: 1.25;
+    }
+
+    .policy-aside p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
     }
 
     .chip-cloud {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 16px;
+      margin-top: 18px;
     }
 
     .chip-cloud span {
@@ -422,12 +285,48 @@
       background: rgba(236, 249, 255, 0.9);
       font-size: 12px;
       font-weight: 700;
-      transition: transform 220ms ease, background 220ms ease;
     }
 
-    .chip-cloud span:hover {
-      transform: translateY(-3px);
-      background: var(--white);
+    .policy-card {
+      padding: 26px;
+    }
+
+    .policy-section + .policy-section {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(18, 107, 153, 0.1);
+    }
+
+    .policy-card p,
+    .policy-card li {
+      color: #36566b;
+      font-size: 14px;
+      line-height: 1.85;
+    }
+
+    .policy-card p {
+      margin-top: 12px;
+    }
+
+    .policy-card ul {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+      padding-left: 20px;
+    }
+
+    .contact-box {
+      margin-top: 16px;
+      padding: 18px;
+      border: 1px solid rgba(33, 165, 223, 0.18);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(236, 249, 255, 0.96), rgba(255, 255, 255, 0.96));
+    }
+
+    .contact-box a {
+      color: var(--blue-700);
+      font-weight: 700;
+      overflow-wrap: anywhere;
     }
 
     footer {
@@ -485,33 +384,18 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes floatIn {
-      from { opacity: 0; transform: translateX(34px) scale(0.97); }
-      to { opacity: 1; transform: translateX(0) scale(1); }
-    }
-
-    @keyframes gentleFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.07); }
     }
 
     @media (max-width: 980px) {
-      .hero-inner,
-      .contact-grid {
+      .policy-wrap {
         grid-template-columns: 1fr;
       }
 
-      .contact-panel {
-        animation: floatIn 900ms ease 180ms both;
-      }
-
-      .hero {
-        padding-top: 48px;
+      .policy-aside {
+        position: static;
       }
     }
 
@@ -550,30 +434,21 @@
       .hero::before {
         background:
           linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.88) 48%, rgba(255, 255, 255, 0.62) 100%),
-          url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1100&q=85") center / cover;
-      }
-
-      .contact-photo {
-        min-height: 320px;
+          url("https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1100&q=85") center / cover;
       }
     }
 
     @media (max-width: 520px) {
-      .hero-actions {
-        display: grid;
-      }
-
-      .book-btn,
-      .outline-btn {
-        width: 100%;
-      }
-
       .menu-links.active {
         grid-template-columns: 1fr;
       }
 
       .content-section {
         padding: 54px 0;
+      }
+
+      .policy-card {
+        padding: 22px;
       }
     }
   </style>
@@ -596,10 +471,10 @@
           <a href="packages.html">Packages</a>
           <a href="feedback.html">Feedback</a>
           <a href="about.html">About Us</a>
-          <a href="contact.html" class="active">Contact</a>
+          <a href="contact.html">Contact</a>
           <a href="employees.html">Employee Platform</a>
           <a href="connect.html">Connect</a>
-          <a href="privacy.html">Privacy</a>
+          <a href="privacy.html" class="active">Privacy</a>
           <a href="https://wa.me/917994256121" class="book-link" target="_blank" rel="noopener">Book Your Trip</a>
         </nav>
       </div>
@@ -608,70 +483,72 @@
     <main>
       <section class="hero">
         <div class="hero-inner">
-          <div class="hero-copy">
-            <div class="eyebrow">Contact Travelog</div>
-            <h1>Start planning your <span>next</span> destination.</h1>
-            <p class="subtitle">Connect with the right Travelog team member for trip planning, sales assistance, booking support, and operations coordination.</p>
-
-            <div class="hero-actions">
-              <a href="https://wa.me/917994256121" class="book-btn" target="_blank" rel="noopener">Chat on WhatsApp</a>
-              <a href="mailto:Sales@travelogdrop.online" class="outline-btn">Send Email</a>
-            </div>
-          </div>
-
-          <aside class="contact-panel" aria-label="Contact support">
-            <div class="contact-photo">
-              <div class="contact-badge">
-                <strong>Personal travel support</strong>
-                <span>Share your preferred destination, dates, guest count, and budget. We will help shape a realistic tour plan.</span>
-              </div>
-            </div>
-          </aside>
+          <div class="eyebrow">Privacy Policy</div>
+          <h1>Your travel details stay <span>protected</span>.</h1>
+          <p class="subtitle">Travelog collects only the information needed to plan, confirm, and support your trip. This policy explains how we handle your details with care.</p>
         </div>
       </section>
 
       <section class="content-section">
-        <div class="section-heading">
-          <small>Get in touch</small>
-          <h2>Reach us for tour packages, booking support, and travel questions.</h2>
-        </div>
+        <div class="policy-wrap">
+          <aside class="policy-aside">
+            <h2>Policy Summary</h2>
+            <p>We use customer information for travel planning, booking support, communication, and service improvement.</p>
+            <div class="chip-cloud">
+              <span>Booking Details</span>
+              <span>Customer Support</span>
+              <span>Travel Updates</span>
+              <span>Data Care</span>
+            </div>
+          </aside>
 
-        <div class="contact-grid">
-          <article class="info-box">
-            <h3>Managing Director</h3>
-            <p><strong>Akhil</strong></p>
-            <a href="https://wa.me/917994256121" class="text-link" target="_blank" rel="noopener">+91 7994256121</a>
-            <a href="mailto:Sales@travelogdrop.online" class="text-link">Sales@travelogdrop.online</a>
-            <p>For business inquiries, key travel planning discussions, and direct guidance from Travelog.</p>
+          <article class="policy-card">
+            <section class="policy-section">
+              <h2>Introduction</h2>
+              <p>Travelog respects your privacy and is committed to protecting your personal information. This policy explains how we collect, use, and safeguard your data when you use our website, contact us, or book travel services with us.</p>
+            </section>
+
+            <section class="policy-section">
+              <h2>Information We Collect</h2>
+              <p>We may collect information that helps us understand your travel requirement and provide the right service.</p>
+              <ul>
+                <li>Name and contact details</li>
+                <li>Email address and phone number</li>
+                <li>Travel preferences, destinations, dates, and booking details</li>
+                <li>Passport, visa, or document details only when required for a booking service</li>
+                <li>Basic website usage information</li>
+              </ul>
+            </section>
+
+            <section class="policy-section">
+              <h2>How We Use Your Information</h2>
+              <p>Your information may be used to plan trips, process bookings, coordinate support, and keep you updated about your travel arrangements.</p>
+              <ul>
+                <li>Prepare customized tour packages and itineraries</li>
+                <li>Process travel bookings and related services</li>
+                <li>Provide customer support before, during, and after travel</li>
+                <li>Improve our services and destination recommendations</li>
+                <li>Send important travel updates or relevant offers</li>
+              </ul>
+            </section>
+
+            <section class="policy-section">
+              <h2>Data Protection</h2>
+              <p>Travelog uses reasonable security measures to protect personal information from unauthorized access, misuse, loss, or disclosure. We only share details with trusted partners when needed to complete travel-related services, such as hotels, transfers, visa support, or tour operations.</p>
+            </section>
+
+            <section class="policy-section">
+              <h2>Contact Information</h2>
+              <p>For privacy questions, data requests, booking support, or corrections to your information, contact Travelog directly.</p>
+              <div class="contact-box">
+                <p><strong>Travelog</strong></p>
+                <p>Managing Director: Akhil, <a href="https://wa.me/917994256121" target="_blank" rel="noopener">+91 7994256121</a>, <a href="mailto:Sales@travelogdrop.online">Sales@travelogdrop.online</a></p>
+                <p>Sales: Shifana, <a href="https://wa.me/917306350388" target="_blank" rel="noopener">+91 7306350388</a>, <a href="mailto:support@travelogdrop.online">support@travelogdrop.online</a></p>
+                <p>Operations: <a href="https://wa.me/919995338422" target="_blank" rel="noopener">+91 9995338422</a>, <a href="mailto:operations.travelog@gmail.com">operations.travelog@gmail.com</a></p>
+              </div>
+              <p><em>Last Updated: March 2026</em></p>
+            </section>
           </article>
-
-          <article class="info-box">
-            <h3>Sales</h3>
-            <p><strong>Shifana</strong></p>
-            <a href="https://wa.me/917306350388" class="text-link" target="_blank" rel="noopener">+91 7306350388</a>
-            <a href="mailto:support@travelogdrop.online" class="text-link">support@travelogdrop.online</a>
-            <p>For tour package details, price quotes, destination suggestions, and booking assistance.</p>
-            <a href="https://wa.me/917306350388" class="card-btn" target="_blank" rel="noopener">Chat with Sales</a>
-          </article>
-
-          <article class="info-box">
-            <h3>Operations</h3>
-            <a href="https://wa.me/919995338422" class="text-link" target="_blank" rel="noopener">+91 9995338422</a>
-            <a href="mailto:operations.travelog@gmail.com" class="text-link">operations.travelog@gmail.com</a>
-            <p>For confirmed trip coordination, hotel and transfer updates, travel documents, and on-ground operations support.</p>
-          </article>
-        </div>
-
-        <div class="value-band">
-          <h3>For faster planning, send these details</h3>
-          <div class="chip-cloud">
-            <span>Destination</span>
-            <span>Travel Dates</span>
-            <span>Number of Guests</span>
-            <span>Budget Range</span>
-            <span>Hotel Preference</span>
-            <span>Trip Type</span>
-          </div>
         </div>
       </section>
     </main>
