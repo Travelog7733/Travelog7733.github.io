@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Packages | Travelog</title>
+  <link rel="icon" href="images/icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue-900: #0b3d5c;
+      --blue-700: #0f6fa8;
+      --blue-500: #21a5df;
+      --blue-100: #ecf9ff;
+      --white: #ffffff;
+      --ink: #173044;
+      --muted: #64798a;
+      --line: rgba(18, 107, 153, 0.16);
+      --shadow: 0 24px 70px rgba(15, 111, 168, 0.18);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Poppins", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(33, 165, 223, 0.14), transparent 30%),
+        linear-gradient(180deg, #f7fdff 0%, #ffffff 44%, #eef9ff 100%);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.62);
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 34px rgba(11, 61, 92, 0.07);
+    }
+
+    .nav-wrap {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 76px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      color: var(--blue-900);
+    }
+
+    .brand-logo {
+      width: 138px;
+      max-height: 48px;
+      object-fit: contain;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      display: none;
+      place-items: center;
+      border-radius: var(--radius);
+      color: var(--white);
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      box-shadow: 0 14px 26px rgba(33, 165, 223, 0.28);
+      font-size: 21px;
+    }
+
+    .brand-text {
+      display: none;
+      font-size: 19px;
+    }
+
+    .menu-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--blue-900);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .menu-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .menu-links a {
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      color: #315268;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 220ms ease, background 220ms ease, transform 220ms ease;
+    }
+
+    .menu-links a:hover,
+    .menu-links a.active {
+      color: var(--blue-900);
+      background: var(--blue-100);
+      transform: translateY(-2px);
+    }
+
+    .header-book-btn {
+      color: var(--white) !important;
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500)) !important;
+      box-shadow: 0 14px 28px rgba(33, 165, 223, 0.24);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 470px;
+      display: grid;
+      align-items: center;
+      padding: 84px 0 70px;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.84) 42%, rgba(255, 255, 255, 0.3) 76%, rgba(255, 255, 255, 0.72) 100%),
+        url("https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1800&q=85") center / cover;
+      transform: scale(1.02);
+      transition: transform 900ms ease;
+    }
+
+    .hero.zoomed::before {
+      transform: scale(1.08);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 130px;
+      z-index: -1;
+      background: linear-gradient(180deg, transparent, #ffffff);
+    }
+
+    .hero-inner,
+    .packages-section {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      padding: 8px 12px;
+      border: 1px solid rgba(33, 165, 223, 0.26);
+      border-radius: var(--radius);
+      color: var(--blue-700);
+      background: rgba(255, 255, 255, 0.78);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      animation: fadeUp 700ms ease both;
+    }
+
+    .hero h1 {
+      max-width: 760px;
+      margin-top: 18px;
+      color: var(--blue-900);
+      font-size: clamp(42px, 7vw, 78px);
+      line-height: 0.98;
+      animation: fadeUp 800ms ease 90ms both;
+    }
+
+    .hero h1 span {
+      color: var(--blue-500);
+    }
+
+    .subtitle {
+      max-width: 620px;
+      margin-top: 22px;
+      color: #36566b;
+      font-size: clamp(16px, 2.1vw, 21px);
+      line-height: 1.75;
+      animation: fadeUp 850ms ease 170ms both;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 13px;
+      margin-top: 30px;
+      animation: fadeUp 900ms ease 250ms both;
+    }
+
+    .book-btn,
+    .outline-btn,
+    .card-btn {
+      min-height: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 800;
+      transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+    }
+
+    .book-btn,
+    .card-btn {
+      padding: 0 22px;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      box-shadow: 0 18px 34px rgba(33, 165, 223, 0.3);
+    }
+
+    .outline-btn {
+      padding: 0 18px;
+      border: 1px solid rgba(15, 111, 168, 0.22);
+      color: var(--blue-900);
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .book-btn:hover,
+    .outline-btn:hover,
+    .card-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 42px rgba(15, 111, 168, 0.22);
+    }
+
+    .packages-section {
+      padding: 76px 0;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .section-heading small {
+      color: var(--blue-700);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .section-heading h2 {
+      max-width: 700px;
+      margin-top: 8px;
+      color: var(--blue-900);
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.12;
+    }
+
+    .section-heading p {
+      max-width: 360px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      font-weight: 500;
+    }
+
+    .country-block {
+      margin-top: 34px;
+    }
+
+    .country-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      color: var(--blue-900);
+      font-size: 26px;
+    }
+
+    .country-title::before {
+      content: "";
+      width: 34px;
+      height: 4px;
+      border-radius: 99px;
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+    }
+
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .package-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 18px 42px rgba(11, 61, 92, 0.08);
+      animation: fadeUp 800ms ease both;
+      transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
+    }
+
+    .package-card:nth-child(2) {
+      animation-delay: 90ms;
+    }
+
+    .package-card:nth-child(3) {
+      animation-delay: 180ms;
+    }
+
+    .package-card:hover {
+      transform: translateY(-7px);
+      border-color: rgba(33, 165, 223, 0.36);
+      box-shadow: 0 28px 56px rgba(15, 111, 168, 0.14);
+    }
+
+    .package-card img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      transition: transform 620ms ease, filter 260ms ease;
+    }
+
+    .package-card:hover img {
+      transform: scale(1.08);
+      filter: saturate(1.08);
+    }
+
+    .package-info {
+      padding: 18px;
+    }
+
+    .package-duration {
+      display: inline-flex;
+      min-height: 32px;
+      align-items: center;
+      padding: 6px 10px;
+      border: 1px solid rgba(33, 165, 223, 0.2);
+      border-radius: var(--radius);
+      color: var(--blue-700);
+      background: var(--blue-100);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .package-title {
+      margin-top: 14px;
+      color: var(--blue-900);
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .package-location {
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .package-price {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 12px;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(18, 107, 153, 0.12);
+    }
+
+    .price-main {
+      color: var(--blue-900);
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .price-main span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .price-old {
+      color: #8aa0af;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: line-through;
+    }
+
+    .price-off {
+      grid-column: 1 / -1;
+      width: fit-content;
+      padding: 5px 9px;
+      border-radius: var(--radius);
+      color: #087a4b;
+      background: #e8fff5;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .card-btn {
+      width: 100%;
+      margin-top: 17px;
+    }
+
+    .cta-band {
+      margin-top: 30px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      border: 1px solid rgba(33, 165, 223, 0.18);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(236, 249, 255, 0.96), rgba(255, 255, 255, 0.96));
+      box-shadow: 0 18px 42px rgba(11, 61, 92, 0.07);
+    }
+
+    .cta-band h3 {
+      color: var(--blue-900);
+      font-size: 22px;
+    }
+
+    .cta-band p {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    footer {
+      padding: 36px 16px;
+      border-top: 1px solid var(--line);
+      color: #45697f;
+      background: var(--white);
+      text-align: center;
+    }
+
+    .site-logo {
+      width: 132px;
+      margin: 0 auto 12px;
+    }
+
+    .tagline {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 14px;
+      color: var(--blue-700);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 60;
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #25d366;
+      box-shadow: 0 18px 34px rgba(37, 211, 102, 0.35);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    .whatsapp-float img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.07);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .package-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .section-heading,
+      .cta-band {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .nav-wrap {
+        min-height: 68px;
+      }
+
+      .menu-toggle {
+        display: grid;
+        place-items: center;
+      }
+
+      .menu-links {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        top: 78px;
+        display: none;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: var(--shadow);
+      }
+
+      .menu-links.active {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .menu-links a {
+        padding: 12px;
+      }
+
+      .hero {
+        min-height: 410px;
+      }
+
+      .hero::before {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.82) 54%, rgba(255, 255, 255, 0.62) 100%),
+          url("https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1100&q=85") center / cover;
+      }
+
+      .package-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .hero-actions,
+      .cta-band .book-btn {
+        width: 100%;
+      }
+
+      .book-btn,
+      .outline-btn {
+        width: 100%;
+      }
+
+      .menu-links.active {
+        grid-template-columns: 1fr;
+      }
+
+      .packages-section {
+        padding: 54px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a href="index.html" class="brand" aria-label="Travelog home">
+        <img src="assets/travelog-logo.png" class="brand-logo" alt="Travelog Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'; this.nextElementSibling.nextElementSibling.style.display='inline';">
+        <span class="brand-mark">T</span>
+        <span class="brand-text">Travelog</span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+
+      <nav class="menu-links" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="packages.html" class="active">Packages</a>
+        <a href="feedback.html">Feedback</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="https://wa.me/917994256121" class="header-book-btn" target="_blank" rel="noopener">Book Your Trip</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">Travel packages</div>
+        <h1>Choose a <span>blue-sky</span> holiday plan.</h1>
+        <p class="subtitle">Popular Vietnam and Thailand packages with clear pricing, flexible customization, and direct WhatsApp enquiry.</p>
+        <div class="hero-actions">
+          <a href="https://wa.me/917994256121" class="book-btn" target="_blank" rel="noopener">Book Your Trip</a>
+          <a href="#packages" class="outline-btn">View Packages</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="packages-section" id="packages">
+      <div class="section-heading">
+        <div>
+          <small>Our popular packages</small>
+          <h2>Ready-made routes with room to customize.</h2>
+        </div>
+        <p>Pick a package as your starting point. Travelog can adjust hotels, transfers, activities, and travel dates around your budget.</p>
+      </div>
+
+      <div class="country-block">
+        <h3 class="country-title">Vietnam</h3>
+        <div class="package-grid">
+          <article class="package-card">
+            <img src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=900&q=82" alt="Vietnam 4 days">
+            <div class="package-info">
+              <div class="package-duration">4 Days / 3 Nights</div>
+              <h3 class="package-title">Vietnam Explorer</h3>
+              <div class="package-location">Ho Chi Minh City</div>
+              <div class="package-price">
+                <div class="price-main">Rs 35,000 <span>/ person</span></div>
+                <div class="price-old">Rs 42,000</div>
+                <div class="price-off">20% off</div>
+              </div>
+              <a href="https://wa.me/917994256121?text=I want Vietnam 4 Days Package" class="card-btn" target="_blank" rel="noopener">Enquire Now</a>
+            </div>
+          </article>
+
+          <article class="package-card">
+            <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=900&q=82" alt="Vietnam 7 days">
+            <div class="package-info">
+              <div class="package-duration">7 Days / 6 Nights</div>
+              <h3 class="package-title">Vietnam Discovery</h3>
+              <div class="package-location">Da Nang / Hoi An</div>
+              <div class="package-price">
+                <div class="price-main">Rs 58,000 <span>/ person</span></div>
+                <div class="price-old">Rs 70,000</div>
+                <div class="price-off">18% off</div>
+              </div>
+              <a href="https://wa.me/917994256121?text=I want Vietnam 7 Days Package" class="card-btn" target="_blank" rel="noopener">Enquire Now</a>
+            </div>
+          </article>
+
+          <article class="package-card">
+            <img src="https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?auto=format&fit=crop&w=900&q=82" alt="Vietnam 9 days">
+            <div class="package-info">
+              <div class="package-duration">9 Days / 8 Nights</div>
+              <h3 class="package-title">Vietnam Grand Tour</h3>
+              <div class="package-location">Ho Chi Minh / Da Nang</div>
+              <div class="package-price">
+                <div class="price-main">Rs 75,000 <span>/ person</span></div>
+                <div class="price-old">Rs 90,000</div>
+                <div class="price-off">17% off</div>
+              </div>
+              <a href="https://wa.me/917994256121?text=I want Vietnam 9 Days Package" class="card-btn" target="_blank" rel="noopener">Enquire Now</a>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="country-block">
+        <h3 class="country-title">Thailand</h3>
+        <div class="package-grid">
+          <article class="package-card">
+            <img src="https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=900&q=82" alt="Thailand 5 days">
+            <div class="package-info">
+              <div class="package-duration">5 Days / 4 Nights</div>
+              <h3 class="package-title">Thailand Escape</h3>
+              <div class="package-location">Bangkok / Pattaya</div>
+              <div class="package-price">
+                <div class="price-main">Rs 50,000 <span>/ person</span></div>
+                <div class="price-old">Rs 62,500</div>
+                <div class="price-off">20% off</div>
+              </div>
+              <a href="https://wa.me/917994256121?text=I want Thailand 5 Days Package" class="card-btn" target="_blank" rel="noopener">Enquire Now</a>
+            </div>
+          </article>
+
+          <article class="package-card">
+            <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=900&q=82" alt="Thailand 7 days">
+            <div class="package-info">
+              <div class="package-duration">7 Days / 6 Nights</div>
+              <h3 class="package-title">Thailand Island Tour</h3>
+              <div class="package-location">Phuket / Bangkok</div>
+              <div class="package-price">
+                <div class="price-main">Rs 65,000 <span>/ person</span></div>
+                <div class="price-old">Rs 78,000</div>
+                <div class="price-off">16% off</div>
+              </div>
+              <a href="https://wa.me/917994256121?text=I want Thailand 7 Days Package" class="card-btn" target="_blank" rel="noopener">Enquire Now</a>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="cta-band">
+        <div>
+          <h3>Need a different country or date?</h3>
+          <p>Send your destination, dates, group size, and hotel preference. Travelog can build a custom package.</p>
+        </div>
+        <a href="https://wa.me/917994256121" class="book-btn" target="_blank" rel="noopener">Plan Custom Trip</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <img src="assets/travelog-logo.png" class="site-logo" alt="Travelog Logo" onerror="this.style.display='none'">
+    <div class="tagline">Travelog © 2026 All Rights Reserved</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="cancellation.html">Cancellation</a>
+      <a href="refund.html">Refund</a>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/917994256121" class="whatsapp-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <img src="images/whatsapp.png" alt="WhatsApp Chat" onerror="this.style.display='none'">
+  </a>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggle = document.querySelector(".menu-toggle");
+      const menu = document.querySelector(".menu-links");
+
+      toggle.addEventListener("click", function () {
+        const isOpen = menu.classList.toggle("active");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+      });
+    });
+
+    window.addEventListener("scroll", function () {
+      const hero = document.querySelector(".hero");
+      if (!hero) return;
+      hero.classList.toggle("zoomed", window.scrollY > 60);
+    });
+  </script>
+</body>
+</html>
