@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1049188031119863');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1049188031119863&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Travel Enquiry – Travelog Holidays</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --brand:      #1a56a0;
+    --brand-dark: #0f3870;
+    --brand-light:#e8f0fb;
+    --accent:     #c8930a;
+    --text:       #1a202c;
+    --muted:      #718096;
+    --border:     #cbd5e0;
+    --error:      #c53030;
+    --bg:         #f0f4f8;
+    --white:      #ffffff;
+    --r:          10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--brand-dark);
+    border-bottom: 3px solid var(--accent);
+    padding: 0 24px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: grid; place-items: center;
+    color: #fff; font-size: 0.9rem; font-weight: 700;
+    font-family: 'Poppins', sans-serif; flex-shrink: 0;
+  }
+  .logo-name { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: #fff; }
+  .logo-name span { color: var(--accent); }
+
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+  .header-contact { font-size: 0.72rem; color: rgba(255,255,255,0.55); display: none; }
+  @media(min-width:600px){ .header-contact { display: block; } }
+  .header-enquiry-btn {
+    font-size: 0.70rem; font-weight: 600; color: var(--accent);
+    background: rgba(200,147,10,0.12); border: 1px solid rgba(200,147,10,0.30);
+    border-radius: 999px; padding: 3px 11px; cursor: pointer;
+    transition: background 0.15s; white-space: nowrap;
+  }
+  .header-enquiry-btn:hover { background: rgba(200,147,10,0.22); }
+
+  /* ── Conversational UI wrapper ── */
+  .chat-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 60px;
+  }
+
+  .chat-intro {
+    text-align: center;
+    max-width: 480px;
+    margin-bottom: 36px;
+  }
+  .chat-intro h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 800;
+    color: var(--brand-dark);
+    margin-bottom: 10px;
+  }
+  .chat-intro p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+  /* progress bar */
+  .progress-wrap {
+    width: 100%; max-width: 560px;
+    margin-bottom: 28px;
+  }
+  .progress-top {
+    display: flex; justify-content: space-between;
+    font-size: 0.72rem; color: var(--muted); font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .progress-bar {
+    width: 100%; height: 4px;
+    background: #dde4ed;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand), #3a8fd1);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  /* ── Question card ── */
+  .q-card {
+    width: 100%; max-width: 560px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07), 0 8px 32px rgba(0,0,0,0.05);
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-header {
+    background: var(--brand);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .q-num {
+    width: 26px; height: 26px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 0.72rem; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .q-title { font-size: 0.95rem; font-weight: 600; color: #fff; line-height: 1.3; }
+  .q-optional {
+    margin-left: auto;
+    font-size: 0.65rem; font-weight: 500;
+    color: rgba(255,255,255,0.60);
+    background: rgba(255,255,255,0.10);
+    padding: 2px 8px; border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .q-body { padding: 24px 20px 20px; }
+
+  .q-hint { font-size: 0.75rem; color: var(--muted); margin-bottom: 14px; }
+
+  /* inputs */
+  .q-input {
+    width: 100%;
+    height: 44px;
+    background: #f7fafc;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none; appearance: none;
+  }
+  .q-input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(26,86,160,0.12);
+    background: #fff;
+  }
+  .q-input.err { border-color: var(--error); background: #fff5f5; }
+  .q-input::placeholder { color: #a0aec0; }
+
+  /* select */
+  .sel-wrap { position: relative; }
+  .sel-wrap::after {
+    content: ''; position: absolute;
+    right: 12px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--muted);
+    pointer-events: none;
+  }
+  select.q-input option { background: #fff; color: var(--text); }
+
+  /* destination chips */
+  .dest-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .dest-chip {
+    padding: 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    background: #f7fafc;
+    font-size: 0.82rem; font-weight: 500; color: #4a5568;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .dest-chip:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+  .dest-chip.selected {
+    background: var(--brand); color: #fff;
+    border-color: var(--brand);
+  }
+
+  /* date toggle */
+  .date-toggle { display: flex; border: 1.5px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+  .date-toggle button {
+    flex: 1; padding: 8px;
+    font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 500;
+    color: var(--muted); background: #f7fafc; border: none; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .date-toggle button.active { background: var(--brand); color: #fff; font-weight: 600; }
+
+  /* budget */
+  .budget-opts { display: flex; flex-direction: column; gap: 8px; }
+  .budget-opt { position: relative; }
+  .budget-opt input[type="radio"] { position: absolute; opacity: 0; }
+  .budget-opt label {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #f7fafc;
+    cursor: pointer; font-size: 0.85rem; color: #4a5568;
+    transition: all 0.15s; user-select: none;
+  }
+  .budget-opt label .rb {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0;
+    background: #fff; transition: all 0.15s;
+    display: grid; place-items: center;
+  }
+  .budget-opt input:checked + label { border-color: var(--brand); background: var(--brand-light); color: var(--brand-dark); font-weight: 500; }
+  .budget-opt input:checked + label .rb { border-color: var(--brand); background: var(--brand); }
+  .budget-opt input:checked + label .rb::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff; display: block; }
+  .budget-custom-input { margin-top: 10px; display: none; }
+
+  /* call time */
+  .time-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .time-opt { position: relative; }
+  .time-opt input[type="checkbox"] { position: absolute; opacity: 0; }
+  .time-opt label {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    background: #f7fafc; cursor: pointer;
+    font-size: 0.80rem; color: #4a5568;
+    transition: all 0.15s; user-select: none;
+  }
+  .time-opt label .cb {
+    width: 15px; height: 15px; border-radius: 4px;
+    border: 1.5px solid var(--border); flex-shrink: 0; background: #fff;
+    display: grid; place-items: center; transition: all 0.15s;
+  }
+  .time-opt input:checked + label { border-color: var(--brand); background: var(--brand-light); color: var(--brand-dark); font-weight: 500; }
+  .time-opt input:checked + label .cb { background: var(--brand); border-color: var(--brand); }
+  .time-opt input:checked + label .cb::after { content: ''; display: block; width: 4px; height: 7px; border: 1.5px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); }
+
+  /* ── Multi-field step ── */
+  .multi-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+  .multi-field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 6px;
+  }
+  .multi-field .q-error { font-size: 0.70rem; }
+  @media(max-width: 480px) { .multi-row { grid-template-columns: 1fr; } }
+
+  /* error msg */
+  .q-error { font-size: 0.72rem; color: var(--error); font-weight: 500; margin-top: 8px; display: none; }
+  .q-error.show { display: block; }
+
+  /* action buttons */
+  .q-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-next {
+    flex: 1; height: 44px;
+    background: var(--brand); color: #fff;
+    border: none; border-radius: 8px;
+    font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-next:hover { background: var(--brand-dark); }
+  .btn-next:active { transform: scale(0.98); }
+  .btn-next:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-back {
+    height: 44px; padding: 0 16px;
+    background: none; border: 1.5px solid var(--border);
+    border-radius: 8px; font-family: 'Inter', sans-serif;
+    font-size: 0.85rem; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-back:hover { border-color: var(--brand); color: var(--brand); }
+
+  .btn-skip {
+    background: none; border: none; font-family: 'Inter', sans-serif;
+    font-size: 0.75rem; color: var(--muted); cursor: pointer;
+    text-decoration: underline; margin-top: 10px; display: block;
+    transition: color 0.15s;
+  }
+  .btn-skip:hover { color: var(--brand); }
+
+  /* spinner */
+  .spinner { display: none; width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Success ── */
+  .success-wrap {
+    display: none;
+    width: 100%; max-width: 560px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding: 48px 24px;
+    text-align: center;
+    animation: slideUp 0.3s ease;
+  }
+  .success-wrap.show { display: block; }
+  .success-icon {
+    width: 64px; height: 64px;
+    background: #e6f4ee; border-radius: 50%;
+    display: grid; place-items: center;
+    margin: 0 auto 20px;
+    animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .success-icon svg { width: 28px; height: 28px; color: #276749; }
+  .success-title { font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+  .success-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+  .ref-box { display: inline-block; background: #f7fafc; border: 1px solid var(--border); border-radius: 6px; padding: 6px 16px; font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; }
+  .ref-box strong { color: var(--text); }
+  .wa-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #25d366; color: #fff; border: none; border-radius: 8px;
+    padding: 12px 24px; font-family: 'Inter', sans-serif;
+    font-size: 0.88rem; font-weight: 600; text-decoration: none;
+    transition: background 0.15s;
+  }
+  .wa-link:hover { background: #1ebe5d; }
+
+  /* ── Passcode Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 500;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: var(--r);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    width: 100%; max-width: 320px; overflow: hidden;
+    animation: pop 0.2s ease;
+  }
+  .modal-head {
+    background: var(--brand-dark); padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-head h3 { font-size: 0.88rem; font-weight: 700; color: #fff; font-family: 'Poppins', sans-serif; }
+  .modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1.2rem; cursor: pointer; }
+  .modal-close:hover { color: #fff; }
+  .modal-body { padding: 24px 20px 20px; }
+  .modal-body label { display: block; font-size: 0.78rem; font-weight: 600; color: #4a5568; margin-bottom: 8px; }
+  .modal-body input[type="password"] {
+    width: 100%; height: 40px; border: 1.5px solid var(--border);
+    border-radius: 6px; padding: 0 12px;
+    font-family: 'Inter', sans-serif; font-size: 1rem; letter-spacing: 4px;
+    color: var(--text); outline: none; margin-bottom: 6px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .modal-body input[type="password"]:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(26,86,160,0.12); }
+  .pin-error { font-size: 0.72rem; color: var(--error); font-weight: 500; min-height: 16px; margin-bottom: 14px; }
+  .modal-btn {
+    width: 100%; height: 38px; background: var(--brand); color: #fff;
+    border: none; border-radius: 6px; font-family: 'Inter', sans-serif;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.15s;
+  }
+  .modal-btn:hover { background: var(--brand-dark); }
+  .modal-passcode { display: block; }
+  .modal-result { display: none; text-align: center; }
+  .modal-count-num { font-family: 'Poppins', sans-serif; font-size: 3.5rem; font-weight: 800; color: var(--brand); line-height: 1; }
+  .modal-count-label { font-size: 0.80rem; color: var(--muted); margin-top: 6px; }
+  .modal-count-date { font-size: 0.70rem; color: var(--border); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .modal-lock-btn { width: 100%; height: 34px; background: none; border: 1px solid var(--border); border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: var(--muted); cursor: pointer; margin-top: 16px; transition: all 0.15s; }
+  .modal-lock-btn:hover { border-color: var(--brand); color: var(--brand); }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--brand-dark); border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 24px; display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  footer p { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
+  footer a { color: rgba(255,255,255,0.45); text-decoration: none; }
+  footer a:hover { color: rgba(255,255,255,0.80); }
+
+  @media(max-width:480px) {
+    .time-opts { grid-template-columns: 1fr; }
+    .q-actions { flex-direction: column-reverse; }
+    .btn-back { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">TL</div>
+    <span class="logo-name">Travelog <span>Holidays</span></span>
+  </a>
+  <div class="header-right">
+    <p class="header-contact">Need help? Call us: +91 7306350388 &nbsp;|&nbsp; +91 9995338422</p>
+    <button class="header-enquiry-btn" onclick="openEnquiryModal()">📋 Today's Submissions</button>
+  </div>
+</header>
+
+<!-- Passcode Modal -->
+<div class="modal-overlay" id="enquiryModal" onclick="handleOverlayClick(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Today's Submissions</h3>
+      <button class="modal-close" onclick="closeEnquiryModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-passcode" id="modalPasscode">
+        <label for="pinInput">Enter Passcode</label>
+        <input type="password" id="pinInput" maxlength="6" placeholder="••••" onkeydown="if(event.key==='Enter') checkPin()" />
+        <div class="pin-error" id="pinError"></div>
+        <button class="modal-btn" onclick="checkPin()">Unlock</button>
+      </div>
+      <div class="modal-result" id="modalResult">
+        <div class="modal-count-num" id="modalCount">…</div>
+        <div class="modal-count-label">Enquiries submitted today</div>
+        <div class="modal-count-date" id="modalDate"></div>
+        <button class="modal-lock-btn" onclick="lockModal()">🔒 Lock</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="chat-page">
+
+  <div class="chat-intro">
+    <h1>Plan Your Trip ✈️</h1>
+    <p>Answer a few quick questions and our travel expert will reach out with a personalised itinerary.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <span id="progressLabel">Question 1 of 8</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Question card (rendered by JS) -->
+  <div id="qCard"></div>
+
+  <!-- Success -->
+  <div class="success-wrap" id="successWrap">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 class="success-title">Enquiry Submitted!</h2>
+    <p class="success-desc">Thank you! Our travel expert will contact you within 24 hours with a personalised itinerary.</p>
+    <div class="ref-box">Reference ID: <strong id="refId">—</strong></div><br>
+    <a class="wa-link" id="waLink" href="#" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Chat on WhatsApp
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2025 Travelog Holidays. All rights reserved.</p>
+  <p><a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms & Conditions</a></p>
+</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, where, Timestamp }
+    from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    apiKey:            "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+    authDomain:        "travelog-itinerary.firebaseapp.com",
+    projectId:         "travelog-itinerary",
+    storageBucket:     "travelog-itinerary.firebasestorage.app",
+    messagingSenderId: "33567258851",
+    appId:             "1:33567258851:web:790e8f165a3d917bf7edd6"
+  });
+  const db = getFirestore(app);
+  const enquiriesRef = collection(db, 'lead_enquiries');
+
+  /* ── Live counter ── */
+  const PASSCODE = '7733';
+  let liveCount = 0;
+
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+  onSnapshot(query(enquiriesRef, where('submittedAt','>=',Timestamp.fromDate(todayStart))), snap => {
+    liveCount = snap.size;
+    const r = document.getElementById('modalResult');
+    if (r && r.style.display === 'block') document.getElementById('modalCount').textContent = liveCount;
+  });
+
+  /* ── Modal ── */
+  window.openEnquiryModal = () => {
+    document.getElementById('enquiryModal').classList.add('open');
+    document.getElementById('modalPasscode').style.display = 'block';
+    document.getElementById('modalResult').style.display   = 'none';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinError').textContent = '';
+    setTimeout(() => document.getElementById('pinInput').focus(), 100);
+  };
+  window.closeEnquiryModal = () => document.getElementById('enquiryModal').classList.remove('open');
+  window.handleOverlayClick = e => { if (e.target === document.getElementById('enquiryModal')) closeEnquiryModal(); };
+  window.checkPin = () => {
+    if (document.getElementById('pinInput').value.trim() === PASSCODE) {
+      document.getElementById('pinError').textContent = '';
+      document.getElementById('modalPasscode').style.display = 'none';
+      document.getElementById('modalResult').style.display   = 'block';
+      document.getElementById('modalCount').textContent = liveCount;
+      document.getElementById('modalDate').textContent = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+    } else {
+      document.getElementById('pinError').textContent = 'Incorrect passcode. Try again.';
+      document.getElementById('pinInput').value = '';
+      document.getElementById('pinInput').focus();
+    }
+  };
+  window.lockModal = () => {
+    document.getElementById('modalPasscode').style.display = 'block';
+    document.getElementById('modalResult').style.display   = 'none';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinError').textContent = '';
+  };
+
+  /* ════════════════════════════════════════
+     CONVERSATIONAL FORM ENGINE
+  ════════════════════════════════════════ */
+
+  // answers store
+  const A = {};
+
+  // question definitions
+  const QUESTIONS = [
+    {
+      // Step 1: Name + WhatsApp together
+      num: 1, type: 'multi', required: true,
+      title: 'Let\'s start with your details',
+      hint: 'We\'ll use these to send your itinerary.',
+      fields: [
+        {
+          id: 'name', label: 'Full Name', type: 'text',
+          placeholder: 'e.g. Riya Sharma', autocomplete: 'name',
+          validate: v => v.trim().length >= 2 ? null : 'Please enter your name.'
+        },
+        {
+          id: 'whatsapp', label: 'WhatsApp Number', type: 'tel',
+          placeholder: '+91 98765 43210', autocomplete: 'tel',
+          validate: v => /^[\d\s\+\-\(\)]{7,15}$/.test(v.trim()) ? null : 'Enter a valid number.'
+        }
+      ]
+    },
+    {
+      // Step 2: Destination + No. of Travelers together
+      num: 2, type: 'multi', required: true,
+      title: 'Tell us about your trip',
+      hint: 'Pick your destination and how many are travelling.',
+      fields: [
+        {
+          id: 'destination', label: 'Destination', type: 'select',
+          options: ['Vietnam','Malaysia','Thailand','Bali','Maldives','Kazakhstan','Lakshadweep','Sri Lanka','Dubai','Kenya – Masai Mara','Other'],
+          validate: v => v ? null : 'Please select a destination.'
+        },
+        {
+          id: 'travelers', label: 'No. of Travelers', type: 'number',
+          placeholder: 'e.g. 4',
+          validate: v => (v && parseInt(v) >= 1) ? null : 'Please enter number of travelers.'
+        }
+      ]
+    },
+    {
+      id: 'travelDate', num: 3, required: false,
+      title: 'When are you planning to travel?',
+      hint: 'A rough month works too — no pressure!',
+      type: 'date',
+    },
+    {
+      id: 'budget', num: 4, required: false,
+      title: 'What\'s your budget per person?',
+      hint: 'This helps us suggest the right packages.',
+      type: 'budget',
+      options: ['Under ₹25,000','₹25,000 – ₹50,000','₹50,000 – ₹1,00,000','₹1,00,000 – ₹2,00,000','Above ₹2,00,000','Enter manually'],
+    },
+    {
+      id: 'callTime', num: 5, required: false,
+      title: 'When is a good time to call you?',
+      hint: 'Select all that apply.',
+      type: 'checkboxes',
+      options: ['Morning (9 AM – 12 PM)','Afternoon (12 – 3 PM)','Evening (3 – 6 PM)','Night (6 – 9 PM)','Anytime'],
+    },
+    {
+      id: 'notes', num: 6, required: false,
+      title: 'Anything else we should know?',
+      hint: 'Special requests, trip type, hotel preferences…',
+      type: 'textarea',
+      placeholder: 'e.g. Honeymoon package, family trip with kids, visa assistance needed…',
+    }
+  ];
+
+  const TOTAL = QUESTIONS.length;
+  let current = 0;
+
+  function updateProgress(idx) {
+    const pct = Math.round((idx / TOTAL) * 100);
+    document.getElementById('progressFill').style.width  = pct + '%';
+    document.getElementById('progressLabel').textContent = `Question ${idx + 1} of ${TOTAL}`;
+    document.getElementById('progressPct').textContent   = pct + '%';
+  }
+
+  function renderQuestion(idx) {
+    const q = QUESTIONS[idx];
+    updateProgress(idx);
+
+    const card = document.getElementById('qCard');
+    card.style.display = 'block';
+    document.getElementById('successWrap').classList.remove('show');
+
+    const saved = A[q.id] || '';
+
+    let inputHTML = '';
+
+    if (q.type === 'multi') {
+      const hasChips = q.fields.some(f => f.type === 'chips');
+      inputHTML = hasChips
+        ? renderMultiStacked(q.fields)
+        : `<div class="multi-row">${q.fields.map(renderMultiField).join('')}</div>`;
+    } else if (q.type === 'text' || q.type === 'tel') {
+      inputHTML = `<input class="q-input" id="qInput" type="${q.type}" placeholder="${q.placeholder||''}" value="${saved}" autocomplete="${q.type==='tel'?'tel':'name'}" />`;
+    } else if (q.type === 'number') {
+      inputHTML = `<input class="q-input" id="qInput" type="number" min="1" max="99" placeholder="${q.placeholder||''}" value="${saved}" />`;
+    } else if (q.type === 'textarea') {
+      inputHTML = `<textarea class="q-input" id="qInput" rows="4" placeholder="${q.placeholder||''}" style="height:auto;padding:12px 14px;resize:vertical;">${saved}</textarea>`;
+    } else if (q.type === 'chips') {
+      inputHTML = `<div class="dest-chips" id="chipsWrap">` +
+        q.options.map(o => `<div class="dest-chip${saved===o?' selected':''}" onclick="selectChip(this,'${o}')">${o}</div>`).join('') +
+        `</div><input type="hidden" id="qInput" value="${saved}" />`;
+    } else if (q.type === 'date') {
+      const isMonth = !saved || saved.length === 7;
+      inputHTML = `
+        <div class="date-toggle">
+          <button type="button" id="dtgMonth" class="${isMonth?'active':''}" onclick="switchDate('month')">By Month</button>
+          <button type="button" id="dtgDate"  class="${!isMonth?'active':''}" onclick="switchDate('date')">Specific Date</button>
+        </div>
+        <input class="q-input" id="qInput" type="${isMonth?'month':'date'}" value="${saved}" />`;
+    } else if (q.type === 'budget') {
+      const isCustom = saved && !q.options.slice(0,-1).includes(saved);
+      inputHTML = `<div class="budget-opts">` +
+        q.options.map(o => {
+          const isManual = o === 'Enter manually';
+          const checked  = isManual ? isCustom : saved === o;
+          return `<div class="budget-opt">
+            <input type="radio" name="budget" id="b_${o.replace(/\s/g,'_')}" value="${o}" ${checked?'checked':''} onchange="toggleBudgetCustom(this.value)" />
+            <label for="b_${o.replace(/\s/g,'_')}"><span class="rb"></span>${o}</label>
+          </div>`;
+        }).join('') +
+        `</div>
+        <div class="budget-custom-input" id="budgetCustomWrap" style="display:${isCustom?'block':'none'}">
+          <input class="q-input" id="budgetCustom" type="text" placeholder="e.g. ₹75,000 or $1,000" value="${isCustom?saved:''}" />
+        </div>
+        <input type="hidden" id="qInput" value="${saved}" />`;
+    } else if (q.type === 'checkboxes') {
+      const savedArr = saved ? saved.split(', ') : [];
+      inputHTML = `<div class="time-opts">` +
+        q.options.map(o => `<div class="time-opt">
+          <input type="checkbox" id="ct_${o.replace(/\s/g,'_')}" value="${o}" ${savedArr.includes(o)?'checked':''} onchange="syncCheckboxes()" />
+          <label for="ct_${o.replace(/\s/g,'_')}"><span class="cb"></span>${o}</label>
+        </div>`).join('') +
+        `</div><input type="hidden" id="qInput" value="${saved}" />`;
+    }
+
+    const backBtn  = idx > 0 ? `<button class="btn-back" onclick="goBack()">← Back</button>` : '';
+    const isLast   = idx === TOTAL - 1;
+    const btnLabel = isLast ? 'Submit Enquiry' : 'Next →';
+    const skipBtn  = !q.required ? `<button class="btn-skip" onclick="skipQuestion()">Skip this question</button>` : '';
+
+    card.innerHTML = `
+      <div class="q-card">
+        <div class="q-header">
+          <div class="q-num">${q.num}</div>
+          <div class="q-title">${q.title}</div>
+          ${!q.required ? '<span class="q-optional">Optional</span>' : ''}
+        </div>
+        <div class="q-body">
+          ${q.hint ? `<p class="q-hint">${q.hint}</p>` : ''}
+          ${inputHTML}
+          <div class="q-error" id="qError"></div>
+          <div class="q-actions">
+            ${backBtn}
+            <button class="btn-next" id="btnNext" onclick="nextQuestion()">
+              <span id="btnNextText">${btnLabel}</span>
+              <div class="spinner" id="btnSpinner"></div>
+            </button>
+          </div>
+          ${skipBtn}
+        </div>
+      </div>`;
+
+    // auto-focus text inputs
+    const inp = document.getElementById('qInput');
+    if (inp && (q.type === 'text' || q.type === 'tel' || q.type === 'number')) {
+      setTimeout(() => inp.focus(), 80);
+    }
+
+    // Enter key to advance
+    if (inp && q.type !== 'textarea' && q.type !== 'checkboxes') {
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') nextQuestion(); });
+    }
+  }
+
+  /* ── Multi-field renderers ── */
+  function renderMultiField(f) {
+    const saved = A[f.id] || '';
+    let inp = '';
+    if (f.type === 'text' || f.type === 'tel') {
+      inp = `<input class="q-input" id="mf_${f.id}" type="${f.type}" placeholder="${f.placeholder||''}" value="${saved}" autocomplete="${f.autocomplete||'off'}" />`;
+    } else if (f.type === 'number') {
+      inp = `<input class="q-input" id="mf_${f.id}" type="number" min="1" max="99" placeholder="${f.placeholder||''}" value="${saved}" />`;
+    } else if (f.type === 'select') {
+      const opts = f.options.map(o => `<option value="${o}"${saved===o?' selected':''}>${o}</option>`).join('');
+      inp = `<div class="sel-wrap"><select class="q-input" id="mf_${f.id}"><option value="" disabled ${!saved?'selected':''}>— Select —</option>${opts}</select></div>`;
+    }
+    return `<div class="multi-field">
+      <label for="mf_${f.id}">${f.label}</label>
+      ${inp}
+      <div class="q-error" id="err_${f.id}"></div>
+    </div>`;
+  }
+
+  function renderMultiStacked(fields) {
+    return fields.map(f => {
+      const saved = A[f.id] || '';
+      if (f.type === 'chips') {
+        return `<div class="multi-field" style="margin-bottom:14px;">
+          <label>${f.label}</label>
+          <div class="dest-chips" id="chipsWrap">
+            ${f.options.map(o => `<div class="dest-chip${saved===o?' selected':''}" onclick="selectChip(this,'${o}','${f.id}')">${o}</div>`).join('')}
+          </div>
+          <input type="hidden" id="mf_${f.id}" value="${saved}" />
+          <div class="q-error" id="err_${f.id}"></div>
+        </div>`;
+      } else if (f.type === 'number') {
+        return `<div class="multi-field" style="max-width:200px;">
+          <label for="mf_${f.id}">${f.label}</label>
+          <input class="q-input" id="mf_${f.id}" type="number" min="1" max="99" placeholder="${f.placeholder||''}" value="${saved}" />
+          <div class="q-error" id="err_${f.id}"></div>
+        </div>`;
+      }
+      return renderMultiField(f);
+    }).join('');
+  }
+
+  /* ── helpers exposed to inline handlers ── */
+  window.selectChip = (el, val, fieldId) => {
+    // support both old single-field and new multi-field chips
+    const fid = fieldId || 'destination';
+    document.querySelectorAll('.dest-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    const hidden = document.getElementById('mf_' + fid) || document.getElementById('qInput');
+    if (hidden) hidden.value = val;
+  };
+
+  window.switchDate = type => {
+    const inp = document.getElementById('qInput');
+    inp.type  = type; inp.value = '';
+    document.getElementById('dtgMonth').classList.toggle('active', type === 'month');
+    document.getElementById('dtgDate').classList.toggle('active',  type === 'date');
+  };
+
+  window.toggleBudgetCustom = val => {
+    const wrap = document.getElementById('budgetCustomWrap');
+    const hidden = document.getElementById('qInput');
+    if (val === 'Enter manually') {
+      wrap.style.display = 'block';
+      document.getElementById('budgetCustom').focus();
+      hidden.value = '';
+    } else {
+      wrap.style.display = 'none';
+      hidden.value = val;
+    }
+  };
+
+  window.syncCheckboxes = () => {
+    const checked = [...document.querySelectorAll('.time-opts input:checked')].map(c => c.value);
+    document.getElementById('qInput').value = checked.join(', ');
+  };
+
+  window.goBack = () => {
+    if (current > 0) { current--; renderQuestion(current); }
+  };
+
+  window.skipQuestion = () => {
+    const q = QUESTIONS[current];
+    if (q.type === 'multi') {
+      q.fields.forEach(f => { A[f.id] = A[f.id] || ''; });
+    } else {
+      A[q.id] = '';
+    }
+    current++;
+    if (current < TOTAL) renderQuestion(current);
+    else submitForm();
+  };
+
+  window.nextQuestion = async () => {
+    const q = QUESTIONS[current];
+
+    if (q.type === 'multi') {
+      let allOk = true;
+      for (const f of q.fields) {
+        const el    = document.getElementById('mf_' + f.id);
+        const val   = (el?.value || '').trim();
+        const errEl = document.getElementById('err_' + f.id);
+        if (f.validate) {
+          const err = f.validate(val);
+          if (err) {
+            errEl.textContent = err; errEl.classList.add('show');
+            el?.classList.add('err');
+            allOk = false;
+          } else {
+            errEl.textContent = ''; errEl.classList.remove('show');
+            el?.classList.remove('err');
+          }
+        }
+      }
+      if (!allOk) return;
+      q.fields.forEach(f => { A[f.id] = (document.getElementById('mf_' + f.id)?.value || '').trim(); });
+    } else {
+      let val = '';
+      if (q.type === 'budget') {
+        const sel = document.querySelector('input[name="budget"]:checked');
+        val = (sel && sel.value === 'Enter manually')
+          ? (document.getElementById('budgetCustom')?.value || '').trim()
+          : (sel ? sel.value : '');
+      } else {
+        val = (document.getElementById('qInput')?.value || '').trim();
+      }
+      if (q.validate) {
+        const err = q.validate(val);
+        if (err) {
+          const errEl = document.getElementById('qError');
+          errEl.textContent = err; errEl.classList.add('show');
+          document.getElementById('qInput')?.classList.add('err');
+          return;
+        }
+      }
+      A[q.id] = val;
+    }
+
+    if (current < TOTAL - 1) { current++; renderQuestion(current); }
+    else await submitForm();
+  };
+
+  /* ── Submit ── */
+  async function submitForm() {
+    const btn  = document.getElementById('btnNext');
+    const txt  = document.getElementById('btnNextText');
+    const spin = document.getElementById('btnSpinner');
+    if (btn) { btn.disabled = true; txt.textContent = 'Submitting…'; spin.style.display = 'block'; }
+
+    const refId = 'TLH-' + Date.now().toString(36).toUpperCase().slice(-6);
+    const now   = new Date();
+
+    const payload = {
+      ref:         refId,
+      name:        A.name        || '—',
+      whatsapp:    A.whatsapp    || '—',
+      destination: A.destination || '—',
+      travelers:   A.travelers   || '—',
+      travelDate:  A.travelDate  || 'Not specified',
+      budget:      A.budget      || 'Not decided',
+      callTime:    A.callTime    || 'Not specified',
+      notes:       A.notes       || '—',
+      submittedAt: Timestamp.fromDate(now),
+      timestamp:   now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+    };
+
+    try { await addDoc(enquiriesRef, payload); } catch(e) { console.error(e); }
+
+    const msg = encodeURIComponent(
+`*New Travel Enquiry – Travelog Holidays*
+*Ref:* ${payload.ref}
+
+*Name:* ${payload.name}
+*WhatsApp:* ${payload.whatsapp}
+*Destination:* ${payload.destination}
+*No. of Travelers:* ${payload.travelers}
+*Travel Period:* ${payload.travelDate}
+*Budget per Person:* ${payload.budget}
+*Preferred Call Time:* ${payload.callTime}
+*Remarks:* ${payload.notes}
+
+_Submitted on: ${payload.timestamp}_`);
+
+    window.open(`https://wa.me/917306350388?text=${msg}`, '_blank');
+
+    // update progress to 100%
+    document.getElementById('progressFill').style.width  = '100%';
+    document.getElementById('progressLabel').textContent = 'Completed!';
+    document.getElementById('progressPct').textContent   = '100%';
+
+    document.getElementById('qCard').style.display = 'none';
+    document.getElementById('refId').textContent   = refId;
+    document.getElementById('waLink').href         = `https://wa.me/917306350388?text=${msg}`;
+    document.getElementById('successWrap').classList.add('show');
+  }
+
+  /* ── Start ── */
+  renderQuestion(0);
+</script>
+</body>
+</html>
