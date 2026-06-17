@@ -1,0 +1,2441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Guest Status | Travelog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background: linear-gradient(135deg, #050b1a 0%, #0b1f3a 45%, #2b1205 100%);
+padding:40px 20px;
+}
+
+.status-wrapper{
+max-width:1400px;
+margin:auto;
+}
+
+.page-title{
+text-align:center;
+font-size:38px;
+font-weight:700;
+margin-bottom:10px;
+color:#fff;
+text-transform:uppercase;
+}
+
+.page-subtitle{
+text-align:center;
+color:#e6e6e6;
+margin-bottom:30px;
+}
+
+.top-bar{
+display:flex;
+justify-content:center;
+margin-bottom:30px;
+}
+
+.add-btn{
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:14px 28px;
+border-radius:40px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.add-btn:hover{
+background:#0F6E56;
+transform:translateY(-2px);
+}
+
+.form-box{
+background:#fff;
+padding:30px;
+border-radius:24px;
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
+margin-bottom:30px;
+display:none;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:18px;
+}
+
+.input-field,
+select,
+textarea{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #dcdcdc;
+font-size:15px;
+outline:none;
+}
+
+.input-field:focus,
+select:focus,
+textarea:focus{
+border-color:#1D9E75;
+}
+
+textarea{
+resize:vertical;
+min-height:120px;
+}
+
+.section-title{
+font-size:20px;
+font-weight:700;
+margin-bottom:18px;
+color:#222;
+}
+
+.sub-section{
+margin-top:35px;
+}
+
+.add-small-btn{
+margin-top:12px;
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+}
+
+.save-btn{
+margin-top:30px;
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:15px 28px;
+border-radius:40px;
+font-size:16px;
+font-weight:700;
+cursor:pointer;
+}
+
+.status-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+gap:25px;
+}
+
+.guest-tile{
+background:#fff;
+padding:25px;
+border-radius:24px;
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
+cursor:pointer;
+transition:.3s;
+overflow:hidden;
+position:relative;
+}
+
+.guest-tile:hover{
+transform:translateY(-4px);
+}
+
+.tile-head{
+display:flex;
+justify-content:space-between;
+gap:20px;
+position:relative;
+padding-bottom:20px;
+}
+
+.tile-details{
+max-height:0;
+overflow:hidden;
+transition:.4s ease;
+}
+
+.guest-tile.active .tile-details{
+max-height:5000px;
+margin-top:20px;
+}
+
+.guest-name{
+font-size:25px;
+font-weight:700;
+margin-bottom:6px;
+}
+
+.company-name{
+font-size:13px;
+font-weight:600;
+color:#1D9E75;
+margin-bottom:10px;
+}
+
+.status-badge{
+display:inline-block;
+padding:8px 16px;
+border-radius:999px;
+font-size:13px;
+font-weight:700;
+color:#fff;
+}
+
+.confirmed{
+background:#00a86b;
+}
+
+.pending{
+background:#ff9800;
+}
+
+.ongoing{
+background:#ffcc00;
+color:#222;
+}
+
+.completed{
+background:#0077ff;
+}
+
+.detail{
+margin-bottom:14px;
+line-height:1.7;
+color:#555;
+font-size:15px;
+}
+
+.label{
+font-weight:700;
+color:#222;
+}
+
+.card-date{
+font-size:14px;
+font-weight:600;
+color:#666;
+text-align:right;
+}
+
+.card-actions{
+display:flex;
+gap:10px;
+margin-top:25px;
+}
+
+.edit-btn,
+.delete-btn{
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+color:#fff;
+}
+
+.edit-btn{
+background:#0B3D91;
+}
+
+.delete-btn{
+background:#ff4d4f;
+}
+
+.radio-group{
+display:flex;
+flex-wrap:wrap;
+gap:14px;
+margin-top:10px;
+}
+
+.radio-item{
+display:flex;
+align-items:center;
+gap:6px;
+background:#fff;
+border:1px solid #ddd;
+padding:10px 14px;
+border-radius:12px;
+}
+
+.day-card,
+.hotel-card{
+background:#f9fbfb;
+border:1px solid #E4ECE9;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+}
+
+.day-title{
+font-weight:700;
+margin-bottom:12px;
+color:#1D9E75;
+}
+
+.day-options{
+margin-bottom:14px;
+}
+
+.day-option-row{
+margin-bottom:10px;
+}
+
+.mini-label{
+font-size:11px;
+font-weight:700;
+color:#999;
+letter-spacing:.5px;
+margin-bottom:6px;
+}
+
+.mini-radio-group{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+}
+
+.mini-radio-item{
+display:flex;
+align-items:center;
+gap:5px;
+background:#fff;
+border:1px solid #ddd;
+padding:6px 10px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+color:#444;
+cursor:pointer;
+}
+
+.mini-radio-item input{
+width:13px;
+height:13px;
+margin:0;
+accent-color:#1D9E75;
+cursor:pointer;
+}
+
+.hotel-grid{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:12px;
+}
+
+.flight-card{
+background:#f9fbfb;
+border:1px solid #E4ECE9;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+}
+
+.flight-number-row{
+margin-bottom:14px;
+}
+
+.flight-leg-label{
+font-size:13px;
+font-weight:700;
+color:#1D9E75;
+letter-spacing:.5px;
+margin-bottom:8px;
+}
+
+.flight-leg-label:not(:first-of-type){
+margin-top:14px;
+}
+
+.flight-grid{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:12px;
+}
+
+.amount{
+font-weight:700;
+color:#1D9E75;
+}
+
+.tile-block{
+margin-top:18px;
+padding-top:18px;
+border-top:1px solid #eee;
+}
+
+.remove-btn{
+background:#ff4d4f;
+color:#fff;
+border:none;
+padding:8px 14px;
+border-radius:10px;
+cursor:pointer;
+font-size:13px;
+font-weight:600;
+margin-top:12px;
+}
+
+.remove-btn:hover{
+opacity:.9;
+}
+
+.share-fab{
+position:absolute;
+bottom:15px;
+right:15px;
+width:42px;
+height:42px;
+background:#25D366;
+color:#fff;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:18px;
+cursor:pointer;
+box-shadow:0 6px 15px rgba(0,0,0,0.15);
+transition:0.3s;
+}
+
+.share-fab:hover{
+transform:scale(1.1);
+}
+  
+.tab-bar{
+display:flex;
+justify-content:center;
+gap:12px;
+margin-bottom:28px;
+}
+
+.tab-btn{
+background:transparent;
+color:#fff;
+border:2px solid rgba(255,255,255,0.3);
+padding:12px 28px;
+border-radius:40px;
+font-size:15px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.tab-btn:hover{
+border-color:#fff;
+background:rgba(255,255,255,0.08);
+}
+
+.tab-btn.active{
+background:#1D9E75;
+border-color:#1D9E75;
+color:#fff;
+}
+
+@media(max-width:768px){
+
+.page-title{
+font-size:30px;
+}
+
+.form-box{
+padding:20px;
+}
+
+.tile-head{
+flex-direction:column;
+align-items:flex-start;
+gap:10px;
+}
+
+.card-date{
+text-align:left;
+width:100%;
+margin-top:10px;
+font-size:13px;
+}
+  
+.hotel-grid{
+grid-template-columns:1fr;
+}
+
+.flight-grid{
+grid-template-columns:1fr;
+}
+
+.share-fab{
+bottom:10px;
+right:10px;
+width:38px;
+height:38px;
+font-size:16px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="status-wrapper">
+
+<h1 class="page-title">
+Guest Status
+</h1>
+
+<p class="page-subtitle">
+Track booking and payment status of guests
+</p>
+
+<div class="top-bar">
+
+<button class="add-btn" onclick="toggleForm()">
++ ADD NEW GUEST
+</button>
+
+</div>
+
+<div class="tab-bar">
+<button class="tab-btn active" onclick="switchTab('active')">ACTIVE GUESTS</button>
+<button class="tab-btn" onclick="switchTab('completed')">COMPLETED GUESTS</button>
+</div>
+
+<div class="form-box" id="guestFormBox">
+
+<div class="section-title">
+Guest Details
+</div>
+
+<div class="form-grid">
+
+<input
+type="text"
+id="guestName"
+class="input-field"
+placeholder="Guest Name">
+
+<input
+type="text"
+id="companyName"
+class="input-field"
+placeholder="Company Name (Optional)">
+
+<input
+type="text"
+id="salesPerson"
+class="input-field"
+placeholder="Sales Person">
+
+<input
+type="text"
+id="destination"
+class="input-field"
+placeholder="Destination">
+
+<input
+type="text"
+id="travelDate"
+class="input-field"
+placeholder="DD/MM/YYYY"
+maxlength="10"
+oninput="formatDate(this);generateDates()">
+
+<input
+type="number"
+id="days"
+class="input-field"
+placeholder="No of Days">
+
+<input
+type="number"
+id="guests"
+class="input-field"
+placeholder="No of Guests">
+
+<select
+id="travelStatus"
+class="input-field">
+
+<option>CONFIRMED</option>
+<option>PENDING FOR CONFIRMATION</option>
+<option>COMPLETED</option>
+
+</select>
+
+<select
+id="paymentStatus"
+class="input-field">
+
+<option>ADVANCE PAID</option>
+<option>PAYMENT PENDING</option>
+<option>PAYMENT COMPLETED</option>
+
+</select>
+
+<input
+type="number"
+id="invoiceAmount"
+class="input-field"
+placeholder="₹ Total Invoice Amount"
+oninput="calculateBalance()">
+
+<input
+type="number"
+id="amountReceived"
+class="input-field"
+placeholder="₹ Amount Received"
+oninput="calculateBalance()">
+
+<input
+type="number"
+id="balanceAmount"
+class="input-field"
+placeholder="₹ Balance Receivable"
+readonly>
+
+</div>
+
+<div class="sub-section">
+
+<div class="section-title">
+Visa Status
+</div>
+
+<select id="visaStatus" class="input-field">
+
+<option>PENDING FOR APPLYING</option>
+<option>APPLIED BY CUSTOMER</option>
+<option>APPLIED</option>
+<option>APPROVED</option>
+<option>NOT REQUIRED</option>
+<option>REJECTED</option>
+
+</select>
+
+</div>
+
+<div class="sub-section">
+
+<div class="section-title">
+Hotel Status
+</div>
+
+<div id="hotelContainer">
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+type="text"
+class="input-field hotel-place"
+placeholder="Place">
+
+<input
+type="text"
+class="input-field hotel-name"
+placeholder="Hotel Name">
+
+<select
+class="input-field hotel-status">
+
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
+
+</select>
+
+</div>
+
+</div>
+
+</div>
+
+<button
+class="add-small-btn"
+onclick="addHotel()">
+
++ Add Hotel
+
+</button>
+
+</div>
+
+<div class="sub-section">
+
+<div class="section-title">
+Cruise Status
+</div>
+
+<div id="cruiseContainer">
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+type="text"
+class="input-field cruise-place"
+placeholder="Cruise Place">
+
+<input
+type="text"
+class="input-field cruise-name"
+placeholder="Cruise Name">
+
+<select
+class="input-field cruise-status">
+
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
+<option>NO CRUISE</option>
+
+</select>
+
+</div>
+
+</div>
+
+</div>
+
+<button
+class="add-small-btn"
+onclick="addCruise()">
+
++ Add Cruise
+
+</button>
+
+</div>
+
+<div class="sub-section">
+
+<div class="section-title">
+Flight Details
+</div>
+
+<div id="flightContainer">
+
+<div class="flight-card">
+
+<div class="flight-number-row">
+
+<input
+type="text"
+class="input-field flight-number"
+placeholder="Flight No.">
+
+</div>
+
+<div class="flight-leg-label">FROM</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-from-place"
+placeholder="From (Place)">
+
+<input
+type="text"
+class="input-field flight-from-date"
+placeholder="DD/MM/YYYY"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+class="input-field flight-from-time">
+
+</div>
+
+<div class="flight-leg-label">TO</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-to-place"
+placeholder="To (Place)">
+
+<input
+type="text"
+class="input-field flight-to-date"
+placeholder="DD/MM/YYYY"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+class="input-field flight-to-time">
+
+</div>
+
+</div>
+
+</div>
+
+<button
+class="add-small-btn"
+onclick="addFlight()">
+
++ Add Flight
+
+</button>
+
+</div>
+
+<div class="sub-section">
+
+<div class="section-title">
+Day-wise Itinerary
+</div>
+
+<div id="dayContainer">
+
+<div class="day-card">
+
+<div class="day-title">
+Day 1 - <span class="auto-date"></span>
+</div>
+
+<div class="day-options">
+
+<div class="day-option-row">
+<div class="mini-label">TRANSFER</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-transfer-radio" name="transfer-0" value="SHARED" checked>
+SHARED
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-transfer-radio" name="transfer-0" value="PRIVATE">
+PRIVATE
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">MEAL PLAN</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-0" value="B" checked>
+B
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-0" value="BR">
+BR
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-0" value="L">
+L
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-0" value="D">
+D
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">GUIDE</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-guide-radio" name="guide-0" value="WITH GUIDE" checked>
+WITH GUIDE
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-guide-radio" name="guide-0" value="WITHOUT GUIDE">
+WITHOUT GUIDE
+</label>
+
+</div>
+</div>
+
+</div>
+
+<textarea
+class="input-field itinerary-text"
+placeholder="Activity / Plans"></textarea>
+
+</div>
+
+</div>
+
+<button
+class="add-small-btn"
+onclick="addDay()">
+
++ Add Day
+
+</button>
+
+</div>
+
+<div class="sub-section">
+
+<div class="section-title">
+Notes
+</div>
+
+<textarea
+id="inclusions"
+placeholder="Notes / Inclusions"></textarea>
+
+</div>
+
+<button
+class="save-btn"
+onclick="addGuest()">
+
+SAVE GUEST
+
+</button>
+
+</div>
+
+<div class="status-grid" id="guestContainer"></div>
+<div class="status-grid" id="completedContainer" style="display:none;"></div>
+
+</div>
+
+<script type="module">
+
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+deleteDoc,
+doc,
+onSnapshot,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+
+authDomain: "travelog-itinerary.firebaseapp.com",
+
+projectId: "travelog-itinerary",
+
+storageBucket: "travelog-itinerary.firebasestorage.app",
+
+messagingSenderId: "33567258851",
+
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+window.onSnapshot = onSnapshot;
+window.updateDoc = updateDoc;
+
+</script>
+
+<script>
+
+let editingId = null;
+let dayCount = 1;
+let dayUid = 1;
+
+function formatDate(input){
+
+let value = input.value.replace(/\D/g,'');
+
+if(value.length > 2){
+value = value.substring(0,2) + '/' + value.substring(2);
+}
+
+if(value.length > 5){
+value = value.substring(0,5) + '/' + value.substring(5,9);
+}
+
+input.value = value;
+
+}
+  
+function calculateBalance(){
+
+const invoice =
+parseFloat(
+document.getElementById("invoiceAmount").value
+) || 0;
+
+const received =
+parseFloat(
+document.getElementById("amountReceived").value
+) || 0;
+
+const balance = invoice - received;
+
+document.getElementById(
+"balanceAmount"
+).value = balance;
+
+}
+function toggleForm(){
+
+const form =
+document.getElementById("guestFormBox");
+
+form.style.display =
+form.style.display==="block"
+? "none"
+: "block";
+
+}
+
+function generateDates(){
+
+const startDate =
+document.getElementById("travelDate").value;
+
+if(startDate.length !== 10) return;
+
+const parts = startDate.split('/');
+
+const baseDate = new Date(
+parts[2],
+parts[1]-1,
+parts[0]
+);
+
+document.querySelectorAll(".day-card")
+.forEach((card,index)=>{
+
+const date = new Date(baseDate);
+
+date.setDate(baseDate.getDate() + index);
+
+const dd = String(date.getDate()).padStart(2,'0');
+const mm = String(date.getMonth()+1).padStart(2,'0');
+const yyyy = date.getFullYear();
+
+card.querySelector(".auto-date").innerText =
+`${dd}/${mm}/${yyyy}`;
+
+});
+
+}
+
+function addDay(){
+
+dayCount++;
+dayUid++;
+
+document.getElementById("dayContainer")
+.insertAdjacentHTML("beforeend",`
+
+<div class="day-card">
+
+<div class="day-title">
+Day ${dayCount} -
+<span class="auto-date"></span>
+</div>
+
+<div class="day-options">
+
+<div class="day-option-row">
+<div class="mini-label">TRANSFER</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-transfer-radio" name="transfer-${dayUid}" value="SHARED" checked>
+SHARED
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-transfer-radio" name="transfer-${dayUid}" value="PRIVATE">
+PRIVATE
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">MEAL PLAN</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-${dayUid}" value="B" checked>
+B
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-${dayUid}" value="BR">
+BR
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-${dayUid}" value="L">
+L
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-${dayUid}" value="D">
+D
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">GUIDE</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-guide-radio" name="guide-${dayUid}" value="WITH GUIDE" checked>
+WITH GUIDE
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-guide-radio" name="guide-${dayUid}" value="WITHOUT GUIDE">
+WITHOUT GUIDE
+</label>
+
+</div>
+</div>
+
+</div>
+
+<textarea
+class="input-field itinerary-text"
+placeholder="Activity / Plans"></textarea>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeDay(this)">
+Remove Day
+</button>
+
+</div>
+
+`);
+
+generateDates();
+
+}
+
+function removeDay(button){
+
+button.closest(".day-card").remove();
+
+const allDays =
+document.querySelectorAll(".day-card");
+
+dayCount = 0;
+
+allDays.forEach((card,index)=>{
+
+dayCount++;
+
+card.querySelector(".day-title").innerHTML =
+`Day ${dayCount} -
+<span class="auto-date"></span>`;
+
+});
+
+generateDates();
+
+}
+
+function addHotel(){
+
+document.getElementById("hotelContainer")
+.insertAdjacentHTML("beforeend",`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+type="text"
+class="input-field hotel-place"
+placeholder="Place">
+
+<input
+type="text"
+class="input-field hotel-name"
+placeholder="Hotel Name">
+
+<select
+class="input-field hotel-status">
+
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
+
+</select>
+
+</div>
+
+</div>
+
+`);
+
+}
+
+function addCruise(){
+
+document.getElementById(
+"cruiseContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field cruise-place"
+placeholder="Cruise Place">
+
+<input
+class="input-field cruise-name"
+placeholder="Cruise Name">
+
+<select
+class="input-field cruise-status">
+
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
+<option>NO CRUISE</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+}
+
+function addFlight(){
+
+document.getElementById(
+"flightContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="flight-card">
+
+<div class="flight-number-row">
+
+<input
+type="text"
+class="input-field flight-number"
+placeholder="Flight No.">
+
+</div>
+
+<div class="flight-leg-label">FROM</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-from-place"
+placeholder="From (Place)">
+
+<input
+type="text"
+class="input-field flight-from-date"
+placeholder="DD/MM/YYYY"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+class="input-field flight-from-time">
+
+</div>
+
+<div class="flight-leg-label">TO</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-to-place"
+placeholder="To (Place)">
+
+<input
+type="text"
+class="input-field flight-to-date"
+placeholder="DD/MM/YYYY"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+class="input-field flight-to-time">
+
+</div>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeFlight(this)">
+Remove Flight
+</button>
+
+</div>
+
+`
+
+);
+
+}
+
+function removeFlight(button){
+
+button.closest(".flight-card").remove();
+
+}
+
+async function addGuest(){
+
+const visaStatus =
+document.getElementById("visaStatus").value;
+
+const hotels =
+[...document.querySelectorAll("#hotelContainer .hotel-card")]
+.map(card=>({
+
+place:
+card.querySelector(".hotel-place").value,
+
+hotel:
+card.querySelector(".hotel-name").value,
+
+status:
+card.querySelector(".hotel-status").value
+
+}));
+
+const cruises =
+[...document.querySelectorAll(".cruise-status")]
+.map((item,index)=>({
+
+place:
+document.querySelectorAll(
+".cruise-place"
+)[index].value,
+
+name:
+document.querySelectorAll(
+".cruise-name"
+)[index].value,
+
+status:
+item.value
+
+}));
+
+const flights =
+[...document.querySelectorAll("#flightContainer .flight-card")]
+.map(card=>({
+
+flightNumber:
+card.querySelector(".flight-number").value,
+
+fromPlace:
+card.querySelector(".flight-from-place").value,
+
+fromDate:
+card.querySelector(".flight-from-date").value,
+
+fromTime:
+card.querySelector(".flight-from-time").value,
+
+toPlace:
+card.querySelector(".flight-to-place").value,
+
+toDate:
+card.querySelector(".flight-to-date").value,
+
+toTime:
+card.querySelector(".flight-to-time").value
+
+}));
+
+const itineraryDays =
+[...document.querySelectorAll(".day-card")]
+.map((card,index)=>({
+
+day:index+1,
+
+date:
+card.querySelector(".auto-date").innerText,
+
+activity:
+card.querySelector(".itinerary-text").value,
+
+transfer:
+card.querySelector(".day-transfer-radio:checked").value,
+
+mealPlan:
+card.querySelector(".day-meal-radio:checked").value,
+
+guideStatus:
+card.querySelector(".day-guide-radio:checked").value
+
+}));
+
+const guest = {
+
+guestName:
+document.getElementById("guestName").value,
+
+companyName:
+document.getElementById("companyName").value,
+
+salesPerson:
+document.getElementById("salesPerson").value,
+
+destination:
+document.getElementById("destination").value,
+
+travelDate:
+document.getElementById("travelDate").value,
+
+days:
+document.getElementById("days").value,
+
+guests:
+document.getElementById("guests").value,
+
+travelStatus:
+document.getElementById("travelStatus").value,
+
+paymentStatus:
+document.getElementById("paymentStatus").value,
+
+invoiceAmount:
+document.getElementById("invoiceAmount").value,
+
+amountReceived:
+document.getElementById("amountReceived").value,
+
+balanceAmount:
+document.getElementById("balanceAmount").value,
+
+visaStatus,
+hotels,
+cruises,
+flights,
+itineraryDays,
+
+notes:
+document.getElementById("inclusions").value,
+
+created:
+new Date().toISOString()
+
+};
+
+if(editingId){
+
+await updateDoc(
+doc(db,"guestStatus",editingId),
+guest
+);
+
+alert("Guest Updated!");
+
+editingId = null;
+
+}else{
+
+await addDoc(
+collection(db,"guestStatus"),
+guest
+);
+
+alert("Guest Saved!");
+
+}
+
+document.getElementById("guestFormBox")
+.style.display = "none";
+
+}
+
+function loadGuests(){
+
+onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
+
+let guests = [];
+
+snapshot.forEach((docItem)=>{
+guests.push({
+id:docItem.id,
+...docItem.data()
+});
+});
+
+// ✅ SINGLE CLEAN SORT: nearest date first
+const parseDate = (d) => {
+if(!d || !d.includes('/')) return new Date(9999, 11, 31);
+
+const [dd, mm, yyyy] = d.split('/');
+return new Date(yyyy, mm - 1, dd);
+};
+
+guests.sort((a, b) => parseDate(a.travelDate) - parseDate(b.travelDate));
+
+window.allGuests = guests;
+
+let html = "";
+let completedHtml = "";
+
+guests.forEach((g)=>{
+
+let badge = "confirmed";
+
+if(g.travelStatus === "PENDING FOR CONFIRMATION"){
+badge = "pending";
+}
+
+if(g.travelStatus === "COMPLETED"){
+badge = "completed";
+}
+
+let tripStage = "UPCOMING";
+let tripStageClass = "pending";
+
+if(g.itineraryDays && g.itineraryDays.length){
+
+const today = new Date();
+
+today.setHours(0,0,0,0);
+
+const parseDate = (dateStr) => {
+
+if(!dateStr || !dateStr.includes('/'))
+return null;
+
+const [dd, mm, yyyy] = dateStr.split('/');
+
+return new Date(yyyy, mm - 1, dd);
+
+};
+
+const firstDay =
+parseDate(g.itineraryDays[0].date);
+
+const lastDay =
+parseDate(
+g.itineraryDays[g.itineraryDays.length - 1].date
+);
+
+if(firstDay && lastDay){
+
+if(today > lastDay){
+
+tripStage = "COMPLETED";
+tripStageClass = "completed";
+
+}
+else if(today >= firstDay && today <= lastDay){
+
+tripStage = "ONGOING";
+tripStageClass = "ongoing";
+
+}
+else{
+
+const diffTime =
+firstDay - today;
+
+const daysLeft =
+Math.ceil(
+diffTime / (1000 * 60 * 60 * 24)
+);
+
+tripStage =
+`UPCOMING IN ${daysLeft} DAY${daysLeft > 1 ? "S" : ""}`;
+
+tripStageClass = "pending";
+
+}
+
+}
+
+}
+const tileHtml = `
+<div class="guest-tile" onclick="this.classList.toggle('active')">
+
+<div class="tile-head">
+
+<div>
+
+<div class="guest-name">
+${g.guestName || ""}
+</div>
+
+${
+g.companyName
+? `<div class="company-name">🏢 ${g.companyName}</div>`
+: ""
+}
+
+<div class="status-badge ${badge}">
+${g.travelStatus || ""}
+</div>
+
+<div
+class="status-badge ${tripStageClass}"
+style="margin-top:10px;">
+${tripStage}
+</div>
+
+</div>
+
+<div class="card-date">
+${g.travelDate || "-"} <br>
+👤 ${g.salesPerson || "-"}
+</div>
+
+</div>
+
+<div class="tile-details">
+
+<div class="detail"><span class="label">Destination:</span> ${g.destination || ""}</div>
+
+<div class="detail"><span class="label">Visa Status:</span> ${g.visaStatus || ""}</div>
+
+<div class="detail"><span class="label">Guests:</span> ${g.guests || ""}</div>
+
+<div class="detail"><span class="label">Payment:</span> ${g.paymentStatus || ""}</div>
+
+<div class="detail">
+<span class="label">Invoice Amount:</span>
+<span class="amount">
+₹ ${g.invoiceAmount || 0}
+</span>
+</div>
+
+<div class="detail">
+<span class="label">Advance Required (60%):</span>
+<span class="amount">
+₹ ${((Number(g.invoiceAmount || 0) * 60) / 100).toFixed(0)}
+</span>
+</div>
+
+<div class="detail">
+<span class="label">Advance Received:</span>
+<span class="amount">
+₹ ${g.amountReceived || 0}
+</span>
+</div>
+
+<div class="detail">
+
+<span class="label">
+Advance Pending:
+</span>
+
+<span
+class="amount"
+style="
+color:
+${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+) > 0
+? '#ff3b30'
+: '#1D9E75'
+};
+font-weight:700;
+">
+
+₹ ${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+).toFixed(0)
+}
+
+${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+) > 0
+? ' ⚠️'
+: ''
+}
+
+</span>
+
+</div>
+
+<div class="detail">
+<span class="label">Final Balance:</span>
+<span class="amount">
+₹ ${g.balanceAmount || 0}
+</span>
+</div>
+
+<div class="tile-block">
+<div class="label">Hotel Status</div><br>
+
+${(g.hotels || []).map(h=>`
+<div class="detail">
+🏨 ${h.place || ""}<br>
+Hotel: <b>${h.hotel || ""}</b><br>
+Status: <b>${h.status || ""}</b>
+</div>
+`).join("")}
+
+</div>
+
+${
+(() => {
+const visibleCruises =
+(g.cruises || []).filter(c => c.status !== "NO CRUISE");
+
+if(!visibleCruises.length) return "";
+
+return `
+<div class="tile-block">
+<div class="label">Cruise Status</div><br>
+
+${visibleCruises.map(c=>`
+<div class="detail">
+🛳️ ${c.place || ""}<br>
+Cruise: <b>${c.name || ""}</b><br>
+Status: <b>${c.status || ""}</b>
+</div>
+`).join("")}
+
+</div>
+`;
+})()
+}
+
+<div class="tile-block">
+<div class="label">Flight Details</div><br>
+
+${(g.flights || []).map(f=>`
+<div class="detail">
+✈️ Flight: <b>${f.flightNumber || ""}</b><br>
+From: <b>${f.fromPlace || ""}</b> — ${f.fromDate || ""} ${f.fromTime || ""}<br>
+To: <b>${f.toPlace || ""}</b> — ${f.toDate || ""} ${f.toTime || ""}
+</div>
+`).join("")}
+
+</div>
+
+<div class="tile-block">
+<div class="label">Day-wise Itinerary</div><br>
+
+${(g.itineraryDays || []).map(d=>`
+<div class="detail">
+<b>Day ${d.day} - ${d.date}</b><br>
+🚐 Transfer: <b>${d.transfer || "-"}</b> &nbsp; 🍽️ Meal Plan: <b>${d.mealPlan || "-"}</b> &nbsp; 🧑‍✈️ Guide: <b>${d.guideStatus || "-"}</b><br>
+${d.activity || ""}
+</div>
+`).join("")}
+
+</div>
+
+<div class="tile-block">
+<div class="label">Notes</div><br>
+<div class="detail">${g.notes || ""}</div>
+</div>
+
+<div class="card-actions">
+
+<button class="edit-btn"
+onclick="event.stopPropagation(); editGuest('${g.id}')">
+Edit
+</button>
+
+<button class="delete-btn"
+onclick="event.stopPropagation(); deleteGuest('${g.id}')">
+Delete
+</button>
+
+</div>
+
+<div class="share-fab"
+onclick="event.stopPropagation(); shareWhatsApp('${g.id}')">
+📤
+</div>
+
+</div>
+</div>
+`;
+
+if(g.travelStatus === "COMPLETED" || tripStage === "COMPLETED"){
+completedHtml += tileHtml;
+} else {
+html += tileHtml;
+}
+
+});
+
+document.getElementById("guestContainer").innerHTML = html;
+document.getElementById("completedContainer").innerHTML = completedHtml;
+
+});
+
+}
+
+async function editGuest(id){
+
+const password =
+prompt("Enter password");
+
+if(password !== "5655"){
+
+alert("Wrong password");
+return;
+
+}
+
+editingId = id;
+
+const guest =
+window.allGuests.find(
+g=>g.id===id
+);
+
+if(!guest) return;
+
+document.getElementById(
+"guestFormBox"
+).style.display="block";
+
+document.getElementById(
+"guestName"
+).value =
+guest.guestName || "";
+
+document.getElementById(
+"companyName"
+).value =
+guest.companyName || "";
+
+document.getElementById(
+"salesPerson"
+).value =
+guest.salesPerson || "";
+
+document.getElementById(
+"destination"
+).value =
+guest.destination || "";
+
+document.getElementById(
+"travelDate"
+).value =
+guest.travelDate || "";
+
+document.getElementById(
+"days"
+).value =
+guest.days || "";
+
+document.getElementById(
+"guests"
+).value =
+guest.guests || "";
+
+document.getElementById(
+"travelStatus"
+).value =
+guest.travelStatus || "";
+
+document.getElementById(
+"paymentStatus"
+).value =
+guest.paymentStatus || "";
+
+document.getElementById(
+"invoiceAmount"
+).value =
+guest.invoiceAmount || "";
+
+document.getElementById(
+"amountReceived"
+).value =
+guest.amountReceived || "";
+
+document.getElementById(
+"balanceAmount"
+).value =
+guest.balanceAmount || "";
+
+document.getElementById(
+"inclusions"
+).value =
+guest.notes || "";
+
+document.getElementById(
+"visaStatus"
+).value =
+guest.visaStatus || "PENDING FOR APPLYING";
+
+document.getElementById(
+"hotelContainer"
+).innerHTML="";
+
+(guest.hotels || [])
+.forEach(h=>{
+
+document.getElementById(
+"hotelContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field hotel-place"
+value="${h.place || ""}">
+
+<input
+class="input-field hotel-name"
+value="${h.hotel || ""}">
+
+<select
+class="input-field hotel-status">
+
+<option ${
+h.status==="BOOKED"
+?"selected":""
+}>
+BOOKED
+</option>
+
+<option ${
+h.status==="BOOKED BY CUSTOMER"
+?"selected":""
+}>
+BOOKED BY CUSTOMER
+</option>
+
+<option ${
+h.status==="PENDING FOR BOOKING"
+?"selected":""
+}>
+PENDING FOR BOOKING
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"cruiseContainer"
+).innerHTML="";
+
+(guest.cruises || [])
+.forEach(c=>{
+
+document.getElementById(
+"cruiseContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field cruise-place"
+value="${c.place || ""}">
+
+<input
+class="input-field cruise-name"
+value="${c.name || ""}">
+
+<select
+class="input-field cruise-status">
+
+<option ${
+c.status==="BOOKED"
+?"selected":""
+}>
+BOOKED
+</option>
+
+<option ${
+c.status==="BOOKED BY CUSTOMER"
+?"selected":""
+}>
+BOOKED BY CUSTOMER
+</option>
+
+<option ${
+c.status==="PENDING FOR BOOKING"
+?"selected":""
+}>
+PENDING FOR BOOKING
+</option>
+
+<option ${
+c.status==="NO CRUISE"
+?"selected":""
+}>
+NO CRUISE
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"flightContainer"
+).innerHTML="";
+
+(guest.flights || [])
+.forEach(f=>{
+
+document.getElementById(
+"flightContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="flight-card">
+
+<div class="flight-number-row">
+
+<input
+type="text"
+class="input-field flight-number"
+value="${f.flightNumber || ""}">
+
+</div>
+
+<div class="flight-leg-label">FROM</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-from-place"
+value="${f.fromPlace || ""}">
+
+<input
+type="text"
+class="input-field flight-from-date"
+value="${f.fromDate || ""}"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+class="input-field flight-from-time"
+value="${f.fromTime || ""}">
+
+</div>
+
+<div class="flight-leg-label">TO</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-to-place"
+value="${f.toPlace || ""}">
+
+<input
+type="text"
+class="input-field flight-to-date"
+value="${f.toDate || ""}"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+class="input-field flight-to-time"
+value="${f.toTime || ""}">
+
+</div>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeFlight(this)">
+Remove Flight
+</button>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"dayContainer"
+).innerHTML="";
+
+dayCount = 0;
+
+(guest.itineraryDays || [])
+.forEach(day=>{
+
+dayCount++;
+dayUid++;
+
+
+document.getElementById(
+"dayContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="day-card">
+
+<div class="day-title">
+
+Day ${day.day}
+
+-
+
+<span class="auto-date">
+
+${day.date}
+
+</span>
+
+</div>
+
+<div class="day-options">
+
+<div class="day-option-row">
+<div class="mini-label">TRANSFER</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-transfer-radio" name="transfer-${dayUid}" value="SHARED" ${day.transfer==="SHARED"||!day.transfer?"checked":""}>
+SHARED
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-transfer-radio" name="transfer-${dayUid}" value="PRIVATE" ${day.transfer==="PRIVATE"?"checked":""}>
+PRIVATE
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">MEAL PLAN</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-${dayUid}" value="B" ${day.mealPlan==="B"||!day.mealPlan?"checked":""}>
+B
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-${dayUid}" value="BR" ${day.mealPlan==="BR"?"checked":""}>
+BR
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-${dayUid}" value="L" ${day.mealPlan==="L"?"checked":""}>
+L
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-meal-radio" name="meal-${dayUid}" value="D" ${day.mealPlan==="D"?"checked":""}>
+D
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">GUIDE</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="radio" class="day-guide-radio" name="guide-${dayUid}" value="WITH GUIDE" ${day.guideStatus==="WITH GUIDE"||!day.guideStatus?"checked":""}>
+WITH GUIDE
+</label>
+
+<label class="mini-radio-item">
+<input type="radio" class="day-guide-radio" name="guide-${dayUid}" value="WITHOUT GUIDE" ${day.guideStatus==="WITHOUT GUIDE"?"checked":""}>
+WITHOUT GUIDE
+</label>
+
+</div>
+</div>
+
+</div>
+
+<textarea
+class="input-field itinerary-text">
+
+${day.activity || ""}
+
+</textarea>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeDay(this)">
+Remove Day
+</button>
+
+</div>
+
+`
+
+);
+
+});
+
+alert(
+"Guest loaded for editing"
+);
+
+}
+
+async function deleteGuest(id){
+
+const password =
+prompt("Enter password");
+
+if(password !== "5655"){
+
+alert("Wrong password");
+return;
+
+}
+
+if(!confirm("Delete Guest?"))
+return;
+
+await deleteDoc(
+doc(db,"guestStatus",id)
+);
+
+}
+
+function switchTab(tab){
+const activeBtn = document.querySelector('.tab-btn.active');
+if(activeBtn) activeBtn.classList.remove('active');
+
+const btns = document.querySelectorAll('.tab-btn');
+if(tab === 'active'){
+btns[0].classList.add('active');
+document.getElementById('guestContainer').style.display = '';
+document.getElementById('completedContainer').style.display = 'none';
+} else {
+btns[1].classList.add('active');
+document.getElementById('guestContainer').style.display = 'none';
+document.getElementById('completedContainer').style.display = '';
+}
+}
+
+window.addEventListener(
+"load",
+()=>{
+
+loadGuests();
+
+generateDates();
+
+}
+);
+
+function shareWhatsApp(id){
+
+const g = window.allGuests.find(x => x.id === id);
+if(!g){
+alert("Guest not found");
+return;
+}
+
+let message = `
+*🏝️ Guest Status - Travelog*
+
+👤 Name: ${g.guestName || "-"}
+🏢 Company: ${g.companyName || "-"}
+📍 Destination: ${g.destination || "-"}
+📅 Travel Date: ${g.travelDate || "-"}
+📆 Days: ${g.days || "-"}
+👥 Guests: ${g.guests || "-"}
+
+✈️ Visa Status: ${g.visaStatus || "-"}
+📊 Travel Status: ${g.travelStatus || "-"}
+💳 Payment Status: ${g.paymentStatus || "-"}
+
+💰 Invoice: ₹${g.invoiceAmount || 0}
+💵 Received: ₹${g.amountReceived || 0}
+📉 Balance: ₹${g.balanceAmount || 0}
+
+🏨 Hotels:
+${(g.hotels || []).map(h => `- ${h.place || ""} | ${h.hotel || ""} | ${h.status || ""}`).join("\n") || "-"}
+
+🛳️ Cruises:
+${(g.cruises || []).filter(c => c.status !== "NO CRUISE").map(c => `- ${c.place || ""} | ${c.name || ""} | ${c.status || ""}`).join("\n") || "-"}
+
+✈️ Flights:
+${(g.flights || []).map(f => `- ${f.flightNumber || ""} | ${f.fromPlace || ""} ${f.fromDate || ""} ${f.fromTime || ""} → ${f.toPlace || ""} ${f.toDate || ""} ${f.toTime || ""}`).join("\n") || "-"}
+
+🗓️ Itinerary:
+${(g.itineraryDays || []).map(d => `Day ${d.day} (${d.date}) | Transfer: ${d.transfer || "-"} | Meal: ${d.mealPlan || "-"} | Guide: ${d.guideStatus || "-"}\n${d.activity || ""}`).join("\n\n") || "-"}
+
+📝 Notes:
+${g.notes || "-"}
+`;
+
+const url = "https://wa.me/?text=" + encodeURIComponent(message);
+window.open(url, "_blank");
+}
+
+</script>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+deleteDoc,
+doc,
+onSnapshot,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+
+authDomain: "travelog-itinerary.firebaseapp.com",
+
+projectId: "travelog-itinerary",
+
+storageBucket: "travelog-itinerary.firebasestorage.app",
+
+messagingSenderId: "33567258851",
+
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+window.onSnapshot = onSnapshot;
+window.updateDoc = updateDoc;
+
+</script>
+
+</body>
+
+</html> 
