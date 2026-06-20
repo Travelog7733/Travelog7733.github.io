@@ -1,0 +1,2790 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Guest Status | Travelog</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background: linear-gradient(135deg, #050b1a 0%, #0b1f3a 45%, #2b1205 100%);
+padding:40px 20px;
+}
+
+.status-wrapper{
+max-width:1400px;
+margin:auto;
+}
+
+.page-title{
+text-align:center;
+font-size:38px;
+font-weight:700;
+margin-bottom:10px;
+color:#fff;
+text-transform:uppercase;
+}
+
+.page-subtitle{
+text-align:center;
+color:#e6e6e6;
+margin-bottom:30px;
+}
+
+.top-bar{
+display:flex;
+justify-content:center;
+margin-bottom:30px;
+}
+
+.add-btn{
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:14px 28px;
+border-radius:40px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.add-btn:hover{
+background:#0F6E56;
+transform:translateY(-2px);
+}
+
+.form-box{
+background:#fff;
+padding:30px;
+border-radius:24px;
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
+margin-bottom:30px;
+display:none;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:18px;
+}
+
+.input-field,
+select,
+textarea{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid #dcdcdc;
+font-size:15px;
+outline:none;
+}
+
+.input-field:focus,
+select:focus,
+textarea:focus{
+border-color:#1D9E75;
+}
+
+textarea{
+resize:vertical;
+min-height:120px;
+}
+
+.section-title{
+font-size:20px;
+font-weight:700;
+margin-bottom:18px;
+color:#222;
+}
+
+.sub-section{
+margin-top:35px;
+}
+
+.add-small-btn{
+margin-top:12px;
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+}
+
+.save-btn{
+margin-top:30px;
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:15px 28px;
+border-radius:40px;
+font-size:16px;
+font-weight:700;
+cursor:pointer;
+}
+
+.status-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+gap:25px;
+}
+
+.guest-tile{
+background:#fff;
+padding:25px;
+border-radius:24px;
+border:1px solid #E4ECE9;
+box-shadow:0 8px 30px rgba(0,0,0,.04);
+cursor:pointer;
+transition:.3s;
+overflow:hidden;
+position:relative;
+}
+
+.guest-tile:hover{
+transform:translateY(-4px);
+}
+
+.tile-head{
+display:flex;
+justify-content:space-between;
+gap:20px;
+position:relative;
+padding-bottom:20px;
+}
+
+.tile-details{
+max-height:0;
+overflow:hidden;
+transition:.4s ease;
+}
+
+.guest-tile.active .tile-details{
+max-height:5000px;
+margin-top:20px;
+}
+
+.guest-name{
+font-size:25px;
+font-weight:700;
+margin-bottom:6px;
+}
+
+.company-name{
+font-size:13px;
+font-weight:600;
+color:#1D9E75;
+margin-bottom:10px;
+}
+
+.status-badge{
+display:inline-block;
+padding:8px 16px;
+border-radius:999px;
+font-size:13px;
+font-weight:700;
+color:#fff;
+}
+
+.confirmed{
+background:#00a86b;
+}
+
+.pending{
+background:#ff9800;
+}
+
+.ongoing{
+background:#ffcc00;
+color:#222;
+}
+
+.completed{
+background:#0077ff;
+}
+
+.detail{
+margin-bottom:14px;
+line-height:1.7;
+color:#555;
+font-size:15px;
+}
+
+.label{
+font-weight:700;
+color:#222;
+}
+
+.card-date{
+font-size:14px;
+font-weight:600;
+color:#666;
+text-align:right;
+}
+
+.card-actions{
+display:flex;
+gap:10px;
+margin-top:25px;
+}
+
+.edit-btn,
+.delete-btn{
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+color:#fff;
+}
+
+.edit-btn{
+background:#0B3D91;
+}
+
+.delete-btn{
+background:#ff4d4f;
+}
+
+.radio-group{
+display:flex;
+flex-wrap:wrap;
+gap:14px;
+margin-top:10px;
+}
+
+.radio-item{
+display:flex;
+align-items:center;
+gap:6px;
+background:#fff;
+border:1px solid #ddd;
+padding:10px 14px;
+border-radius:12px;
+}
+
+.day-card,
+.hotel-card{
+background:#f9fbfb;
+border:1px solid #E4ECE9;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+}
+
+.day-title{
+font-weight:700;
+margin-bottom:12px;
+color:#1D9E75;
+}
+
+.day-options{
+margin-bottom:14px;
+}
+
+.day-option-row{
+margin-bottom:10px;
+}
+
+.mini-label{
+font-size:11px;
+font-weight:700;
+color:#999;
+letter-spacing:.5px;
+margin-bottom:6px;
+}
+
+.mini-radio-group{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+}
+
+.mini-radio-item{
+display:flex;
+align-items:center;
+gap:5px;
+background:#fff;
+border:1px solid #ddd;
+padding:6px 10px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+color:#444;
+cursor:pointer;
+}
+
+.mini-radio-item input{
+width:13px;
+height:13px;
+margin:0;
+accent-color:#1D9E75;
+cursor:pointer;
+}
+
+.hotel-grid{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:12px;
+}
+
+.flight-card{
+background:#f9fbfb;
+border:1px solid #E4ECE9;
+padding:16px;
+border-radius:16px;
+margin-bottom:14px;
+}
+
+.flight-number-row{
+margin-bottom:14px;
+}
+
+.flight-leg-label{
+font-size:13px;
+font-weight:700;
+color:#1D9E75;
+letter-spacing:.5px;
+margin-bottom:8px;
+}
+
+.flight-leg-label:not(:first-of-type){
+margin-top:14px;
+}
+
+.flight-grid{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:12px;
+}
+
+.amount{
+font-weight:700;
+color:#1D9E75;
+}
+
+.tile-block{
+margin-top:18px;
+padding-top:18px;
+border-top:1px solid #eee;
+}
+
+.remove-btn{
+background:#ff4d4f;
+color:#fff;
+border:none;
+padding:8px 14px;
+border-radius:10px;
+cursor:pointer;
+font-size:13px;
+font-weight:600;
+margin-top:12px;
+}
+
+.remove-btn:hover{
+opacity:.9;
+}
+
+.share-fab{
+position:absolute;
+bottom:15px;
+right:15px;
+width:42px;
+height:42px;
+background:#25D366;
+color:#fff;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:18px;
+cursor:pointer;
+box-shadow:0 6px 15px rgba(0,0,0,0.15);
+transition:0.3s;
+}
+
+.share-fab:hover{
+transform:scale(1.1);
+}
+  
+.tab-bar{
+display:flex;
+justify-content:center;
+gap:12px;
+margin-bottom:28px;
+}
+
+.tab-btn{
+background:transparent;
+color:#fff;
+border:2px solid rgba(255,255,255,0.3);
+padding:12px 28px;
+border-radius:40px;
+font-size:15px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.tab-btn:hover{
+border-color:#fff;
+background:rgba(255,255,255,0.08);
+}
+
+.tab-btn.active{
+background:#1D9E75;
+border-color:#1D9E75;
+color:#fff;
+}
+
+/* ── MODAL ── */
+.modal-backdrop{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.65);
+backdrop-filter:blur(6px);
+z-index:1000;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+opacity:0;
+pointer-events:none;
+transition:opacity .3s ease;
+}
+
+.modal-backdrop.open{
+opacity:1;
+pointer-events:all;
+}
+
+.modal-box{
+background:#fff;
+border-radius:24px;
+width:100%;
+max-width:720px;
+max-height:88vh;
+overflow-y:auto;
+padding:30px;
+position:relative;
+transform:scale(0.88) translateY(30px);
+transition:transform .35s cubic-bezier(.34,1.3,.64,1), opacity .3s ease;
+opacity:0;
+box-shadow:0 30px 80px rgba(0,0,0,0.35);
+}
+
+.modal-backdrop.open .modal-box{
+transform:scale(1) translateY(0);
+opacity:1;
+}
+
+.modal-top-actions{
+position:sticky;
+top:-30px;
+margin:-30px -30px 20px -30px;
+padding:16px 20px;
+background:#fff;
+border-radius:24px 24px 0 0;
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid #eee;
+z-index:10;
+}
+
+.modal-guest-title{
+font-size:20px;
+font-weight:700;
+color:#111;
+}
+
+.modal-btn-group{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.modal-edit-btn{
+background:#0B3D91;
+color:#fff;
+border:none;
+padding:9px 18px;
+border-radius:10px;
+font-weight:600;
+font-size:14px;
+cursor:pointer;
+}
+
+.modal-close-btn{
+background:#f0f0f0;
+color:#333;
+border:none;
+width:36px;
+height:36px;
+border-radius:50%;
+font-size:18px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+transition:.2s;
+}
+
+.modal-close-btn:hover{
+background:#e0e0e0;
+}
+
+.modal-share-btn{
+background:#25D366;
+color:#fff;
+border:none;
+width:36px;
+height:36px;
+border-radius:50%;
+font-size:16px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+transition:.2s;
+}
+
+.modal-share-btn:hover{
+transform:scale(1.1);
+}
+
+.modal-view-btn{
+background:#555;
+color:#fff;
+border:none;
+padding:9px 18px;
+border-radius:10px;
+font-weight:600;
+font-size:14px;
+cursor:pointer;
+}
+
+/* modal edit panel */
+#modalEditPanel .section-title{ margin-top:0; }
+#modalEditPanel .sub-section{ margin-top:28px; }
+#modalEditPanel .form-grid{ margin-top:0; }
+#modalEditPanel textarea{ width:100%; }
+#modalEditPanel .me-save-btn{
+margin-top:24px;
+background:#1D9E75;
+color:#fff;
+border:none;
+padding:14px 28px;
+border-radius:40px;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+width:100%;
+}
+
+.adv-status-row{
+display:flex;
+align-items:center;
+gap:7px;
+margin-top:12px;
+margin-bottom:6px;
+}
+
+.adv-dot{
+width:9px;
+height:9px;
+border-radius:50%;
+flex-shrink:0;
+}
+
+.adv-none{ background:#ff3b30; }
+.adv-partial{ background:#ff9800; }
+.adv-full{ background:#1D9E75; }
+
+.adv-label{
+font-size:12px;
+font-weight:600;
+color:#555;
+}
+
+.tile-payment-bar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:14px;
+padding:10px 14px;
+border-radius:12px;
+background:#f4f8f6;
+border:1px solid #e0ede8;
+}
+
+.tile-payment-label{
+font-size:13px;
+font-weight:600;
+color:#333;
+}
+
+.tile-balance{
+font-size:13px;
+font-weight:700;
+}
+
+.bal-pending{ color:#ff3b30; }
+.bal-clear{ color:#1D9E75; }
+
+.tile-details{ display:none !important; }
+
+@media(max-width:768px){
+
+.page-title{
+font-size:30px;
+}
+
+.form-box{
+padding:20px;
+}
+
+.tile-head{
+flex-direction:column;
+align-items:flex-start;
+gap:10px;
+}
+
+.card-date{
+text-align:left;
+width:100%;
+margin-top:10px;
+font-size:13px;
+}
+  
+.hotel-grid{
+grid-template-columns:1fr;
+}
+
+.flight-grid{
+grid-template-columns:1fr;
+}
+
+.share-fab{
+bottom:10px;
+right:10px;
+width:38px;
+height:38px;
+font-size:16px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="status-wrapper">
+
+<h1 class="page-title">
+Guest Status
+</h1>
+
+<p class="page-subtitle">
+Track booking and payment status of guests
+</p>
+
+<div class="top-bar">
+
+<button class="add-btn" onclick="openAddModal()">
++ ADD NEW GUEST
+</button>
+
+</div>
+
+<div class="tab-bar">
+<button class="tab-btn active" onclick="switchTab('active')">ACTIVE GUESTS</button>
+<button class="tab-btn" onclick="switchTab('completed')">COMPLETED GUESTS</button>
+</div>
+
+<!-- ADD GUEST MODAL -->
+<div class="modal-backdrop" id="addGuestModal" onclick="handleAddModalBackdrop(event)">
+  <div class="modal-box" id="addGuestBox">
+    <div class="modal-top-actions">
+      <div class="modal-guest-title">Add New Guest</div>
+      <div class="modal-btn-group">
+        <button class="modal-edit-btn" onclick="addGuest()">💾 Save</button>
+        <button class="modal-close-btn" onclick="closeAddModal()">✕</button>
+      </div>
+    </div>
+
+<div class="section-title">Guest Details</div>
+<div class="form-grid">
+<input type="text" id="guestName" class="input-field" placeholder="Guest Name">
+<input type="text" id="companyName" class="input-field" placeholder="Company Name *">
+<input type="text" id="salesPerson" class="input-field" placeholder="Sales Person">
+<input type="text" id="destination" class="input-field" placeholder="Destination">
+<input type="text" id="travelDate" class="input-field" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDate(this);generateDates()">
+<input type="number" id="days" class="input-field" placeholder="No of Days">
+<input type="number" id="guests" class="input-field" placeholder="No of Guests">
+<select id="travelStatus" class="input-field">
+<option>CONFIRMED</option>
+<option>PENDING FOR CONFIRMATION</option>
+<option>COMPLETED</option>
+</select>
+<select id="paymentStatus" class="input-field">
+<option>ADVANCE RECEIVED</option>
+<option>PAYMENT PENDING</option>
+<option>PAYMENT COMPLETED</option>
+</select>
+<input type="number" id="invoiceAmount" class="input-field" placeholder="₹ Total Invoice Amount" oninput="calculateBalance()">
+<input type="number" id="amountReceived" class="input-field" placeholder="₹ Amount Received" oninput="calculateBalance()">
+<input type="number" id="balanceAmount" class="input-field" placeholder="₹ Balance Receivable" readonly>
+</div>
+
+<div class="sub-section">
+<div class="section-title">Visa Status</div>
+<select id="visaStatus" class="input-field">
+<option>PENDING FOR APPLYING</option>
+<option>APPLIED BY CUSTOMER</option>
+<option>APPLIED</option>
+<option>APPROVED</option>
+<option>NOT REQUIRED</option>
+<option>REJECTED</option>
+</select>
+</div>
+
+<div class="sub-section">
+<div class="section-title">Hotel Status</div>
+<div id="hotelContainer">
+<div class="hotel-card"><div class="hotel-grid">
+<input type="text" class="input-field hotel-place" placeholder="Place">
+<input type="text" class="input-field hotel-name" placeholder="Hotel Name">
+<select class="input-field hotel-status">
+<option>BOOKED</option><option>BOOKED BY CUSTOMER</option><option>PENDING FOR BOOKING</option>
+</select>
+</div></div>
+</div>
+<button class="add-small-btn" onclick="addHotel()">+ Add Hotel</button>
+</div>
+
+<div class="sub-section">
+<div class="section-title">Cruise Status</div>
+<div id="cruiseContainer">
+<div class="hotel-card"><div class="hotel-grid">
+<input type="text" class="input-field cruise-place" placeholder="Cruise Place">
+<input type="text" class="input-field cruise-name" placeholder="Cruise Name">
+<select class="input-field cruise-status">
+<option>BOOKED</option><option>BOOKED BY CUSTOMER</option><option>PENDING FOR BOOKING</option><option>NO CRUISE</option>
+</select>
+</div></div>
+</div>
+<button class="add-small-btn" onclick="addCruise()">+ Add Cruise</button>
+</div>
+
+<div class="sub-section">
+<div class="section-title">Flight Details</div>
+<div id="flightContainer">
+<div class="flight-card">
+<div class="flight-number-row"><input type="text" class="input-field flight-number" placeholder="Flight No."></div>
+<div class="flight-leg-label">FROM</div>
+<div class="flight-grid">
+<input type="text" class="input-field flight-from-place" placeholder="From (Place)">
+<input type="text" class="input-field flight-from-date" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDate(this)">
+<input type="time" lang="en-GB" class="input-field flight-from-time">
+</div>
+<div class="flight-leg-label">TO</div>
+<div class="flight-grid">
+<input type="text" class="input-field flight-to-place" placeholder="To (Place)">
+<input type="text" class="input-field flight-to-date" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDate(this)">
+<input type="time" lang="en-GB" class="input-field flight-to-time">
+</div>
+</div>
+</div>
+<button class="add-small-btn" onclick="addFlight()">+ Add Flight</button>
+</div>
+
+<div class="sub-section">
+<div class="section-title">Day-wise Itinerary</div>
+<div id="dayContainer">
+<div class="day-card">
+<div class="day-title">Day 1 - <span class="auto-date"></span></div>
+<div class="day-options">
+<div class="day-option-row"><div class="mini-label">TRANSFER</div><div class="mini-radio-group">
+<label class="mini-radio-item"><input type="checkbox" class="day-transfer-checkbox" value="SHARED" checked>SHARED</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-transfer-checkbox" value="PRIVATE">PRIVATE</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-transfer-checkbox" value="NO TRANSFER">NO TRANSFER</label>
+</div></div>
+<div class="day-option-row"><div class="mini-label">MEAL PLAN</div><div class="mini-radio-group">
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="B" checked>B</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="BR">BR</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="L">L</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="D">D</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="NO MEALS">NO MEALS</label>
+</div></div>
+<div class="day-option-row"><div class="mini-label">GUIDE</div><div class="mini-radio-group">
+<label class="mini-radio-item"><input type="checkbox" class="day-guide-checkbox" value="WITH GUIDE" checked>WITH GUIDE</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-guide-checkbox" value="WITHOUT GUIDE">WITHOUT GUIDE</label>
+</div></div>
+</div>
+<textarea class="input-field itinerary-text" placeholder="Activity / Plans"></textarea>
+</div>
+</div>
+<button class="add-small-btn" onclick="addDay()">+ Add Day</button>
+</div>
+
+<div class="sub-section">
+<div class="section-title">Notes</div>
+<textarea id="inclusions" placeholder="Notes / Inclusions"></textarea>
+</div>
+
+  </div>
+</div>
+
+<div class="status-grid" id="guestContainer"></div>
+<div class="status-grid" id="completedContainer" style="display:none;"></div>
+
+</div>
+
+<script type="module">
+
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+deleteDoc,
+doc,
+onSnapshot,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+
+authDomain: "travelog-itinerary.firebaseapp.com",
+
+projectId: "travelog-itinerary",
+
+storageBucket: "travelog-itinerary.firebasestorage.app",
+
+messagingSenderId: "33567258851",
+
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+window.onSnapshot = onSnapshot;
+window.updateDoc = updateDoc;
+
+</script>
+
+<script>
+
+let editingId = null;
+let dayCount = 1;
+let dayUid = 1;
+
+function normalizePayment(v){ return (v||"").replace("ADVANCE PAID","ADVANCE RECEIVED"); }
+
+function formatDate(input){
+
+let value = input.value.replace(/\D/g,'');
+
+if(value.length > 2){
+value = value.substring(0,2) + '/' + value.substring(2);
+}
+
+if(value.length > 5){
+value = value.substring(0,5) + '/' + value.substring(5,9);
+}
+
+input.value = value;
+
+}
+  
+function calculateBalance(){
+
+const invoice =
+parseFloat(
+document.getElementById("invoiceAmount").value
+) || 0;
+
+const received =
+parseFloat(
+document.getElementById("amountReceived").value
+) || 0;
+
+const balance = invoice - received;
+
+document.getElementById(
+"balanceAmount"
+).value = balance;
+
+}
+function toggleForm(){ openAddModal(); }
+
+function openAddModal(){
+document.getElementById("addGuestModal").classList.add("open");
+document.body.style.overflow="hidden";
+document.getElementById("addGuestBox").scrollTop=0;
+}
+
+function closeAddModal(){
+document.getElementById("addGuestModal").classList.remove("open");
+document.body.style.overflow="";
+}
+
+function handleAddModalBackdrop(e){
+if(e.target===document.getElementById("addGuestModal")) closeAddModal();
+}
+
+function generateDates(){
+
+const startDate =
+document.getElementById("travelDate").value;
+
+if(startDate.length !== 10) return;
+
+const parts = startDate.split('/');
+
+const baseDate = new Date(
+parts[2],
+parts[1]-1,
+parts[0]
+);
+
+document.querySelectorAll(".day-card")
+.forEach((card,index)=>{
+
+const date = new Date(baseDate);
+
+date.setDate(baseDate.getDate() + index);
+
+const dd = String(date.getDate()).padStart(2,'0');
+const mm = String(date.getMonth()+1).padStart(2,'0');
+const yyyy = date.getFullYear();
+
+card.querySelector(".auto-date").innerText =
+`${dd}/${mm}/${yyyy}`;
+
+});
+
+}
+
+function addDay(){
+
+dayCount++;
+dayUid++;
+
+document.getElementById("dayContainer")
+.insertAdjacentHTML("beforeend",`
+
+<div class="day-card">
+
+<div class="day-title">
+Day ${dayCount} -
+<span class="auto-date"></span>
+</div>
+
+<div class="day-options">
+
+<div class="day-option-row">
+<div class="mini-label">TRANSFER</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-transfer-checkbox" value="SHARED" checked>
+SHARED
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-transfer-checkbox" value="PRIVATE">
+PRIVATE
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-transfer-checkbox" value="NO TRANSFER">
+NO TRANSFER
+</label>
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">MEAL PLAN</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="B" checked>
+B
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="BR">
+BR
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="L">
+L
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="D">
+D
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="NO MEALS">
+NO MEALS
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">GUIDE</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-guide-checkbox" value="WITH GUIDE" checked>
+WITH GUIDE
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-guide-checkbox" value="WITHOUT GUIDE">
+WITHOUT GUIDE
+</label>
+
+</div>
+</div>
+
+</div>
+
+<textarea
+class="input-field itinerary-text"
+placeholder="Activity / Plans"></textarea>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeDay(this)">
+Remove Day
+</button>
+
+</div>
+
+`);
+
+generateDates();
+
+}
+
+function removeDay(button){
+
+button.closest(".day-card").remove();
+
+const allDays =
+document.querySelectorAll(".day-card");
+
+dayCount = 0;
+
+allDays.forEach((card,index)=>{
+
+dayCount++;
+
+card.querySelector(".day-title").innerHTML =
+`Day ${dayCount} -
+<span class="auto-date"></span>`;
+
+});
+
+generateDates();
+
+}
+
+function addHotel(){
+
+document.getElementById("hotelContainer")
+.insertAdjacentHTML("beforeend",`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+type="text"
+class="input-field hotel-place"
+placeholder="Place">
+
+<input
+type="text"
+class="input-field hotel-name"
+placeholder="Hotel Name">
+
+<select
+class="input-field hotel-status">
+
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
+
+</select>
+
+</div>
+
+</div>
+
+`);
+
+}
+
+function addCruise(){
+
+document.getElementById(
+"cruiseContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field cruise-place"
+placeholder="Cruise Place">
+
+<input
+class="input-field cruise-name"
+placeholder="Cruise Name">
+
+<select
+class="input-field cruise-status">
+
+<option>BOOKED</option>
+<option>BOOKED BY CUSTOMER</option>
+<option>PENDING FOR BOOKING</option>
+<option>NO CRUISE</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+}
+
+function addFlight(){
+
+document.getElementById(
+"flightContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="flight-card">
+
+<div class="flight-number-row">
+
+<input
+type="text"
+class="input-field flight-number"
+placeholder="Flight No.">
+
+</div>
+
+<div class="flight-leg-label">FROM</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-from-place"
+placeholder="From (Place)">
+
+<input
+type="text"
+class="input-field flight-from-date"
+placeholder="DD/MM/YYYY"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+lang="en-GB"
+class="input-field flight-from-time">
+
+</div>
+
+<div class="flight-leg-label">TO</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-to-place"
+placeholder="To (Place)">
+
+<input
+type="text"
+class="input-field flight-to-date"
+placeholder="DD/MM/YYYY"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+lang="en-GB"
+class="input-field flight-to-time">
+
+</div>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeFlight(this)">
+Remove Flight
+</button>
+
+</div>
+
+`
+
+);
+
+}
+
+function removeFlight(button){
+
+button.closest(".flight-card").remove();
+
+}
+
+async function addGuest(){
+
+if(!document.getElementById("companyName").value.trim()){
+  alert("Company Name is required.");
+  document.getElementById("companyName").focus();
+  return;
+}
+
+const visaStatus =
+document.getElementById("visaStatus").value;
+
+const hotels =
+[...document.querySelectorAll("#hotelContainer .hotel-card")]
+.map(card=>({
+
+place:
+card.querySelector(".hotel-place").value,
+
+hotel:
+card.querySelector(".hotel-name").value,
+
+status:
+card.querySelector(".hotel-status").value
+
+}));
+
+const cruises =
+[...document.querySelectorAll(".cruise-status")]
+.map((item,index)=>({
+
+place:
+document.querySelectorAll(
+".cruise-place"
+)[index].value,
+
+name:
+document.querySelectorAll(
+".cruise-name"
+)[index].value,
+
+status:
+item.value
+
+}));
+
+const flights =
+[...document.querySelectorAll("#flightContainer .flight-card")]
+.map(card=>({
+
+flightNumber:
+card.querySelector(".flight-number").value,
+
+fromPlace:
+card.querySelector(".flight-from-place").value,
+
+fromDate:
+card.querySelector(".flight-from-date").value,
+
+fromTime:
+card.querySelector(".flight-from-time").value,
+
+toPlace:
+card.querySelector(".flight-to-place").value,
+
+toDate:
+card.querySelector(".flight-to-date").value,
+
+toTime:
+card.querySelector(".flight-to-time").value
+
+}));
+
+const itineraryDays =
+[...document.querySelectorAll(".day-card")]
+.map((card,index)=>({
+
+day:index+1,
+
+date:
+card.querySelector(".auto-date").innerText,
+
+activity:
+card.querySelector(".itinerary-text").value,
+
+transfer:
+[...card.querySelectorAll(".day-transfer-checkbox:checked")]
+.map(el=>el.value),
+
+mealPlan:
+[...card.querySelectorAll(".day-meal-checkbox:checked")]
+.map(el=>el.value),
+
+guideStatus:
+[...card.querySelectorAll(".day-guide-checkbox:checked")]
+.map(el=>el.value)
+
+}));
+
+const guest = {
+
+guestName:
+document.getElementById("guestName").value,
+
+companyName:
+document.getElementById("companyName").value,
+
+salesPerson:
+document.getElementById("salesPerson").value,
+
+destination:
+document.getElementById("destination").value,
+
+travelDate:
+document.getElementById("travelDate").value,
+
+days:
+document.getElementById("days").value,
+
+guests:
+document.getElementById("guests").value,
+
+travelStatus:
+document.getElementById("travelStatus").value,
+
+paymentStatus:
+document.getElementById("paymentStatus").value,
+
+invoiceAmount:
+document.getElementById("invoiceAmount").value,
+
+amountReceived:
+document.getElementById("amountReceived").value,
+
+balanceAmount:
+document.getElementById("balanceAmount").value,
+
+visaStatus,
+hotels,
+cruises,
+flights,
+itineraryDays,
+
+notes:
+document.getElementById("inclusions").value,
+
+created:
+new Date().toISOString()
+
+};
+
+if(editingId){
+
+await updateDoc(
+doc(db,"guestStatus",editingId),
+guest
+);
+
+alert("Guest Updated!");
+
+editingId = null;
+
+}else{
+
+await addDoc(
+collection(db,"guestStatus"),
+guest
+);
+
+alert("Guest Saved!");
+
+}
+
+document.getElementById("addGuestBox")
+.scrollTop = 0;
+
+closeAddModal();
+
+}
+
+function loadGuests(){
+
+onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
+
+let guests = [];
+
+snapshot.forEach((docItem)=>{
+guests.push({
+id:docItem.id,
+...docItem.data()
+});
+});
+
+// ✅ SINGLE CLEAN SORT: nearest date first
+const parseDate = (d) => {
+if(!d || !d.includes('/')) return new Date(9999, 11, 31);
+
+const [dd, mm, yyyy] = d.split('/');
+return new Date(yyyy, mm - 1, dd);
+};
+
+guests.sort((a, b) => parseDate(a.travelDate) - parseDate(b.travelDate));
+
+window.allGuests = guests;
+
+let html = "";
+let completedHtml = "";
+
+guests.forEach((g)=>{
+
+let badge = "confirmed";
+
+if(g.travelStatus === "PENDING FOR CONFIRMATION"){
+badge = "pending";
+}
+
+if(g.travelStatus === "COMPLETED"){
+badge = "completed";
+}
+
+let tripStage = "UPCOMING";
+let tripStageClass = "pending";
+
+if(g.itineraryDays && g.itineraryDays.length){
+
+const today = new Date();
+
+today.setHours(0,0,0,0);
+
+const parseDate = (dateStr) => {
+
+if(!dateStr || !dateStr.includes('/'))
+return null;
+
+const [dd, mm, yyyy] = dateStr.split('/');
+
+return new Date(yyyy, mm - 1, dd);
+
+};
+
+const firstDay =
+parseDate(g.itineraryDays[0].date);
+
+const lastDay =
+parseDate(
+g.itineraryDays[g.itineraryDays.length - 1].date
+);
+
+if(firstDay && lastDay){
+
+if(today > lastDay){
+
+tripStage = "COMPLETED";
+tripStageClass = "completed";
+
+}
+else if(today >= firstDay && today <= lastDay){
+
+tripStage = "ONGOING";
+tripStageClass = "ongoing";
+
+}
+else{
+
+const diffTime =
+firstDay - today;
+
+const daysLeft =
+Math.ceil(
+diffTime / (1000 * 60 * 60 * 24)
+);
+
+tripStage =
+`UPCOMING IN ${daysLeft} DAY${daysLeft > 1 ? "S" : ""}`;
+
+tripStageClass = "pending";
+
+}
+
+}
+
+}
+const tileHtml = `
+<div class="guest-tile" onclick="openModal('${g.id}')">
+
+<div class="tile-head">
+
+<div>
+
+<div class="guest-name">
+${g.guestName || ""}
+</div>
+
+${
+g.companyName
+? `<div class="company-name">🏢 ${g.companyName}</div>`
+: ""
+}
+
+<div class="status-badge ${badge}">
+${g.travelStatus || ""}
+</div>
+
+<div
+class="status-badge ${tripStageClass}"
+style="margin-top:10px;">
+${tripStage}
+</div>
+
+</div>
+
+<div class="card-date">
+${g.travelDate || "-"} <br>
+👤 ${g.salesPerson || "-"}
+</div>
+
+</div>
+
+${(()=>{
+const paid = normalizePayment(g.paymentStatus);
+const invoice = Number(g.invoiceAmount||0);
+const received = Number(g.amountReceived||0);
+if(paid === "PAYMENT COMPLETED" || (invoice > 0 && received >= invoice)) return "";
+const required = (invoice * 60) / 100;
+let dotClass, dotLabel;
+if(received <= 0){
+  dotClass="adv-none"; dotLabel="Advance Not Received";
+} else if(received >= required){
+  dotClass="adv-full"; dotLabel="Advance Fully Received";
+} else {
+  dotClass="adv-partial"; dotLabel="Advance Partially Received";
+}
+return `<div class="adv-status-row"><span class="adv-dot ${dotClass}"></span><span class="adv-label">${dotLabel}</span></div>`;
+})()}
+
+<div class="tile-payment-bar">
+<span class="tile-payment-label">💳 ${Number(g.amountReceived||0) >= Number(g.invoiceAmount||1) && Number(g.invoiceAmount||0) > 0 ? "PAYMENT COMPLETED" : normalizePayment(g.paymentStatus) || "—"}</span>
+<span class="tile-balance ${Number(g.balanceAmount||0) > 0 ? 'bal-pending' : 'bal-clear'}">₹ ${Number(g.balanceAmount||0).toLocaleString('en-IN')} balance</span>
+</div>
+
+<div class="tile-details">
+
+<div class="detail"><span class="label">Destination:</span> ${g.destination || ""}</div>
+
+<div class="detail"><span class="label">Visa Status:</span> ${g.visaStatus || ""}</div>
+
+<div class="detail"><span class="label">Guests:</span> ${g.guests || ""}</div>
+
+<div class="detail"><span class="label">Payment:</span> ${normalizePayment(g.paymentStatus)}</div>
+
+<div class="detail">
+<span class="label">Invoice Amount:</span>
+<span class="amount">
+₹ ${g.invoiceAmount || 0}
+</span>
+</div>
+
+<div class="detail">
+<span class="label">Advance Required (60%):</span>
+<span class="amount">
+₹ ${((Number(g.invoiceAmount || 0) * 60) / 100).toFixed(0)}
+</span>
+</div>
+
+<div class="detail">
+<span class="label">Advance Received:</span>
+<span class="amount">
+₹ ${g.amountReceived || 0}
+</span>
+</div>
+
+<div class="detail">
+
+<span class="label">
+Advance Pending:
+</span>
+
+<span
+class="amount"
+style="
+color:
+${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+) > 0
+? '#ff3b30'
+: '#1D9E75'
+};
+font-weight:700;
+">
+
+₹ ${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+).toFixed(0)
+}
+
+${
+Math.max(
+((Number(g.invoiceAmount || 0) * 60) / 100)
+-
+Number(g.amountReceived || 0),
+0
+) > 0
+? ' ⚠️'
+: ''
+}
+
+</span>
+
+</div>
+
+<div class="detail">
+<span class="label">Final Balance:</span>
+<span class="amount">
+₹ ${g.balanceAmount || 0}
+</span>
+</div>
+
+<div class="tile-block">
+<div class="label">Hotel Status</div><br>
+
+${(g.hotels || []).map(h=>`
+<div class="detail">
+🏨 ${h.place || ""}<br>
+Hotel: <b>${h.hotel || ""}</b><br>
+Status: <b>${h.status || ""}</b>
+</div>
+`).join("")}
+
+</div>
+
+${
+(() => {
+const visibleCruises =
+(g.cruises || []).filter(c => c.status !== "NO CRUISE");
+
+if(!visibleCruises.length) return "";
+
+return `
+<div class="tile-block">
+<div class="label">Cruise Status</div><br>
+
+${visibleCruises.map(c=>`
+<div class="detail">
+🛳️ ${c.place || ""}<br>
+Cruise: <b>${c.name || ""}</b><br>
+Status: <b>${c.status || ""}</b>
+</div>
+`).join("")}
+
+</div>
+`;
+})()
+}
+
+<div class="tile-block">
+<div class="label">Flight Details</div><br>
+
+${(g.flights || []).map(f=>`
+<div class="detail">
+✈️ Flight: <b>${f.flightNumber || ""}</b><br>
+From: <b>${f.fromPlace || ""}</b> — ${f.fromDate || ""} ${f.fromTime || ""}<br>
+To: <b>${f.toPlace || ""}</b> — ${f.toDate || ""} ${f.toTime || ""}
+</div>
+`).join("")}
+
+</div>
+
+<div class="tile-block">
+<div class="label">Day-wise Itinerary</div><br>
+
+${(g.itineraryDays || []).map(d=>`
+<div class="detail">
+<b>Day ${d.day} - ${d.date}</b><br>
+🚐 Transfer: <b>${formatDayOption(d.transfer)}</b> &nbsp; 🍽️ Meal Plan: <b>${formatDayOption(d.mealPlan)}</b> &nbsp; 🧑‍✈️ Guide: <b>${formatDayOption(d.guideStatus)}</b><br>
+${d.activity || ""}
+</div>
+`).join("")}
+
+</div>
+
+<div class="tile-block">
+<div class="label">Notes</div><br>
+<div class="detail">${g.notes || ""}</div>
+</div>
+
+<div class="card-actions">
+
+<button class="edit-btn"
+onclick="event.stopPropagation(); editGuest('${g.id}')">
+Edit
+</button>
+
+<button class="delete-btn"
+onclick="event.stopPropagation(); deleteGuest('${g.id}')">
+Delete
+</button>
+
+</div>
+
+<div class="share-fab"
+onclick="event.stopPropagation(); shareWhatsApp('${g.id}')">
+📤
+</div>
+
+</div>
+</div>
+`;
+
+if(g.travelStatus === "COMPLETED" || tripStage === "COMPLETED"){
+completedHtml += tileHtml;
+} else {
+html += tileHtml;
+}
+
+});
+
+document.getElementById("guestContainer").innerHTML = html;
+document.getElementById("completedContainer").innerHTML = completedHtml;
+
+});
+
+}
+
+function dayOptionChecked(value, option, defaultOption){
+
+if(Array.isArray(value)){
+return value.includes(option);
+}
+
+if(typeof value === "string" && value){
+return value === option;
+}
+
+return option === defaultOption;
+
+}
+
+function formatDayOption(value){
+
+if(Array.isArray(value)){
+return value.length ? value.join(", ") : "-";
+}
+
+return value || "-";
+
+}
+
+async function editGuest(id){
+
+const password =
+prompt("Enter password");
+
+if(password !== "5655"){
+
+alert("Wrong password");
+return;
+
+}
+
+editingId = id;
+
+const guest =
+window.allGuests.find(
+g=>g.id===id
+);
+
+if(!guest) return;
+
+document.getElementById(
+"addGuestBox"
+).scrollTop=0;
+
+openAddModal();
+
+document.getElementById(
+"guestName"
+).value =
+guest.guestName || "";
+
+document.getElementById(
+"companyName"
+).value =
+guest.companyName || "";
+
+document.getElementById(
+"salesPerson"
+).value =
+guest.salesPerson || "";
+
+document.getElementById(
+"destination"
+).value =
+guest.destination || "";
+
+document.getElementById(
+"travelDate"
+).value =
+guest.travelDate || "";
+
+document.getElementById(
+"days"
+).value =
+guest.days || "";
+
+document.getElementById(
+"guests"
+).value =
+guest.guests || "";
+
+document.getElementById(
+"travelStatus"
+).value =
+guest.travelStatus || "";
+
+document.getElementById(
+"paymentStatus"
+).value =
+guest.paymentStatus || "";
+
+document.getElementById(
+"invoiceAmount"
+).value =
+guest.invoiceAmount || "";
+
+document.getElementById(
+"amountReceived"
+).value =
+guest.amountReceived || "";
+
+document.getElementById(
+"balanceAmount"
+).value =
+guest.balanceAmount || "";
+
+document.getElementById(
+"inclusions"
+).value =
+guest.notes || "";
+
+document.getElementById(
+"visaStatus"
+).value =
+guest.visaStatus || "PENDING FOR APPLYING";
+
+document.getElementById(
+"hotelContainer"
+).innerHTML="";
+
+(guest.hotels || [])
+.forEach(h=>{
+
+document.getElementById(
+"hotelContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field hotel-place"
+value="${h.place || ""}">
+
+<input
+class="input-field hotel-name"
+value="${h.hotel || ""}">
+
+<select
+class="input-field hotel-status">
+
+<option ${
+h.status==="BOOKED"
+?"selected":""
+}>
+BOOKED
+</option>
+
+<option ${
+h.status==="BOOKED BY CUSTOMER"
+?"selected":""
+}>
+BOOKED BY CUSTOMER
+</option>
+
+<option ${
+h.status==="PENDING FOR BOOKING"
+?"selected":""
+}>
+PENDING FOR BOOKING
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"cruiseContainer"
+).innerHTML="";
+
+(guest.cruises || [])
+.forEach(c=>{
+
+document.getElementById(
+"cruiseContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="hotel-card">
+
+<div class="hotel-grid">
+
+<input
+class="input-field cruise-place"
+value="${c.place || ""}">
+
+<input
+class="input-field cruise-name"
+value="${c.name || ""}">
+
+<select
+class="input-field cruise-status">
+
+<option ${
+c.status==="BOOKED"
+?"selected":""
+}>
+BOOKED
+</option>
+
+<option ${
+c.status==="BOOKED BY CUSTOMER"
+?"selected":""
+}>
+BOOKED BY CUSTOMER
+</option>
+
+<option ${
+c.status==="PENDING FOR BOOKING"
+?"selected":""
+}>
+PENDING FOR BOOKING
+</option>
+
+<option ${
+c.status==="NO CRUISE"
+?"selected":""
+}>
+NO CRUISE
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"flightContainer"
+).innerHTML="";
+
+(guest.flights || [])
+.forEach(f=>{
+
+document.getElementById(
+"flightContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="flight-card">
+
+<div class="flight-number-row">
+
+<input
+type="text"
+class="input-field flight-number"
+value="${f.flightNumber || ""}">
+
+</div>
+
+<div class="flight-leg-label">FROM</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-from-place"
+value="${f.fromPlace || ""}">
+
+<input
+type="text"
+class="input-field flight-from-date"
+value="${f.fromDate || ""}"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+lang="en-GB"
+class="input-field flight-from-time"
+value="${f.fromTime || ""}">
+
+</div>
+
+<div class="flight-leg-label">TO</div>
+
+<div class="flight-grid">
+
+<input
+type="text"
+class="input-field flight-to-place"
+value="${f.toPlace || ""}">
+
+<input
+type="text"
+class="input-field flight-to-date"
+value="${f.toDate || ""}"
+maxlength="10"
+oninput="formatDate(this)">
+
+<input
+type="time"
+lang="en-GB"
+class="input-field flight-to-time"
+value="${f.toTime || ""}">
+
+</div>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeFlight(this)">
+Remove Flight
+</button>
+
+</div>
+
+`
+
+);
+
+});
+
+document.getElementById(
+"dayContainer"
+).innerHTML="";
+
+dayCount = 0;
+
+(guest.itineraryDays || [])
+.forEach(day=>{
+
+dayCount++;
+dayUid++;
+
+
+document.getElementById(
+"dayContainer"
+).insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="day-card">
+
+<div class="day-title">
+
+Day ${day.day}
+
+-
+
+<span class="auto-date">
+
+${day.date}
+
+</span>
+
+</div>
+
+<div class="day-options">
+
+<div class="day-option-row">
+<div class="mini-label">TRANSFER</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-transfer-checkbox" value="SHARED" ${dayOptionChecked(day.transfer,"SHARED","SHARED")?"checked":""}>
+SHARED
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-transfer-checkbox" value="PRIVATE" ${dayOptionChecked(day.transfer,"PRIVATE","SHARED")?"checked":""}>
+PRIVATE
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-transfer-checkbox" value="NO TRANSFER" ${dayOptionChecked(day.transfer,"NO TRANSFER","SHARED")?"checked":""}>
+NO TRANSFER
+</label>
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">MEAL PLAN</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="B" ${dayOptionChecked(day.mealPlan,"B","B")?"checked":""}>
+B
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="BR" ${dayOptionChecked(day.mealPlan,"BR","B")?"checked":""}>
+BR
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="L" ${dayOptionChecked(day.mealPlan,"L","B")?"checked":""}>
+L
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="D" ${dayOptionChecked(day.mealPlan,"D","B")?"checked":""}>
+D
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-meal-checkbox" value="NO MEALS" ${dayOptionChecked(day.mealPlan,"NO MEALS","B")?"checked":""}>
+NO MEALS
+</label>
+
+</div>
+</div>
+
+<div class="day-option-row">
+<div class="mini-label">GUIDE</div>
+<div class="mini-radio-group">
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-guide-checkbox" value="WITH GUIDE" ${dayOptionChecked(day.guideStatus,"WITH GUIDE","WITH GUIDE")?"checked":""}>
+WITH GUIDE
+</label>
+
+<label class="mini-radio-item">
+<input type="checkbox" class="day-guide-checkbox" value="WITHOUT GUIDE" ${dayOptionChecked(day.guideStatus,"WITHOUT GUIDE","WITH GUIDE")?"checked":""}>
+WITHOUT GUIDE
+</label>
+
+</div>
+</div>
+
+</div>
+
+<textarea
+class="input-field itinerary-text">
+
+${day.activity || ""}
+
+</textarea>
+
+<button
+type="button"
+class="remove-btn"
+onclick="removeDay(this)">
+Remove Day
+</button>
+
+</div>
+
+`
+
+);
+
+});
+
+alert(
+"Guest loaded for editing"
+);
+
+}
+
+async function deleteGuest(id){
+
+const password =
+prompt("Enter password");
+
+if(password !== "5655"){
+
+alert("Wrong password");
+return;
+
+}
+
+if(!confirm("Delete Guest?"))
+return;
+
+await deleteDoc(
+doc(db,"guestStatus",id)
+);
+
+}
+
+/* ── helpers for modal edit day cards ── */
+function meDayChecked(val,opt,def){
+  if(Array.isArray(val)) return val.includes(opt);
+  if(typeof val==="string"&&val) return val===opt;
+  return opt===def;
+}
+
+function meBuildDayCard(day, index){
+  const chk=(arr,v,d)=>meDayChecked(arr,v,d)?"checked":"";
+  return `<div class="day-card" data-day-index="${index}">
+<div class="day-title">Day ${day.day} - <span class="auto-date">${day.date||""}</span></div>
+<div class="day-options">
+<div class="day-option-row"><div class="mini-label">TRANSFER</div><div class="mini-radio-group">
+<label class="mini-radio-item"><input type="checkbox" class="day-transfer-checkbox" value="SHARED" ${chk(day.transfer,"SHARED","SHARED")}>SHARED</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-transfer-checkbox" value="PRIVATE" ${chk(day.transfer,"PRIVATE","SHARED")}>PRIVATE</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-transfer-checkbox" value="NO TRANSFER" ${chk(day.transfer,"NO TRANSFER","SHARED")}>NO TRANSFER</label>
+</div></div>
+<div class="day-option-row"><div class="mini-label">MEAL PLAN</div><div class="mini-radio-group">
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="B" ${chk(day.mealPlan,"B","B")}>B</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="BR" ${chk(day.mealPlan,"BR","B")}>BR</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="L" ${chk(day.mealPlan,"L","B")}>L</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="D" ${chk(day.mealPlan,"D","B")}>D</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-meal-checkbox" value="NO MEALS" ${chk(day.mealPlan,"NO MEALS","B")}>NO MEALS</label>
+</div></div>
+<div class="day-option-row"><div class="mini-label">GUIDE</div><div class="mini-radio-group">
+<label class="mini-radio-item"><input type="checkbox" class="day-guide-checkbox" value="WITH GUIDE" ${chk(day.guideStatus,"WITH GUIDE","WITH GUIDE")}>WITH GUIDE</label>
+<label class="mini-radio-item"><input type="checkbox" class="day-guide-checkbox" value="WITHOUT GUIDE" ${chk(day.guideStatus,"WITHOUT GUIDE","WITH GUIDE")}>WITHOUT GUIDE</label>
+</div></div>
+</div>
+<textarea class="input-field itinerary-text" style="width:100%;margin-top:8px;">${day.activity||""}</textarea>
+<button type="button" class="remove-btn" onclick="this.closest('.day-card').remove()">Remove Day</button>
+</div>`;
+}
+
+function meAddDay(container){
+  const cards = container.querySelectorAll(".day-card");
+  const num = cards.length+1;
+  container.insertAdjacentHTML("beforeend", meBuildDayCard({day:num,date:"",transfer:["SHARED"],mealPlan:["B"],guideStatus:["WITH GUIDE"],activity:""},num-1));
+}
+
+function openModalEditPanel(id){
+  const g = window.allGuests && window.allGuests.find(x=>x.id===id);
+  if(!g) return;
+
+  const sel=(opts,cur)=>opts.map(o=>`<option${o===cur?" selected":""}>${o}</option>`).join("");
+
+  const hotelsHtml = (g.hotels||[{place:"",hotel:"",status:"BOOKED"}]).map(h=>`
+<div class="hotel-card"><div class="hotel-grid">
+<input class="input-field me-hotel-place" value="${h.place||""}" placeholder="Place">
+<input class="input-field me-hotel-name" value="${h.hotel||""}" placeholder="Hotel Name">
+<select class="input-field me-hotel-status">${sel(["BOOKED","BOOKED BY CUSTOMER","PENDING FOR BOOKING"],h.status)}</select>
+</div></div>`).join("");
+
+  const cruisesHtml = (g.cruises||[{place:"",name:"",status:"NO CRUISE"}]).map(c=>`
+<div class="hotel-card"><div class="hotel-grid">
+<input class="input-field me-cruise-place" value="${c.place||""}" placeholder="Cruise Place">
+<input class="input-field me-cruise-name" value="${c.name||""}" placeholder="Cruise Name">
+<select class="input-field me-cruise-status">${sel(["BOOKED","BOOKED BY CUSTOMER","PENDING FOR BOOKING","NO CRUISE"],c.status)}</select>
+</div></div>`).join("");
+
+  const flightsHtml = (g.flights||[]).map(f=>`
+<div class="flight-card">
+<div class="flight-number-row"><input type="text" class="input-field me-flight-number" value="${f.flightNumber||""}" placeholder="Flight No."></div>
+<div class="flight-leg-label">FROM</div>
+<div class="flight-grid">
+<input type="text" class="input-field me-flight-from-place" value="${f.fromPlace||""}" placeholder="From (Place)">
+<input type="text" class="input-field me-flight-from-date" value="${f.fromDate||""}" maxlength="10" oninput="formatDate(this)" placeholder="DD/MM/YYYY">
+<input type="time" lang="en-GB" class="input-field me-flight-from-time" value="${f.fromTime||""}">
+</div>
+<div class="flight-leg-label">TO</div>
+<div class="flight-grid">
+<input type="text" class="input-field me-flight-to-place" value="${f.toPlace||""}" placeholder="To (Place)">
+<input type="text" class="input-field me-flight-to-date" value="${f.toDate||""}" maxlength="10" oninput="formatDate(this)" placeholder="DD/MM/YYYY">
+<input type="time" lang="en-GB" class="input-field me-flight-to-time" value="${f.toTime||""}">
+</div>
+<button type="button" class="remove-btn" onclick="this.closest('.flight-card').remove()">Remove Flight</button>
+</div>`).join("");
+
+  const daysHtml = (g.itineraryDays||[]).map((d,i)=>meBuildDayCard(d,i)).join("");
+
+  const panel = document.getElementById("modalEditPanel");
+  panel.innerHTML = `
+<div class="section-title">Guest Details</div>
+<div class="form-grid">
+<input id="me-guestName" class="input-field" value="${g.guestName||""}" placeholder="Guest Name">
+<input id="me-companyName" class="input-field" value="${g.companyName||""}" placeholder="Company Name *">
+<input id="me-salesPerson" class="input-field" value="${g.salesPerson||""}" placeholder="Sales Person">
+<input id="me-destination" class="input-field" value="${g.destination||""}" placeholder="Destination">
+<input id="me-travelDate" class="input-field" value="${g.travelDate||""}" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDate(this)">
+<input id="me-days" type="number" class="input-field" value="${g.days||""}" placeholder="No of Days">
+<input id="me-guests" type="number" class="input-field" value="${g.guests||""}" placeholder="No of Guests">
+<select id="me-travelStatus" class="input-field">${sel(["CONFIRMED","PENDING FOR CONFIRMATION","COMPLETED"],g.travelStatus)}</select>
+<select id="me-paymentStatus" class="input-field">${sel(["ADVANCE RECEIVED","PAYMENT PENDING","PAYMENT COMPLETED"],g.paymentStatus)}</select>
+<input id="me-invoiceAmount" type="number" class="input-field" value="${g.invoiceAmount||""}" placeholder="₹ Total Invoice Amount" oninput="meCalcBalance()">
+<input id="me-amountReceived" type="number" class="input-field" value="${g.amountReceived||""}" placeholder="₹ Amount Received" oninput="meCalcBalance()">
+<input id="me-balanceAmount" type="number" class="input-field" value="${g.balanceAmount||""}" placeholder="₹ Balance Receivable" readonly>
+</div>
+
+<div class="sub-section"><div class="section-title">Visa Status</div>
+<select id="me-visaStatus" class="input-field">${sel(["PENDING FOR APPLYING","APPLIED BY CUSTOMER","APPLIED","APPROVED","NOT REQUIRED","REJECTED"],g.visaStatus)}</select>
+</div>
+
+<div class="sub-section"><div class="section-title">Hotel Status</div>
+<div id="me-hotelContainer">${hotelsHtml}</div>
+<button class="add-small-btn" type="button" onclick="document.getElementById('me-hotelContainer').insertAdjacentHTML('beforeend','<div class=\\'hotel-card\\'><div class=\\'hotel-grid\\'><input class=\\'input-field me-hotel-place\\' placeholder=\\'Place\\'><input class=\\'input-field me-hotel-name\\' placeholder=\\'Hotel Name\\'><select class=\\'input-field me-hotel-status\\'><option>BOOKED</option><option>BOOKED BY CUSTOMER</option><option>PENDING FOR BOOKING</option></select></div></div>')">+ Add Hotel</button>
+</div>
+
+<div class="sub-section"><div class="section-title">Cruise Status</div>
+<div id="me-cruiseContainer">${cruisesHtml}</div>
+<button class="add-small-btn" type="button" onclick="document.getElementById('me-cruiseContainer').insertAdjacentHTML('beforeend','<div class=\\'hotel-card\\'><div class=\\'hotel-grid\\'><input class=\\'input-field me-cruise-place\\' placeholder=\\'Cruise Place\\'><input class=\\'input-field me-cruise-name\\' placeholder=\\'Cruise Name\\'><select class=\\'input-field me-cruise-status\\'><option>BOOKED</option><option>BOOKED BY CUSTOMER</option><option>PENDING FOR BOOKING</option><option>NO CRUISE</option></select></div></div>')">+ Add Cruise</button>
+</div>
+
+<div class="sub-section"><div class="section-title">Flight Details</div>
+<div id="me-flightContainer">${flightsHtml}</div>
+<button class="add-small-btn" type="button" onclick="meAddFlight()">+ Add Flight</button>
+</div>
+
+<div class="sub-section"><div class="section-title">Day-wise Itinerary</div>
+<div id="me-dayContainer">${daysHtml}</div>
+<button class="add-small-btn" type="button" onclick="meAddDay(document.getElementById('me-dayContainer'))">+ Add Day</button>
+</div>
+
+<div class="sub-section"><div class="section-title">Notes</div>
+<textarea id="me-notes" class="input-field" style="width:100%;min-height:100px;" placeholder="Notes / Inclusions">${g.notes||""}</textarea>
+</div>
+
+<button class="me-save-btn" style="display:none;" onclick="meModalSave('${id}')">💾 SAVE CHANGES</button>
+`;
+}
+
+function meAddFlight(){
+  document.getElementById("me-flightContainer").insertAdjacentHTML("beforeend",`
+<div class="flight-card">
+<div class="flight-number-row"><input type="text" class="input-field me-flight-number" placeholder="Flight No."></div>
+<div class="flight-leg-label">FROM</div>
+<div class="flight-grid">
+<input type="text" class="input-field me-flight-from-place" placeholder="From (Place)">
+<input type="text" class="input-field me-flight-from-date" maxlength="10" oninput="formatDate(this)" placeholder="DD/MM/YYYY">
+<input type="time" lang="en-GB" class="input-field me-flight-from-time">
+</div>
+<div class="flight-leg-label">TO</div>
+<div class="flight-grid">
+<input type="text" class="input-field me-flight-to-place" placeholder="To (Place)">
+<input type="text" class="input-field me-flight-to-date" maxlength="10" oninput="formatDate(this)" placeholder="DD/MM/YYYY">
+<input type="time" lang="en-GB" class="input-field me-flight-to-time">
+</div>
+<button type="button" class="remove-btn" onclick="this.closest('.flight-card').remove()">Remove Flight</button>
+</div>`);
+}
+
+function meCalcBalance(){
+  const inv=parseFloat(document.getElementById("me-invoiceAmount").value)||0;
+  const rec=parseFloat(document.getElementById("me-amountReceived").value)||0;
+  document.getElementById("me-balanceAmount").value=inv-rec;
+}
+
+async function meModalSave(id){
+  if(!document.getElementById("me-companyName").value.trim()){
+    alert("Company Name is required.");
+    document.getElementById("me-companyName").focus();
+    return;
+  }
+  const hotels=[...document.querySelectorAll("#me-hotelContainer .hotel-card")].map(c=>({
+    place:c.querySelector(".me-hotel-place").value,
+    hotel:c.querySelector(".me-hotel-name").value,
+    status:c.querySelector(".me-hotel-status").value
+  }));
+  const cruises=[...document.querySelectorAll("#me-cruiseContainer .hotel-card")].map(c=>({
+    place:c.querySelector(".me-cruise-place").value,
+    name:c.querySelector(".me-cruise-name").value,
+    status:c.querySelector(".me-cruise-status").value
+  }));
+  const flights=[...document.querySelectorAll("#me-flightContainer .flight-card")].map(c=>({
+    flightNumber:c.querySelector(".me-flight-number").value,
+    fromPlace:c.querySelector(".me-flight-from-place").value,
+    fromDate:c.querySelector(".me-flight-from-date").value,
+    fromTime:c.querySelector(".me-flight-from-time").value,
+    toPlace:c.querySelector(".me-flight-to-place").value,
+    toDate:c.querySelector(".me-flight-to-date").value,
+    toTime:c.querySelector(".me-flight-to-time").value
+  }));
+  const itineraryDays=[...document.querySelectorAll("#me-dayContainer .day-card")].map((c,i)=>({
+    day:i+1,
+    date:c.querySelector(".auto-date").innerText,
+    activity:c.querySelector(".itinerary-text").value,
+    transfer:[...c.querySelectorAll(".day-transfer-checkbox:checked")].map(e=>e.value),
+    mealPlan:[...c.querySelectorAll(".day-meal-checkbox:checked")].map(e=>e.value),
+    guideStatus:[...c.querySelectorAll(".day-guide-checkbox:checked")].map(e=>e.value)
+  }));
+
+  const guest={
+    guestName:document.getElementById("me-guestName").value,
+    companyName:document.getElementById("me-companyName").value,
+    salesPerson:document.getElementById("me-salesPerson").value,
+    destination:document.getElementById("me-destination").value,
+    travelDate:document.getElementById("me-travelDate").value,
+    days:document.getElementById("me-days").value,
+    guests:document.getElementById("me-guests").value,
+    travelStatus:document.getElementById("me-travelStatus").value,
+    paymentStatus:document.getElementById("me-paymentStatus").value,
+    invoiceAmount:document.getElementById("me-invoiceAmount").value,
+    amountReceived:document.getElementById("me-amountReceived").value,
+    balanceAmount:document.getElementById("me-balanceAmount").value,
+    visaStatus:document.getElementById("me-visaStatus").value,
+    notes:document.getElementById("me-notes").value,
+    hotels,cruises,flights,itineraryDays
+  };
+
+  await updateDoc(doc(db,"guestStatus",id), guest);
+  alert("Saved!");
+  closeModal();
+}
+
+function openModal(id){
+const g = window.allGuests && window.allGuests.find(x=>x.id===id);
+if(!g) return;
+const badge = g.travelStatus==="PENDING FOR CONFIRMATION"?"pending":g.travelStatus==="COMPLETED"?"completed":"confirmed";
+let tripStage="UPCOMING",tripStageClass="pending";
+if(g.itineraryDays&&g.itineraryDays.length){
+  const today=new Date();today.setHours(0,0,0,0);
+  const pd=s=>{if(!s||!s.includes('/'))return null;const[dd,mm,yyyy]=s.split('/');return new Date(yyyy,mm-1,dd);};
+  const fd=pd(g.itineraryDays[0].date),ld=pd(g.itineraryDays[g.itineraryDays.length-1].date);
+  if(fd&&ld){
+    if(today>ld){tripStage="COMPLETED";tripStageClass="completed";}
+    else if(today>=fd&&today<=ld){tripStage="ONGOING";tripStageClass="ongoing";}
+    else{const dl=Math.ceil((fd-today)/86400000);tripStage=`UPCOMING IN ${dl} DAY${dl>1?"S":""}`;tripStageClass="pending";}
+  }
+}
+document.getElementById("modalGuestTitle").textContent=g.guestName||"Guest";
+document.getElementById("modalShareBtn").onclick=function(){shareWhatsApp(id);};
+
+// Edit button → switch to edit panel (password protected)
+document.getElementById("modalEditBtn").onclick=async function(){
+  const pw=prompt("Enter password");
+  if(pw!=="5655"){alert("Wrong password");return;}
+  document.getElementById("modalContent").style.display="none";
+  document.getElementById("modalEditPanel").style.display="block";
+  document.getElementById("modalEditBtn").style.display="none";
+  document.getElementById("modalViewBtn").style.display="";
+  document.getElementById("modalSaveBtn").style.display="";
+  document.getElementById("modalSaveBtn").onclick=()=>meModalSave(id);
+  document.getElementById("modalBox").scrollTop=0;
+  openModalEditPanel(id);
+};
+
+// Back button → switch to view panel
+document.getElementById("modalViewBtn").onclick=function(){
+  document.getElementById("modalContent").style.display="";
+  document.getElementById("modalEditPanel").style.display="none";
+  document.getElementById("modalEditBtn").style.display="";
+  document.getElementById("modalViewBtn").style.display="none";
+  document.getElementById("modalSaveBtn").style.display="none";
+  document.getElementById("modalBox").scrollTop=0;
+};
+
+document.getElementById("modalContent").innerHTML=`
+<div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;">
+  <span class="status-badge ${badge}">${g.travelStatus||""}</span>
+  <span class="status-badge ${tripStageClass}">${tripStage}</span>
+</div>
+<div class="detail"><span class="label">Destination:</span> ${g.destination||""}</div>
+<div class="detail"><span class="label">Travel Date:</span> ${g.travelDate||"-"}</div>
+<div class="detail"><span class="label">Days:</span> ${g.days||""} &nbsp; <span class="label">Guests:</span> ${g.guests||""}</div>
+<div class="detail"><span class="label">Sales Person:</span> ${g.salesPerson||"-"}</div>
+${g.companyName?`<div class="detail"><span class="label">Company:</span> ${g.companyName}</div>`:""}
+<div class="detail"><span class="label">Visa Status:</span> ${g.visaStatus||""}</div>
+<div class="detail"><span class="label">Payment:</span> ${normalizePayment(g.paymentStatus)}</div>
+<div class="detail"><span class="label">Invoice:</span> <span class="amount">&#8377; ${g.invoiceAmount||0}</span></div>
+<div class="detail"><span class="label">Advance Req (60%):</span> <span class="amount">&#8377; ${((Number(g.invoiceAmount||0)*60)/100).toFixed(0)}</span></div>
+<div class="detail"><span class="label">Received:</span> <span class="amount">&#8377; ${g.amountReceived||0}</span></div>
+<div class="detail"><span class="label">Advance Pending:</span>
+  <span class="amount" style="color:${Math.max(((Number(g.invoiceAmount||0)*60)/100)-Number(g.amountReceived||0),0)>0?"#ff3b30":"#1D9E75"};font-weight:700;">
+    &#8377; ${Math.max(((Number(g.invoiceAmount||0)*60)/100)-Number(g.amountReceived||0),0).toFixed(0)}${Math.max(((Number(g.invoiceAmount||0)*60)/100)-Number(g.amountReceived||0),0)>0?" &#9888;&#65039;":""}
+  </span>
+</div>
+<div class="detail"><span class="label">Final Balance:</span> <span class="amount">&#8377; ${g.balanceAmount||0}</span></div>
+<div class="tile-block"><div class="label">Hotel Status</div><br>
+${(g.hotels||[]).map(h=>`<div class="detail">&#127968; ${h.place||""}<br>Hotel: <b>${h.hotel||""}</b><br>Status: <b>${h.status||""}</b></div>`).join("")}
+</div>
+${(()=>{const vc=(g.cruises||[]).filter(c=>c.status!=="NO CRUISE");if(!vc.length)return"";return`<div class="tile-block"><div class="label">Cruise Status</div><br>${vc.map(c=>`<div class="detail">&#128741;&#65039; ${c.place||""}<br>Cruise: <b>${c.name||""}</b><br>Status: <b>${c.status||""}</b></div>`).join("")}</div>`;})()}
+<div class="tile-block"><div class="label">Flight Details</div><br>
+${(g.flights||[]).map(f=>`<div class="detail">&#9992;&#65039; Flight: <b>${f.flightNumber||""}</b><br>From: <b>${f.fromPlace||""}</b> &#8212; ${f.fromDate||""} ${f.fromTime||""}<br>To: <b>${f.toPlace||""}</b> &#8212; ${f.toDate||""} ${f.toTime||""}</div>`).join("")}
+</div>
+<div class="tile-block"><div class="label">Day-wise Itinerary</div><br>
+${(g.itineraryDays||[]).map(d=>`<div class="detail"><b>Day ${d.day} - ${d.date}</b><br>Transfer: <b>${formatDayOption(d.transfer)}</b> &nbsp; Meal: <b>${formatDayOption(d.mealPlan)}</b> &nbsp; Guide: <b>${formatDayOption(d.guideStatus)}</b><br>${d.activity||""}</div>`).join("")}
+</div>
+<div class="tile-block"><div class="label">Notes</div><br><div class="detail">${g.notes||""}</div></div>
+<div class="card-actions">
+<button class="delete-btn" onclick="closeModal();deleteGuest('${g.id}')">Delete</button>
+</div>`;
+
+// reset to view panel
+document.getElementById("modalContent").style.display="";
+document.getElementById("modalEditPanel").style.display="none";
+document.getElementById("modalEditBtn").style.display="";
+document.getElementById("modalViewBtn").style.display="none";
+document.getElementById("modalSaveBtn").style.display="none";
+
+document.getElementById("guestModal").classList.add("open");
+document.body.style.overflow="hidden";
+document.getElementById("modalBox").scrollTop=0;
+}
+
+function closeModal(){
+document.getElementById("guestModal").classList.remove("open");
+document.body.style.overflow="";
+}
+
+function handleModalBackdropClick(e){
+if(e.target===document.getElementById("guestModal"))closeModal();
+}
+
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeModal();closeAddModal();}});
+
+function switchTab(tab){
+const activeBtn = document.querySelector('.tab-btn.active');
+if(activeBtn) activeBtn.classList.remove('active');
+
+const btns = document.querySelectorAll('.tab-btn');
+if(tab === 'active'){
+btns[0].classList.add('active');
+document.getElementById('guestContainer').style.display = '';
+document.getElementById('completedContainer').style.display = 'none';
+} else {
+btns[1].classList.add('active');
+document.getElementById('guestContainer').style.display = 'none';
+document.getElementById('completedContainer').style.display = '';
+}
+}
+
+window.addEventListener(
+"load",
+()=>{
+
+loadGuests();
+
+generateDates();
+
+}
+);
+
+function shareWhatsApp(id){
+
+const g = window.allGuests.find(x => x.id === id);
+if(!g){
+alert("Guest not found");
+return;
+}
+
+let message = `
+*🏝️ Guest Status - Travelog*
+
+👤 Name: ${g.guestName || "-"}
+🏢 Company: ${g.companyName || "-"}
+📍 Destination: ${g.destination || "-"}
+📅 Travel Date: ${g.travelDate || "-"}
+📆 Days: ${g.days || "-"}
+👥 Guests: ${g.guests || "-"}
+
+✈️ Visa Status: ${g.visaStatus || "-"}
+📊 Travel Status: ${g.travelStatus || "-"}
+💳 Payment Status: ${normalizePayment(g.paymentStatus) || "-"}
+
+💰 Invoice: ₹${g.invoiceAmount || 0}
+💵 Received: ₹${g.amountReceived || 0}
+📉 Balance: ₹${g.balanceAmount || 0}
+
+🏨 Hotels:
+${(g.hotels || []).map(h => `- ${h.place || ""} | ${h.hotel || ""} | ${h.status || ""}`).join("\n") || "-"}
+
+🛳️ Cruises:
+${(g.cruises || []).filter(c => c.status !== "NO CRUISE").map(c => `- ${c.place || ""} | ${c.name || ""} | ${c.status || ""}`).join("\n") || "-"}
+
+✈️ Flights:
+${(g.flights || []).map(f => `- ${f.flightNumber || ""} | ${f.fromPlace || ""} ${f.fromDate || ""} ${f.fromTime || ""} → ${f.toPlace || ""} ${f.toDate || ""} ${f.toTime || ""}`).join("\n") || "-"}
+
+🗓️ Itinerary:
+${(g.itineraryDays || []).map(d => `Day ${d.day} (${d.date}) | Transfer: ${formatDayOption(d.transfer)} | Meal: ${formatDayOption(d.mealPlan)} | Guide: ${formatDayOption(d.guideStatus)}\n${d.activity || ""}`).join("\n\n") || "-"}
+
+📝 Notes:
+${g.notes || "-"}
+`;
+
+const url = "https://wa.me/?text=" + encodeURIComponent(message);
+window.open(url, "_blank");
+}
+
+</script>
+
+<!-- GUEST DETAIL MODAL -->
+<div class="modal-backdrop" id="guestModal" onclick="handleModalBackdropClick(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-top-actions">
+      <div class="modal-guest-title" id="modalGuestTitle"></div>
+      <div class="modal-btn-group">
+        <button class="modal-share-btn" id="modalShareBtn" title="Share on WhatsApp">📤</button>
+        <button class="modal-edit-btn" id="modalEditBtn">✏️ Edit</button>
+        <button class="modal-edit-btn" id="modalSaveBtn" style="display:none;background:#1D9E75;">💾 Save</button>
+        <button class="modal-view-btn" id="modalViewBtn" style="display:none;">← Back</button>
+        <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      </div>
+    </div>
+    <div id="modalContent"></div>
+    <div id="modalEditPanel" style="display:none;"></div>
+  </div>
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+deleteDoc,
+doc,
+onSnapshot,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+
+authDomain: "travelog-itinerary.firebaseapp.com",
+
+projectId: "travelog-itinerary",
+
+storageBucket: "travelog-itinerary.firebasestorage.app",
+
+messagingSenderId: "33567258851",
+
+appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+window.onSnapshot = onSnapshot;
+window.updateDoc = updateDoc;
+
+</script>
+
+</body>
+
+</html> 
