@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Global Itinerary Maker</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #162032;
+    --navy-light: #1e2f44;
+    --gold: #c9a84c;
+    --gold-light: #e2c478;
+    --gold-pale: #f5e9c8;
+    --slate: #8fa0b4;
+    --white: #ffffff;
+    --off-white: #f8f6f1;
+    --border: rgba(201,168,76,0.18);
+    --shadow: 0 8px 40px rgba(13,27,42,0.18);
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #1a2a1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.3);
+  }
+  .logo-mark {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--white);
+  }
+  header h1 span { color: var(--gold); }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 20px 40px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    padding: 10px 24px;
+    border: none;
+    background: transparent;
+    color: var(--slate);
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+  .tab-btn:hover:not(.active) { color: var(--white); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── MAIN LAYOUT ── */
+  .container { max-width: 1000px; margin: 0 auto; padding: 36px 24px; }
+
+  /* ── SECTION CARD ── */
+  .card {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── FORM ELEMENTS ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--slate);
+  }
+
+  input[type="text"], input[type="date"], input[type="number"], select, textarea {
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--white);
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+  }
+  input::placeholder, textarea::placeholder { color: var(--slate); }
+  select option { background: var(--navy); }
+
+  .searchable-wrapper { position: relative; }
+  .searchable-input {
+    width: 100%;
+    background: var(--navy-mid);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--white);
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.2s;
+  }
+  .searchable-input:focus, .searchable-input.open { border-color: var(--gold); }
+  .dropdown-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: var(--navy-mid);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    z-index: 200;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .dropdown-panel.open { display: block; }
+  .dropdown-search {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    border-radius: 0;
+    border-left: none; border-right: none; border-top: none;
+  }
+  .dropdown-list {
+    max-height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) transparent;
+  }
+  .dropdown-item {
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--white);
+    transition: background 0.15s;
+  }
+  .dropdown-item:hover, .dropdown-item.selected { background: rgba(201,168,76,0.15); color: var(--gold-light); }
+
+  /* ── PRICE TABLE ── */
+  .price-table { width: 100%; border-collapse: collapse; }
+  .price-table th {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--slate);
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-table td {
+    padding: 10px 10px;
+    vertical-align: middle;
+  }
+  .price-table td:first-child { font-size: 13px; font-weight: 500; color: var(--white); }
+  .price-table input[type="number"] { text-align: right; }
+  .total-cell {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold-light);
+    text-align: right;
+  }
+  .grand-total-row td {
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  /* ── DAY CARDS ── */
+  .day-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .day-header {
+    background: linear-gradient(90deg, rgba(201,168,76,0.12), transparent);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .day-num {
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 6px;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .day-remove {
+    background: rgba(255,80,80,0.1);
+    border: 1px solid rgba(255,80,80,0.25);
+    color: #ff6b6b;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.2s;
+  }
+  .day-remove:hover { background: rgba(255,80,80,0.2); }
+  .day-body { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .day-body .full { grid-column: 1 / -1; }
+  .day-body textarea { resize: vertical; min-height: 80px; }
+  .hotel-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .hotel-body {
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 180px auto;
+    gap: 14px;
+    align-items: end;
+  }
+  @media (max-width: 760px) {
+    .hotel-body { grid-template-columns: 1fr; }
+    .hotel-body .day-remove { justify-self: start; }
+  }
+
+  .pill-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.12);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    color: var(--slate);
+    background: transparent;
+    font-family: 'Poppins', sans-serif;
+  }
+  .pill.active { background: rgba(201,168,76,0.2); border-color: var(--gold); color: var(--gold-light); }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-ghost:hover { background: rgba(201,168,76,0.08); }
+
+  .btn-add-day {
+    width: 100%;
+    border: 2px dashed rgba(201,168,76,0.3);
+    background: transparent;
+    border-radius: 10px;
+    padding: 14px;
+    color: var(--gold);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-add-day:hover { background: rgba(201,168,76,0.06); border-color: var(--gold); }
+
+  .action-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    justify-content: flex-end;
+  }
+
+  /* ── LIBRARY ── */
+  .library-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .itinerary-card {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+  }
+  .itinerary-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .itinerary-card .ic-dest {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .itinerary-card .ic-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .itinerary-card .ic-meta {
+    font-size: 12px;
+    color: var(--slate);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .ic-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ic-btn {
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    border: 1px solid;
+    transition: background 0.2s;
+  }
+  .ic-btn.view { border-color: var(--gold); color: var(--gold); background: transparent; }
+  .ic-btn.view:hover { background: rgba(201,168,76,0.12); }
+  .ic-btn.edit { border-color: rgba(95,180,120,0.45); color: #7ee29a; background: transparent; }
+  .ic-btn.edit:hover { background: rgba(95,180,120,0.12); }
+  .ic-btn.pdf { border-color: rgba(255,255,255,0.15); color: var(--white); background: transparent; }
+  .ic-btn.pdf:hover { background: rgba(255,255,255,0.06); }
+  .ic-btn.del { border-color: rgba(255,80,80,0.25); color: #ff6b6b; background: transparent; }
+  .ic-btn.del:hover { background: rgba(255,80,80,0.1); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--slate);
+  }
+  .empty-state .es-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(13,27,42,0.85);
+    backdrop-filter: blur(6px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) transparent;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  }
+  .modal-header {
+    padding: 24px 28px 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .modal-close {
+    background: rgba(255,255,255,0.06);
+    border: none;
+    color: var(--slate);
+    border-radius: 6px;
+    width: 30px; height: 30px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .modal-close:hover { color: var(--white); }
+  .modal-body { padding: 20px 28px 28px; }
+
+  /* ═══════════════════════════════════════════════════════════════
+     PDF LIGHT BLUE TEMPLATE
+     Palette: Light Blue #EAF7FF · Sky Blue #4FA7D8 · White #FFFFFF
+  ═══════════════════════════════════════════════════════════════ */
+  .pdf-template {
+    display: none;
+    background: #F4FAFF;
+    color: #14324A;
+    font-family: 'Poppins', Segoe UI, sans-serif;
+  }
+
+  .pdf-page {
+    width: min(980px, 100%);
+    margin: 0 auto;
+    background: #F4FAFF;
+    padding: 36px;
+  }
+
+  /* ── COVER ── */
+  .pdf-cover {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 32px 36px;
+    border-radius: 6px;
+    overflow: hidden;
+    background:
+      linear-gradient(108deg, rgba(255,255,255,0.96) 0%, rgba(234,247,255,0.92) 55%, rgba(207,235,250,0.88) 100%),
+      url("https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1400&q=80") center / cover;
+    border: 1px solid rgba(79,167,216,0.28);
+    box-shadow: 0 24px 60px rgba(36,112,154,0.16);
+  }
+  .pdf-cover::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #4FA7D8 0%, #9DD8F4 100%);
+  }
+  .pdf-cover::after {
+    content: "";
+    position: absolute;
+    right: 0; top: 0;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle at 100% 0%, rgba(79,167,216,0.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .pdf-brand { display: flex; gap: 18px; align-items: center; }
+  .pdf-logo {
+    width: 200px;
+    height: 62px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    color: #24709A;
+    font-weight: 600;
+    overflow: hidden;
+    padding: 0;
+    font-size: 13px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .pdf-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+  }
+  .pdf-logo.has-logo img { display: block; }
+  .pdf-logo.has-logo span { display: none; }
+  .pdf-brand-divider {
+    width: 1px;
+    height: 52px;
+    background: linear-gradient(180deg, transparent, rgba(79,167,216,0.45), transparent);
+  }
+
+  .pdf-brand-text h2 {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 26px;
+    color: #14324A;
+    font-weight: 600;
+    letter-spacing: .01em;
+    line-height: 1.2;
+  }
+  .pdf-brand-text p {
+    margin: 5px 0 0;
+    color: #4FA7D8;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .pdf-meta { text-align: right; }
+  .pdf-meta strong {
+    display: block;
+    font-size: 20px;
+    color: #24709A;
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
+  .pdf-meta p {
+    margin: 4px 0 0;
+    color: #5B7C91;
+    font-size: 11px;
+    letter-spacing: .06em;
+  }
+
+  /* ── SECTION HEADINGS ── */
+  .pdf-section { margin-top: 26px; break-inside: avoid; }
+  .pdf-section h3 {
+    margin: 0 0 12px;
+    font-size: 17px;
+    color: #14324A;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .pdf-section h3::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, #4FA7D8, transparent);
+    opacity: 0.65;
+  }
+
+  /* ── INFO GRID ── */
+  .pdf-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid rgba(79,167,216,0.28);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(36,112,154,0.07);
+  }
+  .pdf-info {
+    padding: 14px 16px;
+    border-right: 1px solid rgba(79,167,216,0.24);
+    min-height: 78px;
+    background: #ffffff;
+  }
+  .pdf-info:last-child { border-right: 0; }
+  .pdf-info span {
+    display: block;
+    color: #4FA7D8;
+    font-size: 9.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .pdf-info strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+    color: #14324A;
+    font-weight: 500;
+  }
+
+  /* ── PRICE BOX ── */
+  .pdf-price-box {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    gap: 16px;
+    align-items: start;
+  }
+  .pdf-total {
+    background: linear-gradient(135deg, #FFFFFF 0%, #EAF7FF 100%);
+    border: 1px solid rgba(79,167,216,0.35);
+    border-radius: 6px;
+    padding: 22px 20px;
+    box-shadow: 0 18px 42px rgba(36,112,154,0.14);
+    position: relative;
+    overflow: hidden;
+  }
+  .pdf-total::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4FA7D8, #9DD8F4, transparent);
+  }
+  .pdf-total span {
+    color: #24709A;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .pdf-total strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 36px;
+    color: #14324A;
+    font-weight: 600;
+    letter-spacing: .01em;
+  }
+
+  /* ── LINES / RATE TABLE ── */
+  .pdf-lines {
+    border: 1px solid rgba(79,167,216,0.28);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(36,112,154,0.06);
+  }
+  .pdf-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(79,167,216,0.18);
+    font-size: 13px;
+    color: #14324A;
+  }
+  .pdf-line:last-child { border-bottom: 0; }
+
+  .pdf-rate-table {
+    border: 1px solid rgba(79,167,216,0.28);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(36,112,154,0.06);
+  }
+  .pdf-rate-row {
+    display: grid;
+    grid-template-columns: 1fr 70px 120px 120px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(79,167,216,0.18);
+    font-size: 13px;
+  }
+  .pdf-rate-row:last-child { border-bottom: 0; }
+  .pdf-rate-row.head {
+    background: linear-gradient(90deg, #DDF2FF 0%, #F5FBFF 100%);
+    color: #24709A;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .pdf-rate-row strong { color: #14324A; font-weight: 600; }
+
+  .pdf-hotel-list {
+    border: 1px solid rgba(79,167,216,0.28);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(36,112,154,0.06);
+  }
+  .pdf-hotel-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 120px;
+    gap: 12px;
+    align-items: center;
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(79,167,216,0.18);
+    color: #31546A;
+    font-size: 13px;
+  }
+  .pdf-hotel-row:last-child { border-bottom: 0; }
+  .pdf-hotel-row.head {
+    background: linear-gradient(90deg, #DDF2FF 0%, #F5FBFF 100%);
+    color: #24709A;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .pdf-hotel-row strong { color: #14324A; font-weight: 600; }
+
+  /* ── DAY CARDS ── */
+  .pdf-day {
+    border: 1px solid rgba(79,167,216,0.28);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    break-inside: avoid;
+    background: #ffffff;
+    box-shadow: 0 3px 12px rgba(36,112,154,0.06);
+  }
+  .pdf-day-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 16px;
+    background: linear-gradient(90deg, #DDF2FF 0%, #F5FBFF 100%);
+    color: #24709A;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .02em;
+  }
+  .pdf-day-body {
+    padding: 14px 16px;
+    display: grid;
+    gap: 7px;
+    color: #31546A;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .pdf-day-disks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 3px;
+  }
+  .pdf-day-disk {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 24px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(11,42,68,0.2);
+    background: #0B2A44;
+    color: #ffffff;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .pdf-day-disk::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #59B878;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.18);
+    flex: 0 0 auto;
+  }
+  .pdf-day-disk.meal {
+    background: #2E8B57;
+    border-color: rgba(46,139,87,0.25);
+  }
+  .pdf-day-disk.transfer {
+    background: #0B2A44;
+    border-color: rgba(11,42,68,0.25);
+  }
+
+  /* ── FOOTER ── */
+  .pdf-footer {
+    margin-top: 36px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(79,167,216,0.3);
+    color: #5B7C91;
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    letter-spacing: .03em;
+  }
+
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    .tabs, header, .tab-panel, .toast, #sync-status { display: none !important; }
+    .pdf-template { display: block !important; }
+    .pdf-page { width: 100%; padding: 0; }
+    .pdf-info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pdf-price-box { grid-template-columns: 1fr; }
+    body { background: #F4FAFF; }
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 30px; right: 30px;
+    background: var(--navy-light);
+    border: 1px solid var(--gold);
+    color: var(--white);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    z-index: 999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">✈</div>
+  <h1>Global <span>Itinerary</span> Maker</h1>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('create')">✦ Create Itinerary</button>
+  <button class="tab-btn" onclick="switchTab('library')">☰ Itinerary Library</button>
+</div>
+
+<!-- ══ TAB: CREATE ══ -->
+<div id="tab-create" class="tab-panel active">
+<div class="container">
+
+  <!-- Basic Info -->
+  <div class="card">
+    <div class="card-title">Trip Details</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Itinerary Title</label>
+        <input type="text" id="itin-title" placeholder="e.g. Golden Triangle Explorer" />
+      </div>
+      <div class="form-group">
+        <label>Destination / Country</label>
+        <div class="searchable-wrapper">
+          <div class="searchable-input" id="dest-display" tabindex="0" onclick="toggleDropdown('dest-dd')">
+            <span id="dest-text" style="color:var(--slate)">Select destination…</span>
+            <span style="color:var(--gold);font-size:10px">▼</span>
+          </div>
+          <div class="dropdown-panel" id="dest-dd">
+            <input class="dropdown-search" type="text" placeholder="Search country…" oninput="filterDropdown(this,'dest-list','dest-dd','dest-text','dest-val')" />
+            <div class="dropdown-list" id="dest-list"></div>
+          </div>
+          <input type="hidden" id="dest-val" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Validity Date (Optional)</label>
+        <input type="date" id="itin-validity" />
+      </div>
+      <div class="form-group">
+        <label>Currency</label>
+        <div class="searchable-wrapper">
+          <div class="searchable-input" id="curr-display" tabindex="0" onclick="toggleDropdown('curr-dd')">
+            <span id="curr-text" style="color:var(--slate)">Select currency…</span>
+            <span style="color:var(--gold);font-size:10px">▼</span>
+          </div>
+          <div class="dropdown-panel" id="curr-dd">
+            <input class="dropdown-search" type="text" placeholder="Search currency…" oninput="filterDropdown(this,'curr-list','curr-dd','curr-text','curr-val')" />
+            <div class="dropdown-list" id="curr-list"></div>
+          </div>
+          <input type="hidden" id="curr-val" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <div class="card">
+    <div class="card-title">Pricing</div>
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Pax Type</th>
+          <th>Count</th>
+          <th>Rate per Person</th>
+          <th style="text-align:right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>👤 Adult</td>
+          <td><input type="number" id="p-adult-count" min="0" value="2" style="width:70px" onchange="calcPricing()" oninput="calcPricing()" /></td>
+          <td><input type="number" id="p-adult-rate" min="0" value="0" style="width:120px" placeholder="0.00" onchange="calcPricing()" oninput="calcPricing()" /></td>
+          <td class="total-cell" id="p-adult-total">0.00</td>
+        </tr>
+        <tr>
+          <td>🧒 Child</td>
+          <td><input type="number" id="p-child-count" min="0" value="0" style="width:70px" onchange="calcPricing()" oninput="calcPricing()" /></td>
+          <td><input type="number" id="p-child-rate" min="0" value="0" style="width:120px" placeholder="0.00" onchange="calcPricing()" oninput="calcPricing()" /></td>
+          <td class="total-cell" id="p-child-total">0.00</td>
+        </tr>
+        <tr>
+          <td>👶 Infant</td>
+          <td><input type="number" id="p-infant-count" min="0" value="0" style="width:70px" onchange="calcPricing()" oninput="calcPricing()" /></td>
+          <td><input type="number" id="p-infant-rate" min="0" value="0" style="width:120px" placeholder="0.00" onchange="calcPricing()" oninput="calcPricing()" /></td>
+          <td class="total-cell" id="p-infant-total">0.00</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="grand-total-row">
+          <td colspan="3">Grand Total</td>
+          <td class="total-cell" id="p-grand">0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Hotels -->
+  <div class="card">
+    <div class="card-title">Hotels</div>
+    <div id="hotels-container"></div>
+    <button class="btn-add-day" onclick="addHotel()">+ Add Hotel</button>
+  </div>
+
+  <!-- Day-wise Itinerary -->
+  <div class="card">
+    <div class="card-title">Day-wise Itinerary</div>
+    <div id="days-container"></div>
+    <button class="btn-add-day" onclick="addDay()">＋ Add Day</button>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn-ghost" onclick="clearForm()">Clear Form</button>
+    <button class="btn-primary" onclick="saveItinerary()">💾 Save to Library</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,#2a4a3a,#3a6a4a);color:#c9e8c9" onclick="exportCurrentPDF()">🖨 Print / Save PDF</button>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ TAB: LIBRARY ══ -->
+<div id="tab-library" class="tab-panel">
+<div class="container">
+  <div class="card-title" style="margin-bottom:20px">Saved Itineraries</div>
+  <div id="library-grid" class="library-grid"></div>
+</div>
+</div>
+
+<!-- Modal: View Itinerary -->
+<div class="modal-overlay" id="view-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--gold);margin-bottom:6px" id="modal-dest"></div>
+        <div style="font-family:'Poppins',sans-serif;font-size:22px;font-weight:700" id="modal-title"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- PDF Template (hidden, shown on print) -->
+<section class="pdf-template" id="pdf-template">
+  <div class="pdf-page">
+    <header class="pdf-cover">
+      <div class="pdf-brand">
+        <div class="pdf-logo has-logo" id="pdfLogo"><span>LOGO</span><img id="pdfLogoImg" src="assets/travelog-logo.png" alt="Company logo"></div>
+        <div class="pdf-brand-divider"></div>
+        <div class="pdf-brand-text">
+          <h2>Travel Itinerary Proposal</h2>
+          <p>Curated exclusively for your journey</p>
+        </div>
+      </div>
+      <div class="pdf-meta">
+        <strong id="pdf-itinerary-title">Itinerary</strong>
+        <p id="pdf-destination-sub">TRAVEL QUOTE</p>
+      </div>
+    </header>
+
+    <section class="pdf-section">
+      <h3>Trip Summary</h3>
+      <div class="pdf-info-grid">
+        <div class="pdf-info"><span>Destination</span><strong id="pdf-info-destination">—</strong></div>
+        <div class="pdf-info"><span>Duration</span><strong id="pdf-info-duration">—</strong></div>
+        <div class="pdf-info"><span>Travelers</span><strong id="pdf-info-travelers">—</strong></div>
+        <div class="pdf-info"><span>Valid Until</span><strong id="pdf-info-validity">—</strong></div>
+      </div>
+    </section>
+
+    <section class="pdf-section">
+      <h3>Price Summary</h3>
+      <div class="pdf-price-box">
+        <div class="pdf-total">
+          <span>Grand Total</span>
+          <strong id="pdf-grand-total">0</strong>
+        </div>
+        <div>
+          <div class="pdf-rate-table">
+            <div class="pdf-rate-row head"><span>Guest Type</span><span>Pax</span><span>Rate / Pax</span><span>Total Rate</span></div>
+            <div class="pdf-rate-row"><strong>Adult</strong><span id="pdf-adult-pax">0</span><span id="pdf-adult-rate">0</span><strong id="pdf-adult-total">0</strong></div>
+            <div class="pdf-rate-row"><strong>Child</strong><span id="pdf-child-pax">0</span><span id="pdf-child-rate">0</span><strong id="pdf-child-total">0</strong></div>
+            <div class="pdf-rate-row"><strong>Infant</strong><span id="pdf-infant-pax">0</span><span id="pdf-infant-rate">0</span><strong id="pdf-infant-total">0</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pdf-section">
+      <h3>Hotels</h3>
+      <div id="pdf-hotels-content"></div>
+    </section>
+
+    <section class="pdf-section">
+      <h3>Day Wise Itinerary</h3>
+      <div id="pdf-days-content"></div>
+    </section>
+
+    <footer class="pdf-footer">
+      <span>Global Itinerary Maker</span>
+      <span id="pdf-generated-note">Generated on</span>
+    </footer>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+<div id="sync-status" style="position:fixed;bottom:0;left:0;right:0;background:rgba(13,27,42,0.92);color:#8fa0b4;font-size:11px;font-family:'Poppins',sans-serif;padding:5px 20px;text-align:center;z-index:90;border-top:1px solid rgba(201,168,76,0.15);letter-spacing:0.3px;">Connecting to Firebase…</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+    authDomain: "travelog-itinerary.firebaseapp.com",
+    projectId: "travelog-itinerary",
+    storageBucket: "travelog-itinerary.firebasestorage.app",
+    messagingSenderId: "33567258851",
+    appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.globalItineraryFirebase = {
+    docRef: doc(db, "globalItineraryMaker", "libraryState"),
+    onSnapshot,
+    setDoc
+  };
+  window.dispatchEvent(new Event("globalItineraryFirebaseReady"));
+</script>
+
+<script>
+// ── DATA ──────────────────────────────────────────
+const COUNTRIES = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo (Brazzaville)","Congo (Kinshasa)","Costa Rica","Croatia","Cuba","Cyprus","Czechia","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","São Tomé and Príncipe","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+
+const CURRENCIES = [
+  {code:'USD',name:'US Dollar'},
+  {code:'EUR',name:'Euro'},
+  {code:'GBP',name:'British Pound'},
+  {code:'INR',name:'Indian Rupee'},
+  {code:'AED',name:'UAE Dirham'},
+  {code:'SGD',name:'Singapore Dollar'},
+  {code:'MYR',name:'Malaysian Ringgit'},
+  {code:'THB',name:'Thai Baht'},
+  {code:'VND',name:'Vietnamese Dong'},
+  {code:'JPY',name:'Japanese Yen'},
+  {code:'AUD',name:'Australian Dollar'},
+  {code:'CAD',name:'Canadian Dollar'},
+  {code:'CHF',name:'Swiss Franc'},
+  {code:'CNY',name:'Chinese Yuan'},
+  {code:'HKD',name:'Hong Kong Dollar'},
+  {code:'NZD',name:'New Zealand Dollar'},
+  {code:'MXN',name:'Mexican Peso'},
+  {code:'BRL',name:'Brazilian Real'},
+  {code:'ZAR',name:'South African Rand'},
+  {code:'SAR',name:'Saudi Riyal'},
+  {code:'QAR',name:'Qatari Riyal'},
+  {code:'KWD',name:'Kuwaiti Dinar'},
+  {code:'BHD',name:'Bahraini Dinar'},
+  {code:'OMR',name:'Omani Rial'},
+  {code:'EGP',name:'Egyptian Pound'},
+  {code:'TRY',name:'Turkish Lira'},
+  {code:'RUB',name:'Russian Ruble'},
+  {code:'KRW',name:'South Korean Won'},
+  {code:'IDR',name:'Indonesian Rupiah'},
+  {code:'PHP',name:'Philippine Peso'},
+  {code:'PKR',name:'Pakistani Rupee'},
+  {code:'BDT',name:'Bangladeshi Taka'},
+  {code:'LKR',name:'Sri Lankan Rupee'},
+  {code:'NPR',name:'Nepalese Rupee'},
+  {code:'MMK',name:'Myanmar Kyat'},
+  {code:'KHR',name:'Cambodian Riel'},
+  {code:'LAK',name:'Lao Kip'},
+  {code:'TWD',name:'Taiwan Dollar'},
+  {code:'SEK',name:'Swedish Krona'},
+  {code:'NOK',name:'Norwegian Krone'},
+  {code:'DKK',name:'Danish Krone'},
+  {code:'PLN',name:'Polish Zloty'},
+  {code:'CZK',name:'Czech Koruna'},
+  {code:'HUF',name:'Hungarian Forint'},
+  {code:'RON',name:'Romanian Leu'},
+  {code:'HRK',name:'Croatian Kuna'},
+  {code:'BGN',name:'Bulgarian Lev'},
+  {code:'ILS',name:'Israeli Shekel'},
+  {code:'JOD',name:'Jordanian Dinar'},
+  {code:'MAD',name:'Moroccan Dirham'},
+  {code:'TND',name:'Tunisian Dinar'},
+  {code:'DZD',name:'Algerian Dinar'},
+  {code:'NGN',name:'Nigerian Naira'},
+  {code:'GHS',name:'Ghanaian Cedi'},
+  {code:'KES',name:'Kenyan Shilling'},
+  {code:'TZS',name:'Tanzanian Shilling'},
+  {code:'ETB',name:'Ethiopian Birr'},
+  {code:'UGX',name:'Ugandan Shilling'},
+  {code:'XOF',name:'West African CFA Franc'},
+  {code:'XAF',name:'Central African CFA Franc'},
+  {code:'CLP',name:'Chilean Peso'},
+  {code:'COP',name:'Colombian Peso'},
+  {code:'PEN',name:'Peruvian Sol'},
+  {code:'ARS',name:'Argentine Peso'},
+  {code:'UYU',name:'Uruguayan Peso'},
+  {code:'PYG',name:'Paraguayan Guaraní'},
+  {code:'BOB',name:'Bolivian Boliviano'},
+  {code:'VES',name:'Venezuelan Bolívar'},
+  {code:'GTQ',name:'Guatemalan Quetzal'},
+  {code:'HNL',name:'Honduran Lempira'},
+  {code:'CRC',name:'Costa Rican Colón'},
+  {code:'DOP',name:'Dominican Peso'},
+  {code:'JMD',name:'Jamaican Dollar'},
+  {code:'TTD',name:'Trinidad Dollar'},
+  {code:'BBD',name:'Barbadian Dollar'},
+  {code:'FJD',name:'Fijian Dollar'},
+  {code:'PGK',name:'Papua New Guinean Kina'},
+  {code:'MOP',name:'Macanese Pataca'},
+  {code:'BND',name:'Brunei Dollar'},
+  {code:'MVR',name:'Maldivian Rufiyaa'},
+];
+
+let dayCount = 0;
+let hotelCount = 0;
+let library = JSON.parse(localStorage.getItem('itinerary-library') || '[]');
+let editingIndex = null;
+
+// ── FIREBASE SYNC (same pattern as Itinerary-Builder) ─────────────
+const STORAGE_KEY = 'itinerary-library';
+let firebaseReady = false;
+let firebaseLoaded = false;
+let suppressFirebaseSave = false;
+
+const syncStatus = document.getElementById('sync-status');
+
+const persistLibrary = (syncRemote = true) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(library));
+  if (syncRemote && firebaseReady && firebaseLoaded && !suppressFirebaseSave && window.globalItineraryFirebase) {
+    window.globalItineraryFirebase.setDoc(window.globalItineraryFirebase.docRef, {
+      library,
+      updatedAt: new Date().toISOString()
+    }).then(() => {
+      syncStatus.textContent = 'Firebase connected — changes sync through Firestore with local backup.';
+    }).catch(err => {
+      syncStatus.textContent = 'Firebase save failed — changes kept in local browser backup.';
+      showToast('Firebase save failed: ' + err.message);
+    });
+  }
+};
+
+const connectFirebase = () => {
+  if (firebaseReady || !window.globalItineraryFirebase) return;
+  firebaseReady = true;
+  syncStatus.textContent = 'Firebase connected — loading cloud records…';
+
+  window.globalItineraryFirebase.onSnapshot(window.globalItineraryFirebase.docRef, snapshot => {
+    if (snapshot.exists()) {
+      const remote = snapshot.data().library;
+      if (Array.isArray(remote)) {
+        suppressFirebaseSave = true;
+        library = remote;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(library));
+        firebaseLoaded = true;
+        renderLibrary();
+        suppressFirebaseSave = false;
+        syncStatus.textContent = 'Firebase connected — changes sync through Firestore with local backup.';
+        return;
+      }
+    }
+    firebaseLoaded = true;
+    persistLibrary();
+    syncStatus.textContent = 'Firebase connected — new cloud record created.';
+  }, err => {
+    firebaseLoaded = true;
+    syncStatus.textContent = 'Firebase unavailable — records saved in local browser backup.';
+    showToast('Firebase sync unavailable: ' + err.message);
+  });
+};
+
+window.addEventListener('globalItineraryFirebaseReady', connectFirebase);
+if (window.globalItineraryFirebase) connectFirebase();
+
+// ── DROPDOWN HELPERS ──────────────────────────────
+function buildDropdownList(listId, items) {
+  const el = document.getElementById(listId);
+  el.innerHTML = items.map(item =>
+    `<div class="dropdown-item" data-val="${item.val}" onclick="selectItem('${listId}','${item.val}','${item.label.replace(/'/g,"\\'")}')">
+      ${item.label}
+    </div>`
+  ).join('');
+}
+
+function filterDropdown(input, listId, ddId, displayId, valId) {
+  const q = input.value.toLowerCase();
+  const el = document.getElementById(listId);
+  const items = el.querySelectorAll('.dropdown-item');
+  items.forEach(i => {
+    i.style.display = i.dataset.val.toLowerCase().includes(q) || i.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function selectItem(listId, val, label) {
+  if (listId === 'dest-list') {
+    document.getElementById('dest-val').value = val;
+    document.getElementById('dest-text').textContent = label;
+    document.getElementById('dest-text').style.color = 'var(--white)';
+    closeDropdown('dest-dd');
+  } else if (listId === 'curr-list') {
+    document.getElementById('curr-val').value = val;
+    document.getElementById('curr-text').textContent = label;
+    document.getElementById('curr-text').style.color = 'var(--white)';
+    closeDropdown('curr-dd');
+    calcPricing();
+  }
+}
+
+function toggleDropdown(ddId) {
+  const dd = document.getElementById(ddId);
+  const isOpen = dd.classList.contains('open');
+  document.querySelectorAll('.dropdown-panel.open').forEach(d => d.classList.remove('open'));
+  if (!isOpen) dd.classList.add('open');
+}
+
+function closeDropdown(ddId) {
+  document.getElementById(ddId).classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.searchable-wrapper')) {
+    document.querySelectorAll('.dropdown-panel.open').forEach(d => d.classList.remove('open'));
+  }
+});
+
+// ── INIT DROPDOWNS ────────────────────────────────
+buildDropdownList('dest-list', COUNTRIES.map(c => ({val:c, label:c})));
+buildDropdownList('curr-list', CURRENCIES.map(c => ({val:c.code, label:`${c.code} — ${c.name}`})));
+
+// ── PRICING ───────────────────────────────────────
+function fmt(n) {
+  const curr = document.getElementById('curr-val').value || '';
+  return n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function calcPricing() {
+  const ac = +document.getElementById('p-adult-count').value||0;
+  const ar = +document.getElementById('p-adult-rate').value||0;
+  const cc = +document.getElementById('p-child-count').value||0;
+  const cr = +document.getElementById('p-child-rate').value||0;
+  const ic = +document.getElementById('p-infant-count').value||0;
+  const ir = +document.getElementById('p-infant-rate').value||0;
+  const at = ac*ar, ct = cc*cr, it = ic*ir, gt = at+ct+it;
+  const curr = document.getElementById('curr-val').value;
+  const sym = curr ? curr+' ' : '';
+  document.getElementById('p-adult-total').textContent = sym+fmt(at);
+  document.getElementById('p-child-total').textContent = sym+fmt(ct);
+  document.getElementById('p-infant-total').textContent = sym+fmt(it);
+  document.getElementById('p-grand').textContent = sym+fmt(gt);
+}
+
+// ── DAYS ──────────────────────────────────────────
+function addHotel(hotelData = null, shouldScroll = true) {
+  hotelCount++;
+  const h = hotelCount;
+  const container = document.getElementById('hotels-container');
+  const div = document.createElement('div');
+  div.className = 'hotel-card';
+  div.id = `hotel-${h}`;
+  div.innerHTML = `
+    <div class="hotel-body">
+      <div class="form-group">
+        <label>Hotel Name</label>
+        <input type="text" id="hotel-name-${h}" placeholder="e.g. Grand Palace Hotel" />
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <input type="text" id="hotel-city-${h}" placeholder="e.g. Bangkok" />
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="hotel-category-${h}">
+          <option value="">Select</option>
+          <option value="Standard">Standard</option>
+          <option value="3 Star">3 Star</option>
+          <option value="4 Star">4 Star</option>
+          <option value="5 Star">5 Star</option>
+          <option value="Luxury">Luxury</option>
+          <option value="Boutique">Boutique</option>
+          <option value="Resort">Resort</option>
+          <option value="Apartment">Apartment</option>
+        </select>
+      </div>
+      <button class="day-remove" onclick="removeHotel(${h})">Remove</button>
+    </div>
+  `;
+  container.appendChild(div);
+  if (hotelData) {
+    document.getElementById(`hotel-name-${h}`).value = hotelData.name || '';
+    document.getElementById(`hotel-city-${h}`).value = hotelData.city || '';
+    document.getElementById(`hotel-category-${h}`).value = hotelData.category || '';
+  }
+  if (shouldScroll) div.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function removeHotel(h) {
+  document.getElementById(`hotel-${h}`)?.remove();
+}
+
+function addDay(dayData = null, shouldScroll = true) {
+  dayCount++;
+  const d = dayCount;
+  const container = document.getElementById('days-container');
+  const div = document.createElement('div');
+  div.className = 'day-card';
+  div.id = `day-${d}`;
+  div.innerHTML = `
+    <div class="day-header">
+      <div class="day-label">
+        <div class="day-num">${d}</div>
+        <span id="day-title-preview-${d}">Day ${d}</span>
+      </div>
+      <button class="day-remove" onclick="removeDay(${d})">Remove</button>
+    </div>
+    <div class="day-body">
+      <div class="form-group full">
+        <label>Day Heading</label>
+        <input type="text" id="day-heading-${d}" placeholder="e.g. Arrival in Paris — City of Light"
+          oninput="document.getElementById('day-title-preview-${d}').textContent = this.value || 'Day ${d}'" />
+      </div>
+      <div class="form-group full">
+        <label>Detailed Description</label>
+        <textarea id="day-desc-${d}" placeholder="Describe the day's activities, sights, and experiences…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Transfer</label>
+        <div class="pill-group" id="transfer-${d}">
+          <button class="pill active" onclick="setPill(this,'transfer-${d}')">No Transfer</button>
+          <button class="pill" onclick="setPill(this,'transfer-${d}')">Private</button>
+          <button class="pill" onclick="setPill(this,'transfer-${d}')">Shared</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Meals</label>
+        <div class="pill-group" id="meals-${d}">
+          <button class="pill active" onclick="toggleMealPill(this,'meals-${d}', true)">No Meals</button>
+          <button class="pill" onclick="toggleMealPill(this,'meals-${d}')">Breakfast</button>
+          <button class="pill" onclick="toggleMealPill(this,'meals-${d}')">Brunch</button>
+          <button class="pill" onclick="toggleMealPill(this,'meals-${d}')">Lunch</button>
+          <button class="pill" onclick="toggleMealPill(this,'meals-${d}')">Dinner</button>
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  if (dayData) {
+    document.getElementById(`day-heading-${d}`).value = dayData.heading || '';
+    document.getElementById(`day-desc-${d}`).value = dayData.desc || '';
+    document.getElementById(`day-title-preview-${d}`).textContent = dayData.heading || `Day ${d}`;
+    setPillValue(`transfer-${d}`, dayData.transfer || 'No Transfer');
+    setMealPillValues(`meals-${d}`, dayData.meals || 'No Meals');
+  }
+  if (shouldScroll) div.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function removeDay(d) {
+  document.getElementById(`day-${d}`)?.remove();
+}
+
+function setPill(btn, groupId) {
+  document.querySelectorAll(`#${groupId} .pill`).forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setPillValue(groupId, value) {
+  const fallback = document.querySelector(`#${groupId} .pill`);
+  const match = [...document.querySelectorAll(`#${groupId} .pill`)]
+    .find(p => p.textContent.trim() === value);
+  setPill(match || fallback, groupId);
+}
+
+function getActivePill(groupId) {
+  return document.querySelector(`#${groupId} .pill.active`)?.textContent?.trim() || '';
+}
+
+function toggleMealPill(btn, groupId, isNone = false) {
+  const pills = [...document.querySelectorAll(`#${groupId} .pill`)];
+  const nonePill = pills[0];
+  if (isNone) {
+    pills.forEach(p => p.classList.remove('active'));
+    nonePill.classList.add('active');
+    return;
+  }
+  nonePill.classList.remove('active');
+  btn.classList.toggle('active');
+  if (!pills.slice(1).some(p => p.classList.contains('active'))) {
+    nonePill.classList.add('active');
+  }
+}
+
+function getActiveMealPills(groupId) {
+  const activeMeals = [...document.querySelectorAll(`#${groupId} .pill.active`)]
+    .map(p => p.textContent.trim())
+    .filter(meal => meal && meal !== 'No Meals');
+  return activeMeals.length ? activeMeals.join(' + ') : 'No Meals';
+}
+
+function normalizeMealName(meal) {
+  const key = String(meal || '').trim();
+  const meals = {
+    B: 'Breakfast',
+    BR: 'Brunch',
+    L: 'Lunch',
+    D: 'Dinner',
+    BLD: 'Breakfast + Lunch + Dinner',
+  };
+  return meals[key] || key;
+}
+
+function normalizeMealsText(value) {
+  if (!value || value === 'No Meals') return 'No Meals';
+  return String(value).split('+')
+    .map(normalizeMealName)
+    .filter(Boolean)
+    .join(' + ') || 'No Meals';
+}
+
+function setMealPillValues(groupId, value) {
+  const pills = [...document.querySelectorAll(`#${groupId} .pill`)];
+  const selected = String(value || 'No Meals').split('+')
+    .map(meal => meal.trim())
+    .filter(Boolean)
+    .flatMap(meal => meal === 'BLD' ? ['Breakfast', 'Lunch', 'Dinner'] : [normalizeMealName(meal)]);
+
+  pills.forEach(p => p.classList.remove('active'));
+  const mealPills = pills.filter(p => selected.includes(p.textContent.trim()) && p.textContent.trim() !== 'No Meals');
+  if (mealPills.length) {
+    mealPills.forEach(p => p.classList.add('active'));
+  } else {
+    pills[0]?.classList.add('active');
+  }
+}
+
+// ── COLLECT FORM DATA ─────────────────────────────
+function collectForm() {
+  const hotels = [];
+  document.querySelectorAll('.hotel-card').forEach(card => {
+    const id = card.id.replace('hotel-','');
+    const hotel = {
+      name: document.getElementById(`hotel-name-${id}`)?.value || '',
+      city: document.getElementById(`hotel-city-${id}`)?.value || '',
+      category: document.getElementById(`hotel-category-${id}`)?.value || '',
+    };
+    if (hotel.name || hotel.city || hotel.category) hotels.push(hotel);
+  });
+  const days = [];
+  document.querySelectorAll('.day-card').forEach(card => {
+    const id = card.id.replace('day-','');
+    days.push({
+      heading: document.getElementById(`day-heading-${id}`)?.value||'',
+      desc: document.getElementById(`day-desc-${id}`)?.value||'',
+      transfer: getActivePill(`transfer-${id}`),
+      meals: getActiveMealPills(`meals-${id}`),
+    });
+  });
+  return {
+    id: Date.now(),
+    title: document.getElementById('itin-title').value,
+    destination: document.getElementById('dest-val').value,
+    validity: document.getElementById('itin-validity').value,
+    currency: document.getElementById('curr-val').value,
+    pax: {
+      adult: { count: +document.getElementById('p-adult-count').value||0, rate: +document.getElementById('p-adult-rate').value||0 },
+      child: { count: +document.getElementById('p-child-count').value||0, rate: +document.getElementById('p-child-rate').value||0 },
+      infant: { count: +document.getElementById('p-infant-count').value||0, rate: +document.getElementById('p-infant-rate').value||0 },
+    },
+    hotels,
+    days,
+    createdAt: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+  };
+}
+
+// ── SAVE ──────────────────────────────────────────
+function saveItinerary() {
+  const data = collectForm();
+  if (!data.title) { showToast('Please enter an itinerary title'); return; }
+  const wasEditing = editingIndex !== null && library[editingIndex];
+  if (editingIndex !== null && library[editingIndex]) {
+    data.id = library[editingIndex].id || data.id;
+    data.createdAt = library[editingIndex].createdAt || data.createdAt;
+    library[editingIndex] = data;
+  } else {
+    library.unshift(data);
+  }
+  persistLibrary();
+  showToast('Itinerary saved ✓');
+  if (wasEditing) showToast('Itinerary updated');
+  renderLibrary();
+  editingIndex = null;
+}
+
+// ── CLEAR FORM ────────────────────────────────────
+function clearForm() {
+  editingIndex = null;
+  document.getElementById('itin-title').value='';
+  document.getElementById('dest-val').value='';
+  document.getElementById('dest-text').textContent='Select destination…';
+  document.getElementById('dest-text').style.color='var(--slate)';
+  document.getElementById('curr-val').value='';
+  document.getElementById('curr-text').textContent='Select currency…';
+  document.getElementById('curr-text').style.color='var(--slate)';
+  document.getElementById('itin-validity').value='';
+  ['p-adult-count','p-child-count','p-infant-count'].forEach(id => document.getElementById(id).value=id.includes('adult')?2:0);
+  ['p-adult-rate','p-child-rate','p-infant-rate'].forEach(id => document.getElementById(id).value=0);
+  calcPricing();
+  document.getElementById('hotels-container').innerHTML='';
+  hotelCount=0;
+  document.getElementById('days-container').innerHTML='';
+  dayCount=0;
+}
+
+// ── TABS ──────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  const evt = typeof event !== 'undefined' ? event : null;
+  const btn = evt?.target?.classList?.contains('tab-btn')
+    ? evt.target
+    : document.querySelector(`.tab-btn[onclick*="'${tab}'"]`);
+  btn?.classList.add('active');
+  if (tab === 'library') renderLibrary();
+}
+
+// ── LIBRARY ───────────────────────────────────────
+function renderLibrary() {
+  const grid = document.getElementById('library-grid');
+  if (!library.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">✈</div><p>No itineraries saved yet.<br>Create one and save it to your library.</p></div>`;
+    return;
+  }
+  grid.innerHTML = library.map((it,i) => {
+    const curr = it.currency||'';
+    const at = it.pax.adult.count * it.pax.adult.rate;
+    const ct = it.pax.child.count * it.pax.child.rate;
+    const inf = it.pax.infant.count * it.pax.infant.rate;
+    const gt = at+ct+inf;
+    return `<div class="itinerary-card">
+      <div class="ic-dest">${it.destination||'—'}</div>
+      <div class="ic-title">${it.title||'Untitled Itinerary'}</div>
+      <div class="ic-meta">
+        <span>📅 ${it.days.length} Day${it.days.length!==1?'s':''}</span>
+        <span>💰 ${curr} ${gt.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+        <span>🗓 Saved ${it.createdAt}</span>
+        ${it.validity ? `<span>⏳ Valid till ${it.validity}</span>`:''}
+      </div>
+      <div class="ic-actions">
+        <button class="ic-btn view" onclick="viewItinerary(${i})">View</button>
+        <button class="ic-btn edit" onclick="editItinerary(${i})">Edit</button>
+        <button class="ic-btn pdf" onclick="exportPDF(${i})">🖨 Print PDF</button>
+        <button class="ic-btn del" onclick="deleteItinerary(${i})">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getCurrencyLabel(code) {
+  const currency = CURRENCIES.find(c => c.code === code);
+  return currency ? `${currency.code} - ${currency.name}` : code;
+}
+
+function editItinerary(i) {
+  const it = library[i];
+  if (!it) return;
+  editingIndex = i;
+
+  document.getElementById('itin-title').value = it.title || '';
+  document.getElementById('dest-val').value = it.destination || '';
+  document.getElementById('dest-text').textContent = it.destination || 'Select destination...';
+  document.getElementById('dest-text').style.color = it.destination ? 'var(--white)' : 'var(--slate)';
+  document.getElementById('curr-val').value = it.currency || '';
+  document.getElementById('curr-text').textContent = it.currency ? getCurrencyLabel(it.currency) : 'Select currency...';
+  document.getElementById('curr-text').style.color = it.currency ? 'var(--white)' : 'var(--slate)';
+  document.getElementById('itin-validity').value = it.validity || '';
+
+  document.getElementById('p-adult-count').value = it.pax?.adult?.count ?? 0;
+  document.getElementById('p-adult-rate').value = it.pax?.adult?.rate ?? 0;
+  document.getElementById('p-child-count').value = it.pax?.child?.count ?? 0;
+  document.getElementById('p-child-rate').value = it.pax?.child?.rate ?? 0;
+  document.getElementById('p-infant-count').value = it.pax?.infant?.count ?? 0;
+  document.getElementById('p-infant-rate').value = it.pax?.infant?.rate ?? 0;
+  calcPricing();
+
+  document.getElementById('hotels-container').innerHTML = '';
+  hotelCount = 0;
+  (it.hotels || []).forEach(hotel => addHotel(hotel, false));
+  document.getElementById('days-container').innerHTML = '';
+  dayCount = 0;
+  (it.days || []).forEach(day => addDay(day, false));
+  switchTab('create');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('Editing saved itinerary');
+}
+
+function deleteItinerary(i) {
+  if (editingIndex === i) editingIndex = null;
+  else if (editingIndex !== null && editingIndex > i) editingIndex--;
+  library.splice(i,1);
+  persistLibrary();
+  renderLibrary();
+  showToast('Deleted');
+}
+
+// ── VIEW MODAL ────────────────────────────────────
+function viewItinerary(i) {
+  const it = library[i];
+  const curr = it.currency||'';
+  document.getElementById('modal-dest').textContent = it.destination||'';
+  document.getElementById('modal-title').textContent = it.title||'Untitled';
+  const at = it.pax.adult.count * it.pax.adult.rate;
+  const ct = it.pax.child.count * it.pax.child.rate;
+  const inf = it.pax.infant.count * it.pax.infant.rate;
+  const gt = at+ct+inf;
+  const fmtN = n => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  let body = `
+    <table class="price-table" style="margin-bottom:20px">
+      <thead><tr><th>Pax</th><th>Count</th><th>Rate</th><th style="text-align:right">Total</th></tr></thead>
+      <tbody>
+        <tr><td>Adult</td><td>${it.pax.adult.count}</td><td>${curr} ${fmtN(it.pax.adult.rate)}</td><td class="total-cell">${curr} ${fmtN(at)}</td></tr>
+        <tr><td>Child</td><td>${it.pax.child.count}</td><td>${curr} ${fmtN(it.pax.child.rate)}</td><td class="total-cell">${curr} ${fmtN(ct)}</td></tr>
+        <tr><td>Infant</td><td>${it.pax.infant.count}</td><td>${curr} ${fmtN(it.pax.infant.rate)}</td><td class="total-cell">${curr} ${fmtN(inf)}</td></tr>
+      </tbody>
+      <tfoot><tr class="grand-total-row"><td colspan="3">Grand Total</td><td class="total-cell">${curr} ${fmtN(gt)}</td></tr></tfoot>
+    </table>
+  `;
+  if (it.hotels?.length) {
+    body += `<div class="card-title" style="margin-bottom:12px">Hotels</div>
+      <table class="price-table" style="margin-bottom:20px">
+        <thead><tr><th>Hotel Name</th><th>City</th><th>Category</th></tr></thead>
+        <tbody>${it.hotels.map(hotel => `
+          <tr>
+            <td>${escapeHtml(hotel.name || '-')}</td>
+            <td>${escapeHtml(hotel.city || '-')}</td>
+            <td>${escapeHtml(hotel.category || '-')}</td>
+          </tr>
+        `).join('')}</tbody>
+      </table>`;
+  }
+  it.days.forEach((d,idx) => {
+    body += `<div class="day-card" style="margin-bottom:12px">
+      <div class="day-header" style="cursor:default">
+        <div class="day-label"><div class="day-num">${idx+1}</div>${d.heading||'Day '+(idx+1)}</div>
+      </div>
+      <div class="day-body" style="grid-template-columns:1fr">
+        <div class="form-group full"><p style="font-size:13px;line-height:1.65;color:var(--slate);white-space:pre-line">${d.desc||'—'}</p></div>
+        <div class="form-group full" style="flex-direction:row;gap:12px">
+          <span class="pill active" style="cursor:default">🚌 ${d.transfer}</span>
+          <span class="pill active" style="cursor:default">🍽 ${normalizeMealsText(d.meals)}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('view-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('view-modal').classList.remove('open');
+}
+
+// ── PDF EXPORT ────────────────────────────────────
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildPdfHotels(hotels = []) {
+  if (!hotels.length) {
+    return `<div class="pdf-hotel-list"><div class="pdf-hotel-row"><strong>Hotels to be confirmed</strong><span></span><span></span></div></div>`;
+  }
+  const rows = hotels.map(hotel => `
+    <div class="pdf-hotel-row">
+      <strong>${escapeHtml(hotel.name || 'Hotel to be confirmed')}</strong>
+      <span>${escapeHtml(hotel.city || '-')}</span>
+      <span>${escapeHtml(hotel.category || '-')}</span>
+    </div>
+  `).join('');
+  return `<div class="pdf-hotel-list">
+    <div class="pdf-hotel-row head"><span>Hotel Name</span><span>City</span><span>Category</span></div>
+    ${rows}
+  </div>`;
+}
+
+function buildPdfDayDisks(d) {
+  const disks = [];
+  disks.push({ type: 'transfer', label: `Transfer: ${d.transfer || 'No Transfer'}` });
+  const mealText = normalizeMealsText(d.meals);
+  if (mealText !== 'No Meals') {
+    mealText.split('+')
+      .map(meal => meal.trim())
+      .filter(Boolean)
+      .forEach(meal => disks.push({ type: 'meal', label: `Meal: ${meal}` }));
+  } else {
+    disks.push({ type: 'meal', label: 'Meal: No Meals' });
+  }
+  return disks.length
+    ? `<div class="pdf-day-disks">${disks.map(disk => `<span class="pdf-day-disk ${disk.type}">${escapeHtml(disk.label)}</span>`).join('')}</div>`
+    : '';
+}
+
+function buildPDFContent(it) {
+  const curr = it.currency ? it.currency + ' ' : '';
+  const fmtN = n => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const at = it.pax.adult.count * it.pax.adult.rate;
+  const ct = it.pax.child.count * it.pax.child.rate;
+  const inf = it.pax.infant.count * it.pax.infant.rate;
+  const gt = at+ct+inf;
+
+  document.getElementById('pdf-itinerary-title').textContent = it.title||'Travel Itinerary';
+  document.getElementById('pdf-destination-sub').textContent = it.destination ? it.destination.toUpperCase() : 'TRAVEL QUOTE';
+
+  // Info grid
+  const travelers = [
+    it.pax.adult.count ? `${it.pax.adult.count} Adult${it.pax.adult.count !== 1 ? 's' : ''}` : '',
+    it.pax.child.count ? `${it.pax.child.count} Child${it.pax.child.count !== 1 ? 'ren' : ''}` : '',
+    it.pax.infant.count ? `${it.pax.infant.count} Infant${it.pax.infant.count !== 1 ? 's' : ''}` : '',
+  ].filter(Boolean).join(', ') || '—';
+
+  document.getElementById('pdf-info-destination').textContent = it.destination || '—';
+  document.getElementById('pdf-info-duration').textContent = it.days.length ? `${it.days.length} Day${it.days.length !== 1 ? 's' : ''}` : '—';
+  document.getElementById('pdf-info-travelers').textContent = travelers;
+  document.getElementById('pdf-info-validity').textContent = it.validity || '—';
+
+  // Pricing
+  document.getElementById('pdf-grand-total').textContent = curr + fmtN(gt);
+  document.getElementById('pdf-adult-pax').textContent = it.pax.adult.count;
+  document.getElementById('pdf-adult-rate').textContent = curr + fmtN(it.pax.adult.rate);
+  document.getElementById('pdf-adult-total').textContent = curr + fmtN(at);
+  document.getElementById('pdf-child-pax').textContent = it.pax.child.count;
+  document.getElementById('pdf-child-rate').textContent = curr + fmtN(it.pax.child.rate);
+  document.getElementById('pdf-child-total').textContent = curr + fmtN(ct);
+  document.getElementById('pdf-infant-pax').textContent = it.pax.infant.count;
+  document.getElementById('pdf-infant-rate').textContent = curr + fmtN(it.pax.infant.rate);
+  document.getElementById('pdf-infant-total').textContent = curr + fmtN(inf);
+  document.getElementById('pdf-hotels-content').innerHTML = buildPdfHotels(it.hotels || []);
+
+  // Day-wise itinerary
+  const daysHtml = it.days.length ? it.days.map((d, i) => {
+    const lines = [
+      d.heading ? `<div><strong>${escapeHtml(d.heading)}</strong></div>` : '',
+      d.desc ? `<div style="color:#36566b;font-style:italic;margin-top:2px;white-space:pre-line;">${escapeHtml(d.desc)}</div>` : '',
+      buildPdfDayDisks(d),
+    ].filter(Boolean).join('');
+    return `<article class="pdf-day">
+      <div class="pdf-day-head">
+        <span>Day ${i + 1}</span>
+        <span>${escapeHtml(d.heading || '')}</span>
+      </div>
+      <div class="pdf-day-body">${lines || '<div>Details will be confirmed soon.</div>'}</div>
+    </article>`;
+  }).join('') : '<div class="pdf-day"><div class="pdf-day-body">Itinerary details will be confirmed soon.</div></div>';
+
+  document.getElementById('pdf-days-content').innerHTML = daysHtml;
+  document.getElementById('pdf-generated-note').textContent = it.validity
+    ? `Valid until ${it.validity}`
+    : `Generated on ${new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'})}`;
+}
+
+function runPDFExport(it) {
+  buildPDFContent(it);
+  const prevTitle = document.title;
+  document.title = (it.title || 'itinerary').replace(/[^a-z0-9]/gi, '_');
+  window.print();
+  document.title = prevTitle;
+}
+
+function exportPDF(i) { runPDFExport(library[i]); }
+function exportCurrentPDF() {
+  const data = collectForm();
+  if (!data.title) { showToast('Please enter a title first'); return; }
+  runPDFExport(data);
+}
+
+// ── TOAST ──────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Init
+calcPricing();
+</script>
+</body>
+</html>
