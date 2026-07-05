@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments | Travelog</title>
+  <link rel="icon" href="images/icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --blue-900: #0b3d5c;
+      --blue-700: #0f6fa8;
+      --blue-500: #21a5df;
+      --blue-100: #ecf9ff;
+      --white: #ffffff;
+      --ink: #173044;
+      --muted: #64798a;
+      --line: rgba(18, 107, 153, 0.16);
+      --shadow: 0 24px 70px rgba(15, 111, 168, 0.18);
+      --radius: 8px;
+      --green: #16a34a;
+      --danger: #d64545;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Poppins", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(33, 165, 223, 0.15), transparent 28%),
+        linear-gradient(180deg, #f7fdff 0%, #ffffff 42%, #eef9ff 100%);
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    .page-shell { position: relative; isolation: isolate; min-height: 100vh; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.62);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 34px rgba(11, 61, 92, 0.07);
+    }
+
+    .nav-wrap {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 76px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+
+    .brand { display: inline-flex; align-items: center; gap: 12px; color: var(--blue-900); font-weight: 800; }
+    .brand-logo { width: 138px; max-height: 48px; object-fit: contain; }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      color: var(--white);
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      box-shadow: 0 14px 26px rgba(33, 165, 223, 0.28);
+      font-size: 21px;
+    }
+
+    .brand-text { font-size: 19px; }
+
+    .menu-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--blue-900);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .menu-links {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .menu-links a {
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      color: #315268;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 220ms ease, background 220ms ease, transform 220ms ease;
+    }
+
+    .menu-links a:hover,
+    .menu-links a.active {
+      color: var(--blue-900);
+      background: var(--blue-100);
+      transform: translateY(-2px);
+    }
+
+    .book-link {
+      color: var(--white) !important;
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      box-shadow: 0 14px 26px rgba(33, 165, 223, 0.22);
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(60vh - 76px);
+      display: grid;
+      align-items: center;
+      padding: 64px 0 40px;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.9) 46%, rgba(255, 255, 255, 0.4) 78%, rgba(255, 255, 255, 0.8) 100%),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=85") center / cover;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 120px;
+      z-index: -1;
+      background: linear-gradient(180deg, transparent, #ffffff);
+    }
+
+    .hero-inner,
+    .content-section {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+      gap: 36px;
+      align-items: start;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      padding: 8px 12px;
+      border: 1px solid rgba(33, 165, 223, 0.26);
+      border-radius: var(--radius);
+      color: var(--blue-700);
+      background: rgba(255, 255, 255, 0.76);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      animation: fadeUp 700ms ease both;
+    }
+
+    .hero h1 {
+      max-width: 620px;
+      margin-top: 18px;
+      color: var(--blue-900);
+      font-size: clamp(36px, 6vw, 60px);
+      line-height: 1.02;
+      animation: fadeUp 800ms ease 90ms both;
+    }
+
+    .hero h1 span { color: var(--blue-500); }
+
+    .subtitle {
+      max-width: 560px;
+      margin-top: 22px;
+      color: #36566b;
+      font-size: clamp(15px, 2vw, 18px);
+      line-height: 1.75;
+      animation: fadeUp 850ms ease 170ms both;
+    }
+
+    .trust-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .trust-row span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border: 1px solid rgba(33, 165, 223, 0.2);
+      border-radius: var(--radius);
+      color: var(--blue-900);
+      background: rgba(236, 249, 255, 0.9);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .trust-row i { color: var(--blue-500); }
+
+    .pay-panel {
+      padding: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow);
+      animation: floatIn 900ms ease 180ms both;
+    }
+
+    .pay-panel h2 { color: var(--blue-900); font-size: 20px; margin-bottom: 4px; }
+    .pay-panel .sub-note { color: var(--muted); font-size: 12.5px; margin-bottom: 18px; }
+
+    .amount-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--blue-100);
+    }
+    .amount-row .amount-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .amount-row .amount-value { font-size: 24px; font-weight: 800; color: var(--blue-900); }
+
+    .method-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .method-tab {
+      flex: 1 1 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 140px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 200ms ease, border-color 200ms ease, background 200ms ease;
+    }
+    .method-tab i { font-size: 14px; }
+    .method-tab.active {
+      color: var(--white);
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+    }
+
+    form.card-form { display: grid; gap: 14px; }
+
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 12px; font-weight: 700; color: var(--blue-900); }
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--ink);
+      background: var(--white);
+      transition: border-color 200ms ease, box-shadow 200ms ease;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: var(--blue-500);
+      box-shadow: 0 0 0 3px rgba(33, 165, 223, 0.16);
+    }
+    .field .card-input-wrap { position: relative; }
+    .field .card-input-wrap i {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .pay-btn {
+      margin-top: 6px;
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: var(--radius);
+      color: var(--white);
+      background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 14px 26px rgba(33, 165, 223, 0.28);
+      transition: transform 200ms ease, box-shadow 200ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .pay-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 34px rgba(33, 165, 223, 0.34); }
+    .pay-btn:active { transform: translateY(0); }
+
+    .secure-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 11.5px;
+    }
+    .secure-note i { color: var(--green); }
+
+    .status-msg {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .status-msg.show { display: block; }
+    .status-msg.success { background: rgba(22, 163, 74, 0.1); color: var(--green); border: 1px solid rgba(22, 163, 74, 0.25); }
+    .status-msg.error { background: rgba(214, 69, 69, 0.1); color: var(--danger); border: 1px solid rgba(214, 69, 69, 0.25); }
+
+    .content-section { padding: 70px 0; }
+    .section-heading { max-width: 760px; margin-bottom: 28px; }
+    .section-heading small { color: var(--blue-700); font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    .section-heading h2 { margin-top: 8px; color: var(--blue-900); font-size: clamp(26px, 4vw, 42px); line-height: 1.12; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .info-card {
+      padding: 22px;
+      border: 1px solid rgba(33, 165, 223, 0.18);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(236, 249, 255, 0.96), rgba(255, 255, 255, 0.96));
+      box-shadow: 0 18px 42px rgba(11, 61, 92, 0.07);
+    }
+    .info-card i { color: var(--blue-500); font-size: 22px; margin-bottom: 12px; }
+    .info-card h3 { color: var(--blue-900); font-size: 16px; margin-bottom: 8px; }
+    .info-card p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+    footer {
+      padding: 36px 16px;
+      border-top: 1px solid var(--line);
+      color: #45697f;
+      background: var(--white);
+      text-align: center;
+    }
+
+    .site-logo { width: 132px; margin: 0 auto 12px; }
+    .tagline { font-size: 13px; font-weight: 600; }
+    .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 14px; color: var(--blue-700); font-size: 13px; font-weight: 700; }
+
+    .whatsapp-float {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 60;
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #25d366;
+      box-shadow: 0 18px 34px rgba(37, 211, 102, 0.35);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    .whatsapp-float img { width: 32px; height: 32px; object-fit: contain; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes floatIn { from { opacity: 0; transform: translateX(34px) scale(0.97); } to { opacity: 1; transform: translateX(0) scale(1); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero { padding-top: 40px; }
+      .info-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .nav-wrap { min-height: 68px; }
+      .menu-toggle { display: grid; place-items: center; }
+      .menu-links {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        top: 78px;
+        display: none;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: var(--shadow);
+      }
+      .menu-links.active { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .menu-links a { padding: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .menu-links.active { grid-template-columns: 1fr; }
+      .content-section { padding: 48px 0; }
+      .field-row { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr; }
+      .method-tab { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <div class="nav-wrap">
+        <a href="index.html" class="brand" aria-label="Travelog home">
+          <img src="assets/travelog-logo.png" class="brand-logo" alt="Travelog Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'; this.nextElementSibling.nextElementSibling.style.display='inline';">
+          <span class="brand-mark" style="display: none;">T</span>
+          <span class="brand-text" style="display: none;">Travelog</span>
+        </a>
+
+        <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+
+        <nav class="menu-links" aria-label="Primary navigation">
+          <a href="index.html">Home</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="packages.html">Packages</a>
+          <a href="feedback.html">Feedback</a>
+          <a href="about.html">About Us</a>
+          <a href="contact.html">Contact</a>
+          <a href="employees.html">Employee Platform</a>
+          <a href="connect.html">Connect</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="https://wa.me/917994256121" class="book-link" target="_blank" rel="noopener">Book Your Trip</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-inner">
+          <div>
+            <div class="eyebrow">Secure Payments</div>
+            <h1>Pay for your <span>trip</span> safely, in a minute.</h1>
+            <p class="subtitle">Enter your booking amount and pay with any credit or debit card. Your details are encrypted and never stored on our servers.</p>
+
+            <div class="trust-row">
+              <span><i class="fa-solid fa-lock"></i> SSL Secured</span>
+              <span><i class="fa-brands fa-cc-visa"></i> Visa</span>
+              <span><i class="fa-brands fa-cc-mastercard"></i> Mastercard</span>
+              <span><i class="fa-brands fa-cc-amex"></i> Amex</span>
+              <span><i class="fa-brands fa-cc-discover"></i> RuPay</span>
+            </div>
+          </div>
+
+          <div class="pay-panel" aria-label="Payment form">
+            <h2>Pay with Card</h2>
+            <p class="sub-note">Enter your trip / booking reference and card details below.</p>
+
+            <div class="amount-row">
+              <span class="amount-label">Amount due</span>
+              <span class="amount-value">&#8377; <span id="amountDisplay">0.00</span></span>
+            </div>
+
+            <div class="method-tabs" role="tablist" aria-label="Payment methods">
+              <button type="button" class="method-tab active" data-method="card">
+                <i class="fa-solid fa-credit-card"></i> Credit / Debit Card
+              </button>
+              <button type="button" class="method-tab" data-method="upi">
+                <i class="fa-solid fa-mobile-screen"></i> UPI
+              </button>
+            </div>
+
+            <form class="card-form" id="cardPaymentForm" novalidate>
+              <div class="field">
+                <label for="bookingRef">Booking Reference</label>
+                <input type="text" id="bookingRef" name="bookingRef" placeholder="e.g. TL-10234" required>
+              </div>
+
+              <div class="field">
+                <label for="payAmount">Amount (&#8377;)</label>
+                <input type="number" id="payAmount" name="payAmount" placeholder="Enter amount" min="1" step="0.01" required>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="customerName">Full Name</label>
+                  <input type="text" id="customerName" name="customerName" placeholder="Your name" autocomplete="name" required>
+                </div>
+                <div class="field">
+                  <label for="customerPhone">Phone</label>
+                  <input type="tel" id="customerPhone" name="customerPhone" placeholder="10-digit mobile" autocomplete="tel" required>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="customerEmail">Email</label>
+                <input type="email" id="customerEmail" name="customerEmail" placeholder="you@example.com" autocomplete="email" required>
+              </div>
+
+              <button type="submit" class="pay-btn">
+                <i class="fa-solid fa-lock"></i> Pay with Credit / Debit Card
+              </button>
+
+              <div class="secure-note"><i class="fa-solid fa-shield-halved"></i> Card details are entered on Razorpay's secure checkout, not on this page.</div>
+
+              <div class="status-msg" id="statusMsg"></div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-section">
+        <div class="section-heading">
+          <small>Why pay online</small>
+          <h2>A fast, secure way to confirm your booking.</h2>
+        </div>
+        <div class="info-grid">
+          <div class="info-card">
+            <i class="fa-solid fa-bolt"></i>
+            <h3>Instant Confirmation</h3>
+            <p>Your payment confirms your slot right away, no waiting on manual bank transfers.</p>
+          </div>
+          <div class="info-card">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h3>Encrypted &amp; Safe</h3>
+            <p>Card details are transmitted securely and are never stored on Travelog's servers.</p>
+          </div>
+          <div class="info-card">
+            <i class="fa-solid fa-headset"></i>
+            <h3>Support If You Need It</h3>
+            <p>Facing a payment issue? Reach us on WhatsApp and our team will help right away.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <img src="assets/travelog-logo.png" class="site-logo" alt="Travelog Logo" onerror="this.style.display='none'">
+    <div class="tagline">Travelog &copy; 2026 All Rights Reserved</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="cancellation.html">Cancellation</a>
+      <a href="refund.html">Refund</a>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/917994256121" class="whatsapp-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <img src="images/whatsapp.png" alt="WhatsApp Chat" onerror="this.style.display='none'">
+  </a>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    // ---------------------------------------------------------------
+    // TODO: Replace with the URL of your deployed Vercel project that
+    // hosts the /api functions (create-order, verify-payment, config).
+    // GitHub Pages can't run backend code, so the API lives on Vercel
+    // instead — this page calls it cross-origin via CORS.
+    // Example: "https://travelog-api.vercel.app"
+    // ---------------------------------------------------------------
+    const API_BASE_URL = "https://travelog-api-nine.vercel.app";
+
+    // The Key ID (public, non-secret) is fetched from /api/config at
+    // runtime so it isn't hardcoded in this file. The Key Secret never
+    // reaches the browser — it's only used server-side in
+    // /api/create-order.js and /api/verify-payment.js.
+    let RAZORPAY_KEY_ID = null;
+
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch(API_BASE_URL + "/api/config")
+        .then(function (r) { return r.json(); })
+        .then(function (data) { RAZORPAY_KEY_ID = data.key_id; })
+        .catch(function (err) { console.error("Failed to load Razorpay config:", err); });
+
+      const toggle = document.querySelector(".menu-toggle");
+      const menu = document.querySelector(".menu-links");
+
+      toggle.addEventListener("click", function () {
+        const isOpen = menu.classList.toggle("active");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+      });
+
+      const amountInput = document.getElementById("payAmount");
+      const amountDisplay = document.getElementById("amountDisplay");
+      amountInput.addEventListener("input", function () {
+        const val = parseFloat(amountInput.value);
+        amountDisplay.textContent = isNaN(val) ? "0.00" : val.toFixed(2);
+      });
+
+      const methodTabs = document.querySelectorAll(".method-tab");
+      methodTabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          methodTabs.forEach(function (t) { t.classList.remove("active"); });
+          tab.classList.add("active");
+          // NOTE: This demo only wires up the "Card" flow below.
+          // Hook the "UPI" tab up to your UPI/QR provider if you offer that option.
+        });
+      });
+
+      const form = document.getElementById("cardPaymentForm");
+      const statusMsg = document.getElementById("statusMsg");
+      const payBtn = form.querySelector(".pay-btn");
+
+      function setBtnLoading(isLoading) {
+        payBtn.disabled = isLoading;
+        payBtn.style.opacity = isLoading ? "0.7" : "1";
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        statusMsg.className = "status-msg";
+        statusMsg.textContent = "";
+
+        const bookingRef = document.getElementById("bookingRef").value.trim();
+        const amountRupees = parseFloat(document.getElementById("payAmount").value);
+        const customerName = document.getElementById("customerName").value.trim();
+        const customerPhone = document.getElementById("customerPhone").value.trim();
+        const customerEmail = document.getElementById("customerEmail").value.trim();
+
+        if (!amountRupees || amountRupees <= 0) {
+          statusMsg.className = "status-msg show error";
+          statusMsg.textContent = "Please enter a valid amount.";
+          return;
+        }
+
+        if (typeof Razorpay === "undefined") {
+          statusMsg.className = "status-msg show error";
+          statusMsg.textContent = "Payment gateway failed to load. Please refresh and try again.";
+          return;
+        }
+
+        if (!RAZORPAY_KEY_ID) {
+          statusMsg.className = "status-msg show error";
+          statusMsg.textContent = "Payment configuration is still loading. Please try again in a moment.";
+          return;
+        }
+
+        setBtnLoading(true);
+
+        // Step 1: ask our backend to create a Razorpay order.
+        // The backend recomputes/validates the amount server-side.
+        fetch(API_BASE_URL + "/api/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: Math.round(amountRupees * 100), // paise
+            currency: "INR",
+            receipt: bookingRef || undefined
+          })
+        })
+          .then(function (r) {
+            if (!r.ok) throw new Error("create-order-failed");
+            return r.json();
+          })
+          .then(function (order) {
+            setBtnLoading(false);
+
+            // Step 2: open Razorpay Checkout using the server-created order_id.
+            const options = {
+              key: RAZORPAY_KEY_ID,
+              amount: order.amount,
+              currency: order.currency,
+              order_id: order.order_id,
+              name: "Travelog",
+              description: bookingRef ? "Booking " + bookingRef : "Travelog Payment",
+              image: "assets/travelog-logo.png",
+              method: { card: true, netbanking: false, wallet: false, upi: false, emi: false, paylater: false },
+              prefill: {
+                name: customerName,
+                email: customerEmail,
+                contact: customerPhone
+              },
+              theme: { color: "#0f6fa8" },
+              handler: function (response) {
+                // Step 3: send the three returned values to our backend
+                // to verify the signature before treating this as paid.
+                statusMsg.className = "status-msg show";
+                statusMsg.textContent = "Verifying payment...";
+
+                fetch(API_BASE_URL + "/api/verify-payment", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature
+                  })
+                })
+                  .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+                  .then(function (result) {
+                    if (result.ok && result.data.success) {
+                      statusMsg.className = "status-msg show success";
+                      statusMsg.textContent = "Payment verified! Reference ID: " + result.data.payment_id;
+                      form.reset();
+                      document.getElementById("amountDisplay").textContent = "0.00";
+                    } else {
+                      statusMsg.className = "status-msg show error";
+                      statusMsg.textContent = "Payment could not be verified. Please contact support before assuming it went through.";
+                    }
+                  })
+                  .catch(function () {
+                    statusMsg.className = "status-msg show error";
+                    statusMsg.textContent = "Could not reach the server to verify payment. Please contact support.";
+                  });
+              },
+              modal: {
+                ondismiss: function () {
+                  statusMsg.className = "status-msg show error";
+                  statusMsg.textContent = "Payment window closed before completing payment.";
+                }
+              }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on("payment.failed", function (response) {
+              statusMsg.className = "status-msg show error";
+              statusMsg.textContent = "Payment failed: " + response.error.description;
+            });
+            rzp.open();
+          })
+          .catch(function () {
+            setBtnLoading(false);
+            statusMsg.className = "status-msg show error";
+            statusMsg.textContent = "Could not start checkout. Please try again.";
+          });
+      });
+    });
+
+    window.addEventListener("scroll", function () {
+      const hero = document.querySelector(".hero");
+      if (!hero) return;
+    });
+  </script>
+</body>
+</html>
