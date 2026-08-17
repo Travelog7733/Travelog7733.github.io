@@ -1920,6 +1920,30 @@
       page-break-inside: auto;
     }
 
+    .pdf-section.pdf-holiday-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 11px 14px;
+      border: 1px solid #f0c36a;
+      border-left: 4px solid #e05f3f;
+      border-radius: 10px;
+      background: #fff8e8;
+      color: #6f4a13;
+      font-size: 11px;
+      line-height: 1.45;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .pdf-holiday-notice strong {
+      flex: 0 0 auto;
+      color: #b7432c;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
     .pdf-section h3 {
       margin: 0 0 10px;
       font-size: 11px;
@@ -3646,6 +3670,11 @@
           </div>
           <p style="margin:7px 2px 0;color:#6b8ea8;font-size:10px;">Rates doesnt include tax &amp; tcs (if applicable). Each row is priced as an adult group for this same itinerary.</p>
         </div>
+      </section>
+
+      <section class="pdf-section pdf-holiday-notice" aria-label="Holiday surcharge notice">
+        <strong>Holiday Surcharge Notice:</strong>
+        <span>A 10% surcharge applies to bookings covering August 29 - September 02 (Vietnam National Day Holiday) and December 20 - January 05.</span>
       </section>
 
       <section class="pdf-section" id="pdfAlternateRatesSection" style="display:none;">
