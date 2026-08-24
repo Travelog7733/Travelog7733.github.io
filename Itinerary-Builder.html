@@ -4438,12 +4438,17 @@
       .replace(/\s+/g, " ")
       .trim() || "QUOTE";
 
+    const quoteCustomerId = quote => {
+      const mode = quote?.mode === "pro" ? "pro" : "normal";
+      return quote?.[`${mode}CustomerId`] || quote?.customerId || "";
+    };
+
     const quoteDisplayName = quote => {
-      const customer = state.customers.find(c => c.id === quote.customerId);
+      const customer = state.customers.find(c => c.id === quoteCustomerId(quote));
       return customer?.name || quote.destination || "General Customer";
     };
 
-    const quoteCustomerName = quote => state.customers.find(customer => customer.id === quote.customerId)?.name || "";
+    const quoteCustomerName = quote => state.customers.find(customer => customer.id === quoteCustomerId(quote))?.name || "";
 
     const itineraryCodeCandidate = (quote, number) => {
       const name = safeFileNamePart(quoteDisplayName(quote));
@@ -6703,7 +6708,7 @@
       els.pdfTravelersInfo.style.display = proMode ? "none" : "";
     };
 
-    const selectedCustomer = () => state.customers.find(customer => customer.id === state.quote.customerId);
+    const selectedCustomer = () => state.customers.find(customer => customer.id === quoteCustomerId(state.quote));
 
     const buildTravelerText = () => {
       const parts = [];
