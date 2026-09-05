@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Employee Attendance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --navy:#0f172a;--navy2:#111827;--panel:#fff;--canvas:#eef2f7;
+  --ink:#111827;--muted:#6b7280;--line:#dfe5ec;--blue:#2563eb;
+  --blue2:#1d4ed8;--cyan:#06b6d4;--green:#059669;--amber:#d97706;
+  --red:#dc2626;--shadow:0 18px 50px rgba(15,23,42,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);
+  background:var(--canvas);-webkit-font-smoothing:antialiased;
+}
+button,input,select{font:inherit}.hidden{display:none!important}
+.page{min-height:100vh;padding:28px;position:relative}
+.page:not(.center)::before{
+  content:"";position:fixed;inset:0 auto 0 0;width:255px;
+  background:linear-gradient(180deg,rgba(37,99,235,.16),transparent 26%),
+             linear-gradient(180deg,var(--navy),#09111f);z-index:-1
+}
+.center{
+  display:grid;place-items:center;
+  background:radial-gradient(circle at 15% 15%,rgba(37,99,235,.18),transparent 32%),
+             radial-gradient(circle at 85% 10%,rgba(6,182,212,.16),transparent 28%),
+             linear-gradient(135deg,#0f172a,#111827 50%,#172033)
+}
+.wrap{max-width:1180px;margin:auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 8px 28px rgba(15,23,42,.055)}
+.login-card{width:min(460px,100%);padding:38px 34px 34px;border-radius:26px;box-shadow:0 28px 80px rgba(0,0,0,.28);position:relative;overflow:hidden}
+.login-card::after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-65px;top:-65px;background:linear-gradient(145deg,rgba(37,99,235,.20),rgba(6,182,212,.16))}
+.brand{display:inline-flex;align-items:center;gap:9px;color:#334155;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;padding:8px 11px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.brand::before{content:"T";display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;font-size:12px;font-weight:700}
+h1,h2,h3{font-family:'Sora',sans-serif;color:#0f172a;letter-spacing:-.03em}
+h1{font-size:clamp(30px,4vw,42px);line-height:1.08;margin:18px 0 10px}
+h2{font-size:27px;line-height:1.15;margin:12px 0 7px}
+h3{font-size:17px;line-height:1.25;margin:0 0 15px}
+.muted{color:var(--muted)}.small{font-size:12.5px;line-height:1.6}
+label{display:block;margin:17px 0 8px;color:#475569;font-size:12px;font-weight:700}
+input,select{width:100%;min-height:48px;padding:0 14px;border:1px solid #cfd8e3;border-radius:10px;background:#f8fafc;color:#111827;outline:none;font-weight:600;transition:.18s}
+input:focus,select:focus{background:#fff;border-color:#3b82f6;box-shadow:0 0 0 4px rgba(37,99,235,.10)}
+.btn{min-height:44px;padding:0 17px;border:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-size:13px;font-weight:700;text-decoration:none;transition:.18s}
+.btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 9px 20px rgba(37,99,235,.22)}
+.secondary{background:#e8efff;color:#1d4ed8}.warning{background:#fff4df;color:#a85d00}.danger{background:#ffebee;color:#b91c1c}.ghost{background:#eef2f7;color:#475569}
+.full{width:100%;margin-top:20px}.linkbtn{border:0;background:none;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;padding:4px 0}
+.topbar{position:relative;display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:18px;padding:20px 24px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 24px rgba(15,23,42,.05)}
+.topbar::before{content:"Attendance";position:absolute;left:-240px;top:20px;width:190px;color:#fff;font-family:'Sora',sans-serif;font-size:18px;font-weight:700}
+.topbar::after{content:"TRAVELOG • TEAM PORTAL";position:absolute;left:-240px;top:53px;width:190px;color:#94a3b8;font-size:10px;font-weight:700;letter-spacing:.11em}
+.grid{display:grid;gap:14px}.metrics{grid-template-columns:repeat(4,1fr);margin:16px 0}
+.metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.metric::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--blue)}
+.metric:nth-child(2)::before{background:var(--green)}.metric:nth-child(3)::before{background:var(--amber)}.metric:nth-child(4)::before{background:#64748b}
+.metric span{display:block;color:#7b8794;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.metric strong{display:block;font-family:'Sora',sans-serif;color:#0f172a;font-size:29px;line-height:1;font-weight:700}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.status{display:inline-flex;align-items:center;gap:7px;min-height:30px;padding:0 10px;border-radius:8px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.status::before{content:"";width:7px;height:7px;border-radius:2px;background:currentColor}
+.working{background:#e8f8f1;color:#087857}.on-lunch{background:#fff4dd;color:#a95d00}.logged-out{background:#edf1f5;color:#64748b}
+.cloudbar{display:inline-flex;align-items:center;gap:8px;padding:0 11px;min-height:32px;border-radius:9px;border:1px solid #dfe5ec;background:#f8fafc;color:#64748b;font-size:11px;font-weight:700}
+.cloud-dot{width:7px;height:7px;border-radius:50%;background:#f59e0b}.cloudbar.online{color:#047857;background:#ecfdf5;border-color:#d1fae5}.cloudbar.online .cloud-dot{background:#10b981}
+.cloudbar.error{color:#b91c1c;background:#fff1f2;border-color:#fecdd3}.cloudbar.error .cloud-dot{background:#ef4444}
+.filters{display:grid;grid-template-columns:190px minmax(230px,1fr) auto;align-items:end;gap:12px}.filter-actions{display:flex;gap:8px;flex-wrap:wrap}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+table{width:100%;min-width:930px;border-collapse:collapse}th,td{padding:13px 15px;text-align:left;border-bottom:1px solid #e9edf2;font-size:12.5px}
+th{background:#f3f6f9;color:#64748b;text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:.07em}
+tbody tr:hover{background:#f8fafc}tbody tr:last-child td{border-bottom:0}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.add-form{display:grid;grid-template-columns:190px 1fr auto;gap:10px}
+#recordsDate{background:#edf2f7;color:#475569;border-radius:8px;padding:6px 9px;font-size:11px;font-weight:700}
+#employeeDashboard .wrap,#adminDashboard .wrap{margin-left:275px;max-width:calc(100% - 285px)}
+#employeeDashboard .card:first-of-type{border-top:4px solid var(--blue)}
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:99;padding:12px 15px;border-radius:10px;font-size:12.5px;font-weight:700;box-shadow:0 16px 38px rgba(15,23,42,.18)}
+.toast.success{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}.toast.error{background:#fff1f2;color:#b91c1c;border:1px solid #fecdd3}
+.divider{height:1px;background:var(--line);margin:23px 0}
+
+.admin-tabs{
+  display:flex;
+  gap:8px;
+  margin:0 0 16px;
+  padding:6px;
+  width:max-content;
+  max-width:100%;
+  background:#dde5ee;
+  border-radius:12px;
+}
+.admin-tab{
+  border:0;
+  min-height:40px;
+  padding:0 18px;
+  border-radius:9px;
+  background:transparent;
+  color:#64748b;
+  font-weight:700;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.admin-tab:hover{color:#1e293b}
+.admin-tab.active{
+  background:#fff;
+  color:#1d4ed8;
+  box-shadow:0 3px 10px rgba(15,23,42,.10);
+}
+.employee-list-table{min-width:720px}
+.employee-code{
+  display:inline-flex;
+  padding:5px 8px;
+  border-radius:7px;
+  background:#eef2ff;
+  color:#3347a8;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.03em;
+}
+.action-cell{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.btn.small-btn{
+  min-height:34px;
+  padding:0 11px;
+  font-size:11.5px;
+  border-radius:8px;
+}
+.edit-btn{background:#e8efff;color:#1d4ed8}
+.delete-btn{background:#fff0f1;color:#c02635}
+.employee-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:28px;
+  height:26px;
+  padding:0 8px;
+  border-radius:999px;
+  background:#edf2f7;
+  color:#475569;
+  font-size:11px;
+  font-weight:700;
+}
+
+.report-grid{
+  display:grid;
+  grid-template-columns:180px minmax(180px,1fr) minmax(220px,1.2fr);
+  gap:12px;
+  align-items:end;
+}
+.period-fields{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(150px,1fr));
+  gap:10px;
+}
+.period-field.hidden{display:none!important}
+.report-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.report-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 10px;
+  border-radius:8px;
+  background:#edf2f7;
+  color:#475569;
+  font-size:11px;
+  font-weight:700;
+}
+.pdf-btn{background:#feecee;color:#b42331}
+@media(max-width:900px){
+  .report-grid{grid-template-columns:1fr 1fr}
+  .report-grid>div:last-child{grid-column:1/-1}
+}
+@media(max-width:620px){
+  .report-grid,.period-fields{grid-template-columns:1fr}
+  .report-grid>div:last-child{grid-column:auto}
+  .report-actions{display:grid;grid-template-columns:1fr 1fr}
+  .report-actions .btn:first-child{grid-column:1/-1}
+}
+
+.employee-help{
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#f8fafc;
+  border:1px solid #e5eaf0;
+}
+
+
+.smart-employee-info{
+  display:none;
+  margin-top:12px;
+  padding:11px 12px;
+  border:1px solid #e3e9f0;
+  border-radius:10px;
+  background:#f8fafc;
+}
+.smart-employee-info.show{display:block}
+.smart-employee-name{
+  font-weight:700;
+  color:#0f172a;
+  font-size:13px;
+}
+.smart-employee-status{
+  margin-top:3px;
+  color:#64748b;
+  font-size:11.5px;
+  font-weight:600;
+}
+.smart-action-login{
+  background:linear-gradient(135deg,#2563eb,#1d4ed8)!important;
+  color:#fff!important;
+}
+.smart-action-lunch-start{
+  background:linear-gradient(135deg,#f59e0b,#d97706)!important;
+  color:#fff!important;
+  box-shadow:0 9px 20px rgba(217,119,6,.20)!important;
+}
+.smart-action-lunch-end{
+  background:linear-gradient(135deg,#06b6d4,#0891b2)!important;
+  color:#fff!important;
+  box-shadow:0 9px 20px rgba(8,145,178,.20)!important;
+}
+.smart-action-logout{
+  background:linear-gradient(135deg,#ef4444,#dc2626)!important;
+  color:#fff!important;
+  box-shadow:0 9px 20px rgba(220,38,38,.20)!important;
+}
+.smart-action-complete{
+  background:#e8edf3!important;
+  color:#64748b!important;
+  box-shadow:none!important;
+}
+.smart-action-checking{
+  background:#dfe6ef!important;
+  color:#64748b!important;
+  box-shadow:none!important;
+}
+
+
+.settings-card{
+  max-width:620px;
+}
+.settings-form{
+  display:grid;
+  gap:2px;
+}
+.settings-note{
+  margin-top:14px;
+  padding:11px 12px;
+  border-radius:10px;
+  background:#f8fafc;
+  border:1px solid #e5eaf0;
+  color:#64748b;
+  font-size:12px;
+  line-height:1.55;
+}
+.password-row{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+
+.danger-zone{
+  margin-top:18px;
+  padding:16px;
+  border:1px solid #fecaca;
+  border-radius:12px;
+  background:#fff7f7;
+}
+.danger-zone h3{
+  color:#b91c1c;
+  margin-bottom:6px;
+}
+.danger-zone p{
+  margin:0 0 12px;
+  color:#7f1d1d;
+  font-size:12px;
+  line-height:1.55;
+}
+.reset-records-btn{
+  background:#dc2626;
+  color:#fff;
+}
+
+@media(max-width:1050px){.page:not(.center)::before{display:none}.topbar::before,.topbar::after{display:none}#employeeDashboard .wrap,#adminDashboard .wrap{margin-left:auto;max-width:1180px}}
+@media(max-width:860px){.metrics{grid-template-columns:repeat(2,1fr)}.filters,.add-form{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-wrap:wrap}}
+@media(max-width:560px){.page{padding:16px}.login-card{padding:28px 22px;border-radius:20px}h1{font-size:31px}.topbar{padding:17px}.card{padding:18px}.metrics{grid-template-columns:1fr 1fr;gap:9px}.metric{padding:15px}.metric strong{font-size:24px}.actions{display:grid;grid-template-columns:1fr}.actions .btn{width:100%}.filter-actions{display:grid;grid-template-columns:1fr 1fr}.filter-actions .btn:first-child{grid-column:1/-1}}
+
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast hidden"></div>
+
+<section id="employeeLogin" class="page center">
+  <div class="card login-card">
+    <div class="brand">EMPLOYEE ATTENDANCE</div>
+    <h1>Employee Check-in</h1>
+    <p id="todayText" class="muted"></p>
+    <div id="loginCloud" class="cloudbar"><span class="cloud-dot"></span><span>Connecting to cloud…</span></div>
+    <label>Employee Code</label>
+    <input id="employeeCode" placeholder="e.g. EMP001" autocomplete="off"
+      oninput="employeeCodeChanged()">
+    <div id="smartEmployeeInfo" class="smart-employee-info">
+      <div id="smartEmployeeName" class="smart-employee-name"></div>
+      <div id="smartEmployeeStatus" class="smart-employee-status"></div>
+    </div>
+    <button id="smartAttendanceBtn" class="btn primary full smart-action-login"
+      onclick="smartAttendanceAction()" disabled>Login</button>
+    <div class="divider"></div>
+    <button class="linkbtn" onclick="showAdminLogin()">Admin Login</button>
+  </div>
+</section>
+
+<section id="employeeDashboard" class="page hidden">
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="brand">EMPLOYEE ATTENDANCE</div>
+      <h2 id="empName"></h2>
+      <div id="empMeta" class="muted"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div id="empCloud" class="cloudbar"><span class="cloud-dot"></span><span>Cloud Sync</span></div>
+      <span id="empStatus" class="status"></span>
+    </div>
+  </div>
+
+  <div class="grid metrics">
+    <div class="metric"><span>Login Time</span><strong id="loginTime">--:--</strong></div>
+    <div class="metric"><span>Lunch Start</span><strong id="lunchStart">--:--</strong></div>
+    <div class="metric"><span>Lunch End</span><strong id="lunchEnd">--:--</strong></div>
+    <div class="metric"><span>Worked Today</span><strong id="workedTime">00:00</strong></div>
+  </div>
+
+  <div class="card">
+    <h3>Workday Controls</h3>
+    <div class="actions">
+      <button id="btnLunchStart" class="btn warning" onclick="startLunch()">Start Lunch Break</button>
+      <button id="btnLunchEnd" class="btn secondary" onclick="endLunch()">End Lunch / Resume</button>
+      <button id="btnLogout" class="btn danger" onclick="logoutEmployee()">Logout / End Day</button>
+    </div>
+    <p class="muted small">Attendance is saved to Firebase Firestore and synchronized across devices.</p>
+  </div>
+</div>
+</section>
+
+<section id="adminLogin" class="page center hidden">
+  <div class="card login-card">
+    <div class="brand">ATTENDANCE ADMIN</div>
+    <h1>Management Login</h1>
+    <label>Username</label><input id="adminUser" value="admin">
+    <label>Password</label><input id="adminPass" type="password">
+    <button class="btn primary full" onclick="adminLogin()">Login</button>
+    <div class="divider"></div>
+    <button class="linkbtn" onclick="showEmployeeLogin()">Back to Employee Login</button>
+  </div>
+</section>
+
+<section id="adminDashboard" class="page hidden">
+<div class="wrap">
+  <div class="topbar">
+    <div><div class="brand">ATTENDANCE ADMIN</div><h1>Team Attendance</h1><div class="muted">Daily workforce overview and attendance records</div></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div id="adminCloud" class="cloudbar"><span class="cloud-dot"></span><span>Cloud Sync</span></div>
+      <button class="btn ghost" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button id="attendanceTabBtn" class="admin-tab active" onclick="showAdminTab('attendance')">Attendance</button>
+    <button id="employeesTabBtn" class="admin-tab" onclick="showAdminTab('employees')">Employees</button>
+    <button id="settingsTabBtn" class="admin-tab" onclick="showAdminTab('settings')">Settings</button>
+  </div>
+
+  <div id="attendanceTabPanel">
+    <div class="grid metrics">
+      <div class="metric"><span>Attendance Entries</span><strong id="sumPresent">0</strong></div>
+      <div class="metric"><span>Working</span><strong id="sumWorking">0</strong></div>
+      <div class="metric"><span>On Lunch</span><strong id="sumLunch">0</strong></div>
+      <div class="metric"><span>Logged Out</span><strong id="sumOut">0</strong></div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-head">
+        <div>
+          <h3 style="margin-bottom:4px">Attendance Report</h3>
+          <div class="muted small">Generate daily, weekly, monthly or custom-period reports.</div>
+        </div>
+        <span id="reportPeriodLabel" class="report-chip">Daily Report</span>
+      </div>
+
+      <div class="report-grid">
+        <div>
+          <label>Report Type</label>
+          <select id="reportType" onchange="reportTypeChanged()">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="custom">Custom Period</option>
+          </select>
+        </div>
+
+        <div class="period-fields">
+          <div id="dailyField" class="period-field">
+            <label>Date</label>
+            <input type="date" id="dailyDate" onchange="renderAdmin()">
+          </div>
+
+          <div id="weeklyField" class="period-field hidden">
+            <label>Week</label>
+            <input type="week" id="weeklyDate" onchange="renderAdmin()">
+          </div>
+
+          <div id="monthlyField" class="period-field hidden">
+            <label>Month</label>
+            <input type="month" id="monthlyDate" onchange="renderAdmin()">
+          </div>
+
+          <div id="customFromField" class="period-field hidden">
+            <label>From Date</label>
+            <input type="date" id="customFrom" onchange="renderAdmin()">
+          </div>
+
+          <div id="customToField" class="period-field hidden">
+            <label>To Date</label>
+            <input type="date" id="customTo" onchange="renderAdmin()">
+          </div>
+        </div>
+
+        <div>
+          <label>Employee</label>
+          <select id="filterEmployee" onchange="renderAdmin()"></select>
+        </div>
+      </div>
+
+      <div class="report-actions">
+        <button class="btn primary" onclick="renderAdmin()">Generate Report</button>
+        <button class="btn secondary" onclick="setTodayFilter()">Today</button>
+        <button class="btn ghost" onclick="exportCSV()">Export CSV</button>
+        <button class="btn pdf-btn" onclick="exportPDF()">Export PDF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head"><h3>Attendance Records</h3><span id="recordsDate" class="muted"></span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Employee</th><th>Date</th><th>Login</th><th>Lunch Start</th><th>Lunch End</th><th>Logout</th><th>Worked</th><th>Status</th></tr></thead>
+          <tbody id="attendanceRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="employeesTabPanel" class="hidden">
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-head">
+        <div>
+          <h3 style="margin-bottom:4px">Add Employee</h3>
+          <div class="muted small">Create a new employee login code.</div>
+        </div>
+      </div>
+      <div class="add-form">
+        <input id="newCode" placeholder="Employee Code">
+        <input id="newName" placeholder="Employee Name">
+        <button class="btn primary" onclick="addEmployee()">Add Employee</button>
+      </div>
+      <div class="employee-help muted small">Employees are saved to Firestore and synchronized across all devices.</div>
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <h3 style="margin-bottom:4px">Employee Details</h3>
+          <div class="muted small">Edit or remove employee access.</div>
+        </div>
+        <span id="employeeCount" class="employee-count">0</span>
+      </div>
+      <div class="table-wrap">
+        <table class="employee-list-table">
+          <thead>
+            <tr><th>Employee Code</th><th>Employee Name</th><th>Created</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="employeeRows"></tbody>
+        </table>
+      </div>
+      <p class="muted small" style="margin:12px 0 0">Edit and Delete require the management passcode.</p>
+    </div>
+  </div>
+
+  <div id="settingsTabPanel" class="hidden">
+    <div class="card settings-card">
+      <div class="section-head">
+        <div>
+          <h3 style="margin-bottom:4px">Change Admin Password</h3>
+          <div class="muted small">Update the password used to access the Admin dashboard.</div>
+        </div>
+      </div>
+
+      <div class="settings-form">
+        <label>Current Password</label>
+        <input id="currentAdminPassword" type="password" autocomplete="current-password" placeholder="Enter current password">
+
+        <label>New Password</label>
+        <input id="newAdminPassword" type="password" autocomplete="new-password" placeholder="Enter new password">
+
+        <label>Confirm New Password</label>
+        <input id="confirmAdminPassword" type="password" autocomplete="new-password" placeholder="Re-enter new password">
+
+        <button class="btn primary" style="margin-top:18px;width:max-content" onclick="changeAdminPassword()">Change Password</button>
+      </div>
+
+      <div class="settings-note">
+        The new admin password is saved to Firebase and will be used on all devices connected to this attendance app.
+      </div>
+
+      <div class="danger-zone">
+        <h3>Reset Attendance Records</h3>
+        <p>This permanently deletes all attendance history from Firebase. Employees will remain available. Passcode 1234 is required.</p>
+        <button class="btn reset-records-btn" onclick="resetAttendanceRecords()">Reset All Attendance Records</button>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, getDoc, setDoc, updateDoc, deleteDoc,
+  getDocs, onSnapshot, query, where
+} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
+  authDomain: "travelog-itinerary.firebaseapp.com",
+  projectId: "travelog-itinerary",
+  storageBucket: "travelog-itinerary.firebasestorage.app",
+  messagingSenderId: "33567258851",
+  appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const EMP_COLLECTION = "attendanceEmployees";
+const ATT_COLLECTION = "attendanceRecords";
+const ADMIN = {username:"admin", defaultPassword:"admin123"};
+const ADMIN_SETTINGS_COLLECTION = "appSettings";
+const ADMIN_SETTINGS_DOC = "attendanceAdmin";
+const EMPLOYEE_EDIT_PASSCODE = "1234";
+
+let employees = [];
+let records = [];
+let currentEmployee = null;
+let currentRecord = null;
+let clockTimer = null;
+
+let smartEmployee = null;
+let smartRecord = null;
+let smartAction = "login";
+let smartLookupTimer = null;
+let smartLookupToken = 0;
+let unsubscribeEmployees = null;
+let unsubscribeRecords = null;
+
+const $ = id => document.getElementById(id);
+
+function localDateKey(d=new Date()){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function isoNow(){ return new Date().toISOString(); }
+function fmtDate(){ return new Date().toLocaleDateString(undefined,{day:"2-digit",month:"long",year:"numeric"}); }
+function fmtTime(iso){ if(!iso)return "--:--"; return new Date(iso).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); }
+function safeId(v){ return String(v).replace(/[^A-Za-z0-9_-]/g,"_"); }
+function recordDocId(code,date){ return `${safeId(date)}_${safeId(code.toUpperCase())}`; }
+
+function duration(rec){
+  if(!rec?.loginTime) return "00:00";
+  const start=new Date(rec.loginTime);
+  const end=rec.logoutTime?new Date(rec.logoutTime):new Date();
+  let ms=end-start;
+  if(rec.lunchStart){
+    const ls=new Date(rec.lunchStart);
+    const le=rec.lunchEnd?new Date(rec.lunchEnd):new Date();
+    ms-=Math.max(0,le-ls);
+  }
+  ms=Math.max(0,ms);
+  const mins=Math.floor(ms/60000);
+  return `${String(Math.floor(mins/60)).padStart(2,"0")}:${String(mins%60).padStart(2,"0")}`;
+}
+function toast(msg,type="success"){
+  const t=$("toast");t.textContent=msg;t.className=`toast ${type}`;
+  setTimeout(()=>t.classList.add("hidden"),2200);
+}
+function showOnly(id){
+  ["employeeLogin","employeeDashboard","adminLogin","adminDashboard"].forEach(x=>$(x).classList.add("hidden"));
+  $(id).classList.remove("hidden");
+}
+function setCloud(state,text){
+  ["loginCloud","empCloud","adminCloud"].forEach(id=>{
+    const el=$(id); if(!el)return;
+    el.className="cloudbar"+(state==="online"?" online":state==="error"?" error":"");
+    const span=el.querySelector("span:last-child"); if(span) span.textContent=text;
+  });
+}
+
+
+function startCloudSync(){
+  setCloud("","Connecting…");
+  unsubscribeEmployees=onSnapshot(collection(db,EMP_COLLECTION),snap=>{
+    employees=snap.docs.map(d=>({id:d.id,...d.data()})).filter(e=>e.active!==false).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+    populateEmployeeFilter();
+    renderEmployeeDirectory();
+    setCloud("online","Cloud Connected");
+  },err=>{
+    console.error(err);
+    const reason = err?.code ? err.code.replace("firestore/","") : "connection-error";
+    setCloud("error","Cloud Error: " + reason);
+    toast("Firebase: " + reason, "error");
+  });
+
+  unsubscribeRecords=onSnapshot(collection(db,ATT_COLLECTION),snap=>{
+    records=snap.docs.map(d=>({docId:d.id,...d.data()}));
+    if(currentEmployee){
+      currentRecord=records.find(r=>r.code===currentEmployee.code && r.date===localDateKey())||currentRecord;
+      renderEmployee();
+    }
+    if(!$("adminDashboard").classList.contains("hidden")) renderAdmin();
+    if(!$("employeeLogin").classList.contains("hidden") && $("employeeCode")?.value.trim()){
+      refreshSmartAttendanceState(false);
+    }
+    setCloud("online","Cloud Connected");
+  },err=>{
+    console.error(err);
+    const reason = err?.code ? err.code.replace("firestore/","") : "connection-error";
+    setCloud("error","Cloud Error: " + reason);
+    toast("Firebase: " + reason, "error");
+  });
+}
+
+
+function resetSmartAttendanceUI(){
+  smartEmployee=null;
+  smartRecord=null;
+  smartAction="login";
+  const btn=$("smartAttendanceBtn");
+  const info=$("smartEmployeeInfo");
+  if(btn){
+    btn.textContent="Login";
+    btn.disabled=true;
+    btn.className="btn primary full smart-action-login";
+  }
+  if(info) info.classList.remove("show");
+  if($("smartEmployeeName")) $("smartEmployeeName").textContent="";
+  if($("smartEmployeeStatus")) $("smartEmployeeStatus").textContent="";
+}
+
+function setSmartButton(action, employee=null, record=null){
+  smartAction=action;
+  smartEmployee=employee;
+  smartRecord=record;
+
+  const btn=$("smartAttendanceBtn");
+  const info=$("smartEmployeeInfo");
+  if(!btn) return;
+
+  const cfg={
+    login:{label:"Login",cls:"smart-action-login",disabled:false},
+    lunchStart:{label:"Start Lunch Break",cls:"smart-action-lunch-start",disabled:false},
+    lunchEnd:{label:"End Lunch Break",cls:"smart-action-lunch-end",disabled:false},
+    logout:{label:"Logout",cls:"smart-action-logout",disabled:false},
+    complete:{label:"Attendance Completed",cls:"smart-action-complete",disabled:true},
+    invalid:{label:"Invalid Employee Code",cls:"smart-action-complete",disabled:true},
+    checking:{label:"Checking…",cls:"smart-action-checking",disabled:true}
+  }[action] || {label:"Login",cls:"smart-action-login",disabled:true};
+
+  btn.textContent=cfg.label;
+  btn.disabled=cfg.disabled;
+  btn.className=`btn full ${cfg.cls}`;
+
+  if(employee && info){
+    info.classList.add("show");
+    $("smartEmployeeName").textContent=`${employee.name||employee.code} · ${employee.code}`;
+
+    let statusText="";
+    if(action==="login") statusText="Not logged in today";
+    else if(action==="lunchStart") statusText=`Logged in at ${fmtTime(record?.loginTime)} · Working`;
+    else if(action==="lunchEnd") statusText=`Lunch started at ${fmtTime(record?.lunchStart)} · On Lunch`;
+    else if(action==="logout") statusText=`Lunch ended at ${fmtTime(record?.lunchEnd)} · Working`;
+    else if(action==="complete") statusText=`Logged out at ${fmtTime(record?.logoutTime)} · Attendance completed`;
+    $("smartEmployeeStatus").textContent=statusText;
+  }else if(info){
+    info.classList.remove("show");
+  }
+}
+
+function deriveSmartAction(record){
+  if(!record) return "login";
+  if(record.logoutTime) return "complete";
+  if(!record.lunchStart) return "lunchStart";
+  if(record.lunchStart && !record.lunchEnd) return "lunchEnd";
+  return "logout";
+}
+
+function employeeCodeChanged(){
+  const code=$("employeeCode").value.trim().toUpperCase();
+  $("employeeCode").value=code;
+  clearTimeout(smartLookupTimer);
+
+  if(!code){
+    resetSmartAttendanceUI();
+    return;
+  }
+
+  setSmartButton("checking");
+  smartLookupTimer=setTimeout(()=>refreshSmartAttendanceState(true),300);
+}
+
+function employeeCodeKeydown(event){
+  if(event.key==="Enter"){
+    event.preventDefault();
+    if(!$("smartAttendanceBtn").disabled) smartAttendanceAction();
+  }
+}
+
+async function refreshSmartAttendanceState(showInvalid=true){
+  const input=$("employeeCode");
+  if(!input) return;
+
+  const code=input.value.trim().toUpperCase();
+  if(!code){
+    resetSmartAttendanceUI();
+    return;
+  }
+
+  const token=++smartLookupToken;
+  try{
+    const empSnap=await getDoc(doc(db,EMP_COLLECTION,code));
+    if(token!==smartLookupToken) return;
+
+    if(!empSnap.exists() || empSnap.data().active===false){
+      smartEmployee=null;
+      smartRecord=null;
+      setSmartButton("invalid");
+      if(showInvalid) $("smartEmployeeStatus").textContent="";
+      return;
+    }
+
+    const emp={id:empSnap.id,...empSnap.data()};
+    const today=localDateKey();
+    const recSnap=await getDoc(doc(db,ATT_COLLECTION,recordDocId(code,today)));
+    if(token!==smartLookupToken) return;
+
+    const rec=recSnap.exists()?{docId:recSnap.id,...recSnap.data()}:null;
+    setSmartButton(deriveSmartAction(rec),emp,rec);
+  }catch(err){
+    console.error(err);
+    smartEmployee=null;
+    smartRecord=null;
+    setSmartButton("checking");
+    $("smartAttendanceBtn").textContent="Cloud Error";
+    toast("Could not check attendance status.","error");
+  }
+}
+
+async function smartAttendanceAction(){
+  const code=$("employeeCode").value.trim().toUpperCase();
+  if(!code){toast("Enter employee code.","error");return;}
+
+  if(!smartEmployee){
+    await refreshSmartAttendanceState(true);
+    if(!smartEmployee) return;
+  }
+
+  const btn=$("smartAttendanceBtn");
+  const originalAction=smartAction;
+  btn.disabled=true;
+
+  try{
+    const today=localDateKey();
+    const ref=doc(db,ATT_COLLECTION,recordDocId(code,today));
+    const now=isoNow();
+
+    if(originalAction==="login"){
+      const snap=await getDoc(ref);
+      if(!snap.exists()){
+        await setDoc(ref,{
+          code:smartEmployee.code,
+          name:smartEmployee.name,
+          date:today,
+          loginTime:now,
+          lunchStart:null,
+          lunchEnd:null,
+          logoutTime:null,
+          status:"Working",
+          updatedAt:now
+        });
+      }
+      toast("Login recorded.");
+    }
+    else if(originalAction==="lunchStart"){
+      await updateDoc(ref,{lunchStart:now,status:"On Lunch",updatedAt:now});
+      toast("Lunch break started.");
+    }
+    else if(originalAction==="lunchEnd"){
+      await updateDoc(ref,{lunchEnd:now,status:"Working",updatedAt:now});
+      toast("Lunch break ended.");
+    }
+    else if(originalAction==="logout"){
+      if(!confirm("Are you sure you want to logout for today?")){
+        btn.disabled=false;
+        return;
+      }
+      await updateDoc(ref,{logoutTime:now,status:"Logged Out",updatedAt:now});
+      toast("Logout recorded. Attendance completed.");
+    }
+
+    await refreshSmartAttendanceState(false);
+  }catch(err){
+    console.error(err);
+    toast("Could not save attendance. Please try again.","error");
+    await refreshSmartAttendanceState(false);
+  }
+}
+
+async function employeeLogin(){
+  const code=$("employeeCode").value.trim().toUpperCase();
+  if(!code){toast("Enter employee code.","error");return;}
+  try{
+    const empRef=doc(db,EMP_COLLECTION,code);
+    const empSnap=await getDoc(empRef);
+    if(!empSnap.exists() || empSnap.data().active===false){toast("Invalid employee code.","error");return;}
+    const emp={id:empSnap.id,...empSnap.data()};
+    const today=localDateKey();
+    const recRef=doc(db,ATT_COLLECTION,recordDocId(code,today));
+    const recSnap=await getDoc(recRef);
+
+    if(recSnap.exists() && recSnap.data().logoutTime){
+      toast("Attendance for today is already completed.","error");return;
+    }
+
+    if(!recSnap.exists()){
+      currentRecord={
+        code:emp.code,name:emp.name,date:today,loginTime:isoNow(),
+        lunchStart:null,lunchEnd:null,logoutTime:null,status:"Working",
+        updatedAt:isoNow()
+      };
+      await setDoc(recRef,currentRecord);
+    }else{
+      currentRecord={docId:recSnap.id,...recSnap.data()};
+    }
+
+    currentEmployee=emp;
+    showOnly("employeeDashboard");
+    renderEmployee();
+    clearInterval(clockTimer);
+    clockTimer=setInterval(renderEmployee,30000);
+  }catch(err){
+    console.error(err);toast("Unable to connect to Firebase. Check Firestore rules/internet.","error");
+  }
+}
+
+async function patchCurrentRecord(data){
+  if(!currentEmployee)return;
+  const today=localDateKey();
+  const ref=doc(db,ATT_COLLECTION,recordDocId(currentEmployee.code,today));
+  await updateDoc(ref,{...data,updatedAt:isoNow()});
+  currentRecord={...currentRecord,...data,updatedAt:isoNow()};
+  renderEmployee();
+}
+
+async function startLunch(){
+  if(!currentRecord || currentRecord.lunchStart || currentRecord.logoutTime)return;
+  try{await patchCurrentRecord({lunchStart:isoNow(),status:"On Lunch"});}
+  catch(e){console.error(e);toast("Could not save lunch start.","error");}
+}
+async function endLunch(){
+  if(!currentRecord?.lunchStart || currentRecord.lunchEnd || currentRecord.logoutTime)return;
+  try{await patchCurrentRecord({lunchEnd:isoNow(),status:"Working"});}
+  catch(e){console.error(e);toast("Could not save lunch end.","error");}
+}
+async function logoutEmployee(){
+  if(!currentRecord || currentRecord.logoutTime)return;
+  if(!confirm("Are you sure you want to logout for today?"))return;
+  try{
+    const now=isoNow();
+    const patch={logoutTime:now,status:"Logged Out"};
+    if(currentRecord.lunchStart && !currentRecord.lunchEnd)patch.lunchEnd=now;
+    await patchCurrentRecord(patch);
+    toast("Attendance completed and synced.");
+    setTimeout(showEmployeeLogin,500);
+  }catch(e){console.error(e);toast("Could not save logout.","error");}
+}
+function renderEmployee(){
+  const r=currentRecord;if(!r||!currentEmployee)return;
+  $("empName").textContent=currentEmployee.name||currentEmployee.code;
+  $("empMeta").textContent=`${currentEmployee.code} · ${fmtDate()}`;
+  const s=$("empStatus");s.textContent=r.status||"Working";s.className="status "+(r.status||"Working").toLowerCase().replaceAll(" ","-");
+  $("loginTime").textContent=fmtTime(r.loginTime);$("lunchStart").textContent=fmtTime(r.lunchStart);
+  $("lunchEnd").textContent=fmtTime(r.lunchEnd);$("workedTime").textContent=duration(r);
+  $("btnLunchStart").disabled=!!r.lunchStart||!!r.logoutTime;
+  $("btnLunchEnd").disabled=!r.lunchStart||!!r.lunchEnd||!!r.logoutTime;
+  $("btnLogout").disabled=!!r.logoutTime;
+}
+
+
+async function hashText(value){
+  const data=new TextEncoder().encode(value);
+  const hash=await crypto.subtle.digest("SHA-256",data);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+async function getStoredAdminPasswordHash(){
+  try{
+    const ref=doc(db,ADMIN_SETTINGS_COLLECTION,ADMIN_SETTINGS_DOC);
+    const snap=await getDoc(ref);
+    if(snap.exists() && snap.data().passwordHash){
+      return snap.data().passwordHash;
+    }
+    const defaultHash=await hashText(ADMIN.defaultPassword);
+    await setDoc(ref,{
+      passwordHash:defaultHash,
+      username:ADMIN.username,
+      updatedAt:isoNow()
+    },{merge:true});
+    return defaultHash;
+  }catch(err){
+    console.error(err);
+    return await hashText(ADMIN.defaultPassword);
+  }
+}
+
+async function changeAdminPassword(){
+  const current=$("currentAdminPassword").value;
+  const next=$("newAdminPassword").value;
+  const confirmNext=$("confirmAdminPassword").value;
+
+  if(!current||!next||!confirmNext){
+    toast("Fill all password fields.","error");
+    return;
+  }
+  if(next.length<6){
+    toast("New password must be at least 6 characters.","error");
+    return;
+  }
+  if(next!==confirmNext){
+    toast("New passwords do not match.","error");
+    return;
+  }
+
+  try{
+    const storedHash=await getStoredAdminPasswordHash();
+    const currentHash=await hashText(current);
+
+    if(currentHash!==storedHash){
+      toast("Current password is incorrect.","error");
+      return;
+    }
+
+    const newHash=await hashText(next);
+    await setDoc(
+      doc(db,ADMIN_SETTINGS_COLLECTION,ADMIN_SETTINGS_DOC),
+      {
+        username:ADMIN.username,
+        passwordHash:newHash,
+        updatedAt:isoNow()
+      },
+      {merge:true}
+    );
+
+    $("currentAdminPassword").value="";
+    $("newAdminPassword").value="";
+    $("confirmAdminPassword").value="";
+    toast("Admin password changed successfully.");
+  }catch(err){
+    console.error(err);
+    toast("Could not change admin password.","error");
+  }
+}
+
+
+async function resetAttendanceRecords(){
+  const pass=prompt("Enter reset passcode:");
+  if(pass===null) return;
+  if(pass!==EMPLOYEE_EDIT_PASSCODE){
+    toast("Incorrect passcode.","error");
+    return;
+  }
+
+  const ok=confirm(
+    "Delete ALL attendance records?\n\nThis cannot be undone. Employee accounts will be kept."
+  );
+  if(!ok) return;
+
+  const finalConfirm=prompt('Type RESET to permanently delete all attendance records:');
+  if(finalConfirm!=="RESET"){
+    toast("Reset cancelled.","error");
+    return;
+  }
+
+  try{
+    const snap=await getDocs(collection(db,ATT_COLLECTION));
+    if(snap.empty){
+      toast("No attendance records to reset.");
+      return;
+    }
+
+    let deleted=0;
+    for(const d of snap.docs){
+      await deleteDoc(doc(db,ATT_COLLECTION,d.id));
+      deleted++;
+    }
+
+    records=[];
+    renderAdmin();
+    toast(`${deleted} attendance record${deleted===1?"":"s"} deleted.`);
+  }catch(err){
+    console.error(err);
+    toast("Could not reset attendance records.","error");
+  }
+}
+
+function showEmployeeLogin(){currentEmployee=null;currentRecord=null;clearInterval(clockTimer);showOnly("employeeLogin");$("employeeCode").value="";resetSmartAttendanceUI();}
+function showAdminLogin(){clearInterval(clockTimer);showOnly("adminLogin");}
+function adminLogout(){showEmployeeLogin();}
+async function adminLogin(){
+  const u=$("adminUser").value.trim(),p=$("adminPass").value;
+  if(u!==ADMIN.username){toast("Invalid admin login.","error");return;}
+  try{
+    const storedHash=await getStoredAdminPasswordHash();
+    const enteredHash=await hashText(p);
+    if(enteredHash!==storedHash){toast("Invalid admin login.","error");return;}
+    initReportControls();
+    showOnly("adminDashboard");
+    populateEmployeeFilter();
+    showAdminTab("attendance");
+    renderAdmin();
+    $("adminPass").value="";
+  }catch(err){
+    console.error(err);
+    toast("Unable to verify admin password.","error");
+  }
+}
+
+function showAdminTab(tab){
+  const attendance=tab==="attendance";
+  const employeesTab=tab==="employees";
+  const settings=tab==="settings";
+
+  $("attendanceTabPanel").classList.toggle("hidden",!attendance);
+  $("employeesTabPanel").classList.toggle("hidden",!employeesTab);
+  $("settingsTabPanel").classList.toggle("hidden",!settings);
+
+  $("attendanceTabBtn").classList.toggle("active",attendance);
+  $("employeesTabBtn").classList.toggle("active",employeesTab);
+  $("settingsTabBtn").classList.toggle("active",settings);
+
+  if(attendance) renderAdmin();
+  if(employeesTab) renderEmployeeDirectory();
+}
+
+function formatCreated(iso){
+  if(!iso) return "—";
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString(undefined,{day:"2-digit",month:"short",year:"numeric"});
+}
+
+function renderEmployeeDirectory(){
+  const tbody=$("employeeRows");
+  const count=$("employeeCount");
+  if(count) count.textContent=employees.length;
+  if(!tbody) return;
+  if(!employees.length){
+    tbody.innerHTML='<tr><td colspan="4" class="muted" style="text-align:center;padding:30px">No employees available.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=employees.map(e=>`
+    <tr>
+      <td><span class="employee-code">${e.code||""}</span></td>
+      <td><strong>${e.name||""}</strong></td>
+      <td>${formatCreated(e.createdAt)}</td>
+      <td>
+        <div class="action-cell">
+          <button class="btn small-btn edit-btn" onclick="editEmployee('${e.code||""}')">Edit</button>
+          <button class="btn small-btn delete-btn" onclick="deleteEmployee('${e.code||""}')">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function verifyEmployeePasscode(){
+  const pass=prompt("Enter management passcode to continue:");
+  if(pass===null) return false;
+  if(pass!==EMPLOYEE_EDIT_PASSCODE){
+    toast("Incorrect passcode.","error");
+    return false;
+  }
+  return true;
+}
+
+async function editEmployee(code){
+  if(!verifyEmployeePasscode()) return;
+  const emp=employees.find(e=>e.code===code);
+  if(!emp){toast("Employee not found.","error");return;}
+  const newName=prompt("Employee name:",emp.name||"");
+  if(newName===null) return;
+  const name=newName.trim();
+  if(!name){toast("Employee name cannot be empty.","error");return;}
+  try{
+    await updateDoc(doc(db,EMP_COLLECTION,code),{name,updatedAt:isoNow()});
+    toast("Employee details updated.");
+  }catch(err){
+    console.error(err);
+    toast("Could not update employee.","error");
+  }
+}
+
+async function deleteEmployee(code){
+  if(!verifyEmployeePasscode()) return;
+  const emp=employees.find(e=>e.code===code);
+  if(!emp){toast("Employee not found.","error");return;}
+  const ok=confirm(`Delete ${emp.name||code} (${code})?\n\nPast attendance records will be kept.`);
+  if(!ok) return;
+  try{
+    await deleteDoc(doc(db,EMP_COLLECTION,code));
+    toast("Employee deleted.");
+  }catch(err){
+    console.error(err);
+    toast("Could not delete employee.","error");
+  }
+}
+
+function populateEmployeeFilter(){
+  const sel=$("filterEmployee");if(!sel)return;
+  const val=sel.value;
+  sel.innerHTML='<option value="">All Employees</option>'+employees.map(e=>`<option value="${e.code}">${e.code} - ${e.name||""}</option>`).join("");
+  sel.value=val;
+}
+function dateToKey(d){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function currentWeekValue(d=new Date()){
+  const date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const dayNum=date.getUTCDay()||7;
+  date.setUTCDate(date.getUTCDate()+4-dayNum);
+  const yearStart=new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  const weekNo=Math.ceil((((date-yearStart)/86400000)+1)/7);
+  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
+}
+function weekRange(weekValue){
+  const match=/^(\d{4})-W(\d{2})$/.exec(weekValue||"");
+  if(!match){
+    const today=localDateKey();
+    return {start:today,end:today};
+  }
+  const year=Number(match[1]),week=Number(match[2]);
+  const jan4=new Date(year,0,4);
+  const jan4Day=jan4.getDay()||7;
+  const monday=new Date(year,0,4-(jan4Day-1)+(week-1)*7);
+  const sunday=new Date(monday);
+  sunday.setDate(monday.getDate()+6);
+  return {start:dateToKey(monday),end:dateToKey(sunday)};
+}
+function monthRange(monthValue){
+  const m=/^(\d{4})-(\d{2})$/.exec(monthValue||"");
+  if(!m){
+    const t=localDateKey();
+    return {start:t,end:t};
+  }
+  const year=Number(m[1]),month=Number(m[2]);
+  const first=new Date(year,month-1,1);
+  const last=new Date(year,month,0);
+  return {start:dateToKey(first),end:dateToKey(last)};
+}
+function initReportControls(){
+  const today=localDateKey();
+  if($("dailyDate")) $("dailyDate").value=today;
+  if($("weeklyDate")) $("weeklyDate").value=currentWeekValue();
+  if($("monthlyDate")) $("monthlyDate").value=today.slice(0,7);
+  if($("customFrom")) $("customFrom").value=today;
+  if($("customTo")) $("customTo").value=today;
+  if($("reportType")) $("reportType").value="daily";
+  reportTypeChanged(false);
+}
+function reportTypeChanged(shouldRender=true){
+  const type=$("reportType")?.value||"daily";
+  const ids=["dailyField","weeklyField","monthlyField","customFromField","customToField"];
+  ids.forEach(id=>$(id)?.classList.add("hidden"));
+  if(type==="daily") $("dailyField")?.classList.remove("hidden");
+  if(type==="weekly") $("weeklyField")?.classList.remove("hidden");
+  if(type==="monthly") $("monthlyField")?.classList.remove("hidden");
+  if(type==="custom"){
+    $("customFromField")?.classList.remove("hidden");
+    $("customToField")?.classList.remove("hidden");
+  }
+  const labels={daily:"Daily Report",weekly:"Weekly Report",monthly:"Monthly Report",custom:"Custom Period"};
+  if($("reportPeriodLabel")) $("reportPeriodLabel").textContent=labels[type]||"Attendance Report";
+  if(shouldRender) renderAdmin();
+}
+function getReportRange(){
+  const type=$("reportType")?.value||"daily";
+  if(type==="daily"){
+    const d=$("dailyDate")?.value||localDateKey();
+    return {type,start:d,end:d};
+  }
+  if(type==="weekly"){
+    const r=weekRange($("weeklyDate")?.value||currentWeekValue());
+    return {type,...r};
+  }
+  if(type==="monthly"){
+    const r=monthRange($("monthlyDate")?.value||localDateKey().slice(0,7));
+    return {type,...r};
+  }
+  let start=$("customFrom")?.value||localDateKey();
+  let end=$("customTo")?.value||start;
+  if(start>end) [start,end]=[end,start];
+  return {type,start,end};
+}
+function getReportRows(){
+  const {start,end}=getReportRange();
+  const employee=$("filterEmployee")?.value||"";
+  return records
+    .filter(r=>r.date>=start&&r.date<=end&&(!employee||r.code===employee))
+    .sort((a,b)=>{
+      const dateCmp=(a.date||"").localeCompare(b.date||"");
+      return dateCmp || new Date(a.loginTime||0)-new Date(b.loginTime||0);
+    });
+}
+function readableDate(dateKey){
+  if(!dateKey) return "";
+  const [y,m,d]=dateKey.split("-").map(Number);
+  return new Date(y,m-1,d).toLocaleDateString(undefined,{day:"2-digit",month:"short",year:"numeric"});
+}
+function reportRangeText(){
+  const {start,end}=getReportRange();
+  return start===end?readableDate(start):`${readableDate(start)} – ${readableDate(end)}`;
+}
+function reportTypeName(){
+  const t=$("reportType")?.value||"daily";
+  return {daily:"Daily",weekly:"Weekly",monthly:"Monthly",custom:"Custom Period"}[t]||"Attendance";
+}
+function reportEmployeeText(){
+  const code=$("filterEmployee")?.value||"";
+  if(!code) return "All Employees";
+  const emp=employees.find(e=>e.code===code);
+  return emp?`${emp.code} - ${emp.name||""}`:code;
+}
+function setTodayFilter(){
+  $("reportType").value="daily";
+  $("dailyDate").value=localDateKey();
+  if($("filterEmployee")) $("filterEmployee").value="";
+  reportTypeChanged(false);
+  renderAdmin();
+}
+function renderAdmin(){
+  const rows=getReportRows();
+  $("recordsDate").textContent=reportRangeText();
+  $("sumPresent").textContent=rows.length;
+  $("sumWorking").textContent=rows.filter(r=>r.status==="Working").length;
+  $("sumLunch").textContent=rows.filter(r=>r.status==="On Lunch").length;
+  $("sumOut").textContent=rows.filter(r=>r.status==="Logged Out").length;
+  const tbody=$("attendanceRows");
+  if(!rows.length){
+    tbody.innerHTML='<tr><td colspan="8" class="muted" style="text-align:center;padding:30px">No attendance records found for this period.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td><strong>${r.code||""}</strong><br><span class="muted">${r.name||""}</span></td>
+    <td>${r.date||""}</td>
+    <td>${fmtTime(r.loginTime)}</td>
+    <td>${fmtTime(r.lunchStart)}</td>
+    <td>${fmtTime(r.lunchEnd)}</td>
+    <td>${fmtTime(r.logoutTime)}</td>
+    <td>${duration(r)}</td>
+    <td><span class="status ${(r.status||"Working").toLowerCase().replaceAll(" ","-")}">${r.status||"Working"}</span></td>
+  </tr>`).join("");
+}
+async function addEmployee(){
+  const code=$("newCode").value.trim().toUpperCase(),name=$("newName").value.trim();
+  if(!code||!name){toast("Enter employee code and name.","error");return;}
+  if(!/^[A-Z0-9_-]+$/.test(code)){toast("Employee code can use only letters, numbers, - and _.","error");return;}
+  try{
+    const ref=doc(db,EMP_COLLECTION,code),snap=await getDoc(ref);
+    if(snap.exists()){toast("Employee code already exists.","error");return;}
+    await setDoc(ref,{code,name,active:true,createdAt:isoNow(),updatedAt:isoNow()});
+    $("newCode").value="";$("newName").value="";toast("Employee added to cloud.");
+  }catch(e){console.error(e);toast("Could not add employee.","error");}
+}
+function exportCSV(){
+  const rows=getReportRows();
+  if(!rows.length){toast("No records available to export.","error");return;}
+  const esc=v=>`"${String(v??"").replaceAll('"','""')}"`;
+  const range=getReportRange();
+  let csv=[
+    ["Attendance Report",reportTypeName(),reportRangeText(),reportEmployeeText()].map(esc).join(","),
+    "",
+    "Employee Code,Employee Name,Date,Login Time,Lunch Start,Lunch End,Logout Time,Total Worked,Status"
+  ];
+  rows.forEach(r=>csv.push([
+    esc(r.code),esc(r.name),esc(r.date),esc(fmtTime(r.loginTime)),
+    esc(fmtTime(r.lunchStart)),esc(fmtTime(r.lunchEnd)),
+    esc(fmtTime(r.logoutTime)),esc(duration(r)),esc(r.status)
+  ].join(",")));
+  const blob=new Blob([csv.join("\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`attendance_${range.start}_${range.end}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function exportPDF(){
+  const rows=getReportRows();
+  if(!rows.length){toast("No records available to export.","error");return;}
+  if(!window.jspdf?.jsPDF){
+    toast("PDF library could not load. Check your internet connection.","error");
+    return;
+  }
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+  const range=getReportRange();
+  const employee=reportEmployeeText();
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(18);
+  doc.text("Employee Attendance Report",14,16);
+
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9.5);
+  doc.text(`Report: ${reportTypeName()}`,14,23);
+  doc.text(`Period: ${reportRangeText()}`,14,28);
+  doc.text(`Employee: ${employee}`,14,33);
+
+  const working=rows.filter(r=>r.status==="Working").length;
+  const lunch=rows.filter(r=>r.status==="On Lunch").length;
+  const logged=rows.filter(r=>r.status==="Logged Out").length;
+  doc.setFont("helvetica","bold");
+  doc.text(`Attendance Entries: ${rows.length}    Working: ${working}    On Lunch: ${lunch}    Logged Out: ${logged}`,14,40);
+
+  const body=rows.map(r=>[
+    `${r.code||""} - ${r.name||""}`,
+    r.date||"",
+    fmtTime(r.loginTime),
+    fmtTime(r.lunchStart),
+    fmtTime(r.lunchEnd),
+    fmtTime(r.logoutTime),
+    duration(r),
+    r.status||""
+  ]);
+
+  if(typeof doc.autoTable==="function"){
+    doc.autoTable({
+      startY:46,
+      head:[["Employee","Date","Login","Lunch Start","Lunch End","Logout","Worked","Status"]],
+      body,
+      styles:{fontSize:8,cellPadding:2.5},
+      headStyles:{fillColor:[31,41,55],textColor:[255,255,255]},
+      alternateRowStyles:{fillColor:[247,249,252]},
+      margin:{left:14,right:14},
+      didDrawPage:function(data){
+        const page=doc.internal.getNumberOfPages();
+        doc.setFontSize(8);
+        doc.setTextColor(110);
+        doc.text(`Travelog Team Attendance • Page ${page}`,14,202);
+        doc.text(`Generated ${new Date().toLocaleString()}`,283,202,{align:"right"});
+      }
+    });
+  }else{
+    doc.setFontSize(8);
+    let y=48;
+    body.slice(0,25).forEach(row=>{
+      doc.text(row.join("   |   "),14,y);
+      y+=5;
+    });
+  }
+  doc.save(`attendance_${range.start}_${range.end}.pdf`);
+}
+
+
+function setupEnterKeyActions(){
+  const bindEnter=(ids,action)=>{
+    ids.forEach(id=>{
+      const el=$(id);
+      if(!el) return;
+      el.addEventListener("keydown",e=>{
+        if(e.key!=="Enter") return;
+        e.preventDefault();
+        action();
+      });
+    });
+  };
+
+  // Employee attendance: Enter = click the current smart attendance button.
+  const employeeCode=$("employeeCode");
+  if(employeeCode){
+    employeeCode.addEventListener("keydown",e=>{
+      if(e.key!=="Enter") return;
+      e.preventDefault();
+      const btn=$("smartAttendanceBtn");
+      if(btn && !btn.disabled) smartAttendanceAction();
+    });
+  }
+
+  // Admin login: Enter from username or password = Login.
+  bindEnter(["adminUser","adminPass"],()=>adminLogin());
+
+  // Add employee: Enter from code or name = Add Employee.
+  bindEnter(["newCode","newName"],()=>addEmployee());
+
+  // Change admin password: Enter from any password field = Change Password.
+  bindEnter(
+    ["currentAdminPassword","newAdminPassword","confirmAdminPassword"],
+    ()=>changeAdminPassword()
+  );
+
+  // Attendance report filters: Enter = Generate Report.
+  bindEnter(
+    ["dailyDate","weeklyDate","monthlyDate","customFrom","customTo","filterEmployee"],
+    ()=>renderAdmin()
+  );
+}
+
+Object.assign(window,{employeeLogin,startLunch,endLunch,logoutEmployee,showEmployeeLogin,showAdminLogin,adminLogin,adminLogout,renderAdmin,setTodayFilter,addEmployee,exportCSV,exportPDF,reportTypeChanged,showAdminTab,editEmployee,deleteEmployee,employeeCodeChanged,employeeCodeKeydown,smartAttendanceAction,changeAdminPassword,resetAttendanceRecords});
+
+$("todayText").textContent=fmtDate();
+setupEnterKeyActions();
+showOnly("employeeLogin");
+resetSmartAttendanceUI();
+
+try{
+  startCloudSync();
+}catch(err){
+  console.error(err);
+  const reason = err?.code ? err.code.replace("firestore/","") : (err?.message || "connection-error");
+  setCloud("error","Cloud Error: " + reason);
+  toast("Firebase: " + reason, "error");
+}
+</script>
+</body>
+</html>
