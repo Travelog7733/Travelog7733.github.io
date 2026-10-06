@@ -33,7 +33,7 @@
 .paper.print-layout .dates{grid-template-columns:1fr 1fr 100px}.paper.print-layout .dates>div{padding:10px 12px}.paper.print-layout .dates>.nights{grid-column:auto;border-top:0;border-left:1px solid #cbd3dd}.paper.print-layout .value{font-size:13px}.paper.print-layout .label,.paper.print-layout .small{font-size:10px}
 .paper.print-layout .reservation-table{font-size:12px;line-height:1.45}.paper.print-layout .reservation-table th,.paper.print-layout .reservation-table td{padding:7px 11px}.paper.print-layout .reservation-table th{width:35%}
 .paper.print-layout .notes{font-size:11px;line-height:1.6}.paper.print-layout .footer{font-size:10px;margin-top:20px;padding-top:10px}
-@media print{@page{size:A4;margin:10mm}html,body{margin:0;padding:0;background:#fff}header,.editor,.toolbar,.sample,.error{display:none!important}main{display:block;margin:0;padding:0;width:190mm}.preview{display:block;width:190mm;height:276mm;margin:0;padding:0;overflow:hidden}.paper.print-layout{transform:scale(var(--voucher-print-scale,1));transform-origin:top left;break-inside:avoid}.paper.print-layout *{break-inside:auto}.paper.print-layout .voucher-top{flex-wrap:nowrap}}</style><!-- Embedded Poppins font license: Copyright 2020 The Poppins Project Authors (https://github.com/itfoundry/Poppins)
+@media print{@page{size:A4;margin:10mm}html,body{margin:0;padding:0;background:#fff}header,.editor,.toolbar,.sample,.error{display:none!important}main{display:block;margin:0;padding:0;width:190mm}.preview{display:block;width:190mm;height:276mm;margin:0;padding:0;overflow:hidden}.paper.print-layout{transform:scale(var(--voucher-print-scale,1));transform-origin:top left;break-inside:avoid}.paper.print-layout *{break-inside:auto}.paper.print-layout .voucher-top{flex-wrap:nowrap}}.signature-note{font-size:11px;line-height:1.6;text-align:center;color:#64748b;padding-top:12px}.paper.print-layout .signature-note{font-size:10px;padding-top:8px}</style><!-- Embedded Poppins font license: Copyright 2020 The Poppins Project Authors (https://github.com/itfoundry/Poppins)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
@@ -148,7 +148,7 @@ function render(){
     <h3 class="section-title">Guest & reservation details</h3><table class="reservation-table"><tbody>${tableRow('Lead guest',txt('guest'))}${tableRow('Guest email',txt('email'))}${tableRow('Room category',txt('room'))}${tableRow('Number of rooms',txt('rooms'))}${tableRow('Occupancy',txt('adults')+' adult(s) / '+txt('children')+' child(ren)')}${tableRow('Meal plan',txt('meal'))}${tableRow('Payment status',txt('payment'))}</tbody></table>
     <h3 class="section-title">Check-in instructions & special requests</h3><div class="notes">${txt('notes')}</div>
     <h3 class="section-title">Cancellation & amendment terms</h3><div class="notes">${txt('policy')}</div>
-    <div class="footer"><span>Issued by ${txt('agency')}</span><span>Reference: ${txt('reference')}</span></div>`;
+    <div class="footer"><span>Issued by ${txt('agency')}</span><span>Reference: ${txt('reference')}</span></div><p class="signature-note">This is a system-generated document and does not require a signature.</p>`;
 }
 
 function load(values,sampleFlag){data={...values};isSample=sampleFlag;for(const el of form.elements)el.value=data[el.name]||'';document.querySelector('#error').textContent='';render()}
@@ -174,6 +174,7 @@ window.addEventListener('afterprint',()=>{
   paper.classList.remove('print-layout');
   paper.style.removeProperty('--voucher-print-scale');
 });</script></body></html>
+
 
 
 
