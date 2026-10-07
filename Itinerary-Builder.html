@@ -6065,6 +6065,12 @@
     };
     const additionalMealRateForDay = (day, tour) => additionalMealCountForDay(day, tour) * ADDITIONAL_MEAL_RATE_PER_PAX;
 
+    const roomFocCount = (quote = state.quote) => {
+      const eligible = /^\d{4}-\d{2}-\d{2}$/.test(quote.createdDate || "") && quote.createdDate >= "2026-10-06";
+      return eligible && quote.focEnabled ? Math.max(0, Math.floor(Number(quote.foc || 0))) : 0;
+    };
+    const roomGuestCount = (adults = Number(state.quote.adults || 0), quote = state.quote) => Math.max(0, Math.round(Number(adults || 0))) + roomFocCount(quote);
+
     const oddPaxRoomArrangementFor = (quote, adultCount) => {
       const choice = quote?.oddPaxRoomArrangements?.[String(adultCount)];
       return choice === "double" ? "double" : "triple";
@@ -6073,9 +6079,10 @@
     const hotelBilledPaxFor = (quote, adultCount) => {
       const adults = Math.max(0, Math.round(Number(adultCount || 0)));
       if (adults === 0) return 0;
-      if (adults === 1) return 2;
-      if (adults >= 3 && adults % 2 === 1 && oddPaxRoomArrangementFor(quote, adults) === "double") return adults + 1;
-      return adults;
+      const guests = roomGuestCount(adults, quote);
+      const billedGuests = guests === 1 ? 2 : (guests >= 3 && guests % 2 === 1 && oddPaxRoomArrangementFor(quote, guests) === "double" ? guests + 1 : guests);
+      // FOC sharing later restores its hotel portion; avoid charging it twice.
+      return billedGuests * adults / guests;
     };
 
     const getTaxComponents = (q, taxable, infantSubtotal) => {
@@ -6123,16 +6130,18 @@
 
     const selectedRoomArrangement = (day, adults = Number(state.quote.adults || 0)) => {
       if (!day.roomArrangement || adults !== Number(state.quote.adults || 0)) return null;
-      return roomArrangementOptions(adults).find(option => option.value === day.roomArrangement) || null;
+      const guests = roomGuestCount(adults);
+      const option = roomArrangementOptions(guests).find(option => option.value === day.roomArrangement);
+      return option ? { ...option, billedPax: option.billedPax * adults / guests } : null;
     };
 
     const renderRoomArrangement = day => {
       const selected = selectedRoomArrangement(day);
       return '<label style="grid-column:1 / -1;">Room Arrangement<select data-field="roomArrangement">' +
         '<option value="">Automatic (existing pricing)</option>' +
-        roomArrangementOptions(state.quote.adults).map(option => '<option value="' + option.value + '"' +
+        roomArrangementOptions(roomGuestCount()).map(option => '<option value="' + option.value + '"' +
           (selected?.value === option.value ? ' selected' : '') + '>' + escapeHtml(option.label) + '</option>').join('') +
-        '</select><span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--muted);">For adult guests. Double = 2 person rates; triple = 3; each extra bed = 1. Changing adult count returns to automatic.</span></label>';
+        '</select><span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--muted);">For adults and eligible FOC guests. Double = 2 person rates; triple = 3; each extra bed = 1. Changing adult or FOC count returns to automatic.</span></label>';
     };
 
     const lockedCustomerPricing = () => {
@@ -7099,7 +7108,7 @@
         const arrangements = stays.map(day => selectedRoomArrangement(day)?.label || "Automatic room arrangement");
         return new Set(arrangements).size === 1 ? arrangements[0] : "See room arrangement under each hotel stay";
       }
-      const adults = Math.max(0, Math.round(Number(state.quote.adults || 0)));
+      const adults = roomGuestCount();
       if (adults < 3 || adults % 2 === 0) return "";
       const choice = state.quote.oddPaxRoomArrangements?.[String(adults)];
       if (choice !== "double" && choice !== "triple") return "";
@@ -7411,12 +7420,27 @@
         renderTotals();
         renderStats();
         if (id === "travelDates") renderDays();
+        if (id === "foc") {
+          state.quote.days.forEach(day => { delete day.roomArrangement; });
+          renderDays();
+          scheduleRoomCountPrompt();
+        }
         saveState();
       });
     });
 
     let oddPaxRoomPromptTimer = null;
     let pendingOddPaxRoomCount = 0;
+
+    const scheduleRoomCountPrompt = () => {
+      clearTimeout(oddPaxRoomPromptTimer);
+      const pax = roomGuestCount();
+      if (pax >= 3 && pax % 2 === 1) {
+        oddPaxRoomPromptTimer = setTimeout(() => {
+          if (roomGuestCount() === pax) openOddPaxRoomDialog(pax);
+        }, 350);
+      }
+    };
 
     const doubleRoomArrangementLabel = pax => {
       const rooms = (pax + 1) / 2;
@@ -7434,7 +7458,7 @@
       pendingOddPaxRoomCount = pax;
       const currentChoice = oddPaxRoomArrangementFor(state.quote, pax);
       els.oddPaxRoomDialogTitle.textContent = `Confirm room arrangement for ${pax} pax`;
-      els.oddPaxRoomDialogMessage.textContent = `Choose the hotel arrangement. Tours, meals, visa, margins, and traveler counts will continue to use the actual ${pax} pax.`;
+      els.oddPaxRoomDialogMessage.textContent = `Choose the hotel arrangement for ${pax} adults and FOC guests. FOC costs remain shared by paying passengers.`;
       els.oddPaxDoubleRoomsLabel.textContent = doubleRoomArrangementLabel(pax);
       els.oddPaxDoubleRoomsDetail.textContent = `Hotel room rate calculated for ${pax + 1} pax (${pax + 1} rate units).`;
       els.oddPaxTripleRoomLabel.textContent = tripleRoomArrangementLabel(pax);
@@ -7475,13 +7499,7 @@
       renderTotals();
       renderStats();
       saveState();
-      clearTimeout(oddPaxRoomPromptTimer);
-      const pax = Math.max(0, Math.round(Number(els.adults.value || 0)));
-      if (pax >= 3 && pax % 2 === 1) {
-        oddPaxRoomPromptTimer = setTimeout(() => {
-          if (Math.round(Number(els.adults.value || 0)) === pax) openOddPaxRoomDialog(pax);
-        }, 350);
-      }
+      scheduleRoomCountPrompt();
     });
 
     ["toggleChildren", "toggleInfants", "toggleFoc"].forEach(id => {
@@ -7495,6 +7513,11 @@
         }
         else state.quote.focEnabled = els.toggleFoc.checked;
         syncQuoteFromInputs();
+        if (id === "toggleFoc") {
+          state.quote.days.forEach(day => { delete day.roomArrangement; });
+          renderDays();
+          scheduleRoomCountPrompt();
+        }
         renderTotals();
         renderStats();
         saveState();
