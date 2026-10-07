@@ -1530,7 +1530,7 @@ $('records-view').addEventListener('click',event=>{const button=event.target.clo
 const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDomain:'travelog-itinerary.firebaseapp.com',projectId:'travelog-itinerary',storageBucket:'travelog-itinerary.firebasestorage.app',messagingSenderId:'33567258851',appId:'1:33567258851:web:790e8f165a3d917bf7edd6'};
 (()=>{
  const keys=['invoices','payments','purchases','outgoingPayments','expenses','banks','customers','taxes','catalog','purchaseCatalog'];
- const META=STORE+'-firebase',WORKSPACE='travelog-shared-v1';
+ const META=STORE+'-firestore-records-v3',WORKSPACE='travelog-shared-v1',SYNC_PATH='itineraryBuilder/crmState/invoiceStudio';
  let sdk,firestore,auth,storage,ready=false,user=null,base=null,timer,writing=null,refreshing=false,again=false,unsubs=[],retry,generation=0,renderPending=false,backupTimer,backupRevision=0;
  const clone=v=>structuredClone(v),json=v=>JSON.stringify(v),equal=(a,b)=>json(a)===json(b);
  const root=()=>sdk.doc(firestore,'itineraryBuilder','crmState','invoiceStudio','manifest');
@@ -1555,7 +1555,15 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
   for(const key of ['next','nextPurchase','nextOutgoingPayment'])result[key]=Math.max(local[key]||1,remote[key]||1);
   return result;
  }
- function remember(){try{localStorage.setItem(META,json({workspace:WORKSPACE,payload:json({...base,draft:db.draft}),revision:base.revision}));}catch{}}
+ function remember(){try{localStorage.setItem(META,json({workspace:WORKSPACE,path:SYNC_PATH,payload:json({...base,draft:db.draft}),revision:base.revision}));}catch{}}
+ function bootstrap(remote){
+  // Old browser records have no acknowledged baseline for this collection.
+  // Preserve them before choosing the shared cloud as the initial source.
+  if(!equal(shared(db),shared(remote))&&!equal(shared(db),shared(normalizeDB(clone(seed))))){
+   const payload=json(db),recoveryKey=STORE+'-before-cloud';localStorage.setItem(recoveryKey,payload);if(localStorage.getItem(recoveryKey)!==payload)throw Error('Could not preserve local recovery copy');$('cloud-recovery').hidden=false;
+  }
+  apply(remote,true);
+ }
  function render(){if(document.activeElement?.matches('input,textarea,select')||document.querySelector('#records-view dialog[open],#item-tax-dialog[open]')){renderPending=true;return;}renderPending=false;pickers();if(activeTab!=='editor')records();updateInvoiceNumberStatus();}
  document.addEventListener('focusout',()=>setTimeout(()=>{if(renderPending)render();},0));document.addEventListener('click',()=>setTimeout(()=>{if(renderPending)render();},0));
  function apply(remote,explicit=false){
@@ -1612,15 +1620,15 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
   let remote=await read();if(epoch!==generation)return;
   if(!remote&&equal(shared(db),shared(normalizeDB(clone(seed))))){base={...shared(db),revision:0};ready=true;const changed=snapshot=>{if(epoch===generation&&!snapshot.metadata.hasPendingWrites&&!snapshot.metadata.fromCache)refresh().catch(failure);};unsubs=[sdk.onSnapshot(root(),{includeMetadataChanges:true},changed,failure),sdk.onSnapshot(collection(),{includeMetadataChanges:true},changed,failure)];$('cloud-connected').hidden=false;$('cloud-user').textContent='TRAVELOG shared Firestore records · all devices';status('Cloud connected · waiting for your desktop records or first saved record.');return;}
   if(!remote||remote.legacy){await migrate(remote||db,remote?.revision||0);remote=await read();}
-  if(!base){try{const meta=JSON.parse(localStorage.getItem(META)||'null');if(meta?.workspace===WORKSPACE)base=shared(normalizeDB(JSON.parse(meta.payload)));}catch{}}
-  apply(remote);
+  if(!base){try{const meta=JSON.parse(localStorage.getItem(META)||'null');if(meta?.workspace===WORKSPACE&&meta.path===SYNC_PATH)base=shared(normalizeDB(JSON.parse(meta.payload)));}catch{}}
+  if(base)apply(remote);else bootstrap(remote);
   const changed=snapshot=>{if(epoch!==generation||snapshot.metadata.hasPendingWrites||snapshot.metadata.fromCache)return;refresh().catch(failure);};
   unsubs=[sdk.onSnapshot(root(),{includeMetadataChanges:true},changed,failure),sdk.onSnapshot(collection(),{includeMetadataChanges:true},changed,failure)];
   $('cloud-connected').hidden=false;$('cloud-user').textContent='TRAVELOG shared Firestore records · all devices';
  }
  async function load(){if(!confirm('Load cloud records? Your current local records will be saved as a recovery copy.'))return;localStorage.setItem(STORE+'-before-cloud',json(db));$('cloud-recovery').hidden=false;const remote=await read();if(remote)apply(remote,true);$('cloud-dialog').close();}
  async function backup(){if(!ready)return;await flush();const remote=await read();if(!remote)throw Error('Cloud not ready');const value={...remote,draft:clone(db.draft)};delete value.revision;const payload=json(value);if(new TextEncoder().encode(payload).length>900000){backupStatus('Records synced. Full backup exceeds Firestore document size; use Export backup.');backupRevision=remote.revision;return;}await sdk.runTransaction(firestore,async tx=>{const ref=sdk.doc(collection(),'backup'),old=await tx.get(ref);if(!old.exists()||old.data().revision<=remote.revision)tx.set(ref,{version:1,workspace:WORKSPACE,revision:remote.revision,payload});});backupRevision=remote.revision;backupStatus('Firestore backup saved · revision '+remote.revision);}
- window.invoiceCloud={queue,hasUser:()=>!!user,reserveNumber:async minimum=>{await flush();if(!ready)throw Error('cloud-not-ready');const n=await sdk.runTransaction(firestore,async tx=>{const snap=await tx.get(counter()),next=Math.max(18,minimum,snap.exists()?snap.data().next:18);tx.set(counter(),{next:next+1});return next;});return sequence(n);}};
+ window.invoiceCloud={queue,hasUser:()=>!!user,reserveNumber:async minimum=>{if(!ready&&user)await connect();await flush();if(!ready)throw Error('cloud-not-ready');const n=await sdk.runTransaction(firestore,async tx=>{const snap=await tx.get(counter()),next=Math.max(18,minimum,db.next,snap.exists()?snap.data().next:18);tx.set(counter(),{next:next+1});return next;});return sequence(n);}};
  $('cloud-account').onclick=()=>$('cloud-dialog').showModal();$('cloud-close').onclick=()=>$('cloud-dialog').close();$('cloud-retry').onclick=()=>connect().catch(failure);$('cloud-load').onclick=()=>load().catch(failure);
  $('cloud-upload').textContent='Sync this device’s changes';$('cloud-upload').onclick=async()=>{try{await connect();queue();await flush();$('cloud-dialog').close();}catch(error){failure(error);}};
  $('cloud-backup').onclick=()=>backup().catch(error=>backupStatus('Cloud backup failed: '+error.message));
