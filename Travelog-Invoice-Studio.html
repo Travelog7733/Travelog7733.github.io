@@ -1556,12 +1556,12 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
   return result;
  }
  function remember(){try{localStorage.setItem(META,json({workspace:WORKSPACE,payload:json({...base,draft:db.draft}),revision:base.revision}));}catch{}}
- function render(){if(document.activeElement?.matches('input,textarea,select')||document.querySelector('#records-view dialog[open],#item-tax-dialog[open]')){renderPending=true;return;}renderPending=false;if(activeTab!=='editor')records();updateInvoiceNumberStatus();}
+ function render(){if(document.activeElement?.matches('input,textarea,select')||document.querySelector('#records-view dialog[open],#item-tax-dialog[open]')){renderPending=true;return;}renderPending=false;pickers();if(activeTab!=='editor')records();updateInvoiceNumberStatus();}
  document.addEventListener('focusout',()=>setTimeout(()=>{if(renderPending)render();},0));document.addEventListener('click',()=>setTimeout(()=>{if(renderPending)render();},0));
  function apply(remote,explicit=false){
   const local=shared(db),merged=explicit?shared(remote):mergeState(base||shared(normalizeDB(clone(seed))),local,shared(remote));
   const value=normalizeDB({...merged,draft:clone(db.draft),draftSourceNumber:db.draftSourceNumber});if(!validDB(value))throw Error('invalid-cloud-data');
-  prepareWorkspaceReplacement();db=value;base=clone(remote);ready=true;remember();persist();render();status('Live cloud records connected · shared across devices.');if(remote.revision>backupRevision){clearTimeout(backupTimer);backupTimer=setTimeout(()=>backup().catch(error=>{backupStatus('Cloud backup unavailable: '+error.message+'. Firestore sync continues.');}),1600);}if(!equal(shared(db),shared(base)))queue();
+  prepareWorkspaceReplacement();db=value;base=clone(remote);ready=true;remember();persist();render();status('Cloud synced · '+db.invoices.length+' invoices · '+db.customers.length+' customers · revision '+remote.revision+'.');if(remote.revision>backupRevision){clearTimeout(backupTimer);backupTimer=setTimeout(()=>backup().catch(error=>{backupStatus('Cloud backup unavailable: '+error.message+'. Firestore sync continues.');}),1600);}if(!equal(shared(db),shared(base)))queue();
  }
  async function read(){
   for(let attempt=0;attempt<5;attempt++){
