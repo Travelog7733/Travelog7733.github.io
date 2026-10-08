@@ -331,7 +331,7 @@ body.sidebar-collapsed .sidebar #sidebar-nav #sales-nav-toggle.active,body.sideb
 <dialog id="cloud-dialog" aria-labelledby="cloud-title"><div class="cloud-dialog-header"><h2 id="cloud-title">Cloud sync</h2><button id="cloud-close" class="quiet" aria-label="Close cloud settings">Close</button></div>
 <p>TRAVELOG · travelog-itinerary</p><p>One company workspace for every device. Invoices, purchases, payments, receipts, banks, customers, items and tax codes save automatically and appear wherever you open the updated app.</p><button id="cloud-retry" class="quiet">Retry sync</button><p id="cloud-dialog-status" role="status"></p><p id="cloud-dialog-backup-status" role="status">Live backup will start after cloud sync.</p>
 <div id="cloud-connected" hidden><p id="cloud-user"></p><div class="cloud-shared-info"><strong>All devices share the same records</strong><p>No email sign-in or device linking is needed. Open the same updated Accounts Platform page on your desktop, phone or tablet.</p></div>
-<details class="cloud-workspace-tools"><summary>Workspace recovery</summary><p>Sync this device’s changes merges independent edits with cloud records. Export a local backup before loading cloud records to resolve conflicting edits. Your unfinished invoice draft stays on this device.</p><div class="cloud-controls"><button id="cloud-load" class="primary">Load cloud workspace</button><button id="cloud-upload" class="quiet">Upload this workspace</button><button id="cloud-recovery" class="quiet" hidden>Export local recovery copy</button><button id="cloud-export-previous" class="quiet" hidden>Export previous cloud copy</button><button id="cloud-restore-latest" class="quiet">Restore latest cloud backup</button></div></details>
+<details class="cloud-workspace-tools"><summary>Workspace recovery</summary><p>Saved records sync automatically across devices. If edits conflict, the current Firebase version stays active and the other version is preserved automatically. Your unfinished invoice draft stays on this device.</p><div class="cloud-controls"><button id="cloud-load" class="primary">Load cloud workspace</button><button id="cloud-upload" class="quiet">Upload this workspace</button><button id="cloud-recovery" class="quiet" hidden>Export local recovery copy</button><button id="cloud-export-previous" class="quiet" hidden>Export previous cloud copy</button><button id="cloud-restore-latest" class="quiet">Restore latest cloud backup</button></div></details>
 <p class="hint">Firestore syncs records live. Firestore keeps the latest company JSON backup automatically, within its document size limit. Local backups remain available offline.</p></div>
 <details id="firebase-setup"><summary>Cloud setup · same Firebase as Itinerary Builder</summary><p>Uses the existing travelog-itinerary Firestore project directly, without Authentication or a separate Storage bucket. Invoice records use itineraryBuilder/crmState/invoiceStudio, separate from itinerary records.</p><p>If the existing itinerary rules cover all workspace subcollections, no rule change is needed. If access is denied, add this scoped rule inside the existing Firestore documents block and preserve all itinerary rules.</p><p>Like the reference app, this setup allows visitors with the app to access the shared records.</p><pre>// Add inside match /databases/{database}/documents only if existing
 // itinerary workspace rules do not already cover its subcollections.
@@ -1534,6 +1534,15 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  const META=STORE+'-firestore-records-v3',WORKSPACE='travelog-shared-v1',SYNC_PATH='itineraryBuilder/crmState/invoiceStudio';
  let sdk,firestore,auth,storage,ready=false,user=null,base=null,timer,writing=null,refreshing=false,again=false,unsubs=[],retry,generation=0,renderPending=false,backupTimer,backupRevision=0;
  const clone=v=>structuredClone(v),json=v=>JSON.stringify(v),equal=(a,b)=>json(a)===json(b);
+ const conflictCopies=new Map();
+ try{for(const copy of JSON.parse(localStorage.getItem(STORE+'-conflict-recovery')||'[]'))conflictCopies.set(copy.id,copy);}catch{}
+ function preserveConflict(key,id,previous,local,remote){
+  const recoveryKey=STORE+'-conflict-recovery',copies=JSON.parse(localStorage.getItem(recoveryKey)||'[]');
+  const value={type:key,recordId:id,previous:previous??null,local:local??null,remote:remote??null};
+  let copy=copies.find(row=>equal(row.value,value));
+  if(!copy){copy={id:'conflict-'+Date.now()+'-'+Math.random().toString(36).slice(2),value,workspace:clone(db)};copies.push(copy);localStorage.setItem(recoveryKey,json(copies));if(localStorage.getItem(recoveryKey)!==json(copies))throw Error('Could not preserve conflicting records');}
+  conflictCopies.set(copy.id,copy);$('cloud-recovery').hidden=false;return clone(remote);
+ }
  const root=()=>sdk.doc(firestore,'itineraryBuilder','crmState','invoiceStudio','manifest');
  const counter=()=>sdk.doc(firestore,'itineraryBuilder','crmState','invoiceStudio','invoiceCounter');
  const collection=()=>sdk.collection(firestore,'itineraryBuilder','crmState','invoiceStudio');
@@ -1541,9 +1550,14 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  const recordRef=(key,id)=>sdk.doc(collection(),encodeURIComponent(key+':'+id));
  function nextSavedNumber(invoices){return Math.max(0,...invoices.map(row=>{const match=/^TG-INV-(\d+)$/.exec(row.number||'');return match?Number(match[1]):0;}))+1;}
  function shared(value){return Object.fromEntries(keys.map(key=>[key,clone(value[key]||[])]).concat([['version',2],['next',nextSavedNumber(value.invoices||[])],['nextPurchase',value.nextPurchase],['nextOutgoingPayment',value.nextOutgoingPayment]]));}
+ // Load the acknowledged state before the first network request, so saves
+ // made while Firebase is connecting remain pending changes.
+ try{const meta=JSON.parse(localStorage.getItem(META)||'null');if(meta?.workspace===WORKSPACE&&meta.path===SYNC_PATH){const value=normalizeDB(JSON.parse(meta.payload));if(validDB(value))base={...shared(value),revision:meta.revision};}}catch{}
+ if(!base&&equal(shared(db),shared(normalizeDB(clone(seed)))))base={...shared(db),revision:0};
+ function listenerFailure(error){ready=false;failure(error);}
  function status(text){$('cloud-status').textContent=$('cloud-dialog-status').textContent=text;$('cloud-backup').disabled=!ready;}
  function backupStatus(text){$('cloud-backup-status').textContent=$('cloud-dialog-backup-status').textContent=text;}
- function failure(error){console.warn('Cloud sync:',error);status(/permission-denied/.test(error.code||'')?'Cloud access denied. Publish the updated rules in Firebase setup. Local records are safe.':/conflict/.test(error.message||'')?'The same record field changed on two devices. Local changes are safe; export a backup, then load cloud records to resolve.':'Cloud sync interrupted: '+(error.message||error.code)+'. Local changes are safe; retrying.');clearTimeout(retry);retry=setTimeout(()=>connect().catch(failure),10000);}
+ function failure(error){console.warn('Cloud sync:',error);status(/permission-denied/.test(error.code||'')?'Firebase access denied. Changes are saved locally.':'Saved locally · reconnecting automatically…');clearTimeout(retry);retry=setTimeout(()=>autoSync().catch(failure),10000);}
  function merge(baseValue,local,remote){
   if(equal(local,baseValue))return clone(remote);if(equal(remote,baseValue)||equal(local,remote))return clone(local);
   if(local&&remote&&baseValue&&typeof local==='object'&&!Array.isArray(local)&&!Array.isArray(remote)){
@@ -1553,7 +1567,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  }
  function mergeState(previous,local,remote){
   const result=clone(remote);
-  for(const key of keys){const map=rows=>new Map((rows||[]).map(row=>[identity(key,row),row])),b=map(previous[key]),l=map(local[key]),r=map(remote[key]);result[key]=[];for(const id of new Set([...b.keys(),...l.keys(),...r.keys()])){const row=merge(b.get(id),l.get(id),r.get(id));if(row!==undefined)result[key].push(row);}}
+  for(const key of keys){const map=rows=>new Map((rows||[]).map(row=>[identity(key,row),row])),b=map(previous[key]),l=map(local[key]),r=map(remote[key]);result[key]=[];for(const id of new Set([...b.keys(),...l.keys(),...r.keys()])){let row;try{row=merge(b.get(id),l.get(id),r.get(id));}catch(error){if(error.message!=='conflict')throw error;row=preserveConflict(key,id,b.get(id),l.get(id),r.get(id));}if(row!==undefined)result[key].push(row);}}
   for(const key of ['next','nextPurchase','nextOutgoingPayment'])result[key]=Math.max(local[key]||1,remote[key]||1);
   return result;
  }
@@ -1593,24 +1607,28 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  function queue(){if(!ready||!base)return;clearTimeout(timer);if(equal(shared(db),shared(base)))return;status(navigator.onLine?'Changes saved locally · saving cloud records…':'Offline · changes saved locally; cloud sync resumes online.');timer=setTimeout(()=>flush().catch(failure),700);}
  async function flush(){
   clearTimeout(timer);if(writing)return writing;if(!ready||!base||!navigator.onLine)return;
+  for(const [id,copy] of conflictCopies){await sdk.runTransaction(firestore,async tx=>{tx.set(sdk.doc(collection(),id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()});});conflictCopies.delete(id);backupStatus('Conflicting versions preserved in Firebase and this browser. Export local recovery to review.');}
   const sent=shared(db),previous=shared(base),changes=[];
   for(const key of keys){const b=new Map(previous[key].map(row=>[identity(key,row),row])),l=new Map(sent[key].map(row=>[identity(key,row),row]));for(const id of new Set([...b.keys(),...l.keys()]))if(!equal(b.get(id),l.get(id)))changes.push({key,id,before:b.get(id),after:l.get(id)});}
   if(!changes.length&&equal(sent,previous))return;
   const currentGeneration=generation;
   writing=(async()=>{
    if(base.revision===0){await migrate({...sent,draft:clone(db.draft)},0);base={...clone(sent),revision:1};remember();return;}
-   for(let offset=0;offset<Math.max(1,changes.length);offset+=350){const part=changes.slice(offset,offset+350);
+   for(let offset=0;offset<Math.max(1,changes.length);offset+=100){const part=changes.slice(offset,offset+100);let resolved;
     await sdk.runTransaction(firestore,async tx=>{
      const manifest=await tx.get(root()),count=await tx.get(counter()),snapshots=[];for(const change of part)snapshots.push(await tx.get(recordRef(change.key,change.id)));
      if(!manifest.exists()||manifest.data().schemaVersion!==3)throw Error('Workspace schema changed');
-     const merged=part.map((change,i)=>merge(change.before,change.after,snapshots[i].exists()?snapshots[i].data().data:undefined));
+     const archives=[];resolved=new Map();
+     const merged=part.map((change,i)=>{const remote=snapshots[i].exists()?snapshots[i].data().data:undefined;try{return merge(change.before,change.after,remote);}catch(error){if(error.message!=='conflict')throw error;const value=preserveConflict(change.key,change.id,change.before,change.after,remote);resolved.set(i,value);for(const [id,copy] of conflictCopies)if(copy.value.type===change.key&&copy.value.recordId===change.id)archives.push({id,copy});return value;}});
+     for(const {id,copy} of archives)tx.set(sdk.doc(collection(),id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()});
      merged.forEach((row,i)=>{const ref=recordRef(part[i].key,part[i].id);if(row===undefined)tx.delete(ref);else tx.set(ref,{type:part[i].key,data:row});});
      const settings={...manifest.data().settings};for(const key of ['next','nextPurchase','nextOutgoingPayment'])settings[key]=Math.max(settings[key]||1,sent[key]||1);settings.version=2;
      tx.set(root(),{schemaVersion:3,settings,revision:manifest.data().revision+1,updatedAt:sdk.serverTimestamp()});tx.set(counter(),{next:Math.max(18,sent.next,count.exists()?count.data().next:18)});
     });
     if(currentGeneration!==generation)return;
     // Mark only acknowledged local changes as the baseline; later reads merge remote changes.
-    for(const change of part){base[change.key]=base[change.key].filter(row=>identity(change.key,row)!==change.id);if(change.after)base[change.key].push(clone(change.after));}
+    for(const [i,change] of part.entries()){const acknowledged=resolved.has(i)?resolved.get(i):change.after;base[change.key]=base[change.key].filter(row=>identity(change.key,row)!==change.id);if(acknowledged)base[change.key].push(clone(acknowledged));if(resolved.has(i)&&equal(db[change.key].find(row=>identity(change.key,row)===change.id),change.after)){db[change.key]=db[change.key].filter(row=>identity(change.key,row)!==change.id);if(acknowledged)db[change.key].push(clone(acknowledged));}}
+    persist();
     for(const key of ['next','nextPurchase','nextOutgoingPayment'])base[key]=sent[key];remember();
    }
   })();
@@ -1625,20 +1643,38 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
   if(!base){try{const meta=JSON.parse(localStorage.getItem(META)||'null');if(meta?.workspace===WORKSPACE&&meta.path===SYNC_PATH)base=shared(normalizeDB(JSON.parse(meta.payload)));}catch{}}
   if(base)apply(remote);else bootstrap(remote);
   const changed=snapshot=>{if(epoch!==generation||snapshot.metadata.hasPendingWrites||snapshot.metadata.fromCache)return;refresh().catch(failure);};
-  unsubs=[sdk.onSnapshot(root(),{includeMetadataChanges:true},changed,failure),sdk.onSnapshot(collection(),{includeMetadataChanges:true},changed,failure)];
+  unsubs=[sdk.onSnapshot(root(),{includeMetadataChanges:true},changed,listenerFailure),sdk.onSnapshot(collection(),{includeMetadataChanges:true},changed,listenerFailure)];
   $('cloud-connected').hidden=false;$('cloud-user').textContent='TRAVELOG shared Firestore records · all devices';
  }
  async function load(){if(!confirm('Load cloud records? Your current local records will be saved as a recovery copy.'))return;localStorage.setItem(STORE+'-before-cloud',json(db));$('cloud-recovery').hidden=false;const remote=await read();if(remote)apply(remote,true);$('cloud-dialog').close();}
  async function backup(){if(!ready)return;await flush();const remote=await read();if(!remote)throw Error('Cloud not ready');const value={...remote,draft:clone(db.draft)};delete value.revision;const payload=json(value);if(new TextEncoder().encode(payload).length>900000){backupStatus('Records synced. Full backup exceeds Firestore document size; use Export backup.');backupRevision=remote.revision;return;}await sdk.runTransaction(firestore,async tx=>{const ref=sdk.doc(collection(),'backup'),old=await tx.get(ref);if(!old.exists()||old.data().revision<=remote.revision)tx.set(ref,{version:1,workspace:WORKSPACE,revision:remote.revision,payload});});backupRevision=remote.revision;backupStatus('Firestore backup saved · revision '+remote.revision);}
  window.invoiceCloud={queue,hasUser:()=>!!user,reserveNumber:async()=>{if(!sdk||!firestore||!navigator.onLine)throw Error('cloud-not-ready');if(!ready)await connect();await flush();const remote=await read();if(remote)apply(remote);const next=nextSavedNumber(db.invoices);db.next=next;return sequence(next);}};
+ $('cloud-account').textContent='Automatic sync · details';
+ for(const id of ['cloud-upload','cloud-load','cloud-retry'])$(id).hidden=true;
  $('cloud-account').onclick=()=>$('cloud-dialog').showModal();$('cloud-close').onclick=()=>$('cloud-dialog').close();$('cloud-retry').onclick=()=>connect().catch(failure);$('cloud-load').onclick=()=>load().catch(failure);
  $('cloud-upload').textContent='Sync this device’s changes';$('cloud-upload').onclick=async()=>{try{await connect();queue();await flush();$('cloud-dialog').close();}catch(error){failure(error);}};
  $('cloud-backup').onclick=()=>backup().catch(error=>backupStatus('Cloud backup failed: '+error.message));
- $('cloud-recovery').onclick=()=>{const value=JSON.parse(localStorage.getItem(STORE+'-before-cloud')||'null');if(value)downloadJSON(value,'travelog-local-recovery.json');};
+ $('cloud-recovery').hidden=!localStorage.getItem(STORE+'-conflict-recovery')&&!localStorage.getItem(STORE+'-before-cloud');
+ $('cloud-recovery').onclick=()=>{const conflicts=JSON.parse(localStorage.getItem(STORE+'-conflict-recovery')||'[]'),value=JSON.parse(localStorage.getItem(STORE+'-before-cloud')||'null');if(conflicts.length)downloadJSON({conflicts,beforeCloud:value},'travelog-conflict-recovery.json');else if(value)downloadJSON(value,'travelog-local-recovery.json');};
  $('cloud-export-previous').hidden=true;
  $('cloud-restore-latest').onclick=async()=>{try{await writing;const snap=await sdk.getDocFromServer(sdk.doc(collection(),'backup'));if(!snap.exists())throw Error('No cloud backup yet');const record=snap.data(),value=JSON.parse(record.payload);if(record.workspace!==WORKSPACE||!validDB(value))throw Error('Invalid backup');if(!confirm('Restore backup locally? Export your current records first.'))return;ready=false;unsubs.forEach(stop=>stop());unsubs=[];generation++;clearTimeout(timer);clearTimeout(backupTimer);localStorage.setItem(STORE+'-before-cloud',json(db));prepareWorkspaceReplacement();db=normalizeDB(value);data=clone(db.draft);persist();form();render();status('Backup restored locally. Export it before reconnecting to cloud.');}catch(error){backupStatus('Restore failed: '+error.message);}};
- window.addEventListener('online',()=>connect().catch(failure));window.addEventListener('offline',()=>status('Offline · browser backup active. Reconnect to sync.'));document.addEventListener('visibilitychange',()=>{if(!document.hidden&&navigator.onLine&&user)refresh().catch(failure);});
- (async()=>{try{const url='https://www.gstatic.com/firebasejs/12.13.0/';const modules=await Promise.all(['app','firestore'].map(name=>import(url+'firebase-'+name+'.js')));sdk=Object.assign({},...modules);const app=sdk.initializeApp(FIREBASE_CONFIG);firestore=sdk.getFirestore(app);user={uid:'shared-itinerary-workspace'};connect().catch(failure);}catch(error){failure(error);}})();
+ let syncing=null;
+ // One recovery pass at a time. Keep the acknowledged baseline so pending
+ // local changes can be merged safely after a lost connection.
+ async function autoSync(){
+  if(!navigator.onLine)return;if(syncing)return syncing;
+  syncing=(async()=>{
+   if(!user){const url='https://www.gstatic.com/firebasejs/12.13.0/';const modules=await Promise.all(['app','firestore'].map(name=>import(url+'firebase-'+name+'.js')));sdk=Object.assign({},...modules);const app=sdk.getApps().length?sdk.getApp():sdk.initializeApp(FIREBASE_CONFIG);firestore=sdk.getFirestore(app);user={uid:'shared-itinerary-workspace'};}
+   if(!ready)await connect();
+   await flush();await refresh();clearTimeout(retry);
+  })();
+  try{await syncing;}finally{syncing=null;}
+ }
+ window.addEventListener('online',()=>autoSync().catch(failure));window.addEventListener('offline',()=>status('Offline · changes saved locally; automatic sync resumes online.'));
+ window.addEventListener('focus',()=>autoSync().catch(failure));window.addEventListener('pageshow',()=>autoSync().catch(failure));
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync().catch(failure);});
+ setInterval(()=>{if(!document.hidden)autoSync().catch(failure);},15000);
+ autoSync().catch(failure);
 })();
 
 </script></body></html>
