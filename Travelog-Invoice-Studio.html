@@ -1535,13 +1535,14 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  let sdk,firestore,auth,storage,ready=false,user=null,base=null,timer,writing=null,refreshing=false,again=false,unsubs=[],retry,generation=0,renderPending=false,backupTimer,backupRevision=0;
  const clone=v=>structuredClone(v),json=v=>JSON.stringify(v),equal=(a,b)=>json(a)===json(b);
  const conflictCopies=new Map();
+ const memoryConflictCopies=new Map();
  const cloudRecoveryConfirmed=new Set();let quotaRecovery=null;
  try{for(const copy of JSON.parse(localStorage.getItem(STORE+'-conflict-recovery')||'[]'))conflictCopies.set(copy.id,copy);}catch{}
  function preserveConflict(key,id,previous,local,remote){
   const recoveryKey=STORE+'-conflict-recovery',copies=JSON.parse(localStorage.getItem(recoveryKey)||'[]');
   const value={type:key,recordId:id,previous:previous??null,local:local??null,remote:remote??null};
-  let copy=copies.find(row=>equal(row.value,value))||[...conflictCopies.values()].find(row=>equal(row.value,value));
-  if(!copy){copy={id:'conflict-'+Date.now()+'-'+Math.random().toString(36).slice(2),value};copies.push(copy);try{localStorage.setItem(recoveryKey,json(copies));if(localStorage.getItem(recoveryKey)!==json(copies))throw Error('Could not preserve conflicting records');}catch(error){conflictCopies.set(copy.id,copy);error.recoveryCopy=copy;throw error;}}
+  let copy=copies.find(row=>equal(row.value,value))||[...memoryConflictCopies.values(),...conflictCopies.values()].find(row=>equal(row.value,value));
+  if(!copy){copy={id:'conflict-'+Date.now()+'-'+Math.random().toString(36).slice(2),value};memoryConflictCopies.set(copy.id,copy);copies.push(copy);try{localStorage.setItem(recoveryKey,json(copies));if(localStorage.getItem(recoveryKey)!==json(copies))throw Error('Could not preserve conflicting records');}catch(error){conflictCopies.set(copy.id,copy);error.recoveryCopy=copy;throw error;}}
   if(!copies.some(row=>row.id===copy.id)&&!cloudRecoveryConfirmed.has(copy.id)){const error=Error('Recovery awaiting Firebase');error.recoveryCopy=copy;throw error;}
   conflictCopies.set(copy.id,copy);$('cloud-recovery').hidden=false;return clone(remote);
  }
@@ -1624,7 +1625,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  function queue(){if(!ready||!base)return;clearTimeout(timer);if(equal(shared(db),shared(base)))return;status(navigator.onLine?'Changes saved locally · saving cloud records…':'Offline · changes saved locally; cloud sync resumes online.');timer=setTimeout(()=>flush().catch(failure),700);}
  async function flush(){
   clearTimeout(timer);if(writing)return writing;if(!ready||!base||!navigator.onLine)return;
-  for(const [id,copy] of conflictCopies){await commitRecords(firestore,async tx=>{tx.set(sdk.doc(collection(),id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()});});conflictCopies.delete(id);backupStatus('Conflicting versions preserved in Firebase and this browser. Export local recovery to review.');}
+  for(const [id,copy] of conflictCopies){await commitRecords(firestore,async tx=>{tx.set(sdk.doc(collection(),id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()});});cloudRecoveryConfirmed.add(id);conflictCopies.delete(id);backupStatus('Conflicting versions preserved in Firebase and this browser. Export local recovery to review.');}
   const sent=shared(db),previous=shared(base),changes=[];
   for(const key of keys){const b=new Map(previous[key].map(row=>[identity(key,row),row])),l=new Map(sent[key].map(row=>[identity(key,row),row]));for(const id of new Set([...b.keys(),...l.keys()]))if(!equal(b.get(id),l.get(id)))changes.push({key,id,before:b.get(id),after:l.get(id)});}
   if(!changes.length&&equal(sent,previous))return;
@@ -1672,7 +1673,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  $('cloud-upload').textContent='Sync this device’s changes';$('cloud-upload').onclick=async()=>{try{await connect();queue();await flush();$('cloud-dialog').close();}catch(error){failure(error);}};
  $('cloud-backup').onclick=()=>backup().catch(error=>backupStatus('Cloud backup failed: '+error.message));
  $('cloud-recovery').hidden=!localStorage.getItem(STORE+'-conflict-recovery')&&!localStorage.getItem(STORE+'-before-cloud');
- $('cloud-recovery').onclick=()=>{const conflicts=JSON.parse(localStorage.getItem(STORE+'-conflict-recovery')||'[]'),value=window.invoiceRecoveryWorkspace||JSON.parse(localStorage.getItem(STORE+'-before-cloud')||'null');for(const copy of conflictCopies.values())if(!conflicts.some(row=>row.id===copy.id))conflicts.push(copy);if(conflicts.length)downloadJSON({conflicts,beforeCloud:value},'travelog-conflict-recovery.json');else if(value)downloadJSON(value,'travelog-local-recovery.json');};
+ $('cloud-recovery').onclick=()=>{const conflicts=JSON.parse(localStorage.getItem(STORE+'-conflict-recovery')||'[]'),value=window.invoiceRecoveryWorkspace||JSON.parse(localStorage.getItem(STORE+'-before-cloud')||'null');for(const copy of [...memoryConflictCopies.values(),...conflictCopies.values()])if(!conflicts.some(row=>row.id===copy.id))conflicts.push(copy);if(conflicts.length)downloadJSON({conflicts,beforeCloud:value},'travelog-conflict-recovery.json');else if(value)downloadJSON(value,'travelog-local-recovery.json');};
  $('cloud-export-previous').hidden=true;
  $('cloud-restore-latest').onclick=async()=>{try{await writing;const snap=await sdk.getDocFromServer(sdk.doc(collection(),'backup'));if(!snap.exists())throw Error('No cloud backup yet');const record=snap.data(),value=JSON.parse(record.payload);if(record.workspace!==WORKSPACE||!validDB(value))throw Error('Invalid backup');if(!confirm('Restore backup locally? Export your current records first.'))return;ready=false;unsubs.forEach(stop=>stop());unsubs=[];generation++;clearTimeout(timer);clearTimeout(backupTimer);localStorage.setItem(STORE+'-before-cloud',json(db));prepareWorkspaceReplacement();db=normalizeDB(value);data=clone(db.draft);persist();form();render();status('Backup restored locally. Export it before reconnecting to cloud.');}catch(error){backupStatus('Restore failed: '+error.message);}};
  let syncing=null;
