@@ -1535,12 +1535,14 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  let sdk,firestore,auth,storage,ready=false,user=null,base=null,timer,writing=null,refreshing=false,again=false,unsubs=[],retry,generation=0,renderPending=false,backupTimer,backupRevision=0;
  const clone=v=>structuredClone(v),json=v=>JSON.stringify(v),equal=(a,b)=>json(a)===json(b);
  const conflictCopies=new Map();
+ const cloudRecoveryConfirmed=new Set();let quotaRecovery=null;
  try{for(const copy of JSON.parse(localStorage.getItem(STORE+'-conflict-recovery')||'[]'))conflictCopies.set(copy.id,copy);}catch{}
  function preserveConflict(key,id,previous,local,remote){
   const recoveryKey=STORE+'-conflict-recovery',copies=JSON.parse(localStorage.getItem(recoveryKey)||'[]');
   const value={type:key,recordId:id,previous:previous??null,local:local??null,remote:remote??null};
-  let copy=copies.find(row=>equal(row.value,value));
-  if(!copy){copy={id:'conflict-'+Date.now()+'-'+Math.random().toString(36).slice(2),value,workspace:clone(db)};copies.push(copy);localStorage.setItem(recoveryKey,json(copies));if(localStorage.getItem(recoveryKey)!==json(copies))throw Error('Could not preserve conflicting records');}
+  let copy=copies.find(row=>equal(row.value,value))||[...conflictCopies.values()].find(row=>equal(row.value,value));
+  if(!copy){copy={id:'conflict-'+Date.now()+'-'+Math.random().toString(36).slice(2),value};copies.push(copy);try{localStorage.setItem(recoveryKey,json(copies));if(localStorage.getItem(recoveryKey)!==json(copies))throw Error('Could not preserve conflicting records');}catch(error){conflictCopies.set(copy.id,copy);error.recoveryCopy=copy;throw error;}}
+  if(!copies.some(row=>row.id===copy.id)&&!cloudRecoveryConfirmed.has(copy.id)){const error=Error('Recovery awaiting Firebase');error.recoveryCopy=copy;throw error;}
   conflictCopies.set(copy.id,copy);$('cloud-recovery').hidden=false;return clone(remote);
  }
  const root=()=>sdk.doc(firestore,'itineraryBuilder','crmState','invoiceStudio','manifest');
@@ -1564,7 +1566,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  function listenerFailure(error){ready=false;failure(error);}
  function status(text){$('cloud-status').textContent=$('cloud-dialog-status').textContent=text;$('cloud-backup').disabled=!ready;}
  function backupStatus(text){$('cloud-backup-status').textContent=$('cloud-dialog-backup-status').textContent=text;}
- function failure(error){console.warn('Cloud sync:',error);const reason=String(error.code||error.message||'Unknown connection error');status('Firebase save not confirmed · '+reason+' · retrying automatically.');backupStatus('Backup waiting for Firebase connection. Your local records are preserved.');clearTimeout(retry);retry=setTimeout(()=>autoSync().catch(failure),10000);}
+ function failure(error){console.warn('Cloud sync:',error);const quota=error.name==='QuotaExceededError'||error.code===22;const reason=quota?'Browser storage is full':String(error.message||error.code||'Unknown connection error');status('Cloud save pending · '+reason+' · retrying automatically.');backupStatus('Your records are preserved; cloud recovery runs automatically.');if(error.recoveryCopy&&!quotaRecovery){const copy=error.recoveryCopy;quotaRecovery=sdk.setDoc(sdk.doc(collection(),copy.id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()}).then(()=>{cloudRecoveryConfirmed.add(copy.id);return autoSync();}).catch(failure).finally(()=>{quotaRecovery=null;});}clearTimeout(retry);retry=setTimeout(()=>autoSync().catch(failure),10000);}
  function merge(baseValue,local,remote){
   if(equal(local,baseValue))return clone(remote);if(equal(remote,baseValue)||equal(local,remote))return clone(local);
   if(local&&remote&&baseValue&&typeof local==='object'&&!Array.isArray(local)&&!Array.isArray(remote)){
@@ -1579,11 +1581,19 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
   return result;
  }
  function remember(){try{localStorage.setItem(META,json({workspace:WORKSPACE,path:SYNC_PATH,payload:json({...base,draft:db.draft}),revision:base.revision}));}catch{}}
- function bootstrap(remote){
+ async function bootstrap(remote){
   // Old browser records have no acknowledged baseline for this collection.
   // Preserve them before choosing the shared cloud as the initial source.
   if(!equal(shared(db),shared(remote))&&!equal(shared(db),shared(normalizeDB(clone(seed))))){
-   const payload=json(db),recoveryKey=STORE+'-before-cloud';localStorage.setItem(recoveryKey,payload);if(localStorage.getItem(recoveryKey)!==payload)throw Error('Could not preserve local recovery copy');$('cloud-recovery').hidden=false;
+   const payload=json(db),recoveryKey=STORE+'-before-cloud';try{localStorage.setItem(recoveryKey,payload);if(localStorage.getItem(recoveryKey)!==payload)throw Error('Could not preserve local recovery copy');}catch(error){
+    // Preserve local-only records in Firebase before loading the cloud when
+    // the browser cannot store another full workspace copy.
+    const recoveryId='workspace-recovery-'+Date.now();
+    const chunkSize=175000,total=Math.ceil(payload.length/chunkSize);
+    for(let index=0;index<total;index++)await sdk.setDoc(sdk.doc(collection(),recoveryId+'-'+index),{kind:'workspace-recovery-chunk',recoveryId,index,payload:payload.slice(index*chunkSize,(index+1)*chunkSize)});
+    await sdk.setDoc(sdk.doc(collection(),recoveryId),{kind:'workspace-recovery',chunks:total,complete:true,updatedAt:sdk.serverTimestamp()});
+    window.invoiceRecoveryWorkspace=clone(db);
+   }$('cloud-recovery').hidden=false;
   }
   apply(remote,true);
  }
@@ -1648,7 +1658,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
   if(!remote&&equal(shared(db),shared(normalizeDB(clone(seed))))){base={...shared(db),revision:0};ready=true;const changed=snapshot=>{if(epoch===generation&&!snapshot.metadata.hasPendingWrites&&!snapshot.metadata.fromCache)refresh().catch(failure);};unsubs=[sdk.onSnapshot(root(),{includeMetadataChanges:true},changed,failure),sdk.onSnapshot(collection(),{includeMetadataChanges:true},changed,failure)];$('cloud-connected').hidden=false;$('cloud-user').textContent='TRAVELOG shared Firestore records · all devices';status('Cloud connected · waiting for your desktop records or first saved record.');return;}
   if(!remote||remote.legacy){await migrate(remote||db,remote?.revision||0);remote=await read();}
   if(!base){try{const meta=JSON.parse(localStorage.getItem(META)||'null');if(meta?.workspace===WORKSPACE&&meta.path===SYNC_PATH)base=shared(normalizeDB(JSON.parse(meta.payload)));}catch{}}
-  if(base)apply(remote);else bootstrap(remote);
+  if(base)apply(remote);else await bootstrap(remote);
   const changed=snapshot=>{if(epoch!==generation||snapshot.metadata.hasPendingWrites||snapshot.metadata.fromCache)return;refresh().catch(failure);};
   unsubs=[sdk.onSnapshot(root(),{includeMetadataChanges:true},changed,listenerFailure),sdk.onSnapshot(collection(),{includeMetadataChanges:true},changed,listenerFailure)];
   $('cloud-connected').hidden=false;$('cloud-user').textContent='TRAVELOG shared Firestore records · all devices';
@@ -1662,7 +1672,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  $('cloud-upload').textContent='Sync this device’s changes';$('cloud-upload').onclick=async()=>{try{await connect();queue();await flush();$('cloud-dialog').close();}catch(error){failure(error);}};
  $('cloud-backup').onclick=()=>backup().catch(error=>backupStatus('Cloud backup failed: '+error.message));
  $('cloud-recovery').hidden=!localStorage.getItem(STORE+'-conflict-recovery')&&!localStorage.getItem(STORE+'-before-cloud');
- $('cloud-recovery').onclick=()=>{const conflicts=JSON.parse(localStorage.getItem(STORE+'-conflict-recovery')||'[]'),value=JSON.parse(localStorage.getItem(STORE+'-before-cloud')||'null');if(conflicts.length)downloadJSON({conflicts,beforeCloud:value},'travelog-conflict-recovery.json');else if(value)downloadJSON(value,'travelog-local-recovery.json');};
+ $('cloud-recovery').onclick=()=>{const conflicts=JSON.parse(localStorage.getItem(STORE+'-conflict-recovery')||'[]'),value=window.invoiceRecoveryWorkspace||JSON.parse(localStorage.getItem(STORE+'-before-cloud')||'null');for(const copy of conflictCopies.values())if(!conflicts.some(row=>row.id===copy.id))conflicts.push(copy);if(conflicts.length)downloadJSON({conflicts,beforeCloud:value},'travelog-conflict-recovery.json');else if(value)downloadJSON(value,'travelog-local-recovery.json');};
  $('cloud-export-previous').hidden=true;
  $('cloud-restore-latest').onclick=async()=>{try{await writing;const snap=await sdk.getDocFromServer(sdk.doc(collection(),'backup'));if(!snap.exists())throw Error('No cloud backup yet');const record=snap.data(),value=JSON.parse(record.payload);if(record.workspace!==WORKSPACE||!validDB(value))throw Error('Invalid backup');if(!confirm('Restore backup locally? Export your current records first.'))return;ready=false;unsubs.forEach(stop=>stop());unsubs=[];generation++;clearTimeout(timer);clearTimeout(backupTimer);localStorage.setItem(STORE+'-before-cloud',json(db));prepareWorkspaceReplacement();db=normalizeDB(value);data=clone(db.draft);persist();form();render();status('Backup restored locally. Export it before reconnecting to cloud.');}catch(error){backupStatus('Restore failed: '+error.message);}};
  let syncing=null;
