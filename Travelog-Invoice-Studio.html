@@ -1542,7 +1542,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
   const value={type:key,recordId:id,previous:previous??null,local:local??null,remote:remote??null};
   let copy=[...memoryConflictCopies.values(),...conflictCopies.values()].find(row=>equal(row.value,value));
   if(!copy){copy={id:'conflict-'+Date.now()+'-'+Math.random().toString(36).slice(2),value};memoryConflictCopies.set(copy.id,copy);}
-  if(!cloudRecoveryConfirmed.has(copy.id)){conflictCopies.set(copy.id,copy);if(!inCommit){const error=Error('Preserving conflicting version in Firebase');error.recoveryCopy=copy;throw error;}}
+  if(!cloudRecoveryConfirmed.has(copy.id))conflictCopies.set(copy.id,copy);
   $('cloud-recovery').hidden=false;return clone(remote);
  }
  const root=()=>sdk.doc(firestore,'itineraryBuilder','crmState','invoiceStudio','manifest');
@@ -1566,7 +1566,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  function listenerFailure(error){ready=false;failure(error);}
  function status(text){$('cloud-status').textContent=$('cloud-dialog-status').textContent=text;$('cloud-backup').disabled=!ready;}
  function backupStatus(text){$('cloud-backup-status').textContent=$('cloud-dialog-backup-status').textContent=text;}
- function failure(error){console.warn('Cloud sync:',error);const quota=error.name==='QuotaExceededError'||error.code===22;const reason=quota?'Browser storage is full':String(error.message||error.code||'Unknown connection error');status('Cloud save pending · '+reason+' · retrying automatically.');backupStatus('Your records are preserved; cloud recovery runs automatically.');if(error.recoveryCopy&&!quotaRecovery){const copy=error.recoveryCopy;quotaRecovery=sdk.setDoc(sdk.doc(collection(),copy.id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()}).then(()=>{cloudRecoveryConfirmed.add(copy.id);return autoSync();}).catch(failure).finally(()=>{quotaRecovery=null;});}clearTimeout(retry);retry=setTimeout(()=>autoSync().catch(failure),10000);}
+ function failure(error){console.warn('Cloud sync:',error);const quota=error.name==='QuotaExceededError'||error.code===22;const reason=quota?'Browser storage is full':String(error.message||error.code||'Unknown connection error');status('Cloud save pending · '+reason+' · retrying automatically.');backupStatus('Your records are preserved; cloud recovery runs automatically.');clearTimeout(retry);retry=setTimeout(()=>autoSync().catch(failure),10000);}
  function merge(baseValue,local,remote){
   if(equal(local,baseValue))return clone(remote);if(equal(remote,baseValue)||equal(local,remote))return clone(local);
   if(local&&remote&&baseValue&&typeof local==='object'&&!Array.isArray(local)&&!Array.isArray(remote)){
@@ -1595,12 +1595,18 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
     window.invoiceRecoveryWorkspace=clone(db);
    }$('cloud-recovery').hidden=false;
   }
-  apply(remote,true);
+  await apply(remote,true);
  }
  function render(){if(document.activeElement?.matches('input,textarea,select')||document.querySelector('#records-view dialog[open],#item-tax-dialog[open]')){renderPending=true;return;}renderPending=false;pickers();if(activeTab!=='editor')records();updateInvoiceNumberStatus();}
  document.addEventListener('focusout',()=>setTimeout(()=>{if(renderPending)render();},0));document.addEventListener('click',()=>setTimeout(()=>{if(renderPending)render();},0));
- function apply(remote,explicit=false){
-  const local=shared(db),merged=explicit?shared(remote):mergeState(base||shared(normalizeDB(clone(seed))),local,shared(remote));
+ let applying=Promise.resolve();
+ function apply(remote,explicit=false){const task=applying.then(()=>applyRemote(remote,explicit));applying=task.catch(()=>{});return task;}
+ async function saveConflictCopies(){for(const [id,copy] of conflictCopies){await sdk.setDoc(sdk.doc(collection(),id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()});cloudRecoveryConfirmed.add(id);conflictCopies.delete(id);}}
+ async function applyRemote(remote,explicit=false){
+  let local,merged;
+  // Archive every conflicting record in one recovery pass before changing
+  // the active workspace. Recompute if a user saves during the upload.
+  do{local=shared(db);merged=explicit?shared(remote):mergeState(base||shared(normalizeDB(clone(seed))),local,shared(remote));await saveConflictCopies();}while(!equal(local,shared(db)));
   const value=normalizeDB({...merged,draft:clone(db.draft),draftSourceNumber:db.draftSourceNumber});if(!validDB(value))throw Error('invalid-cloud-data');
   prepareWorkspaceReplacement();db=value;base=clone(remote);ready=true;remember();persist();render();status('Cloud synced · '+db.invoices.length+' invoices · '+db.customers.length+' customers · revision '+remote.revision+'.');if(remote.revision>backupRevision){clearTimeout(backupTimer);backupTimer=setTimeout(()=>backup().catch(error=>{backupStatus('Cloud backup unavailable: '+error.message+'. Firestore sync continues.');}),1600);}if(!equal(shared(db),shared(base)))queue();
  }
@@ -1651,22 +1657,22 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
   })();
   try{await writing;}finally{writing=null;refresh().catch(failure);}queue();
  }
- async function refresh(){if(writing||refreshing){again=true;return;}refreshing=true;const epoch=generation;try{const remote=await read();if(epoch===generation&&remote&&!remote.legacy)apply(remote);}finally{refreshing=false;if(again){again=false;setTimeout(()=>refresh().catch(failure),200);}}}
+ async function refresh(){if(writing||refreshing){again=true;return;}refreshing=true;const epoch=generation;try{const remote=await read();if(epoch===generation&&remote&&!remote.legacy)await apply(remote);}finally{refreshing=false;if(again){again=false;setTimeout(()=>refresh().catch(failure),200);}}}
  async function connect(){
   if(writing)await writing;if(!user)return;const epoch=++generation;unsubs.forEach(stop=>stop());unsubs=[];ready=false;clearTimeout(retry);status('Connecting to shared Firestore records…');
   let remote=await read();if(epoch!==generation)return;
   if(!remote&&equal(shared(db),shared(normalizeDB(clone(seed))))){base={...shared(db),revision:0};ready=true;const changed=snapshot=>{if(epoch===generation&&!snapshot.metadata.hasPendingWrites&&!snapshot.metadata.fromCache)refresh().catch(failure);};unsubs=[sdk.onSnapshot(root(),{includeMetadataChanges:true},changed,failure),sdk.onSnapshot(collection(),{includeMetadataChanges:true},changed,failure)];$('cloud-connected').hidden=false;$('cloud-user').textContent='TRAVELOG shared Firestore records · all devices';status('Cloud connected · waiting for your desktop records or first saved record.');return;}
   if(!remote||remote.legacy){await migrate(remote||db,remote?.revision||0);remote=await read();}
   if(!base){try{const meta=JSON.parse(localStorage.getItem(META)||'null');if(meta?.workspace===WORKSPACE&&meta.path===SYNC_PATH)base=shared(normalizeDB(JSON.parse(meta.payload)));}catch{}}
-  if(base)apply(remote);else await bootstrap(remote);
+  if(base)await apply(remote);else await bootstrap(remote);
   const changed=snapshot=>{if(epoch!==generation||snapshot.metadata.hasPendingWrites||snapshot.metadata.fromCache)return;refresh().catch(failure);};
   unsubs=[sdk.onSnapshot(root(),{includeMetadataChanges:true},changed,listenerFailure),sdk.onSnapshot(collection(),{includeMetadataChanges:true},changed,listenerFailure)];
   $('cloud-connected').hidden=false;$('cloud-user').textContent='TRAVELOG shared Firestore records · all devices';
  }
- async function load(){if(!confirm('Load cloud records? Your current local records will be saved as a recovery copy.'))return;localStorage.setItem(STORE+'-before-cloud',json(db));$('cloud-recovery').hidden=false;const remote=await read();if(remote)apply(remote,true);$('cloud-dialog').close();}
+ async function load(){if(!confirm('Load cloud records? Your current local records will be saved as a recovery copy.'))return;localStorage.setItem(STORE+'-before-cloud',json(db));$('cloud-recovery').hidden=false;const remote=await read();if(remote)await apply(remote,true);$('cloud-dialog').close();}
  async function backup(){if(!ready)return;await flush();const remote=await read();if(!remote)throw Error('Cloud not ready');const value={...remote,draft:clone(db.draft)};delete value.revision;const payload=json(value);if(new TextEncoder().encode(payload).length>900000){backupStatus('Records synced. Full backup exceeds Firestore document size; use Export backup.');backupRevision=remote.revision;return;}await commitRecords(firestore,async tx=>{const ref=sdk.doc(collection(),'backup'),old=await tx.get(ref);if(!old.exists()||old.data().revision<=remote.revision)tx.set(ref,{version:1,workspace:WORKSPACE,revision:remote.revision,payload});});backupRevision=remote.revision;backupStatus('Firestore backup saved · revision '+remote.revision);}
- window.invoiceCloud={queue,hasUser:()=>!!user,reserveNumber:async()=>{if(!sdk||!firestore||!navigator.onLine)throw Error('cloud-not-ready');if(!ready)await connect();await flush();const remote=await read();if(remote)apply(remote);const next=nextSavedNumber(db.invoices);db.next=next;return sequence(next);}};
- $('cloud-account').textContent='Automatic sync · cloud v3';
+ window.invoiceCloud={queue,hasUser:()=>!!user,reserveNumber:async()=>{if(!sdk||!firestore||!navigator.onLine)throw Error('cloud-not-ready');if(!ready)await connect();await flush();const remote=await read();if(remote)await apply(remote);const next=nextSavedNumber(db.invoices);db.next=next;return sequence(next);}};
+ $('cloud-account').textContent='Automatic sync · cloud v4';
  for(const id of ['cloud-upload','cloud-load','cloud-retry'])$(id).hidden=true;
  $('cloud-account').onclick=()=>$('cloud-dialog').showModal();$('cloud-close').onclick=()=>$('cloud-dialog').close();$('cloud-retry').onclick=()=>connect().catch(failure);$('cloud-load').onclick=()=>load().catch(failure);
  $('cloud-upload').textContent='Sync this device’s changes';$('cloud-upload').onclick=async()=>{try{await connect();queue();await flush();$('cloud-dialog').close();}catch(error){failure(error);}};
