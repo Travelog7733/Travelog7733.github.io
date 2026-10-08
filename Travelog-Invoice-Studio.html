@@ -1529,6 +1529,27 @@ async function downloadSavedInvoice(number,button){
 $('records-view').addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;if(button.dataset.invoicePdf)return downloadSavedInvoice(button.dataset.invoicePdf,button);if(button.dataset.invoiceShare)return openDocumentShare('invoice',button.dataset.invoiceShare,button);if(button.dataset.receiptShare)return openDocumentShare('receipt',button.dataset.receiptShare,button)});
 </script><script>// Firebase web configuration is public. This app uses one company workspace for all devices.
 const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDomain:'travelog-itinerary.firebaseapp.com',projectId:'travelog-itinerary',storageBucket:'travelog-itinerary.firebasestorage.app',messagingSenderId:'33567258851',appId:'1:33567258851:web:790e8f165a3d917bf7edd6'};
+function createFirebaseREST(projectId){
+ const prefix='projects/'+projectId+'/databases/(default)/documents',endpoint='https://firestore.googleapis.com/v1/'+prefix;
+ const encode=v=>{if(v===null)return {nullValue:null};if(Array.isArray(v))return {arrayValue:{values:v.map(encode)}};if(typeof v==='object')return {mapValue:{fields:fields(v)}};if(typeof v==='string')return {stringValue:v};if(typeof v==='boolean')return {booleanValue:v};if(typeof v==='number'&&Number.isFinite(v))return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};throw Error('Invalid Firebase field');};
+ const fields=v=>Object.fromEntries(Object.entries(v).filter(([,x])=>x!==undefined).map(([k,x])=>[k,encode(x)]));
+ const decode=v=>{if('nullValue'in v)return null;if('stringValue'in v)return v.stringValue;if('integerValue'in v)return Number(v.integerValue);if('doubleValue'in v)return v.doubleValue;if('booleanValue'in v)return v.booleanValue;if('timestampValue'in v)return v.timestampValue;if(v.arrayValue)return (v.arrayValue.values||[]).map(decode);if(v.mapValue)return object(v.mapValue.fields);throw Error('Unsupported Firebase field');};
+ const object=v=>Object.fromEntries(Object.entries(v||{}).map(([k,x])=>[k,decode(x)]));
+ const url=path=>endpoint+'/'+path.split('/').map(encodeURIComponent).join('/');
+ async function request(address,options){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);try{const response=await fetch(address,{...options,signal:controller.signal});const value=await response.json();if(!response.ok){const error=Error(value.error?.message||'Firebase HTTP '+response.status);error.code=value.error?.status||String(response.status);throw error;}return value;}finally{clearTimeout(timer);}}
+ async function get(path){try{const value=await request(url(path));return {exists:()=>true,data:()=>object(value.fields),updateTime:value.updateTime};}catch(error){if(error.code==='NOT_FOUND'||error.code==='404')return {exists:()=>false,data:()=>undefined};throw error;}}
+ return {
+  doc:(...parts)=>parts.filter(p=>typeof p==='string').join('/'),collection:(...parts)=>parts.filter(p=>typeof p==='string').join('/'),serverTimestamp:()=>new Date().toISOString(),getDocFromServer:get,
+  getDocsFromServer:async path=>{const rows=[];let token;do{const query=new URLSearchParams({pageSize:'1000'});if(token)query.set('pageToken',token);const page=await request(url(path)+'?'+query);rows.push(...(page.documents||[]));token=page.nextPageToken;}while(token);return {forEach:fn=>rows.forEach(row=>fn({data:()=>object(row.fields)}))};},
+  // Each write checks the version read by this pass. A changed manifest or
+  // record aborts the entire commit; retry reads fresh versions before merging.
+  runTransaction:async(_,callback)=>{for(let attempt=0;attempt<5;attempt++){const reads=new Map(),writes=[];const transaction={get:async path=>{if(writes.length)throw Error('Firebase reads must precede writes');const snap=await get(path);reads.set(path,snap);return snap;},set:(path,value)=>writes.push({path,value}),delete:path=>writes.push({path,deleted:true})};const result=await callback(transaction);if(!writes.length)return result;const body={writes:writes.map(row=>{const write=row.deleted?{delete:prefix+'/'+row.path}:{update:{name:prefix+'/'+row.path,fields:fields(row.value)}};const snap=reads.get(row.path);if(snap)write.currentDocument=snap.exists()?{updateTime:snap.updateTime}:{exists:false};return write;})};try{await request(endpoint+':commit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return result;}catch(error){if(!['FAILED_PRECONDITION','ABORTED','409'].includes(error.code)||attempt===4)throw error;}}},
+  // Direct Firebase mode refreshes automatically through the app's polling
+  // loop and foreground/reconnection events; no SDK streaming dependency.
+  onSnapshot:()=>()=>{}
+ };
+}
+
 (()=>{
  const keys=['invoices','payments','purchases','outgoingPayments','expenses','banks','customers','taxes','catalog','purchaseCatalog'];
  const META=STORE+'-firestore-records-v3',WORKSPACE='travelog-shared-v1',SYNC_PATH='itineraryBuilder/crmState/invoiceStudio';
@@ -1557,7 +1578,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  function listenerFailure(error){ready=false;failure(error);}
  function status(text){$('cloud-status').textContent=$('cloud-dialog-status').textContent=text;$('cloud-backup').disabled=!ready;}
  function backupStatus(text){$('cloud-backup-status').textContent=$('cloud-dialog-backup-status').textContent=text;}
- function failure(error){console.warn('Cloud sync:',error);status(/permission-denied/.test(error.code||'')?'Firebase access denied. Changes are saved locally.':'Saved locally · reconnecting automatically…');clearTimeout(retry);retry=setTimeout(()=>autoSync().catch(failure),10000);}
+ function failure(error){console.warn('Cloud sync:',error);const reason=String(error.code||error.message||'Unknown connection error');status('Firebase save not confirmed · '+reason+' · retrying automatically.');backupStatus('Backup waiting for Firebase connection. Your local records are preserved.');clearTimeout(retry);retry=setTimeout(()=>autoSync().catch(failure),10000);}
  function merge(baseValue,local,remote){
   if(equal(local,baseValue))return clone(remote);if(equal(remote,baseValue)||equal(local,remote))return clone(local);
   if(local&&remote&&baseValue&&typeof local==='object'&&!Array.isArray(local)&&!Array.isArray(remote)){
@@ -1664,7 +1685,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  async function autoSync(){
   if(!navigator.onLine)return;if(syncing)return syncing;
   syncing=(async()=>{
-   if(!user){const url='https://www.gstatic.com/firebasejs/12.13.0/';const modules=await Promise.all(['app','firestore'].map(name=>import(url+'firebase-'+name+'.js')));sdk=Object.assign({},...modules);const app=sdk.getApps().length?sdk.getApp():sdk.initializeApp(FIREBASE_CONFIG);firestore=sdk.getFirestore(app);user={uid:'shared-itinerary-workspace'};}
+   if(!user){sdk=createFirebaseREST(FIREBASE_CONFIG.projectId);firestore={};user={uid:'shared-itinerary-workspace'};}
    if(!ready)await connect();
    await flush();await refresh();clearTimeout(retry);
   })();
@@ -1673,7 +1694,7 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDoma
  window.addEventListener('online',()=>autoSync().catch(failure));window.addEventListener('offline',()=>status('Offline · changes saved locally; automatic sync resumes online.'));
  window.addEventListener('focus',()=>autoSync().catch(failure));window.addEventListener('pageshow',()=>autoSync().catch(failure));
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync().catch(failure);});
- setInterval(()=>{if(!document.hidden)autoSync().catch(failure);},15000);
+ setInterval(()=>{if(!document.hidden)autoSync().catch(failure);},3000);
  autoSync().catch(failure);
 })();
 
