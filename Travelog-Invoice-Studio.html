@@ -1529,27 +1529,6 @@ async function downloadSavedInvoice(number,button){
 $('records-view').addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;if(button.dataset.invoicePdf)return downloadSavedInvoice(button.dataset.invoicePdf,button);if(button.dataset.invoiceShare)return openDocumentShare('invoice',button.dataset.invoiceShare,button);if(button.dataset.receiptShare)return openDocumentShare('receipt',button.dataset.receiptShare,button)});
 </script><script>// Firebase web configuration is public. This app uses one company workspace for all devices.
 const FIREBASE_CONFIG={apiKey:'AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c',authDomain:'travelog-itinerary.firebaseapp.com',projectId:'travelog-itinerary',storageBucket:'travelog-itinerary.firebasestorage.app',messagingSenderId:'33567258851',appId:'1:33567258851:web:790e8f165a3d917bf7edd6'};
-function createFirebaseREST(projectId){
- const prefix='projects/'+projectId+'/databases/(default)/documents',endpoint='https://firestore.googleapis.com/v1/'+prefix;
- const encode=v=>{if(v===null)return {nullValue:null};if(Array.isArray(v))return {arrayValue:{values:v.map(encode)}};if(typeof v==='object')return {mapValue:{fields:fields(v)}};if(typeof v==='string')return {stringValue:v};if(typeof v==='boolean')return {booleanValue:v};if(typeof v==='number'&&Number.isFinite(v))return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};throw Error('Invalid Firebase field');};
- const fields=v=>Object.fromEntries(Object.entries(v).filter(([,x])=>x!==undefined).map(([k,x])=>[k,encode(x)]));
- const decode=v=>{if('nullValue'in v)return null;if('stringValue'in v)return v.stringValue;if('integerValue'in v)return Number(v.integerValue);if('doubleValue'in v)return v.doubleValue;if('booleanValue'in v)return v.booleanValue;if('timestampValue'in v)return v.timestampValue;if(v.arrayValue)return (v.arrayValue.values||[]).map(decode);if(v.mapValue)return object(v.mapValue.fields);throw Error('Unsupported Firebase field');};
- const object=v=>Object.fromEntries(Object.entries(v||{}).map(([k,x])=>[k,decode(x)]));
- const url=path=>endpoint+'/'+path.split('/').map(encodeURIComponent).join('/');
- async function request(address,options){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);try{const response=await fetch(address,{...options,signal:controller.signal});const value=await response.json();if(!response.ok){const error=Error(value.error?.message||'Firebase HTTP '+response.status);error.code=value.error?.status||String(response.status);throw error;}return value;}finally{clearTimeout(timer);}}
- async function get(path){try{const value=await request(url(path));return {exists:()=>true,data:()=>object(value.fields),updateTime:value.updateTime};}catch(error){if(error.code==='NOT_FOUND'||error.code==='404')return {exists:()=>false,data:()=>undefined};throw error;}}
- return {
-  doc:(...parts)=>parts.filter(p=>typeof p==='string').join('/'),collection:(...parts)=>parts.filter(p=>typeof p==='string').join('/'),serverTimestamp:()=>new Date().toISOString(),getDocFromServer:get,
-  getDocsFromServer:async path=>{const rows=[];let token;do{const query=new URLSearchParams({pageSize:'1000'});if(token)query.set('pageToken',token);const page=await request(url(path)+'?'+query);rows.push(...(page.documents||[]));token=page.nextPageToken;}while(token);return {forEach:fn=>rows.forEach(row=>fn({data:()=>object(row.fields)}))};},
-  // Each write checks the version read by this pass. A changed manifest or
-  // record aborts the entire commit; retry reads fresh versions before merging.
-  runTransaction:async(_,callback)=>{for(let attempt=0;attempt<5;attempt++){const reads=new Map(),writes=[];const transaction={get:async path=>{if(writes.length)throw Error('Firebase reads must precede writes');const snap=await get(path);reads.set(path,snap);return snap;},set:(path,value)=>writes.push({path,value}),delete:path=>writes.push({path,deleted:true})};const result=await callback(transaction);if(!writes.length)return result;const body={writes:writes.map(row=>{const write=row.deleted?{delete:prefix+'/'+row.path}:{update:{name:prefix+'/'+row.path,fields:fields(row.value)}};const snap=reads.get(row.path);if(snap)write.currentDocument=snap.exists()?{updateTime:snap.updateTime}:{exists:false};return write;})};try{await request(endpoint+':commit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return result;}catch(error){if(!['FAILED_PRECONDITION','ABORTED','409'].includes(error.code)||attempt===4)throw error;}}},
-  // Direct Firebase mode refreshes automatically through the app's polling
-  // loop and foreground/reconnection events; no SDK streaming dependency.
-  onSnapshot:()=>()=>{}
- };
-}
-
 (()=>{
  const keys=['invoices','payments','purchases','outgoingPayments','expenses','banks','customers','taxes','catalog','purchaseCatalog'];
  const META=STORE+'-firestore-records-v3',WORKSPACE='travelog-shared-v1',SYNC_PATH='itineraryBuilder/crmState/invoiceStudio';
@@ -1569,6 +1548,13 @@ function createFirebaseREST(projectId){
  const collection=()=>sdk.collection(firestore,'itineraryBuilder','crmState','invoiceStudio');
  const identity=(key,row)=>String(key==='invoices'?row.number:row.id);
  const recordRef=(key,id)=>sdk.doc(collection(),encodeURIComponent(key+':'+id));
+ // Direct SDK writes, like the guest page. Batch related ledger changes so
+ // invoices and receipts become visible together, without transaction APIs.
+ async function commitRecords(database,callback){
+  const batch=sdk.writeBatch(database);let hasWrites=false;
+  const result=await callback({get:ref=>sdk.getDocFromServer(ref),set:(ref,value)=>{hasWrites=true;batch.set(ref,value.schemaVersion===3?{...value,revision:sdk.increment(1)}:value);},delete:ref=>{hasWrites=true;batch.delete(ref);}});
+  if(hasWrites)await batch.commit();return result;
+ }
  function nextSavedNumber(invoices){return Math.max(0,...invoices.map(row=>{const match=/^TG-INV-(\d+)$/.exec(row.number||'');return match?Number(match[1]):0;}))+1;}
  function shared(value){return Object.fromEntries(keys.map(key=>[key,clone(value[key]||[])]).concat([['version',2],['next',nextSavedNumber(value.invoices||[])],['nextPurchase',value.nextPurchase],['nextOutgoingPayment',value.nextOutgoingPayment]]));}
  // Load the acknowledged state before the first network request, so saves
@@ -1623,12 +1609,12 @@ function createFirebaseREST(projectId){
   const state=shared(value),rows=keys.flatMap(key=>state[key].map(row=>({key,row})));
   // A bounded atomic migration preserves the old workspace if it cannot fit.
   if(rows.length>400)throw Error('Migration exceeds 400 records. Export a backup before migrating a larger workspace.');
-  await sdk.runTransaction(firestore,async tx=>{const snap=await tx.get(root()),count=await tx.get(counter());if((snap.exists()?snap.data().revision:0)!==expected)throw Error('Cloud changed during migration; retrying');for(const {key,row} of rows)tx.set(recordRef(key,identity(key,row)),{type:key,data:row});const settings=Object.fromEntries(Object.entries(state).filter(([key])=>!keys.includes(key)));tx.set(root(),{schemaVersion:3,settings,revision:expected+1,updatedAt:sdk.serverTimestamp()});tx.set(counter(),{next:Math.max(18,state.next,count.exists()?count.data().next:18)});});
+  await commitRecords(firestore,async tx=>{const snap=await tx.get(root()),count=await tx.get(counter());if((snap.exists()?snap.data().revision:0)!==expected)throw Error('Cloud changed during migration; retrying');for(const {key,row} of rows)tx.set(recordRef(key,identity(key,row)),{type:key,data:row});const settings=Object.fromEntries(Object.entries(state).filter(([key])=>!keys.includes(key)));tx.set(root(),{schemaVersion:3,settings,revision:expected+1,updatedAt:sdk.serverTimestamp()});tx.set(counter(),{next:Math.max(18,state.next,count.exists()?count.data().next:18)});});
  }
  function queue(){if(!ready||!base)return;clearTimeout(timer);if(equal(shared(db),shared(base)))return;status(navigator.onLine?'Changes saved locally · saving cloud records…':'Offline · changes saved locally; cloud sync resumes online.');timer=setTimeout(()=>flush().catch(failure),700);}
  async function flush(){
   clearTimeout(timer);if(writing)return writing;if(!ready||!base||!navigator.onLine)return;
-  for(const [id,copy] of conflictCopies){await sdk.runTransaction(firestore,async tx=>{tx.set(sdk.doc(collection(),id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()});});conflictCopies.delete(id);backupStatus('Conflicting versions preserved in Firebase and this browser. Export local recovery to review.');}
+  for(const [id,copy] of conflictCopies){await commitRecords(firestore,async tx=>{tx.set(sdk.doc(collection(),id),{kind:'conflict-recovery',payload:json({id:copy.id,value:copy.value}),updatedAt:sdk.serverTimestamp()});});conflictCopies.delete(id);backupStatus('Conflicting versions preserved in Firebase and this browser. Export local recovery to review.');}
   const sent=shared(db),previous=shared(base),changes=[];
   for(const key of keys){const b=new Map(previous[key].map(row=>[identity(key,row),row])),l=new Map(sent[key].map(row=>[identity(key,row),row]));for(const id of new Set([...b.keys(),...l.keys()]))if(!equal(b.get(id),l.get(id)))changes.push({key,id,before:b.get(id),after:l.get(id)});}
   if(!changes.length&&equal(sent,previous))return;
@@ -1636,7 +1622,7 @@ function createFirebaseREST(projectId){
   writing=(async()=>{
    if(base.revision===0){await migrate({...sent,draft:clone(db.draft)},0);base={...clone(sent),revision:1};remember();return;}
    for(let offset=0;offset<Math.max(1,changes.length);offset+=100){const part=changes.slice(offset,offset+100);let resolved;
-    await sdk.runTransaction(firestore,async tx=>{
+    await commitRecords(firestore,async tx=>{
      const manifest=await tx.get(root()),count=await tx.get(counter()),snapshots=[];for(const change of part)snapshots.push(await tx.get(recordRef(change.key,change.id)));
      if(!manifest.exists()||manifest.data().schemaVersion!==3)throw Error('Workspace schema changed');
      const archives=[];resolved=new Map();
@@ -1668,7 +1654,7 @@ function createFirebaseREST(projectId){
   $('cloud-connected').hidden=false;$('cloud-user').textContent='TRAVELOG shared Firestore records · all devices';
  }
  async function load(){if(!confirm('Load cloud records? Your current local records will be saved as a recovery copy.'))return;localStorage.setItem(STORE+'-before-cloud',json(db));$('cloud-recovery').hidden=false;const remote=await read();if(remote)apply(remote,true);$('cloud-dialog').close();}
- async function backup(){if(!ready)return;await flush();const remote=await read();if(!remote)throw Error('Cloud not ready');const value={...remote,draft:clone(db.draft)};delete value.revision;const payload=json(value);if(new TextEncoder().encode(payload).length>900000){backupStatus('Records synced. Full backup exceeds Firestore document size; use Export backup.');backupRevision=remote.revision;return;}await sdk.runTransaction(firestore,async tx=>{const ref=sdk.doc(collection(),'backup'),old=await tx.get(ref);if(!old.exists()||old.data().revision<=remote.revision)tx.set(ref,{version:1,workspace:WORKSPACE,revision:remote.revision,payload});});backupRevision=remote.revision;backupStatus('Firestore backup saved · revision '+remote.revision);}
+ async function backup(){if(!ready)return;await flush();const remote=await read();if(!remote)throw Error('Cloud not ready');const value={...remote,draft:clone(db.draft)};delete value.revision;const payload=json(value);if(new TextEncoder().encode(payload).length>900000){backupStatus('Records synced. Full backup exceeds Firestore document size; use Export backup.');backupRevision=remote.revision;return;}await commitRecords(firestore,async tx=>{const ref=sdk.doc(collection(),'backup'),old=await tx.get(ref);if(!old.exists()||old.data().revision<=remote.revision)tx.set(ref,{version:1,workspace:WORKSPACE,revision:remote.revision,payload});});backupRevision=remote.revision;backupStatus('Firestore backup saved · revision '+remote.revision);}
  window.invoiceCloud={queue,hasUser:()=>!!user,reserveNumber:async()=>{if(!sdk||!firestore||!navigator.onLine)throw Error('cloud-not-ready');if(!ready)await connect();await flush();const remote=await read();if(remote)apply(remote);const next=nextSavedNumber(db.invoices);db.next=next;return sequence(next);}};
  $('cloud-account').textContent='Automatic sync · details';
  for(const id of ['cloud-upload','cloud-load','cloud-retry'])$(id).hidden=true;
@@ -1685,7 +1671,7 @@ function createFirebaseREST(projectId){
  async function autoSync(){
   if(!navigator.onLine)return;if(syncing)return syncing;
   syncing=(async()=>{
-   if(!user){sdk=createFirebaseREST(FIREBASE_CONFIG.projectId);firestore={};user={uid:'shared-itinerary-workspace'};}
+   if(!user){const url='https://www.gstatic.com/firebasejs/12.13.0/';const modules=await Promise.all(['app','firestore'].map(name=>import(url+'firebase-'+name+'.js')));sdk=Object.assign({},...modules);const app=sdk.getApps().length?sdk.getApp():sdk.initializeApp(FIREBASE_CONFIG);firestore=sdk.getFirestore(app);user={uid:'shared-itinerary-workspace'};}
    if(!ready)await connect();
    await flush();await refresh();clearTimeout(retry);
   })();
@@ -1694,7 +1680,7 @@ function createFirebaseREST(projectId){
  window.addEventListener('online',()=>autoSync().catch(failure));window.addEventListener('offline',()=>status('Offline · changes saved locally; automatic sync resumes online.'));
  window.addEventListener('focus',()=>autoSync().catch(failure));window.addEventListener('pageshow',()=>autoSync().catch(failure));
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync().catch(failure);});
- setInterval(()=>{if(!document.hidden)autoSync().catch(failure);},3000);
+ setInterval(()=>{if(!document.hidden)autoSync().catch(failure);},15000);
  autoSync().catch(failure);
 })();
 
