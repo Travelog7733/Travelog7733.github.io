@@ -1795,7 +1795,9 @@
     }
 
     .pdf-without-price #pdfPriceQuoteSection,
-    .pdf-without-price #pdfAlternateRatesSection {
+    .pdf-without-price #pdfAlternateRatesSection,
+    .pdf-without-price #pdfProPaxRateSection,
+    .pdf-without-price #pdfSurchargeNotice {
       display: none !important;
     }
 
@@ -8699,7 +8701,11 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       exportPage.style.setProperty("box-shadow", "none", "important");
       exportPage.style.setProperty("-webkit-text-size-adjust", "100%", "important");
       exportPage.style.setProperty("text-size-adjust", "100%", "important");
-      if (withoutPrice) exportPage.classList.add("pdf-without-price");
+      if (withoutPrice) {
+        exportPage.classList.add("pdf-without-price");
+        // Remove pricing from the export copy so PDF capture cannot retain it.
+        exportPage.querySelectorAll("#pdfPriceQuoteSection, #pdfAlternateRatesSection, #pdfProPaxRateSection, #pdfSurchargeNotice").forEach(section => section.remove());
+      }
       exportPage.querySelectorAll(".pdf-info-grid").forEach(grid => {
         grid.style.setProperty("grid-template-columns", "repeat(2, minmax(0, 1fr))", "important");
       });
@@ -8755,7 +8761,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       button.disabled = true;
       button.textContent = "Preparing PDF...";
       try {
-        if (serverPdfDownloadEndpoint) {
+        if (serverPdfDownloadEndpoint && !withoutPrice) {
           const downloadUrl = new URL(serverPdfDownloadEndpoint);
           downloadUrl.searchParams.set("quote", sharedQuoteId || state.quote.id);
           downloadUrl.searchParams.set("name", quoteDisplayName(state.quote));
