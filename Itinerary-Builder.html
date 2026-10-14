@@ -3692,13 +3692,14 @@
 
       <section class="tab-panel" id="itineraryLibrary">
         <div class="panel">
-          <div class="panel-head"><h2>Itinerary Library</h2><span class="pill">Saved itineraries</span></div>
+          <div class="panel-head"><h2>Itinerary Library</h2><span class="pill">60-day retention</span></div>
           <div class="panel-body">
             <div class="searchbar">
               <label>Search
                 <input id="itineraryLibrarySearch" type="search" placeholder="Itinerary code or customer name">
               </label>
             </div>
+            <p class="subtitle">Quotes are automatically deleted 60 days after their last save. Saving again restarts the 60-day period.</p>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Customer</th><th>Destination</th><th>Travel Date</th><th>Status</th><th>Total</th><th>Updated</th><th></th></tr></thead>
@@ -8763,8 +8764,8 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       button.disabled = true;
       button.textContent = "Preparing PDF...";
       try {
-        // The browser template contains the conditional surcharge notice.
-        if (serverPdfDownloadEndpoint && !withoutPrice && matchingSurchargePeriods().length === 0) {
+        // The deployed server uses this same template for priced and price-free PDFs.
+        if (serverPdfDownloadEndpoint) {
           const downloadUrl = new URL(serverPdfDownloadEndpoint);
           downloadUrl.searchParams.set("quote", sharedQuoteId || state.quote.id);
           downloadUrl.searchParams.set("name", quoteDisplayName(state.quote));
