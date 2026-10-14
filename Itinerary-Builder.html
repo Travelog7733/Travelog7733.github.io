@@ -7261,6 +7261,8 @@
 
     const roundSurchargeAmount = value => Math.round((value + Number.EPSILON * Math.max(1, Math.abs(value))) * 100) / 100;
     const matchingSurchargePeriods = () => {
+      const locked = lockedCustomerPricing();
+      if (locked && Array.isArray(locked.surcharges)) return locked.surcharges;
       const q = state.quote;
       const adults = Math.max(0, Number(q.adults || 0));
 const hotelBilledPax = hotelBilledPaxFor(q, adults);
@@ -8474,7 +8476,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       quote.shareInvalidatedAt = "";
       quote.priceLock = JSON.parse(JSON.stringify(validatePriceLock({
         schema: 1, totals: getTotals(), customer: getCustomerPdfPricing(),
-        proRates: getProPaxRates(), alternates: getAlternatePricing()
+        proRates: getProPaxRates(), alternates: getAlternatePricing(), surcharges: matchingSurchargePeriods()
       })));
       quote.shareRevision = pdfRevisionForQuote(quote);
       const refs = quoteReferenceIds([quote]);
@@ -8761,7 +8763,8 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       button.disabled = true;
       button.textContent = "Preparing PDF...";
       try {
-        if (serverPdfDownloadEndpoint && !withoutPrice) {
+        // The browser template contains the conditional surcharge notice.
+        if (serverPdfDownloadEndpoint && !withoutPrice && matchingSurchargePeriods().length === 0) {
           const downloadUrl = new URL(serverPdfDownloadEndpoint);
           downloadUrl.searchParams.set("quote", sharedQuoteId || state.quote.id);
           downloadUrl.searchParams.set("name", quoteDisplayName(state.quote));
