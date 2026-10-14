@@ -874,6 +874,58 @@
       align-items: end;
     }
 
+    .surcharge-notice {
+      margin: 14px 0;
+      padding: 18px;
+      background: #fff9e6;
+      border: 1px solid #efd890;
+      border-left: 4px solid #d99b14;
+      border-radius: 12px;
+      color: #75520b;
+      font-size: 13px;
+      line-height: 1.6;
+      break-inside: avoid;
+      overflow-wrap: anywhere;
+    }
+    .surcharge-notice[hidden] { display: none !important; }
+    .surcharge-notice .surcharge-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #efdfa9;
+      margin-bottom: 12px;
+    }
+    .surcharge-notice .surcharge-label {
+      flex: 1 1 180px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #62430b;
+    }
+    .surcharge-notice .surcharge-amount-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      padding: 7px 18px;
+      border: 1px solid #e1ad35;
+      border-radius: 999px;
+      background: #ffe39a;
+      color: #583b06;
+      font-size: 21px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+    .surcharge-notice .surcharge-periods { list-style: none; margin: 0; padding: 0; }
+    .surcharge-notice .surcharge-periods li + li { margin-top: 10px; padding-top: 10px; border-top: 1px solid #efdfa9; }
+    .surcharge-notice .surcharge-period-title { font-weight: 700; color: #62430b; }
+    .surcharge-notice .surcharge-dates { margin-top: 3px; font-size: 12px; color: #806525; }
+    .surcharge-notice .surcharge-footnote { margin-top: 12px; font-size: 11px; color: #806525; }
+
     .day-date {
       display: block;
       margin-top: 4px;
@@ -2285,6 +2337,9 @@
       letter-spacing: 0.07em;
     }
 
+    #pdfPaymentGrid #pdfDepositDue,
+    #pdfPaymentGrid #pdfBalanceDue { display: none !important; }
+
     .pdf-payment-cell strong {
       display: block;
       margin-top: 5px;
@@ -3315,6 +3370,10 @@
           <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/><path d="M3 12h4"/></svg>
           <span>Inclusion & Exclusion</span>
         </button>
+        <button class="tab-btn" data-tab="settings" title="Settings" type="button">
+          <svg viewBox="0 0 24 24"><path d="m9 3-1 3-3 1 1 3-2 2 2 2-1 3 3 1 1 3h6l1-3 3-1-1-3 2-2-2-2 1-3-3-1-1-3Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Settings</span>
+        </button>
       </nav>
       <div class="side-panel">
         <strong>Cloud Sync</strong>
@@ -3566,6 +3625,7 @@
                   </div>
                   <div class="metric-row" id="taxAmountRow"><span>Tax</span><strong id="taxAmount">&#8377;0</strong></div>
                   <div class="metric-row total" id="grandTotalRow"><span>Total Quote</span><strong id="grandTotal">&#8377;0</strong></div>
+                  <div class="surcharge-notice" id="quoteSurchargeNotice" role="status" aria-live="polite" hidden></div>
                   <div class="metric-row"><span>Per Adult</span><strong id="perAdult">&#8377;0</strong></div>
                   <div class="metric-row" id="perChildRow"><span>Per Child</span><strong id="perChild">&#8377;0</strong></div>
                   <div class="metric-row" id="perInfantRow"><span>Per Infant</span><strong id="perInfant">&#8377;0</strong></div>
@@ -3623,41 +3683,7 @@
               </div>
             </div>
 
-            <div class="panel automations-panel" id="automationsPanel">
-              <div class="panel-head"><h2>Automations</h2><span class="pill amber">Rules</span></div>
-              <div class="panel-body">
-                <ul class="automation-list">
-                  <li>
-                    <label class="mini-switch"><input type="checkbox" checked><span class="slider"></span></label>
-                    <span>Lead Status</span>
-                  </li>
-                  <li>
-                    <label class="mini-switch"><input type="checkbox" id="toggleDepositBalance" checked><span class="slider"></span></label>
-                    <span>Deposit &amp; Balance</span>
-                  </li>
-                  <li>
-                    <label class="mini-switch"><input type="checkbox" id="togglePdfLogo" checked><span class="slider"></span></label>
-                    <span>PDF Logo</span>
-                  </li>
-                  <li>
-                    <label class="mini-switch"><input type="checkbox" id="toggleGrandTotal" checked><span class="slider"></span></label>
-                    <span>Grand Total</span>
-                  </li>
-                  <li>
-                    <label class="mini-switch"><input type="checkbox"><span class="slider"></span></label>
-                    <span>Follow-up Reminder</span>
-                  </li>
-                  <li>
-                    <label class="mini-switch"><input type="checkbox" checked><span class="slider"></span></label>
-                    <span>Missing Documents</span>
-                  </li>
-                  <li>
-                    <label class="mini-switch"><input type="checkbox"><span class="slider"></span></label>
-                    <span>Child &amp; Infant Pricing</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+
           </aside>
         </div>
       </section>
@@ -3823,6 +3849,74 @@
         </div>
       </section>
 
+      <section class="tab-panel" id="settings">
+            <div class="panel automations-panel open" style="margin-bottom: 20px;" id="automationsPanel">
+              <div class="panel-head"><h2>Automations</h2><span class="pill amber">Rules</span></div>
+              <div class="panel-body">
+                <ul class="automation-list">
+                  <li>
+                    <label class="mini-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                    <span>Lead Status</span>
+                  </li>
+                  <li>
+                    <label class="mini-switch"><input type="checkbox" id="toggleDepositBalance" checked><span class="slider"></span></label>
+                    <span>Deposit &amp; Balance</span>
+                  </li>
+                  <li>
+                    <label class="mini-switch"><input type="checkbox" id="togglePdfLogo" checked><span class="slider"></span></label>
+                    <span>PDF Logo</span>
+                  </li>
+                  <li>
+                    <label class="mini-switch"><input type="checkbox" id="toggleGrandTotal" checked><span class="slider"></span></label>
+                    <span>Grand Total</span>
+                  </li>
+                  <li>
+                    <label class="mini-switch"><input type="checkbox"><span class="slider"></span></label>
+                    <span>Follow-up Reminder</span>
+                  </li>
+                  <li>
+                    <label class="mini-switch"><input type="checkbox" checked><span class="slider"></span></label>
+                    <span>Missing Documents</span>
+                  </li>
+                  <li>
+                    <label class="mini-switch"><input type="checkbox"><span class="slider"></span></label>
+                    <span>Child &amp; Infant Pricing</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+        <div class="panel" style="margin-bottom: 20px;">
+          <div class="panel-head"><h2>Surcharge Periods</h2><span class="pill">Saved automatically</span></div>
+          <div class="panel-body">
+            <p class="subtitle">Saved periods stay here until you edit or delete them, including after their end date.</p>
+            <form id="surchargePeriodForm" class="grid four" style="margin-top: 20px; align-items: end;">
+              <label for="surchargeFrom">From<input id="surchargeFrom" name="from" type="date" required></label>
+              <label for="surchargeTill">Till<input id="surchargeTill" name="till" type="date" required></label>
+              <label for="surchargePercentage">Surcharge (%)<input id="surchargePercentage" name="percentage" type="number" min="0" step="0.01" placeholder="e.g. 10" required></label>
+              <label for="surchargeReason">Reason<input id="surchargeReason" name="reason" type="text" placeholder="e.g. Christmas peak season" maxlength="300" required></label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button class="btn primary" id="surchargeSaveBtn" type="submit">Add Period</button><button class="btn" id="surchargeCancelBtn" type="button" hidden>Cancel</button></div>
+            </form>
+            <p id="surchargePeriodStatus" class="subtitle" role="status" aria-live="polite"></p>
+            <div class="table-wrap">
+              <table><thead><tr><th>From</th><th>Till</th><th>Surcharge (%)</th><th>Reason</th><th>Action</th></tr></thead><tbody id="surchargePeriodRows"></tbody></table>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>PDF Settings</h2><span class="pill">Saved automatically</span></div>
+          <div class="panel-body">
+            <p class="subtitle">Choose what appears in your customer itinerary PDF. These preferences also update the controls in Automations.</p>
+            <div class="grid two" style="margin-top: 20px;">
+              <label for="settingsGrandTotal"><span>Show grand total</span><span class="mini-switch"><input id="settingsGrandTotal" type="checkbox" data-settings-control="toggleGrandTotal"><span class="slider"></span></span></label>
+              <label for="settingsDepositBalance"><span>Show deposit & balance</span><span class="mini-switch"><input id="settingsDepositBalance" type="checkbox" data-settings-control="toggleDepositBalance"><span class="slider"></span></span></label>
+              <label for="settingsPdfLogo"><span>Show company logo</span><span class="mini-switch"><input id="settingsPdfLogo" type="checkbox" data-settings-control="togglePdfLogo"><span class="slider"></span></span></label>
+              <label for="settingsQuoteDate"><span>Show quote date</span><span class="mini-switch"><input id="settingsQuoteDate" type="checkbox" data-settings-control="togglePdfQuoteDate"><span class="slider"></span></span></label>
+              <label for="settingsTravelDate"><span>Show travel date</span><span class="mini-switch"><input id="settingsTravelDate" type="checkbox" data-settings-control="togglePdfTravelDate"><span class="slider"></span></span></label>
+            </div>
+            <p class="subtitle" style="margin-top: 20px;">Company branding is automatically hidden for B2B quotes.</p>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -3903,6 +3997,7 @@
             <span>Grand Total</span>
             <strong id="pdfGrandTotal">₹0</strong>
           </div>
+          <div class="surcharge-notice" id="pdfSurchargeNotice" hidden></div>
           <p class="pdf-tax-included-note" id="pdfTaxIncludedNote">The total amount includes GST &amp; TCS.</p>
           <div class="pdf-payment-grid" id="pdfPaymentGrid">
             <div class="pdf-payment-cell"><span>Deposit to confirm<span id="pdfDepositPercent"></span></span><strong id="pdfDepositDue">₹0</strong></div>
@@ -4838,6 +4933,7 @@
       exclusions: [],
       settings: {
         companyLogo: "https://raw.githubusercontent.com/Travelog7733/Travelog7733.github.io/main/assets/travelog-logo-white.png",
+        surchargePeriods: [],
         showDepositBalance: true,
         showPdfLogo: true,
         showGrandTotal: true,
@@ -6693,6 +6789,7 @@
       els.detailMarkupPerInfant.textContent = money(markupPerInfant);
       els.detailMarkupPerInfantRow.style.display = infantsEnabled() ? "" : "none";
       els.grandTotal.textContent = money(totals.total);
+      renderSurchargeNotices();
       els.toggleGrandTotal.checked = state.settings.showGrandTotal !== false;
       els.grandTotalRow.style.display = state.settings.showGrandTotal !== false ? "" : "none";
       els.depositDue.textContent = money(totals.depositDue);
@@ -7160,6 +7257,80 @@
       };
     };
 
+    const roundSurchargeAmount = value => Math.round((value + Number.EPSILON * Math.max(1, Math.abs(value))) * 100) / 100;
+    const matchingSurchargePeriods = () => {
+      const q = state.quote;
+      const adults = Math.max(0, Number(q.adults || 0));
+const hotelBilledPax = hotelBilledPaxFor(q, adults);
+      const periods = Array.isArray(state.settings.surchargePeriods) ? state.settings.surchargePeriods : [];
+      // Reject impossible travel dates rather than allowing Date to roll into another month.
+      const start = parseDisplayDate(q.travelDates);
+      const displayParts = String(q.travelDates || "").trim().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      const isoParts = String(q.travelDates || "").trim().match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+      const parts = displayParts ? [Number(displayParts[3]), Number(displayParts[2]), Number(displayParts[1])]
+        : isoParts ? [Number(isoParts[1]), Number(isoParts[2]), Number(isoParts[3])] : null;
+      if (!start || !parts || start.getFullYear() !== parts[0] || start.getMonth() + 1 !== parts[1] || start.getDate() !== parts[2]) return [];
+      // Surcharge applies to adults only; retain the existing adult FOC cost.
+      const groupCost = perAdult => perAdult * adults
+        + focSharePerPerson(perAdult, adults, 0, 0) * adults;
+      return periods.map(period => {
+        const rate = Math.max(0, Number(period.percentage) || 0) / 100;
+        const matchingDates = new Set();
+        let hotelBase = 0;
+        let tourBase = 0;
+        const matches = date => {
+          if (!date || Number.isNaN(date.getTime())) return false;
+          const iso = toLocalDateIso(date);
+          if (iso < period.from || iso > period.till) return false;
+          matchingDates.add(iso);
+          return true;
+        };
+        (q.days || []).forEach(day => {
+          const date = dateObjForItineraryDay(day.day);
+          const tour = state.tours.find(item => item.id === day.tourId);
+          if (matches(date)) {
+            const perAdult = tour
+              ? getTourPriceForPax(tour, adults) + additionalMealRateForDay(day, tour) + activityRateForDay(day, tour)
+              : day.tourId === MANUAL_TOUR_ID ? Number(day.manualTourCost || 0) : 0;
+            tourBase += groupCost(Math.max(0, perAdult));
+          }
+          const hotel = state.hotels.find(item => item.id === day.hotelId);
+          if (!hotel || !date || Number.isNaN(date.getTime())) return;
+          const categories = Array.isArray(hotel.roomCategories) && hotel.roomCategories.length
+            ? hotel.roomCategories : [{ name: "Standard", rate: hotel.room || 0 }];
+          const category = categories.find(item => item.name === day.hotelRoomCategory) || categories[0];
+          const nightlyRate = Math.max(0, getCategoryRateForSeason(category, day.hotelSeason || "low"));
+          const arrangement = selectedRoomArrangement(day, adults);
+          const billedPax = arrangement ? arrangement.billedPax : hotelBilledPax;
+          for (let night = 0; night < Number(day.nights || 0); night++) {
+            const nightDate = new Date(date);
+            nightDate.setDate(nightDate.getDate() + night);
+            if (!matches(nightDate)) continue;
+            const nightCost = nightlyRate * billedPax * (night === 0 && day.earlyCheckin ? 2 : 1);
+            hotelBase += groupCost(adults > 0 ? nightCost / adults : 0);
+          }
+        });
+        const hotelSurcharge = roundSurchargeAmount(hotelBase * rate);
+        const tourSurcharge = roundSurchargeAmount(tourBase * rate);
+        return { ...period, matchingDates: [...matchingDates].sort(), hotelBase, tourBase,
+          hotelSurcharge, tourSurcharge, totalSurcharge: roundSurchargeAmount((hotelBase + tourBase) * rate) };
+      }).filter(period => period.matchingDates.length).sort((a, b) => a.from.localeCompare(b.from));
+    };
+    const renderSurchargeNotices = () => {
+      const matches = matchingSurchargePeriods();
+      const total = roundSurchargeAmount(matches.reduce((sum, period) => sum + period.totalSurcharge, 0));
+      const markup = matches.length ? `<div class="surcharge-heading"><span class="surcharge-label">Additional surcharge applicable (Total)</span><strong class="surcharge-amount-pill">${escapeHtml(money(total))}</strong></div><ul class="surcharge-periods">${matches.map(period => {
+        const percentage = period.percentage == null ? "Percentage not set" : `${escapeHtml(period.percentage)}%`;
+        const dates = period.matchingDates.map(date => formatDateDisplay(date)).join(", ");
+        return `<li><div class="surcharge-period-title">${escapeHtml(period.reason)} (${percentage})</div><div class="surcharge-dates">Applicable dates: ${escapeHtml(dates)}</div></li>`;
+      }).join("")}</ul><div class="surcharge-footnote">Additional to the quoted total.${matches.some((period, index) => matches.slice(index + 1).some(other => period.matchingDates.some(date => other.matchingDates.includes(date)))) ? " Overlapping periods are added together." : ""}</div>` : "";
+      ["quoteSurchargeNotice", "pdfSurchargeNotice"].forEach(id => {
+        const notice = document.getElementById(id);
+        notice.innerHTML = markup;
+        notice.hidden = matches.length === 0;
+      });
+    };
+
     const updateCustomerPdf = (syncInputs = true) => {
       if (syncInputs) syncQuoteFromInputs();
       renderLogo();
@@ -7201,6 +7372,7 @@
       const selectedVisa = state.visas.find(item => item.id === state.quote.visaId);
       els.pdfVisaStatus.textContent = selectedVisa ? `Visa Included - ${selectedVisa.country} ${selectedVisa.type}` : "Visa Not Included";
       els.pdfGrandTotal.textContent = money(pdfPricing.packageTotal);
+      renderSurchargeNotices();
       els.pdfGrandTotalBox.style.display = state.settings.showGrandTotal !== false ? "" : "none";
       els.pdfAdultPax.textContent = pdfPricing.adults;
       els.pdfAdultRate.textContent = money(pdfPricing.adultPerPerson);
@@ -7328,6 +7500,8 @@
         renderCustomers();
       } else if (tab === "tours" || tab === "hotels" || tab === "visas") {
         renderLibrary();
+      } else if (tab === "settings") {
+        renderSurchargePeriods();
       } else if (tab === "inclusions") {
         renderInclusions();
       }
@@ -7380,6 +7554,128 @@
       syncQuoteFromInputs();
     };
 
+    const surchargePeriodForm = document.getElementById("surchargePeriodForm");
+    const surchargePeriodRows = document.getElementById("surchargePeriodRows");
+    const surchargePeriodStatus = document.getElementById("surchargePeriodStatus");
+    const surchargeFrom = document.getElementById("surchargeFrom");
+    const surchargeTill = document.getElementById("surchargeTill");
+    const surchargeReason = document.getElementById("surchargeReason");
+    const surchargePercentage = document.getElementById("surchargePercentage");
+    let editingSurchargePeriodId = null;
+    const surchargeSaveBtn = document.getElementById("surchargeSaveBtn");
+    const surchargeCancelBtn = document.getElementById("surchargeCancelBtn");
+    const resetSurchargeEditor = () => {
+      editingSurchargePeriodId = null;
+      surchargePeriodForm.reset();
+      surchargeTill.min = "";
+      surchargeTill.setCustomValidity("");
+      surchargeReason.setCustomValidity("");
+      surchargePercentage.setCustomValidity("");
+      surchargeSaveBtn.textContent = "Add Period";
+      surchargeCancelBtn.hidden = true;
+    };
+    surchargeCancelBtn.addEventListener("click", resetSurchargeEditor);
+    const renderSurchargePeriods = () => {
+      const periods = Array.isArray(state.settings.surchargePeriods) ? state.settings.surchargePeriods : [];
+      surchargePeriodRows.innerHTML = periods.length ? [...periods].sort((a, b) => a.from.localeCompare(b.from)).map(period => `
+        <tr><td>${escapeHtml(period.from)}</td><td>${escapeHtml(period.till)}</td><td>${period.percentage == null ? "—" : `${escapeHtml(period.percentage)}%`}</td><td style="white-space: normal; overflow-wrap: anywhere;">${escapeHtml(period.reason)}</td>
+        <td><button class="btn" type="button" data-edit-surcharge="${escapeHtml(period.id)}" aria-label="Edit surcharge period: ${escapeHtml(period.reason)}">Edit</button> <button class="btn" type="button" data-delete-surcharge="${escapeHtml(period.id)}" aria-label="Delete surcharge period: ${escapeHtml(period.reason)}">Delete</button></td></tr>
+      `).join("") : '<tr><td colspan="5">No surcharge periods yet. Add your first period above.</td></tr>';
+    };
+    surchargeFrom.addEventListener("input", () => {
+      surchargeTill.min = surchargeFrom.value;
+      surchargeTill.setCustomValidity("");
+    });
+    surchargeTill.addEventListener("input", () => surchargeTill.setCustomValidity(""));
+    surchargeReason.addEventListener("input", () => surchargeReason.setCustomValidity(""));
+    surchargePercentage.addEventListener("input", () => surchargePercentage.setCustomValidity(""));
+    surchargePeriodForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (surchargeTill.value < surchargeFrom.value) {
+        surchargeTill.setCustomValidity("Till must be on or after From.");
+        surchargeTill.reportValidity();
+        return;
+      }
+      const percentage = Number(surchargePercentage.value);
+      if (!surchargePercentage.value.trim() || !Number.isFinite(percentage) || percentage < 0 || !surchargePercentage.checkValidity()) {
+        surchargePercentage.setCustomValidity("Enter a valid surcharge percentage of 0 or more, with up to two decimal places.");
+        surchargePercentage.reportValidity();
+        return;
+      }
+      const reason = surchargeReason.value.trim();
+      if (!reason) {
+        surchargeReason.setCustomValidity("Enter a reason for this surcharge period.");
+        surchargeReason.reportValidity();
+        return;
+      }
+      if (!Array.isArray(state.settings.surchargePeriods)) state.settings.surchargePeriods = [];
+      const wasEditing = editingSurchargePeriodId !== null;
+      const period = { id: editingSurchargePeriodId || uid("surcharge"), from: surchargeFrom.value, till: surchargeTill.value, percentage, reason };
+      if (wasEditing) {
+        const index = state.settings.surchargePeriods.findIndex(item => item.id === editingSurchargePeriodId);
+        if (index === -1) {
+          surchargePeriodStatus.textContent = "This period was deleted. Cancel editing to add a new period.";
+          return;
+        }
+        state.settings.surchargePeriods[index] = period;
+      } else {
+        state.settings.surchargePeriods.push(period);
+      }
+      saveState();
+      renderSurchargePeriods();
+      renderSurchargeNotices();
+      resetSurchargeEditor();
+      surchargePeriodStatus.textContent = wasEditing ? "Surcharge period updated." : "Surcharge period added.";
+      surchargeFrom.focus();
+    });
+    surchargePeriodRows.addEventListener("click", event => {
+      const editButton = event.target.closest("[data-edit-surcharge]");
+      if (editButton) {
+        const period = (state.settings.surchargePeriods || []).find(item => item.id === editButton.dataset.editSurcharge);
+        if (!period) return;
+        resetSurchargeEditor();
+        editingSurchargePeriodId = period.id;
+        surchargeFrom.value = period.from;
+        surchargeTill.value = period.till;
+        surchargeTill.min = period.from;
+        surchargeReason.value = period.reason;
+        surchargePercentage.value = period.percentage ?? "";
+        surchargeSaveBtn.textContent = "Save Changes";
+        surchargeCancelBtn.hidden = false;
+        surchargePeriodStatus.textContent = "Editing saved surcharge period.";
+        surchargeFrom.focus();
+        return;
+      }
+      const button = event.target.closest("[data-delete-surcharge]");
+      if (!button) return;
+      state.settings.surchargePeriods = (state.settings.surchargePeriods || []).filter(period => period.id !== button.dataset.deleteSurcharge);
+      saveState();
+      renderSurchargePeriods();
+      if (editingSurchargePeriodId === button.dataset.deleteSurcharge) resetSurchargeEditor();
+      renderSurchargeNotices();
+      surchargePeriodStatus.textContent = "Surcharge period deleted.";
+    });
+
+    const syncSettingsControls = () => {
+      document.querySelectorAll("[data-settings-control]").forEach(control => {
+        const source = document.getElementById(control.dataset.settingsControl);
+        control.checked = source.checked;
+        control.disabled = source.disabled;
+        control.title = source.title;
+      });
+    };
+    document.querySelectorAll("[data-settings-control]").forEach(control => {
+      const source = document.getElementById(control.dataset.settingsControl);
+      control.addEventListener("change", () => {
+        source.checked = control.checked;
+        source.dispatchEvent(new Event("change", { bubbles: true }));
+        syncSettingsControls();
+      });
+      source.addEventListener("change", syncSettingsControls);
+    });
+    // Refresh controls when the Settings panel receives focus.
+    document.getElementById("settings").addEventListener("focusin", syncSettingsControls);
+
     document.querySelectorAll(".tab-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".tab-btn").forEach(item => item.classList.remove("active"));
@@ -7393,12 +7689,14 @@
           tours: ["Tour Library", "Maintain tour costs for automatic itinerary calculations."],
           hotels: ["Hotel Library", "Manage per-person nightly hotel rates and category filters."],
           visas: ["Visa Library", "Track visa fees, timelines, and document requirements."],
-          inclusions: ["Inclusions & Exclusions", "Manage the lists shown below the price summary in exported PDFs."]
+          inclusions: ["Inclusions & Exclusions", "Manage the lists shown below the price summary in exported PDFs."],
+          settings: ["Settings", "Manage your itinerary and PDF display preferences."]
         };
         els.pageTitle.textContent = titles[btn.dataset.tab][0];
         els.pageSubtitle.textContent = titles[btn.dataset.tab][1];
         els.quoteTypeToggle.style.display = btn.dataset.tab === "itinerary" ? "" : "none";
         renderActiveTab();
+        if (btn.dataset.tab === "settings") syncSettingsControls();
       });
     });
 
