@@ -7048,6 +7048,12 @@ fill.style.width = fill.getAttribute("data-width") || "0%";
 }
 
 function openSalesPerformanceModal(){
+const passcode = prompt("Enter Sales Performance passcode");
+if(passcode === null) return;
+if(passcode !== "Akhil"){
+alert("Incorrect passcode. Please try again.");
+return;
+}
 closeNotifPanel();
 if(document.getElementById("calendarModal").classList.contains("open")) closeCalendarModal();
 salesPerformanceMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
