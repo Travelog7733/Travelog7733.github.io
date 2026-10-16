@@ -4656,8 +4656,10 @@ Track booking and payment status of guests
 <div class="hotel-card"><div class="hotel-grid">
 <input type="text" class="input-field hotel-place" placeholder="Place">
 <input type="text" class="input-field hotel-name" placeholder="Hotel Name">
+<input type="text" class="input-field hotel-booking-no" placeholder="Hotel Booking No">
 <select class="input-field hotel-status">
 <option>BOOKED</option><option>BOOKED BY CUSTOMER</option><option>PENDING FOR BOOKING</option>
+<option>REQUESTED</option>
 </select>
 </div>
 <button type="button" class="remove-btn" onclick="this.closest('.hotel-card').remove()">Remove Hotel</button>
@@ -5485,6 +5487,7 @@ placeholder="Place">
 type="text"
 class="input-field hotel-name"
 placeholder="Hotel Name">
+<input type="text" class="input-field hotel-booking-no" placeholder="Hotel Booking No">
 
 <select
 class="input-field hotel-status">
@@ -5493,6 +5496,7 @@ class="input-field hotel-status">
 <option>BOOKED BY CUSTOMER</option>
 <option>PENDING FOR BOOKING</option>
 
+<option>REQUESTED</option>
 </select>
 
 </div>
@@ -5675,6 +5679,7 @@ card.querySelector(".hotel-place").value,
 
 hotel:
 card.querySelector(".hotel-name").value,
+bookingNo: card.querySelector(".hotel-booking-no").value,
 
 status:
 card.querySelector(".hotel-status").value
@@ -6156,6 +6161,7 @@ ${(g.hotels || []).map(h=>`
 <div class="detail">
 🏨 ${h.place || ""}<br>
 Hotel: <b>${h.hotel || ""}</b><br>
+Hotel Booking No: <b>${String(h.bookingNo || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}</b><br>
 Status: <b>${h.status || ""}</b>
 </div>
 `).join("")}
@@ -7455,6 +7461,7 @@ value="${h.place || ""}">
 <input
 class="input-field hotel-name"
 value="${h.hotel || ""}">
+<input type="text" class="input-field hotel-booking-no" placeholder="Hotel Booking No" value="${String(h.bookingNo || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}">
 
 <select
 class="input-field hotel-status">
@@ -7480,6 +7487,7 @@ h.status==="PENDING FOR BOOKING"
 PENDING FOR BOOKING
 </option>
 
+<option ${h.status==="REQUESTED"?"selected":""}>REQUESTED</option>
 </select>
 
 </div>
@@ -7909,7 +7917,8 @@ paxBreakdowns["me-guests"] = normalizePaxBreakdown(g.paxBreakdown, g.guests);
 <div class="hotel-card"><div class="hotel-grid">
 <input class="input-field me-hotel-place" value="${h.place||""}" placeholder="Place">
 <input class="input-field me-hotel-name" value="${h.hotel||""}" placeholder="Hotel Name">
-<select class="input-field me-hotel-status">${sel(["BOOKED","BOOKED BY CUSTOMER","PENDING FOR BOOKING"],h.status)}</select>
+<input type="text" class="input-field me-hotel-booking-no" placeholder="Hotel Booking No" value="${String(h.bookingNo || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}">
+<select class="input-field me-hotel-status">${sel(["BOOKED","BOOKED BY CUSTOMER","PENDING FOR BOOKING","REQUESTED"],h.status)}</select>
 </div>
 <button type="button" class="remove-btn" onclick="this.closest('.hotel-card').remove()">Remove Hotel</button>
 </div>`).join("");
@@ -7992,7 +8001,7 @@ ${["PENDING FOR APPLYING","APPLIED BY CUSTOMER","APPLIED","APPROVED","NOT REQUIR
 
 <div class="sub-section"><div class="section-title">Hotel Status</div>
 <div id="me-hotelContainer">${hotelsHtml}</div>
-<button class="add-small-btn" type="button" onclick="document.getElementById('me-hotelContainer').insertAdjacentHTML('beforeend','<div class=\\'hotel-card\\'><div class=\\'hotel-grid\\'><input class=\\'input-field me-hotel-place\\' placeholder=\\'Place\\'><input class=\\'input-field me-hotel-name\\' placeholder=\\'Hotel Name\\'><select class=\\'input-field me-hotel-status\\'><option>BOOKED</option><option>BOOKED BY CUSTOMER</option><option>PENDING FOR BOOKING</option></select></div><button type=\\'button\\' class=\\'remove-btn\\' onclick=\\'this.closest(&quot;.hotel-card&quot;).remove()\\'>Remove Hotel</button></div>')">+ Add Hotel</button>
+<button class="add-small-btn" type="button" onclick="document.getElementById('me-hotelContainer').insertAdjacentHTML('beforeend','<div class=\\'hotel-card\\'><div class=\\'hotel-grid\\'><input class=\\'input-field me-hotel-place\\' placeholder=\\'Place\\'><input class=\\'input-field me-hotel-name\\' placeholder=\\'Hotel Name\\'><input class=\\'input-field me-hotel-booking-no\\' placeholder=\\'Hotel Booking No\\'><select class=\\'input-field me-hotel-status\\'><option>BOOKED</option><option>BOOKED BY CUSTOMER</option><option>PENDING FOR BOOKING</option><option>REQUESTED</option></select></div><button type=\\'button\\' class=\\'remove-btn\\' onclick=\\'this.closest(&quot;.hotel-card&quot;).remove()\\'>Remove Hotel</button></div>')">+ Add Hotel</button>
 </div>
 
 <div class="sub-section"><div class="section-title">Cruise Status</div>
@@ -8222,6 +8231,7 @@ async function meModalSave(id){
   const hotels=[...document.querySelectorAll("#me-hotelContainer .hotel-card")].map(c=>({
     place:c.querySelector(".me-hotel-place").value,
     hotel:c.querySelector(".me-hotel-name").value,
+    bookingNo:c.querySelector(".me-hotel-booking-no").value,
     status:c.querySelector(".me-hotel-status").value
   }));
   const cruises=[...document.querySelectorAll("#me-cruiseContainer .hotel-card")].map(c=>({
@@ -8380,8 +8390,9 @@ ${(g.hotels||[]).length ? (g.hotels||[]).map(h=>`
   <div class="gd-item-body">
     <div class="gd-item-title">${h.place||"-"}</div>
     <div class="gd-item-sub">${h.hotel||"No hotel selected"}</div>
+    ${h.bookingNo ? `<div class="gd-item-sub">Booking No: ${String(h.bookingNo || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}</div>` : ""}
   </div>
-  <span class="gd-pill ${h.status==="PENDING FOR BOOKING"?"pending":"done"}">${h.status||"-"}</span>
+  <span class="gd-pill ${["PENDING FOR BOOKING","REQUESTED"].includes(h.status)?"pending":"done"}">${h.status||"-"}</span>
 </div>`).join("") : `<div class="gd-empty">No hotel entries added</div>`}
 </div>
 
@@ -8592,8 +8603,9 @@ ${(g.hotels||[]).length ? (g.hotels||[]).map(h=>`
   <div class="gd-item-body">
     <div class="gd-item-title">${h.place||"-"}</div>
     <div class="gd-item-sub">${h.hotel||"No hotel selected"}</div>
+    ${h.bookingNo ? `<div class="gd-item-sub">Booking No: ${String(h.bookingNo || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}</div>` : ""}
   </div>
-  <span class="gd-pill ${h.status==="PENDING FOR BOOKING"?"pending":"done"}">${h.status||"-"}</span>
+  <span class="gd-pill ${["PENDING FOR BOOKING","REQUESTED"].includes(h.status)?"pending":"done"}">${h.status||"-"}</span>
 </div>`).join("") : `<div class="gd-empty">No hotel entries added</div>`}
 </div>
 
@@ -9340,7 +9352,7 @@ Detailed Payment Receipts:
 ${buildPaymentTransactionsText(g)}
 
 🏨 Hotels:
-${(g.hotels || []).map(h => `- ${h.place || ""} | ${h.hotel || ""} | ${h.status || ""}`).join("\n") || "-"}
+${(g.hotels || []).map(h => `- ${h.place || ""} | ${h.hotel || ""} | Booking No: ${h.bookingNo || "-"} | ${h.status || ""}`).join("\n") || "-"}
 
 🛳️ Cruises:
 ${(g.cruises || []).filter(c => c.status !== "NO CRUISE").map(c => `- ${c.place || ""} | ${c.name || ""} | ${c.status || ""}`).join("\n") || "-"}
