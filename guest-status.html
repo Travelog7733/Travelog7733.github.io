@@ -411,7 +411,8 @@ line-height:1;
 box-shadow:0 5px 12px rgba(249,115,22,.22);
 }
 
-.hotel-pending-icon{
+.hotel-pending-icon,
+.hotel-requested-icon{
 position:absolute;
 top:39px;
 right:16px;
@@ -428,7 +429,18 @@ box-shadow:0 7px 18px rgba(220,76,24,.16);
 z-index:3;
 }
 
-.hotel-pending-icon svg{width:18px;height:18px;}
+.hotel-pending-icon svg, .hotel-requested-icon svg{width:18px;height:18px;}
+
+.hotel-requested-icon{
+background:linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+color:#7c3aed;
+border-color:rgba(124,58,237,.22);
+box-shadow:0 7px 18px rgba(124,58,237,.16);
+}
+
+.guest-tile.hotel-pending.hotel-requested .hotel-requested-icon{right:54px;}
+.guest-tile.hotel-requested .tile-head > div:first-child{padding-right:40px;}
+.guest-tile.hotel-pending.hotel-requested .tile-head > div:first-child{padding-right:78px;}
 
 .guest-tile.hotel-pending .tile-head > div:first-child{padding-right:40px;}
 
@@ -5921,6 +5933,7 @@ const createdAt = Date.parse(g.created || "");
 const newGuestAge = Date.now() - createdAt;
 const showNewBadge = Number.isFinite(createdAt) && newGuestAge >= 0 && newGuestAge < (3 * 24 * 60 * 60 * 1000);
 const hasPendingHotel = (g.hotels || []).some(h => String(h.status || "").toUpperCase() === "PENDING FOR BOOKING");
+const hasRequestedHotel = (g.hotels || []).some(h => String(h.status || "").trim().toUpperCase() === "REQUESTED");
 
 let badge = "confirmed";
 
@@ -5995,7 +6008,7 @@ tripStageClass = "pending";
 
 }
 const tileHtml = `
-<div class="guest-tile${hasPendingHotel ? " hotel-pending" : ""}" style="--tile-delay:${Math.min(index * 55, 550)}ms" onclick="openModal('${g.id}')">
+<div class="guest-tile${hasPendingHotel ? " hotel-pending" : ""}${hasRequestedHotel ? " hotel-requested" : ""}" style="--tile-delay:${Math.min(index * 55, 550)}ms" onclick="openModal('${g.id}')">
 
 <div class="tile-ribbon">
 <span class="tile-ribbon-date">${g.travelDate || "-"}</span>
@@ -6008,6 +6021,7 @@ const tileHtml = `
 </div>
 
 ${hasPendingHotel ? `<span class="hotel-pending-icon" title="Hotel booking pending" aria-label="Hotel booking pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20v-9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9"/><path d="M3 16h18"/><path d="M7 9V5h5a2 2 0 0 1 2 2v2"/><path d="M7 20v-2M17 20v-2"/></svg></span>` : ""}
+${hasRequestedHotel ? `<span class="hotel-requested-icon" title="Hotel booking requested" aria-label="Hotel booking requested"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="14" height="17" rx="2"/><path d="M10 4V2h6v2M10 9h6M10 13h6M3 15l3 3 5-5"/></svg></span>` : ""}
 
 <div class="tile-head">
 
