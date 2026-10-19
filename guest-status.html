@@ -4260,6 +4260,12 @@ body{padding:126px 12px 28px;}
 
 
 #guestModal #modalEditBtn{width:42px;height:42px;padding:0;justify-content:center;gap:0;}
+.sales-summary-split{margin-top:18px;padding-top:12px;border-top:1px solid rgba(91,124,250,.14);display:grid;gap:10px;}
+.sales-summary-split-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--ink);}
+.sales-summary-type{padding:4px 9px;border-radius:8px;font-size:11px;font-weight:800;}
+.sales-summary-type.b2b{background:#ede9fe;color:#6d28d9;}
+.sales-summary-type.b2c{background:#ccfbf1;color:#0f766e;}
+.sales-summary-split-row strong{overflow-wrap:anywhere;min-width:0;}
 </style>
 
 <style id="guest-access-style">
@@ -4275,6 +4281,258 @@ html:not(.guest-access-granted) body{overflow:hidden !important;}
 #guest-access-gate button{width:100%;padding:14px;border:0;border-radius:12px;background:#4c63d2;color:white;font-size:15px;font-weight:600;cursor:pointer;}
 #guest-access-gate #guest-access-error{min-height:22px;margin:10px 0;color:#b42318;font-size:13px;}
 </style>
+<style id="compact-sales-chart-design">
+/* Compact sales chart: each month owns its labels and bars. */
+.sales-chart-section{background:linear-gradient(150deg,#fff,#f8faff);min-width:0;}
+.sales-chart-head{flex-wrap:wrap;align-items:center;}
+.sales-chart{height:auto;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;padding:4px 0 0;border:0;overflow:visible;align-items:stretch;}
+.sales-bar-wrap{height:auto;min-width:0;padding:12px 8px 10px;border:1px solid #e8ecf8;border-radius:14px;background:rgba(255,255,255,.9);gap:12px;justify-content:flex-start;}
+.sales-bar-value{width:100%;min-width:0;min-height:0;display:grid;gap:6px;font-variant-numeric:tabular-nums;}
+.sales-chart-amount{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2px 5px;padding:5px 6px;border-radius:7px;text-align:left;line-height:1.35;}
+.sales-chart-amount>span{font-size:9px;font-weight:700;}
+.sales-chart-amount strong{font-size:clamp(10px,1.1vw,12px);white-space:nowrap;}
+.sales-chart-amount.b2b{background:#eef0ff;color:#4c5bd5;}
+.sales-chart-amount.b2c{background:#e3faf5;color:#087f70;}
+.sales-dual-bars{width:100%;gap:8px;padding-top:4px;border-bottom:1px solid #e8ecf8;}
+.sales-bar-track{height:148px;width:20px;background:#f0f3fa;}
+.sales-bar{box-shadow:none;}
+.sales-bar-label{font-size:11px;color:#515d77;line-height:1.4;}
+@media(max-width:800px){
+.sales-chart{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.sales-bar-track{height:110px;}
+}
+@media(max-width:480px){
+.sales-chart-section{padding:14px 10px;}
+.sales-chart-head{gap:8px;margin-bottom:12px;}
+.sales-chart-head .sales-section-title{font-size:12px;}
+.sales-chart-legend{gap:10px;}
+.sales-chart{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.sales-bar-wrap{padding:10px 8px;gap:8px;border-radius:12px;}
+.sales-chart-amount strong{font-size:12px;}
+.sales-bar-track{height:90px;width:18px;}
+}
+@media(prefers-reduced-motion:reduce){.sales-bar{transition:none;}}
+</style>
+<style id="sales-person-alignment">
+.sales-person-section{min-width:0;background:linear-gradient(145deg,#fff,#fafbff);}
+.sales-person-header{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:10px;}
+.sales-person-header .sales-month-nav{width:40px;height:40px;min-width:0;}
+.sales-person-header .sales-month-title{min-width:0;text-align:center;}
+.sales-person-header .sales-section-title{font-size:13px;overflow-wrap:anywhere;}
+.sales-person-list{gap:10px;}
+.sales-person-row{grid-template-columns:minmax(140px, .85fr) minmax(0,2fr);gap:24px;padding:16px;border:1px solid #e8ecf8;border-radius:14px;background:#fff;min-width:0;}
+.sales-person-identity{min-width:0;display:grid;gap:8px;}
+.sales-person-name{font-size:12px;line-height:1.5;}
+.sales-person-total{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:#6c7488;font-variant-numeric:tabular-nums;}
+.sales-person-total strong{color:#22264a;font-size:13px;}
+.sales-person-dual{min-width:0;gap:12px;}
+.sales-person-type-row{grid-template-columns:28px minmax(0,1fr) 110px;gap:10px;min-width:0;}
+.sales-person-figure{font-size:12px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.5;}
+.sales-person-figure.b2b{color:#4c5bd5;}
+.sales-person-figure.b2c{color:#087f70;}
+.sales-person-track{width:100%;min-width:0;height:9px;}
+.sales-figure-compact{display:none;}
+@media(max-width:600px){
+.sales-person-section{padding:14px 10px;}
+.sales-person-row{grid-template-columns:minmax(0,1fr);gap:14px;padding:12px;}
+.sales-person-identity{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.sales-person-name{flex:1;min-width:0;font-size:12px;}
+.sales-person-total{flex-shrink:0;display:grid;gap:2px;text-align:right;}
+.sales-person-total strong{font-size:12px;}
+.sales-person-type-row{grid-template-columns:26px minmax(0,1fr) 76px;gap:8px;}
+.sales-figure-full{display:none;}
+.sales-figure-compact{display:inline;}
+.sales-person-header .sales-section-title{font-size:11px;line-height:1.5;}
+.sales-person-header .sales-month-label{font-size:14px;}
+}
+@media(max-width:340px){
+.sales-person-identity{flex-direction:column;gap:6px;}
+.sales-person-total{display:flex;gap:8px;text-align:left;}
+}
+</style>
+<style>
+.itinerary-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:16px;margin-top:14px;}
+.itinerary-fields label{display:grid;align-content:start;gap:8px;min-width:0;font-size:13px;font-weight:700;color:var(--ink);}
+.itinerary-fields textarea{min-height:130px;}
+.itinerary-disclosure{margin:10px 0;border:1px solid #e3e9fc;border-radius:12px;background:#fff;overflow:hidden;}
+.itinerary-disclosure summary{padding:14px 16px;cursor:pointer;font-size:14px;font-weight:700;overflow-wrap:anywhere;line-height:1.6;color:#344bc2;}
+.itinerary-disclosure summary:focus-visible{outline:3px solid #aab8ff;outline-offset:-3px;}
+.itinerary-description{padding:14px 16px;border-top:1px solid #e3e9fc;color:#4f596d;font-size:14px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;}
+@media(max-width:600px){.itinerary-fields{grid-template-columns:minmax(0,1fr);}.itinerary-disclosure summary{padding:12px;font-size:13px;}.itinerary-description{padding:12px;}}
+</style><style id="compact-itinerary-view">
+.gd-day-card{padding:10px 12px;margin-bottom:8px;border-radius:10px;}
+.gd-day-card .gd-day-head{font-size:12px;line-height:1.4;margin-bottom:2px;}
+.gd-day-card .itinerary-disclosure{margin:2px 0 6px;border:0;border-radius:6px;background:transparent;}
+.gd-day-card .itinerary-disclosure summary{padding:8px 0;min-height:40px;font-size:12px;line-height:1.5;}
+.gd-day-card .itinerary-description{padding:8px 0;font-size:12px;line-height:1.65;}
+.gd-day-card .gd-day-tags{gap:4px;}
+.gd-day-card .gd-day-tag{padding:3px 8px;font-size:10px;line-height:1.4;gap:4px;border-radius:7px;}
+.gd-day-card .gd-day-tag svg{width:12px;height:12px;flex-shrink:0;}
+#gdItinerarySection{padding:16px;}
+#gdItinerarySection>.gd-section-title{margin-bottom:12px;}
+@media(max-width:600px){
+#gdItinerarySection{padding:12px;}
+.gd-day-card{padding:8px 10px;margin-bottom:6px;}
+.gd-day-card .itinerary-disclosure summary{min-height:44px;padding:10px 0;font-size:12px;}
+.gd-day-card .gd-day-tag{font-size:9px;padding:3px 6px;}
+}
+</style><style id="compact-payment-overview">
+.gd-section.gd-payment-compact{padding:14px 16px;}
+.gd-payment-compact .gd-section-title{font-size:12px;line-height:1.5;gap:8px;margin-bottom:10px;}
+.gd-payment-compact .gd-icon-badge{width:24px;height:24px;border-radius:7px;}
+.gd-payment-compact .gd-payment-progress{height:6px;margin:0 0 10px;}
+.gd-payment-compact .gd-stat-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;}
+.gd-payment-compact .gd-stat{padding:8px 10px;border-radius:9px;min-width:0;}
+.gd-payment-compact .gd-stat-label{font-size:9px;letter-spacing:0;line-height:1.4;margin-bottom:3px;}
+.gd-payment-compact .gd-stat-value{font-size:13px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
+.gd-payment-compact .payment-entry-list{margin-top:10px;gap:5px;}
+.gd-payment-compact .payment-entry-heading{font-size:10px;letter-spacing:.2px;margin-bottom:2px;}
+.gd-payment-compact .payment-entry-row{padding:6px 10px;font-size:12px;border-radius:8px;gap:10px;line-height:1.5;}
+.gd-payment-compact .payment-entry-date{min-width:0;overflow-wrap:anywhere;}
+.gd-payment-compact .payment-entry-amount{flex-shrink:0;font-variant-numeric:tabular-nums;}
+.gd-payment-compact .payment-entry-total{margin-top:2px;}
+@media(max-width:600px){
+.gd-section.gd-payment-compact{padding:12px;}
+.gd-payment-compact .gd-section-title{font-size:11px;align-items:center;}
+.gd-payment-compact .gd-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+.gd-payment-compact .gd-stat{padding:7px 9px;}
+.gd-payment-compact .gd-stat:last-child{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.gd-payment-compact .gd-stat:last-child .gd-stat-label{margin:0;}
+.gd-payment-compact .payment-entry-row{font-size:11px;padding:5px 8px;}
+}
+</style>
+<style>
+#guest-access-gate .access-remember{display:flex;align-items:center;gap:10px;margin:0 0 16px;font-size:13px;font-weight:500;cursor:pointer;}
+#guest-access-gate .access-remember input{width:18px;height:18px;padding:0;flex-shrink:0;accent-color:#4c63d2;}
+</style><style id="compact-flight-details">
+.flight-group{margin-bottom:12px;}
+.flight-group-title{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #dfe5ff;}
+.flight-detail-card{display:grid;grid-template-columns:140px minmax(0,1fr) auto;align-items:center;gap:14px;padding:12px 14px;margin-bottom:0;border-radius:12px;box-shadow:0 5px 14px rgba(23,32,51,.04);}
+.flight-airline-section{min-width:0;width:auto;padding:0 12px 0 0;border-right:1px solid #e8eaf6;border-bottom:0;gap:3px;}
+.flight-airline-logo,.flight-airline-logo-fallback{width:24px;height:24px;margin:0 0 2px;}
+.flight-airline-name{font-size:11px;overflow-wrap:anywhere;}
+.flight-airline-code{font-size:10px;margin:0;}
+.flight-type-badge{font-size:9px;padding:3px 7px;margin-top:3px;}
+.flight-journey-section{display:grid;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr);width:100%;min-width:0;gap:8px;}
+.flight-leg{min-width:0;}
+.flight-city-code{font-size:16px;}
+.flight-time{font-size:14px;margin-top:2px;}
+.flight-date{font-size:10px;margin-top:2px;overflow-wrap:anywhere;text-align:center;}
+.flight-duration-section{padding:0;gap:5px;}
+.flight-duration{font-size:10px;}
+.flight-stops-line{width:44px;}
+.flight-stops-indicator{font-size:9px;}
+.flight-details-info{min-width:0;width:auto;}
+.flight-number{font-size:11px;}
+.flight-layover{display:flex;align-items:center;justify-content:center;gap:4px;padding:7px 0;color:#b86b00;font-weight:600;font-size:10px;line-height:1.4;}
+.flight-layover svg{width:12px;height:12px;}
+@media(max-width:600px){
+.flight-detail-card{grid-template-columns:minmax(0,1fr);gap:10px;padding:10px;}
+.flight-airline-section{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:6px;width:100%;padding:0 0 8px;border-right:0;border-bottom:1px solid #edf0f8;}
+.flight-airline-name{flex:1;min-width:60px;text-align:left;font-size:10px;}
+.flight-airline-logo,.flight-airline-logo-fallback{width:20px;height:20px;margin:0;}
+.flight-type-badge{margin:0;font-size:8px;}
+.flight-journey-section{grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);gap:4px;}
+.flight-city-code{font-size:15px;}
+.flight-time{font-size:13px;}
+.flight-date{font-size:9px;}
+.flight-details-info{display:none;}
+}
+</style>
+<style id="compact-guest-summary">
+.gd-facts.gd-summary-compact,#guestModal .gd-facts.gd-summary-compact{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:0;margin-bottom:14px;align-items:start;}
+.gd-summary-compact .gd-fact{display:grid;grid-template-columns:20px minmax(0,1fr);align-items:center;align-content:start;gap:3px 6px;min-width:0;padding:9px 10px;border-radius:10px;}
+.gd-summary-compact .gd-fact-icon{width:20px;height:20px;margin:0;border-radius:6px;}
+.gd-summary-compact .gd-fact-icon svg{width:12px;height:12px;}
+.gd-summary-compact .gd-fact-label{font-size:9px;line-height:1.4;letter-spacing:.15px;margin:0;}
+.gd-summary-compact .gd-fact-value{grid-column:1/-1;font-size:12px;line-height:1.5;min-width:0;overflow-wrap:anywhere;}
+.gd-summary-compact .pax-pill-row{grid-column:1/-1;gap:3px;margin-top:2px;}
+.gd-summary-compact .pax-pill{padding:2px 5px;font-size:9px;line-height:1.4;}
+.gd-wrap .gd-badges{gap:6px;margin-bottom:12px;}
+.gd-wrap .gd-badges .status-badge{padding:6px 10px;font-size:10px;line-height:1.4;box-shadow:none;}
+@media(max-width:600px){
+.gd-facts.gd-summary-compact,#guestModal .gd-facts.gd-summary-compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:0;}
+.gd-summary-compact .gd-fact{padding:8px;gap:3px 5px;}
+.gd-summary-compact .gd-fact-value{font-size:11px;}
+.gd-summary-compact .gd-fact-label{font-size:8px;}
+}
+</style>
+<style id="guest-composition-visual">
+.gd-summary-compact .gd-fact.gd-guests-visual{background:linear-gradient(130deg,#f1f5ff,#fff);border-color:#dfe6ff;gap:5px 6px;}
+.gd-summary-compact .gd-guests-visual .gd-fact-value{display:flex;align-items:baseline;gap:7px;}
+.gd-guests-visual .gd-fact-value>strong{font-size:24px;font-weight:800;line-height:1.2;color:#344bc2;font-variant-numeric:tabular-nums;}
+.guest-count-caption{font-size:10px;font-weight:500;color:#737d95;}
+.guest-composition{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:3px;}
+.guest-composition-item{display:grid;gap:2px;justify-items:center;padding:6px 3px;border-radius:8px;min-width:0;background:#edf1ff;color:#4653b9;}
+.guest-composition-item.adult{background:#e5f7f1;color:#08795a;}
+.guest-composition-item.infant{background:#fff3e3;color:#a75a10;}
+.guest-composition-item strong{font-size:15px;line-height:1.2;font-variant-numeric:tabular-nums;}
+.guest-composition-item span{font-size:9px;line-height:1.4;font-weight:600;}
+@media(max-width:600px){
+.gd-guests-visual .gd-fact-value>strong{font-size:21px;}
+.guest-count-caption{font-size:9px;}
+.guest-composition{gap:3px;}
+.guest-composition-item{padding:5px 2px;border-radius:6px;}
+.guest-composition-item strong{font-size:13px;}
+.guest-composition-item span{font-size:8px;}
+}
+</style>
+<style id="aligned-summary-cards">
+/* Shared card geometry keeps every row aligned. */
+.gd-facts.gd-summary-compact,#guestModal .gd-facts.gd-summary-compact{align-items:stretch;gap:8px;}
+.gd-summary-compact .gd-fact{min-height:104px;padding:12px;grid-template-columns:22px minmax(0,1fr);grid-template-rows:22px auto;align-content:start;gap:7px 7px;background:#fff;border:1px solid #e4e9f5;border-radius:12px;box-shadow:0 2px 6px rgba(35,50,90,.025);}
+.gd-summary-compact .gd-fact-icon{width:22px;height:22px;}
+.gd-summary-compact .gd-fact-label{font-size:10px;font-weight:700;color:#7b86a5;letter-spacing:.2px;}
+.gd-summary-compact .gd-fact-value{font-size:13px;line-height:1.5;align-self:start;color:#27314e;}
+.gd-summary-compact .gd-fact.gd-guests-visual{grid-template-columns:22px minmax(0,1fr) auto;grid-template-rows:22px auto;gap:7px;background:linear-gradient(120deg,#f5f8ff,#fff);border-color:#d9e3ff;}
+.gd-summary-compact .gd-guests-visual .gd-fact-value{grid-column:3;grid-row:1;gap:0;align-self:center;}
+.gd-guests-visual .gd-fact-value>strong{font-size:21px;line-height:1;}
+.gd-guests-visual .guest-count-caption{display:none;}
+.gd-guests-visual .guest-composition{grid-column:1/-1;grid-row:2;margin:0;gap:5px;align-self:start;}
+.gd-guests-visual .guest-composition-item{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;padding:7px 4px;border-radius:7px;}
+.gd-guests-visual .guest-composition-item strong{font-size:13px;line-height:1.4;}
+.gd-guests-visual .guest-composition-item span{font-size:9px;line-height:1.4;}
+@media(max-width:600px){
+.gd-facts.gd-summary-compact,#guestModal .gd-facts.gd-summary-compact{gap:7px;}
+.gd-summary-compact .gd-fact{padding:10px;min-height:98px;gap:6px;}
+.gd-summary-compact .gd-fact-label{font-size:9px;letter-spacing:0;}
+.gd-summary-compact .gd-fact-value{font-size:12px;}
+.gd-summary-compact .gd-fact.gd-guests-visual{grid-template-columns:20px minmax(0,1fr) auto;gap:6px 4px;}
+.gd-guests-visual .guest-composition{gap:3px;}
+.gd-guests-visual .guest-composition-item{flex-direction:column;gap:0;padding:4px 1px;}
+.gd-guests-visual .guest-composition-item span{font-size:8px;}
+.gd-guests-visual .guest-composition-item strong{font-size:12px;}
+}
+</style>
+<style id="summary-extra-compact">
+.gd-facts.gd-summary-compact,#guestModal .gd-facts.gd-summary-compact{gap:6px;margin-bottom:10px;}
+.gd-summary-compact .gd-fact{min-height:86px;padding:9px 10px;gap:5px 6px;border-radius:10px;}
+.gd-summary-compact .gd-fact.gd-guests-visual{gap:5px 6px;}
+.gd-guests-visual .guest-composition-item{padding:4px 3px;}
+.gd-summary-compact .gd-fact-icon{width:20px;height:20px;}
+@media(max-width:600px){
+.gd-summary-compact .gd-fact{min-height:88px;padding:8px;gap:4px;}
+.gd-summary-compact .gd-fact.gd-guests-visual{gap:4px;}
+.gd-guests-visual .guest-composition-item{padding:2px 1px;}
+}
+</style><style id="mobile-expanding-search">
+.guest-search-toggle{display:none;}
+@media(max-width:768px){
+.guest-search-panel{height:46px;min-height:46px;}
+.guest-search-shell{display:flex;align-items:center;position:relative;width:46px;max-width:100%;height:46px;border-radius:24px;background:#fff;border:1px solid #dfe5fa;box-shadow:0 5px 18px rgba(76,99,210,.14);overflow:hidden;transition:width .42s cubic-bezier(.22,1,.36,1),box-shadow .3s ease;}
+.search-open .guest-search-shell{width:min(100%,360px);box-shadow:0 6px 22px rgba(76,99,210,.19);}
+.guest-search-toggle{display:flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;position:relative;border:0;border-radius:50%;background:#526bf1;color:#fff;cursor:pointer;z-index:1;}
+.guest-search-toggle svg{transition:transform .45s cubic-bezier(.22,1,.36,1);}
+.search-open .guest-search-toggle svg{transform:rotate(360deg);}
+.guest-search-panel #guestSearchInput{flex:1;min-width:0;width:0;height:44px;padding:0;border:0;border-radius:0;background:transparent;font-size:13px;opacity:0;visibility:hidden;box-shadow:none;transform:translateX(-8px);transition:opacity .2s ease,transform .3s ease,visibility .2s;}
+.guest-search-panel.search-open #guestSearchInput{padding:0 12px;opacity:1;visibility:visible;transform:none;}
+.guest-search-panel #guestSearchInput:focus{box-shadow:none;transform:none;}
+.search-active-dot{display:none;position:absolute;top:8px;right:8px;width:7px;height:7px;border:1px solid #fff;border-radius:50%;background:#35e4bd;}
+.search-filtered:not(.search-open) .search-active-dot{display:block;}
+.guest-search-toggle:focus-visible{outline:3px solid #aab8ff;outline-offset:-3px;}
+}
+@media(prefers-reduced-motion:reduce){.guest-search-shell,.guest-search-toggle svg,.guest-search-panel #guestSearchInput{transition:none;}}
+</style>
 </head>
 
 <body>
@@ -4285,6 +4543,7 @@ html:not(.guest-access-granted) body{overflow:hidden !important;}
     <label for="guest-access-code">Passcode</label>
     <input id="guest-access-code" type="password" inputmode="numeric" autocomplete="off" maxlength="6" required autofocus aria-describedby="guest-access-error">
     <div id="guest-access-error" role="alert" aria-live="polite"></div>
+    <label class="access-remember"><input id="guest-access-remember" type="checkbox"><span>Remember me for 24 hours</span></label>
     <button type="submit">Unlock page</button>
     <noscript>Enable JavaScript to enter your passcode.</noscript>
   </form>
@@ -4294,6 +4553,25 @@ html:not(.guest-access-granted) body{overflow:hidden !important;}
   const form = document.getElementById('guest-access-form');
   const input = document.getElementById('guest-access-code');
   const error = document.getElementById('guest-access-error');
+  const remember = document.getElementById('guest-access-remember');
+  const accessKey = 'guestAccessUntil:v1';
+  const rememberDuration = 24 * 60 * 60 * 1000;
+  function unlock(){
+    input.value = '';
+    document.documentElement.classList.add('guest-access-granted');
+    document.getElementById('guest-access-gate').remove();
+  }
+  window.lockGuestAccess = function () {
+    try{ localStorage.removeItem(accessKey); }catch(error){}
+    window.location.reload();
+  };
+  let remembered = false;
+  try{
+    const until = Number(localStorage.getItem(accessKey));
+    remembered = Number.isFinite(until) && until > Date.now() && until <= Date.now() + rememberDuration;
+    if(!remembered) localStorage.removeItem(accessKey);
+  }catch(error){}
+  if(remembered) unlock();
   form.addEventListener('submit', function (event) {
     event.preventDefault();
     if (input.value !== '773377') {
@@ -4303,9 +4581,11 @@ html:not(.guest-access-granted) body{overflow:hidden !important;}
       input.focus();
       return;
     }
-    input.value = '';
-    document.documentElement.classList.add('guest-access-granted');
-    document.getElementById('guest-access-gate').remove();
+    try{
+      if(remember.checked) localStorage.setItem(accessKey, String(Date.now() + rememberDuration));
+      else localStorage.removeItem(accessKey);
+    }catch(error){ console.warn('Remember me is unavailable in this browser.', error); }
+    unlock();
   });
   input.addEventListener('input', function () {
     error.textContent = '';
@@ -4321,9 +4601,59 @@ html:not(.guest-access-granted) body{overflow:hidden !important;}
 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></svg>
 </button>
 
-<div class="guest-search-panel">
-<input type="search" class="input-field" placeholder="Search guest or company" oninput="filterGuestTiles(this.value)">
+<div class="guest-search-panel" id="guestSearchPanel">
+<div class="guest-search-shell">
+<button type="button" class="guest-search-toggle" id="guestSearchToggle" aria-label="Open guest search" aria-expanded="false" aria-controls="guestSearchInput"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg><span class="search-active-dot" aria-hidden="true"></span></button>
+<input id="guestSearchInput" type="search" class="input-field" aria-label="Search guest or company" placeholder="Search guest or company" oninput="filterGuestTiles(this.value)">
 </div>
+</div>
+<script>
+(function(){
+const panel = document.getElementById('guestSearchPanel');
+const toggle = document.getElementById('guestSearchToggle');
+const input = document.getElementById('guestSearchInput');
+const mobile = window.matchMedia('(max-width:768px)');
+let idleTimer;
+function collapse(){
+clearTimeout(idleTimer);
+if(!mobile.matches) return;
+if(document.activeElement === input) input.blur();
+panel.classList.remove('search-open');
+toggle.setAttribute('aria-expanded','false');
+toggle.setAttribute('aria-label',input.value ? 'Open guest search — filter active' : 'Open guest search');
+input.tabIndex = -1;
+input.inert = true;
+}
+function activity(){
+clearTimeout(idleTimer);
+if(mobile.matches && panel.classList.contains('search-open')) idleTimer = setTimeout(collapse,8000);
+}
+function expand(){
+panel.classList.add('search-open');
+input.inert = false;
+input.tabIndex = 0;
+toggle.setAttribute('aria-expanded','true');
+toggle.setAttribute('aria-label','Close guest search');
+input.focus({preventScroll:true});
+activity();
+}
+toggle.addEventListener('click',()=>{ panel.classList.contains('search-open') ? collapse() : expand(); });
+['input','focus','pointerdown','keydown'].forEach(name=>input.addEventListener(name,activity));
+input.addEventListener('input',()=>panel.classList.toggle('search-filtered',Boolean(input.value.trim())));
+input.addEventListener('keydown',event=>{
+if(mobile.matches && (event.key === 'Escape' || event.key === 'Enter')){
+event.preventDefault(); collapse(); toggle.focus();
+}
+});
+function resize(){
+clearTimeout(idleTimer);
+if(mobile.matches) collapse();
+else { input.inert = false; input.tabIndex = 0; panel.classList.remove('search-open'); }
+}
+mobile.addEventListener('change',resize);
+resize();
+})();
+</script>
 
 <div class="menu-overlay" id="menuOverlay" onclick="closeSideMenu()"></div>
 
@@ -4333,6 +4663,7 @@ html:not(.guest-access-granted) body{overflow:hidden !important;}
 <button class="side-menu-close" onclick="closeSideMenu()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
 </div>
 <div class="side-menu-body">
+<button class="side-menu-item" onclick="lockGuestAccess()"><span class="smi-icon">🔒</span>Lock page / Forget me</button>
 <button class="side-menu-item" onclick="closeSideMenu(); switchTab('active');"><span class="smi-icon">📋</span>Active Guests</button>
 <button class="side-menu-item" onclick="closeSideMenu(); switchTab('completed');"><span class="smi-icon">✅</span>Completed Guests</button>
 <button class="side-menu-item" onclick="closeSideMenu(); openAddModal();"><span class="smi-icon">➕</span>Add New Guest</button>
@@ -4761,7 +5092,7 @@ Track booking and payment status of guests
 <label class="mini-radio-item"><input type="checkbox" class="day-guide-checkbox" value="WITHOUT GUIDE">WITHOUT GUIDE</label>
 </div></div>
 </div>
-<textarea class="input-field itinerary-text" placeholder="Activity / Plans"></textarea>
+<div class="itinerary-fields"><label>Heading<input class="input-field itinerary-heading" placeholder="e.g. Arrival in Hanoi"></label><label>Description<textarea class="input-field itinerary-text" placeholder="Add the detailed plan for this day"></textarea></label></div>
 </div>
 </div>
 <button class="add-small-btn" onclick="addDay()">+ Add Day</button>
@@ -4775,29 +5106,16 @@ Track booking and payment status of guests
   </div>
 </div>
 
+<div id="guest-load-status" role="status" aria-live="polite" style="text-align:center;padding:16px;color:#6c7488;">
+<span id="guest-load-message">Connecting to guest records…</span>
+<button type="button" id="guest-load-retry" onclick="loadGuests()" hidden style="margin-left:12px;padding:8px 16px;border:0;border-radius:10px;background:#4c63d2;color:white;cursor:pointer;">Retry loading</button>
+</div>
 <div class="status-grid" id="guestContainer"></div>
 <div class="status-grid" id="completedContainer" style="display:none;"></div>
 
 </div>
 
-<script type="module">
-
-import {
-initializeApp
-} from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-
-import {
-getFirestore,
-collection,
-addDoc,
-deleteDoc,
-doc,
-onSnapshot,
-updateDoc,
-setDoc
-}
-from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
+<script>
 const firebaseConfig = {
 
 apiKey: "AIzaSyALSpB73XK5DiR2Ut59NSkKmalPkUGb49c",
@@ -4814,19 +5132,25 @@ appId: "1:33567258851:web:790e8f165a3d917bf7edd6"
 
 };
 
-const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
-
-window.db = db;
-window.collection = collection;
-window.addDoc = addDoc;
-window.deleteDoc = deleteDoc;
-window.doc = doc;
-window.onSnapshot = onSnapshot;
-window.updateDoc = updateDoc;
-window.setDoc = setDoc;
-
+window.connectGuestDatabase = function () {
+if(window.db) return Promise.resolve();
+if(window.guestDatabaseConnection) return window.guestDatabaseConnection;
+window.guestDatabaseConnection = Promise.all([
+import("https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js"),
+import("https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js")
+]).then(([appSDK, storeSDK]) => {
+const app = appSDK.getApps().length ? appSDK.getApp() : appSDK.initializeApp(firebaseConfig);
+window.db = storeSDK.getFirestore(app);
+for(const name of ["collection", "addDoc", "deleteDoc", "doc", "onSnapshot", "updateDoc", "setDoc"]){
+window[name] = storeSDK[name];
+}
+}).catch(error => {
+window.guestDatabaseConnection = null;
+throw error;
+});
+return window.guestDatabaseConnection;
+};
 </script>
 
 <script>
@@ -4834,6 +5158,16 @@ window.setDoc = setDoc;
 let editingId = null;
 let dayCount = 1;
 let dayUid = 1;
+
+
+function itineraryFields(day = {}){
+const heading = day.heading ?? day.activity ?? "";
+return '<div class="itinerary-fields"><label>Heading<input class="input-field itinerary-heading" placeholder="e.g. Arrival in Hanoi" value="' + escapeHTML(heading) + '"></label><label>Description<textarea class="input-field itinerary-text" placeholder="Add the detailed plan for this day">' + escapeHTML(day.description || "") + '</textarea></label></div>';
+}
+function itineraryDisclosure(day){
+const heading = day.heading ?? day.activity ?? "";
+return '<details class="itinerary-disclosure"><summary>' + escapeHTML(heading || "Day plan") + '</summary><div class="itinerary-description">' + escapeHTML(day.description || "No description added.") + '</div></details>';
+}
 
 function normalizePayment(v){ return (v||"").replace("ADVANCE PAID","ADVANCE RECEIVED"); }
 
@@ -4966,6 +5300,10 @@ if(!breakdown.adult && !breakdown.child && !breakdown.infant) return "";
 return `Adult: ${breakdown.adult} | Child: ${breakdown.child} | Infant: ${breakdown.infant}`;
 }
 
+function renderGuestComposition(g){
+const counts = normalizePaxBreakdown(g?.paxBreakdown, g?.guests);
+return '<div class="guest-composition">' + [['adult','Adults','users'],['child','Children','user'],['infant','Infants','user']].map(([key,label,icon]) => '<div class="guest-composition-item ' + key + '"><strong>' + counts[key] + '</strong><span>' + label + '</span></div>').join('') + '</div>';
+}
 function renderPaxBreakdownPills(g){
 const breakdown = normalizePaxBreakdown(g?.paxBreakdown, g?.guests);
 if(!breakdown.adult && !breakdown.child && !breakdown.infant) return "";
@@ -5440,9 +5778,7 @@ WITHOUT GUIDE
 
 </div>
 
-<textarea
-class="input-field itinerary-text"
-placeholder="Activity / Plans"></textarea>
+${itineraryFields()}
 
 <button
 type="button"
@@ -5758,8 +6094,9 @@ day:index+1,
 date:
 card.querySelector(".auto-date").innerText,
 
-activity:
-card.querySelector(".itinerary-text").value,
+heading: card.querySelector(".itinerary-heading").value,
+description: card.querySelector(".itinerary-text").value,
+activity: card.querySelector(".itinerary-heading").value,
 
 transfer:
 [...card.querySelectorAll(".day-transfer-checkbox:checked")]
@@ -5885,9 +6222,30 @@ alert("Save failed. Please check the guest details and try again.");
 
 }
 
-function loadGuests(){
+let guestLoadAttempt = 0;
+let guestUnsubscribe = null;
+let guestLoadTimer = null;
+function setGuestLoadStatus(message, retry = false){
+document.getElementById("guest-load-status").hidden = !message;
+document.getElementById("guest-load-message").textContent = message;
+document.getElementById("guest-load-retry").hidden = !retry;
+}
+async function loadGuests(){
+const attempt = ++guestLoadAttempt;
+clearTimeout(guestLoadTimer);
+if(guestUnsubscribe){ guestUnsubscribe(); guestUnsubscribe = null; }
+setGuestLoadStatus("Loading guest records…");
+guestLoadTimer = setTimeout(() => {
+if(attempt === guestLoadAttempt) setGuestLoadStatus("The connection is taking longer than usual. You can retry loading here.", true);
+}, 15000);
+try{
+await window.connectGuestDatabase();
+if(attempt !== guestLoadAttempt) return;
+startSettingsSync();
 
-onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
+guestUnsubscribe = onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
+if(attempt !== guestLoadAttempt) return;
+try{
 
 let guests = [];
 
@@ -5911,9 +6269,17 @@ guests.sort((a, b) => parseDate(a.travelDate) - parseDate(b.travelDate));
 window.allGuests = guests;
 
 renderGuestTiles(guests);
-
-});
-
+clearTimeout(guestLoadTimer);
+setGuestLoadStatus(guests.length ? "" : "No guest records found.");
+}catch(error){ guestLoadFailed(error); }
+}, guestLoadFailed);
+}catch(error){ guestLoadFailed(error); }
+function guestLoadFailed(error){
+if(attempt !== guestLoadAttempt) return;
+clearTimeout(guestLoadTimer);
+console.error("Guest loading failed", error);
+setGuestLoadStatus(navigator.onLine === false ? "You are offline. Reconnect and retry loading." : "Guest records could not load. Please retry loading.", true);
+}
 }
 
 function renderGuestTiles(guests){
@@ -6228,7 +6594,7 @@ ${(g.itineraryDays || []).map(d=>`
 <div class="detail">
 <b>Day ${d.day} - ${d.date}</b><br>
 🚐 Transfer: <b>${formatDayOption(d.transfer)}</b> &nbsp; 🍽️ Meal Plan: <b>${formatDayOption(d.mealPlan)}</b> &nbsp; 🧑‍✈️ Guide: <b>${formatDayOption(d.guideStatus)}</b><br>
-${d.activity || ""}
+${itineraryDisclosure(d)}
 </div>
 `).join("")}
 
@@ -6659,6 +7025,7 @@ const salesPeople = {};
 const selectedMonthKey = getSalesMonthKey(selectedMonth);
 let totalSales = 0;
 let guestCount = 0;
+const businessSplit = { B2B: { sales: 0, guests: 0 }, B2C: { sales: 0, guests: 0 } };
 
 source.forEach(g => {
 const amount = Number(g.invoiceAmount || 0);
@@ -6678,6 +7045,8 @@ else month.b2c += amount;
 if(monthKey === selectedMonthKey){
 totalSales += amount;
 guestCount += 1;
+businessSplit[businessType].sales += amount;
+businessSplit[businessType].guests += 1;
 const salesName = (g.salesPerson || "Unassigned").trim() || "Unassigned";
 if(!salesPeople[salesName]) salesPeople[salesName] = { total: 0, b2b: 0, b2c: 0 };
 salesPeople[salesName].total += amount;
@@ -6695,6 +7064,7 @@ months,
 personRows,
 totalSales,
 guestCount,
+businessSplit,
 topPersonB2C: personRows.filter(person => person.b2c > 0).sort((a, b) => b.b2c - a.b2c)[0] || null, topPersonB2B: personRows.filter(person => person.b2b > 0).sort((a, b) => b.b2b - a.b2b)[0] || null,
 selectedMonthLabel: getSalesLongMonthLabel(selectedMonth)
 };
@@ -6966,6 +7336,13 @@ pdf.save(`Sales_Report_${reportType}_${options.year}.pdf`);
 closeSalesReportExportModal();
 }
 
+function formatCompactSales(value){
+const amount = Number(value) || 0;
+const absolute = Math.abs(amount);
+const unit = absolute >= 10000000 ? [10000000, "Cr"] : absolute >= 100000 ? [100000, "L"] : absolute >= 1000 ? [1000, "K"] : [1, ""];
+return "₹" + (amount / unit[0]).toLocaleString("en-IN", { maximumFractionDigits: unit[0] === 1 ? 0 : 2 }) + unit[1];
+}
+
 function renderSalesPerformance(){
 const body = document.getElementById("salesPerformanceBody");
 if(!body) return;
@@ -6980,11 +7357,19 @@ body.innerHTML = `
     <div class="sales-summary-label">Total Sales</div>
     <div class="sales-summary-value">${formatINR(data.totalSales)}</div>
     <div class="sales-summary-sub">${data.selectedMonthLabel}</div>
+    <div class="sales-summary-split">
+      <div class="sales-summary-split-row"><span class="sales-summary-type b2b">B2B</span><strong>${formatINR(data.businessSplit.B2B.sales)}</strong></div>
+      <div class="sales-summary-split-row"><span class="sales-summary-type b2c">B2C</span><strong>${formatINR(data.businessSplit.B2C.sales)}</strong></div>
+    </div>
   </div>
   <div class="sales-summary-card">
     <div class="sales-summary-label">Sold Guests</div>
     <div class="sales-summary-value">${data.guestCount}</div>
     <div class="sales-summary-sub">${data.selectedMonthLabel}</div>
+    <div class="sales-summary-split">
+      <div class="sales-summary-split-row"><span class="sales-summary-type b2b">B2B</span><strong>${data.businessSplit.B2B.guests}</strong></div>
+      <div class="sales-summary-split-row"><span class="sales-summary-type b2c">B2C</span><strong>${data.businessSplit.B2C.guests}</strong></div>
+    </div>
   </div>
   <div class="sales-summary-card sales-leaders-card">
     <div class="sales-leaders-heading"><span>Top Sales Person</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v5a4 4 0 0 1-8 0V3Z M8 5H5v2a4 4 0 0 0 4 4 M16 5h3v2a4 4 0 0 1-4 4 M12 12v5 M8 21h8 M9 17h6v4H9z"/></svg></div>
@@ -7008,7 +7393,10 @@ body.innerHTML = `
       const b2cHeight = Math.max(month.b2c ? 8 : 0, (month.b2c / maxMonth) * 100);
       return `
       <div class="sales-bar-wrap">
-        <div class="sales-bar-value">B2B ${month.b2b ? formatINR(month.b2b) : "-"}<br>B2C ${month.b2c ? formatINR(month.b2c) : "-"}</div>
+        <div class="sales-bar-value">
+          <span class="sales-chart-amount b2b" title="B2B: ${formatINR(month.b2b)}" aria-label="B2B: ${formatINR(month.b2b)}"><span>B2B</span><strong>${formatCompactSales(month.b2b)}</strong></span>
+          <span class="sales-chart-amount b2c" title="B2C: ${formatINR(month.b2c)}" aria-label="B2C: ${formatINR(month.b2c)}"><span>B2C</span><strong>${formatCompactSales(month.b2c)}</strong></span>
+        </div>
         <div class="sales-dual-bars">
           <div class="sales-bar-track" title="B2B ${formatINR(month.b2b)}"><div class="sales-bar b2b" data-height="${b2bHeight.toFixed(2)}%"></div></div>
           <div class="sales-bar-track" title="B2C ${formatINR(month.b2c)}"><div class="sales-bar b2c" data-height="${b2cHeight.toFixed(2)}%"></div></div>
@@ -7035,18 +7423,20 @@ body.innerHTML = `
   <div class="sales-person-list">
     ${data.personRows.length ? data.personRows.map(person => `
       <div class="sales-person-row">
-        <div class="sales-person-name">${person.name}</div>
+        <div class="sales-person-identity"><div class="sales-person-name">${escapeHTML(person.name)}</div><div class="sales-person-total"><span>Total</span><strong>${formatINR(person.total)}</strong></div></div>
         <div class="sales-person-dual">
           <div class="sales-person-type-row">
             <span class="sales-person-type-label">B2B</span>
             <div class="sales-person-track"><div class="sales-person-fill b2b" data-width="${((person.b2b / maxPerson) * 100).toFixed(2)}%"></div></div>
+            <strong class="sales-person-figure b2b" title="${formatINR(person.b2b)}"><span class="sales-figure-full">${formatINR(person.b2b)}</span><span class="sales-figure-compact">${formatCompactSales(person.b2b)}</span></strong>
           </div>
           <div class="sales-person-type-row">
             <span class="sales-person-type-label">B2C</span>
             <div class="sales-person-track"><div class="sales-person-fill b2c" data-width="${((person.b2c / maxPerson) * 100).toFixed(2)}%"></div></div>
+            <strong class="sales-person-figure b2c" title="${formatINR(person.b2c)}"><span class="sales-figure-full">${formatINR(person.b2c)}</span><span class="sales-figure-compact">${formatCompactSales(person.b2c)}</span></strong>
           </div>
         </div>
-        <div class="sales-person-amount">B2B ${formatINR(person.b2b)}<br>B2C ${formatINR(person.b2c)}<br>Total ${formatINR(person.total)}</div>
+
       </div>
     `).join("") : `<div class="sales-empty">No sales data available for ${data.selectedMonthLabel}.</div>`}
   </div>
@@ -7810,12 +8200,7 @@ WITHOUT GUIDE
 
 </div>
 
-<textarea
-class="input-field itinerary-text">
-
-${day.activity || ""}
-
-</textarea>
+${itineraryFields(day)}
 
 <button
 type="button"
@@ -7890,7 +8275,7 @@ function meBuildDayCard(day, index){
 <label class="mini-radio-item"><input type="checkbox" class="day-guide-checkbox" value="WITHOUT GUIDE" ${chk(day.guideStatus,"WITHOUT GUIDE","WITH GUIDE")}>WITHOUT GUIDE</label>
 </div></div>
 </div>
-<textarea class="input-field itinerary-text" style="width:100%;margin-top:8px;">${day.activity||""}</textarea>
+${itineraryFields(day)}
 <button type="button" class="remove-btn" onclick="this.closest('.day-card').remove()">Remove Day</button>
 </div>`;
 }
@@ -8268,7 +8653,9 @@ async function meModalSave(id){
   const itineraryDays=[...document.querySelectorAll("#me-dayContainer .day-card")].map((c,i)=>({
     day:i+1,
     date:c.querySelector(".auto-date").innerText,
-    activity:c.querySelector(".itinerary-text").value,
+    heading:c.querySelector(".itinerary-heading").value,
+    description:c.querySelector(".itinerary-text").value,
+    activity:c.querySelector(".itinerary-heading").value,
     transfer:[...c.querySelectorAll(".day-transfer-checkbox:checked")].map(e=>e.value),
     mealPlan:[...c.querySelectorAll(".day-meal-checkbox:checked")].map(e=>e.value),
     guideStatus:[...c.querySelectorAll(".day-guide-checkbox:checked")].map(e=>e.value)
@@ -8359,11 +8746,11 @@ return `
   <span class="status-badge ${tripStageClass}">${tripStage}</span>
 </div>
 
-<div class="gd-facts" id="gdBasicDetailsSection">
+<div class="gd-facts gd-summary-compact" id="gdBasicDetailsSection">
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('pin')}</span><span class="gd-fact-label">Destination</span><span class="gd-fact-value">${g.destination||"-"}</span></div>
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('calendar')}</span><span class="gd-fact-label">Travel Date</span><span class="gd-fact-value">${g.travelDate||"-"}</span></div>
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('moon')}</span><span class="gd-fact-label">Days</span><span class="gd-fact-value">${g.days||"-"}</span></div>
-  <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('users')}</span><span class="gd-fact-label">Guests</span><span class="gd-fact-value">${g.guests||"-"}</span>${renderPaxBreakdownPills(g)}</div>
+  <div class="gd-fact gd-guests-visual"><span class="gd-fact-icon">${gdIcon('users')}</span><span class="gd-fact-label">Guests</span><span class="gd-fact-value"><strong>${g.guests||"-"}</strong><span class="guest-count-caption">Total guests</span></span>${renderGuestComposition(g)}</div>
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('tie')}</span><span class="gd-fact-label">Sales Person</span><span class="gd-fact-value">${g.salesPerson||"-"}</span></div>
   ${g.companyName?`<div class="gd-fact"><span class="gd-fact-icon">${gdIcon('building')}</span><span class="gd-fact-label">Company</span><span class="gd-fact-value">${g.companyName}</span></div>`:""}
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('building')}</span><span class="gd-fact-label">B2B / B2C</span><span class="gd-fact-value">${g.businessType || "B2C"}</span></div>
@@ -8380,7 +8767,7 @@ const advPending = Math.max(advReq-received,0);
 const balance = Number(g.balanceAmount||0);
 const pct = invoice>0 ? Math.min(100,(received/invoice)*100) : 0;
 return `
-<div class="gd-section" id="gdPaymentOverviewSection">
+<div class="gd-section gd-payment-compact" id="gdPaymentOverviewSection">
 <div class="gd-section-title"><span class="gd-icon-badge">${gdIcon('card',15)}</span>Payment Overview — ${getEffectivePaymentStatus(g)}</div>
 <div class="gd-payment-progress">
   <div class="gd-payment-progress-fill" style="width:${pct}%"></div>
@@ -8454,8 +8841,8 @@ const calcLayover = (arrivalTime, nextDepartureTime) => {
 const renderFlightSection = (type, flights, title, iconName) => {
   if(!flights.length) return '';
   return `
-<div style="margin-bottom:20px;">
-<div style="display:flex;align-items:center;gap:6px;font-size:13px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--primary);">${gdIcon(iconName)}${title}</div>
+<div class="flight-group">
+<div class="flight-group-title">${gdIcon(iconName)}${title}</div>
 ${flights.map((f, idx) => {
   const calcDuration = () => {
     if(!f.fromTime || !f.toTime) return "";
@@ -8500,7 +8887,7 @@ ${flights.map((f, idx) => {
     <div class="flight-number">${renderFlightNumber(f)}</div>
   </div>
 </div>
-${layover ? `<div style="display:flex;align-items:center;justify-content:center;gap:5px;padding:12px 0; color:#ff9800; font-weight:600; font-size:12px;">${gdIcon('clock')}Layover: ${layover}</div>` : ''}
+${layover ? `<div class="flight-layover">${gdIcon('clock')}Layover: ${layover}</div>` : ''}
 </div>
 `;
 }).join("")}
@@ -8519,7 +8906,7 @@ return out || `<div class="gd-empty">No flight details added</div>`;
 ${(g.itineraryDays||[]).length ? (g.itineraryDays||[]).map((d, idx)=>`
 <div class="gd-day-card" data-pdf-day-index="${idx}">
   <div class="gd-day-head">Day ${d.day} — ${d.date||""}${earlyCheckinDay === String(d.day) ? '<span class="early-checkin-badge">Early Check-in</span>' : ""}</div>
-  ${d.activity?`<div class="gd-day-activity">${d.activity}</div>`:""}
+  ${itineraryDisclosure(d)}
   <div class="gd-day-tags">
     <span class="gd-day-tag" style="background:#3a5bd9;">${gdIcon('bus')} ${formatDayOption(d.transfer)}</span>
     <span class="gd-day-tag" style="background:#c2500a;">${gdIcon('utensils')} ${formatDayOption(d.mealPlan)}</span>
@@ -8572,11 +8959,11 @@ document.getElementById("modalContent").innerHTML=`
   <span class="status-badge ${tripStageClass}">${tripStage}</span>
 </div>
 
-<div class="gd-facts">
+<div class="gd-facts gd-summary-compact">
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('pin')}</span><span class="gd-fact-label">Destination</span><span class="gd-fact-value">${g.destination||"-"}</span></div>
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('calendar')}</span><span class="gd-fact-label">Travel Date</span><span class="gd-fact-value">${g.travelDate||"-"}</span></div>
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('moon')}</span><span class="gd-fact-label">Days</span><span class="gd-fact-value">${g.days||"-"}</span></div>
-  <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('users')}</span><span class="gd-fact-label">Guests</span><span class="gd-fact-value">${g.guests||"-"}</span>${renderPaxBreakdownPills(g)}</div>
+  <div class="gd-fact gd-guests-visual"><span class="gd-fact-icon">${gdIcon('users')}</span><span class="gd-fact-label">Guests</span><span class="gd-fact-value"><strong>${g.guests||"-"}</strong><span class="guest-count-caption">Total guests</span></span>${renderGuestComposition(g)}</div>
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('tie')}</span><span class="gd-fact-label">Sales Person</span><span class="gd-fact-value">${g.salesPerson||"-"}</span></div>
   ${g.companyName?`<div class="gd-fact"><span class="gd-fact-icon">${gdIcon('building')}</span><span class="gd-fact-label">Company</span><span class="gd-fact-value">${g.companyName}</span></div>`:""}
   <div class="gd-fact"><span class="gd-fact-icon">${gdIcon('building')}</span><span class="gd-fact-label">B2B / B2C</span><span class="gd-fact-value">${g.businessType || "B2C"}</span></div>
@@ -8593,7 +8980,7 @@ const advPending = Math.max(advReq-received,0);
 const balance = Number(g.balanceAmount||0);
 const pct = invoice>0 ? Math.min(100,(received/invoice)*100) : 0;
 return `
-<div class="gd-section">
+<div class="gd-section gd-payment-compact">
 <div class="gd-section-title"><span class="gd-icon-badge">${gdIcon('card',15)}</span>Payment Overview — ${getEffectivePaymentStatus(g)}</div>
 <div class="gd-payment-progress">
   <div class="gd-payment-progress-fill" style="width:${pct}%"></div>
@@ -8667,8 +9054,8 @@ const calcLayover = (arrivalTime, nextDepartureTime) => {
 const renderFlightSection = (type, flights, title, iconName) => {
   if(!flights.length) return '';
   return `
-<div style="margin-bottom:20px;">
-<div style="display:flex;align-items:center;gap:6px;font-size:13px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--primary);">${gdIcon(iconName)}${title}</div>
+<div class="flight-group">
+<div class="flight-group-title">${gdIcon(iconName)}${title}</div>
 ${flights.map((f, idx) => {
   const calcDuration = () => {
     if(!f.fromTime || !f.toTime) return "";
@@ -8713,7 +9100,7 @@ ${flights.map((f, idx) => {
     <div class="flight-number">${renderFlightNumber(f)}</div>
   </div>
 </div>
-${layover ? `<div style="display:flex;align-items:center;justify-content:center;gap:5px;padding:12px 0; color:#ff9800; font-weight:600; font-size:12px;">${gdIcon('clock')}Layover: ${layover}</div>` : ''}
+${layover ? `<div class="flight-layover">${gdIcon('clock')}Layover: ${layover}</div>` : ''}
 </div>
 `;
 }).join("")}
@@ -8732,7 +9119,7 @@ return out || `<div class="gd-empty">No flight details added</div>`;
 ${(g.itineraryDays||[]).length ? (g.itineraryDays||[]).map((d, idx)=>`
 <div class="gd-day-card" data-pdf-day-index="${idx}">
   <div class="gd-day-head">Day ${d.day} — ${d.date||""}${earlyCheckinDay === String(d.day) ? '<span class="early-checkin-badge">Early Check-in</span>' : ""}</div>
-  ${d.activity?`<div class="gd-day-activity">${d.activity}</div>`:""}
+  ${itineraryDisclosure(d)}
   <div class="gd-day-tags">
     <span class="gd-day-tag" style="background:#3a5bd9;">${gdIcon('bus')} ${formatDayOption(d.transfer)}</span>
     <span class="gd-day-tag" style="background:#c2500a;">${gdIcon('utensils')} ${formatDayOption(d.mealPlan)}</span>
@@ -9276,7 +9663,7 @@ if(!snapshot.exists()) return;
 const remote = snapshot.data() || {};
 const settings = Object.assign({}, DEFAULT_SETTINGS, remote);
 delete settings.updatedAt;
-localStorage.setItem("appSettings", JSON.stringify(settings));
+try{ localStorage.setItem("appSettings", JSON.stringify(settings)); }catch(error){ console.warn("Settings could not be cached", error); }
 applySettingsToUI();
 if(!document.querySelector(".tab-btn.active")){
 switchTab(settings.defaultTab);
@@ -9290,8 +9677,10 @@ console.warn("Settings sync failed", error);
 return true;
 }
 
+let settingsSyncStarted = false;
 function startSettingsSync(attempts = 60){
-if(loadSettingsFromFirebase()) return;
+if(settingsSyncStarted) return;
+if(loadSettingsFromFirebase()){ settingsSyncStarted = true; return; }
 if(attempts <= 0){
 console.warn("Firebase settings sync did not start.");
 return;
@@ -9329,12 +9718,10 @@ document.getElementById('completedContainer').style.display = '';
 }
 
 window.addEventListener(
-"load",
+"DOMContentLoaded",
 ()=>{
 
 applyTheme();
-
-startSettingsSync();
 
 loadGuests();
 
@@ -9377,7 +9764,7 @@ ${(g.cruises || []).filter(c => c.status !== "NO CRUISE").map(c => `- ${c.place 
 ${(g.flights || []).map(f => `- ${f.flightNumber || ""} | ${f.fromPlace || ""} ${f.fromDate || ""} ${f.fromTime || ""} → ${f.toPlace || ""} ${f.toDate || ""} ${f.toTime || ""}`).join("\n") || "-"}
 
 🗓️ Itinerary:
-${(g.itineraryDays || []).map(d => `Day ${d.day} (${d.date}) | Transfer: ${formatDayOption(d.transfer)} | Meal: ${formatDayOption(d.mealPlan)} | Guide: ${formatDayOption(d.guideStatus)}\n${d.activity || ""}`).join("\n\n") || "-"}
+${(g.itineraryDays || []).map(d => `Day ${d.day} (${d.date}) | Transfer: ${formatDayOption(d.transfer)} | Meal: ${formatDayOption(d.mealPlan)} | Guide: ${formatDayOption(d.guideStatus)}\n${d.heading ?? d.activity ?? ""}\n${d.description || ""}`).join("\n\n") || "-"}
 
 📝 Notes:
 ${g.notes || "-"}
@@ -9392,7 +9779,7 @@ return `
 📅 Travel Date: ${g.travelDate || "-"} (${g.days || "-"} days)
 👥 Guests: ${g.guests || "-"}
 
-${(g.itineraryDays || []).map(d => `Day ${d.day} (${d.date}) | Transfer: ${formatDayOption(d.transfer)} | Meal: ${formatDayOption(d.mealPlan)} | Guide: ${formatDayOption(d.guideStatus)}\n${d.activity || ""}`).join("\n\n") || "No itinerary added yet"}
+${(g.itineraryDays || []).map(d => `Day ${d.day} (${d.date}) | Transfer: ${formatDayOption(d.transfer)} | Meal: ${formatDayOption(d.mealPlan)} | Guide: ${formatDayOption(d.guideStatus)}\n${d.heading ?? d.activity ?? ""}\n${d.description || ""}`).join("\n\n") || "No itinerary added yet"}
 `;
 }
 
@@ -9521,6 +9908,7 @@ itinerarySection.appendChild(empty);
 
 function syncPdfIcons(container){
 if(!container) return;
+container.querySelectorAll(".itinerary-disclosure").forEach(item => { item.open = true; });
 container.classList.add("pdf-render-mode");
 
 container.querySelectorAll("svg").forEach(svg => {
