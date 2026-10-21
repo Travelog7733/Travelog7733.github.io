@@ -3853,6 +3853,7 @@
       </section>
 
       <section class="tab-panel" id="settings">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn" id="lockSettingsBtn" type="button">Lock Settings</button></div>
         <div class="panel" style="margin-bottom:20px;">
           <div class="panel-head"><h2>Margin Structure</h2><span class="pill">Auto-sync to Firebase</span></div>
           <div class="panel-body">
@@ -4487,6 +4488,18 @@
         <input type="text" class="tour-picker-search" id="hotelPickerSearch" placeholder="Search hotels…">
         <div id="hotelPickerContent"></div>
       </div>
+    </div>
+  </div>
+
+
+  <div class="dialog" id="settingsPasscodeDialog" aria-hidden="true">
+    <div class="dialog-panel" role="dialog" aria-modal="true" aria-labelledby="settingsPasscodeTitle" style="width:min(420px,100%);">
+      <div class="dialog-head"><h2 id="settingsPasscodeTitle">Unlock Settings</h2><button class="mini-btn" id="settingsPasscodeClose" type="button" aria-label="Close passcode prompt">✕</button></div>
+      <form id="settingsPasscodeForm" class="panel-body">
+        <label for="settingsPasscodeInput">Settings passcode<input id="settingsPasscodeInput" type="password" inputmode="numeric" autocomplete="off" required aria-describedby="settingsPasscodeError"></label>
+        <p id="settingsPasscodeError" role="alert" style="color:var(--danger);min-height:1.5em;"></p>
+        <div class="dialog-actions"><button class="btn" id="settingsPasscodeCancel" type="button">Cancel</button><button class="btn primary" type="submit">Unlock Settings</button></div>
+      </form>
     </div>
   </div>
 
@@ -7884,8 +7897,59 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     // Refresh controls when the Settings panel receives focus.
     document.getElementById("settings").addEventListener("focusin", syncSettingsControls);
 
+    // This local UI gate is reset on every page load; it is not Firestore authorization.
+    let settingsUnlocked = false;
+    const settingsPasscodeDialog = document.getElementById('settingsPasscodeDialog');
+    const settingsPasscodeInput = document.getElementById('settingsPasscodeInput');
+    const settingsPasscodeError = document.getElementById('settingsPasscodeError');
+    const settingsTabButton = document.querySelector('[data-tab="settings"]');
+    const closeSettingsPasscode = () => {
+      settingsPasscodeDialog.classList.remove('open');
+      settingsPasscodeDialog.setAttribute('aria-hidden', 'true');
+      settingsPasscodeInput.value = '';
+      settingsPasscodeError.textContent = '';
+      settingsTabButton.focus();
+    };
+    const requestSettingsPasscode = () => {
+      settingsPasscodeInput.value = '';
+      settingsPasscodeError.textContent = '';
+      settingsPasscodeDialog.classList.add('open');
+      settingsPasscodeDialog.setAttribute('aria-hidden', 'false');
+      settingsPasscodeInput.focus();
+    };
+    document.getElementById('settingsPasscodeForm').addEventListener('submit', event => {
+      event.preventDefault();
+      if (settingsPasscodeInput.value !== '5655') {
+        settingsPasscodeError.textContent = 'Incorrect passcode. Try again.';
+        settingsPasscodeInput.value = '';
+        settingsPasscodeInput.focus();
+        return;
+      }
+      settingsUnlocked = true;
+      closeSettingsPasscode();
+      settingsTabButton.click();
+      document.getElementById('lockSettingsBtn').focus();
+    });
+    settingsPasscodeInput.addEventListener('input', () => { settingsPasscodeError.textContent = ''; });
+    ['settingsPasscodeClose', 'settingsPasscodeCancel'].forEach(id => document.getElementById(id).addEventListener('click', closeSettingsPasscode));
+    settingsPasscodeDialog.addEventListener('click', event => { if (event.target === settingsPasscodeDialog) closeSettingsPasscode(); });
+    settingsPasscodeDialog.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeSettingsPasscode(); }
+      if (event.key !== 'Tab') return;
+      const focusable = [...settingsPasscodeDialog.querySelectorAll('button, input')];
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
+    document.getElementById('lockSettingsBtn').addEventListener('click', () => {
+      settingsUnlocked = false;
+      document.querySelector('[data-tab="itinerary"]').click();
+      settingsTabButton.focus();
+    });
+
     document.querySelectorAll(".tab-btn").forEach(btn => {
       btn.addEventListener("click", () => {
+        if (btn.dataset.tab === "settings" && !settingsUnlocked) { requestSettingsPasscode(); return; }
         document.querySelectorAll(".tab-btn").forEach(item => item.classList.remove("active"));
         document.querySelectorAll(".tab-panel").forEach(item => item.classList.remove("active"));
         btn.classList.add("active");
