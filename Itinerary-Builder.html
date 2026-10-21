@@ -3449,7 +3449,7 @@
                     <input id="destination" type="text" placeholder="Auto-detected from days">
                   </label>
                   <div>
-                    <label>Travel Date <span aria-hidden="true" style="color:var(--danger)">*</span>
+                    <label>Travel Date <span id="travelDateRequiredMark" aria-hidden="true" style="color:var(--danger)">*</span>
                       <input id="travelDates" type="text" placeholder="dd/mm/yyyy" required aria-required="true" aria-describedby="travelDateHelp">
                       <span id="travelDateHelp" style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--muted);">Required. Enter a valid travel start date.</span>
                     </label>
@@ -6319,9 +6319,40 @@
       return lock;
     };
 
+    // Saved prices remain in place until an actual itinerary field changes.
+    const savedPricingBaselines = new Map();
+    const pricingEditSignature = quote => syncJson(Object.fromEntries([
+      'customerId','quoteType','destination','travelDates','quoteValidityFrom','quoteValidityTill',
+      'adults','children','childrenEnabled','infants','infantsEnabled','foc','focEnabled',
+      'visaId','markup','proMargin','childMarkup','altNoHotelMarkup','altNoHotelVisaMarkup',
+      'extraCostPerPax','tax','deposit','hotelChildPercent','infantManualRate','notes','days',
+      'oddPaxRoomArrangements'
+    ].map(key => [key, quote[key] ?? null])));
+    const rememberSavedPricing = () => {
+      if (state.quote.id && state.quotes.some(item => item.id === state.quote.id)) {
+        savedPricingBaselines.set(state.quote.id, pricingEditSignature(state.quote));
+      }
+    };
+    const isPristineSavedQuote = () => {
+      const saved = state.quotes.find(item => item.id && item.id === state.quote.id);
+      if (!saved) return false;
+      const baseline = savedPricingBaselines.get(saved.id) || pricingEditSignature(saved);
+      return pricingEditSignature(state.quote) === baseline;
+    };
+    const migrateEditedQuoteMargins = () => {
+      if (sharedQuotePdfView || !state.quote.id || !state.quotes.some(item => item.id === state.quote.id)) return;
+      if (isPristineSavedQuote() || state.quote.marginRulesVersion === 2) return;
+      state.quote.marginRulesVersion = 2;
+      // A directly entered margin is already an intentional manual override.
+      const editingMargin = document.activeElement === els.markup || document.activeElement === els.proMargin;
+      if (!editingMargin) applyDefaultMarginForHotels();
+    };
+    rememberSavedPricing();
+
     const getTotals = (adultOverride = null, childOverride = null, infantOverride = null, proMarginAmountOverride = null) => {
       const locked = lockedCustomerPricing();
       if (locked && adultOverride === null && childOverride === null && infantOverride === null && proMarginAmountOverride === null) return locked.totals;
+      migrateEditedQuoteMargins();
       const q = state.quote;
       const adults = adultOverride === null ? Number(q.adults || 0) : Number(adultOverride);
       const children = childOverride === null ? effectiveChildren() : Number(childOverride);
@@ -6469,6 +6500,19 @@
         const rule = rules.find(item => item.from <= iso && item.till >= iso);
         return rule ? Number(isB2C ? rule.b2c : rule.b2b) : fallback;
       };
+      if (document.body.classList.contains('pro-mode') || state.quote.mode === 'pro') {
+        const from = parseDisplayDate(state.quote.quoteValidityFrom);
+        const till = parseDisplayDate(state.quote.quoteValidityTill);
+        if (from) {
+          const end = till && till >= from ? till : from;
+          let total = 0, count = 0;
+          for (const date = new Date(from); date <= end; date.setDate(date.getDate() + 1)) {
+            total += marginOn(date); count++;
+          }
+          return Math.round((total / count + Number.EPSILON) * 100) / 100;
+        }
+        return marginOn(till || parseDisplayDate(state.quote.quoteDate) || new Date());
+      }
       const start = parseDisplayDate(state.quote.travelDates);
       if (!start) return marginOn(parseDisplayDate(state.quote.quoteDate) || new Date());
       // Count each occupied calendar night once, even if multiple rows share a stay.
@@ -6498,6 +6542,7 @@
     };
 
     const applyDefaultMarginForHotels = () => {
+      if (isPristineSavedQuote()) return Number(state.quote.markup || 0);
       const margin = defaultMarginForHotels(state.quote.quoteType);
       state.quote.markup = margin;
       state.quote.proMargin = margin;
@@ -6819,8 +6864,8 @@
       const q = state.quote;
       renderCustomerOptions();
       renderQuoteTypeToggle();
-      q.quoteDate = currentDateIso();
-      if (!q.manualExpiryEnabled) q.quoteExpiryDate = quoteExpiryIso();
+      if (!isPristineSavedQuote()) q.quoteDate = currentDateIso();
+      if (!isPristineSavedQuote() && !q.manualExpiryEnabled) q.quoteExpiryDate = quoteExpiryIso();
       els.destination.value = q.destination || "";
       autoDetectDestination();
       els.toggleManualExpiry.checked = Boolean(q.manualExpiryEnabled);
@@ -7608,12 +7653,13 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     };
 
     const syncQuoteFromInputs = () => {
+      const preserveSavedDates = isPristineSavedQuote();
       Object.assign(state.quote, {
         customerId: els.quoteCustomer.value,
         quoteType: quoteTypeValue(),
         destination: state.quote.destinationAutoMode !== false ? state.quote.destination : els.destination.value,
-        quoteDate: currentDateIso(),
-        quoteExpiryDate: state.quote.manualExpiryEnabled ? (state.quote.manualExpiryDate || quoteExpiryIso()) : quoteExpiryIso(),
+        quoteDate: preserveSavedDates ? state.quote.quoteDate : currentDateIso(),
+        quoteExpiryDate: preserveSavedDates ? state.quote.quoteExpiryDate : state.quote.manualExpiryEnabled ? (state.quote.manualExpiryDate || quoteExpiryIso()) : quoteExpiryIso(),
         quoteValidityFrom: els.quoteValidityFrom.value,
         quoteValidityTill: els.quoteValidityTill.value,
         travelDates: els.travelDates.value,
@@ -7627,7 +7673,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         extraCostPerPax: Math.max(0, Number(els.extraCostPerPax.value || 0)),
         proMargin: Number(els.proMargin.value || 0),
         tax: Number(els.tax.value || 0),
-        deposit: resolveDepositPercent(els.quoteCustomer.value),
+        deposit: preserveSavedDates ? state.quote.deposit : resolveDepositPercent(els.quoteCustomer.value),
         hotelChildPercent: Number(els.hotelChildPercent.value || 0),
         infantManualRate: Number(els.infantManualRate.value || 0),
         notes: els.quoteNotes.value
@@ -7990,7 +8036,11 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         renderVisaSelection();
         renderTotals();
         renderStats();
-        if (id === "travelDates") { applyDefaultMarginForHotels(); renderTotals(); renderDays(); }
+        if (id === "travelDates" || id === "quoteValidityFrom" || id === "quoteValidityTill") {
+          els.quoteValidityTill.setCustomValidity("");
+          applyDefaultMarginForHotels(); renderTotals();
+          if (id === "travelDates") renderDays();
+        }
         if (id === "foc") {
           state.quote.days.forEach(day => { delete day.roomArrangement; });
           renderDays();
@@ -8698,6 +8748,16 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     });
 
     const requireTravelDate = () => {
+      const pro = document.body.classList.contains('pro-mode');
+      const legacyUnchanged = isPristineSavedQuote() && state.quote.marginRulesVersion !== 2;
+      if (legacyUnchanged) { els.travelDates.setCustomValidity(''); return true; }
+      if (pro) {
+        els.travelDates.setCustomValidity('');
+        const from = els.quoteValidityFrom.value, till = els.quoteValidityTill.value;
+        els.quoteValidityTill.setCustomValidity(from && till && till < from ? 'Validity end must be on or after the start date.' : '');
+        if (!els.quoteValidityTill.reportValidity()) return false;
+        return true;
+      }
       const text = els.travelDates.value.trim();
       const validFormat = /^(?:\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})$/.test(text);
       const valid = validFormat && Boolean(parseDisplayDate(text));
@@ -8716,9 +8776,11 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     els.travelDates.addEventListener('input', () => els.travelDates.setCustomValidity(''));
 
     const saveCurrentItinerary = () => {
+      migrateEditedQuoteMargins();
       if (!requireTravelDate()) return false;
       syncQuoteFromInputs();
       syncActiveModeDays();
+      if (!isPristineSavedQuote()) state.quote.marginRulesVersion = 2;
       if (!state.quote.id) state.quote.id = uid("q");
       const totals = getTotals();
       const existing = state.quotes.find(q => q.id === state.quote.id);
@@ -8742,6 +8804,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         customer.value = totals.total;
         customer.updated = Date.now();
       }
+      rememberSavedPricing();
       renderAll();
       showToast("Itinerary saved and customer pipeline updated.");
       return true;
@@ -8847,6 +8910,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
 
     const loadSavedItinerary = quote => {
       state.quote = normalizeQuoteDayModes(normalizeProPaxMargins(JSON.parse(JSON.stringify(quote))));
+      rememberSavedPricing();
       if (typeof setProMode === "function") setProMode(state.quote.mode === "pro", { syncCurrent: false, render: false });
       state.quote.quoteDate = state.quote.quoteDate || currentDateIso();
       state.quote.quoteExpiryDate = state.quote.quoteExpiryDate || quoteExpiryIso();
@@ -8880,7 +8944,8 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
 
     const printCurrentItinerary = async quote => {
       const travelText = String(quote.travelDates || "").trim();
-      if (!/^(?:\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})$/.test(travelText) || !parseDisplayDate(travelText)) {
+      const needsTravelDate = quote.mode !== "pro" && quote.marginRulesVersion === 2;
+      if (needsTravelDate && (!/^(?:\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})$/.test(travelText) || !parseDisplayDate(travelText))) {
         loadSavedItinerary(quote);
         requireTravelDate();
         return;
@@ -9881,6 +9946,11 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const nextMode = enabled ? "pro" : "normal";
       loadQuoteModeDays(nextMode);
       document.body.classList.toggle("pro-mode", enabled);
+      els.travelDates.required = !enabled;
+      els.travelDates.setAttribute('aria-required', String(!enabled));
+      els.travelDates.setCustomValidity('');
+      document.getElementById('travelDateRequiredMark').hidden = enabled;
+      document.getElementById('travelDateHelp').textContent = enabled ? 'Optional. Pro margins use the quote validity period.' : 'Required for new or edited itineraries. Enter a valid travel start date.';
       proModeToggle.checked = enabled;
       proModeToggle.setAttribute("aria-checked", String(enabled));
       try {
