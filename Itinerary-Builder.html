@@ -3602,7 +3602,7 @@
                   <div class="metric-row" style="flex-wrap:wrap;gap:8px;">
                     <span style="display:inline-flex;align-items:center;gap:6px;">Markup
                       <span style="font-size:11px;color:var(--muted);">&#8377;</span>
-                      <input id="markup" type="number" min="0" step="1" title="Markup amount per traveler"
+                      <input id="markup" type="number" min="0" step="0.01" title="Markup amount per traveler"
                         style="width:72px;min-height:0;height:26px;padding:3px 6px;font-size:12px;font-weight:600;border-radius:5px;text-align:center;">
                       <button class="markup-expand-btn" id="markupExpandBtn" type="button" title="Show breakdown">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -3640,7 +3640,7 @@
                     <span>Pro Group Rate Matrix</span>
                     <span style="display:inline-flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:11px;">
                       Margin &#8377;
-                      <input id="proMargin" type="number" min="0" step="1" title="Pro margin amount per pax"
+                      <input id="proMargin" type="number" min="0" step="0.01" title="Pro margin amount per pax"
                         style="width:68px;min-height:0;height:24px;padding:2px 6px;font-size:11px;font-weight:700;border-radius:5px;text-align:center;">
                     </span>
                     <label style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;white-space:nowrap;">Extra cost / pax &#8377;
@@ -3656,7 +3656,7 @@
                     <div class="metric-row" style="padding:6px 0;">
                       <span style="font-size:13px;display:inline-flex;align-items:center;gap:6px;">Margin
                         <span style="font-size:11px;color:var(--muted);">&#8377;</span>
-                        <input id="altNoHotelMarkupInput" type="number" min="0" step="1" title="Override margin amount per traveler for Without Hotel rate"
+                        <input id="altNoHotelMarkupInput" type="number" min="0" step="0.01" title="Override margin amount per traveler for Without Hotel rate"
                           style="width:68px;min-height:0;height:26px;padding:3px 6px;font-size:12px;font-weight:600;border-radius:5px;text-align:center;">
                       </span>
                       <strong id="altNoHotelMarkup">&#8377;0</strong>
@@ -3671,7 +3671,7 @@
                     <div class="metric-row" style="padding:6px 0;">
                       <span style="font-size:13px;display:inline-flex;align-items:center;gap:6px;">Margin
                         <span style="font-size:11px;color:var(--muted);">&#8377;</span>
-                        <input id="altNoHotelVisaMarkupInput" type="number" min="0" step="1" title="Override margin amount per traveler for Without Hotel &amp; Visa rate"
+                        <input id="altNoHotelVisaMarkupInput" type="number" min="0" step="0.01" title="Override margin amount per traveler for Without Hotel &amp; Visa rate"
                           style="width:68px;min-height:0;height:26px;padding:3px 6px;font-size:12px;font-weight:600;border-radius:5px;text-align:center;">
                       </span>
                       <strong id="altNoHotelVisaMarkup">&#8377;0</strong>
@@ -3853,6 +3853,30 @@
       </section>
 
       <section class="tab-panel" id="settings">
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-head"><h2>Margin Structure</h2><span class="pill">Auto-sync to Firebase</span></div>
+          <div class="panel-body">
+            <p class="subtitle">Select one common period to view and edit all its markups. Dates apply to every markup in the selected period. Trips crossing periods prorate the margin by nights in each period (checkout day excluded).</p>
+            <div class="grid four" style="margin-top:20px;align-items:end;">
+              <label>Margin period<select id="marginPeriodSelect"></select></label>
+              <label>From<input id="marginFrom" type="date" required></label>
+              <label>Till<input id="marginTill" type="date" required></label>
+              <div><button class="btn primary" id="marginPeriodSave" type="button">Save Period</button> <button class="btn" id="marginPeriodAdd" type="button">Add New Period</button></div>
+            </div>
+            <p id="marginStatus" class="subtitle" role="status" aria-live="polite"></p>
+            <button class="btn" id="marginFirebaseSave" type="button">Save Margins to Firebase</button>
+            <p id="marginFirebaseStatus" class="subtitle" role="status" aria-live="polite"></p>
+            <div class="table-wrap"><table><thead><tr><th>Hotel category</th><th>B2B ₹ / pax</th><th>B2C ₹ / pax</th><th>Action</th></tr></thead><tbody id="marginRuleRows"></tbody></table></div>
+            <form id="marginRuleForm" class="grid four" style="margin-top:20px;align-items:end;">
+              <label>Hotel category<select id="marginCategory"><option value="3">3 star / no hotel (default)</option><option value="4">4 star</option><option value="5">5 star</option><option value="3+4">3 + 4 star</option><option value="4+5">4 + 5 star</option></select></label>
+              <label>B2B margin (₹ / pax)<input id="marginB2B" type="number" min="0" step="0.01" required></label>
+              <label>B2C margin (₹ / pax)<input id="marginB2C" type="number" min="0" step="0.01" required></label>
+              <div><button class="btn primary" id="marginSave" type="submit">Add Markup</button> <button class="btn" id="marginCancel" type="button" hidden>Cancel</button></div>
+            </form>
+            <p class="subtitle">New periods start with all five standard hotel categories. Outside configured periods, the original category margins apply.</p>
+          </div>
+        </div>
+
             <div class="panel automations-panel open" style="margin-bottom: 20px;" id="automationsPanel">
               <div class="panel-head"><h2>Automations</h2><span class="pill amber">Rules</span></div>
               <div class="panel-body">
@@ -4556,13 +4580,13 @@
       if (displayMatch) {
         const [, day, month, year] = displayMatch;
         const date = new Date(Number(year), Number(month) - 1, Number(day));
-        return Number.isNaN(date.getTime()) ? null : date;
+        return Number.isNaN(date.getTime()) || date.getFullYear() !== Number(year) || date.getMonth() !== Number(month) - 1 || date.getDate() !== Number(day) ? null : date;
       }
       const isoMatch = text.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
       if (isoMatch) {
         const [, year, month, day] = isoMatch;
         const date = new Date(Number(year), Number(month) - 1, Number(day));
-        return Number.isNaN(date.getTime()) ? null : date;
+        return Number.isNaN(date.getTime()) || date.getFullYear() !== Number(year) || date.getMonth() !== Number(month) - 1 || date.getDate() !== Number(day) ? null : date;
       }
       return null;
     };
@@ -4936,6 +4960,13 @@
       exclusions: [],
       settings: {
         companyLogo: "https://raw.githubusercontent.com/Travelog7733/Travelog7733.github.io/main/assets/travelog-logo-white.png",
+        marginRules: [
+          { id: 'margin-3', category: '3', b2b: 2300, b2c: 3800 },
+          { id: 'margin-4', category: '4', b2b: 4300, b2c: 5800 },
+          { id: 'margin-5', category: '5', b2b: 6300, b2c: 8300 },
+          { id: 'margin-3-4', category: '3+4', b2b: 3500, b2c: 4500 },
+          { id: 'margin-4-5', category: '4+5', b2b: 5500, b2c: 6800 }
+        ].map(rule => ({ ...rule, from: '2026-01-01', till: '2026-12-31' })),
         surchargePeriods: [],
         showDepositBalance: true,
         showPdfLogo: true,
@@ -5440,6 +5471,10 @@
       }
     });
 
+    const updateMarginFirebaseStatus = message => {
+      const status = document.getElementById('marginFirebaseStatus');
+      if (status) status.textContent = message;
+    };
     const saveStateToFirebase = async () => {
       if (!firebaseReady || !firebaseLoaded || suppressFirebaseSave || sharedQuotePdfView) return;
       if (firebaseSaveInFlight || cloudRefreshRunning) {
@@ -5460,6 +5495,8 @@
         });
       });
       const settingsChanged = syncJson(base.settings) !== syncJson(sent.settings);
+      const marginsChanged = syncJson(base.settings?.marginRules) !== syncJson(sent.settings?.marginRules);
+      if (marginsChanged) updateMarginFirebaseStatus('Saving margins to Firebase…');
       try {
         const fb = window.itineraryFirebase;
         // Small transactions keep large libraries below Firestore's operation limits.
@@ -5493,11 +5530,15 @@
             if (change.after) cloudBaseline[change.key].push(change.after);
           });
           if (offset === 0 && settingsChanged) cloudBaseline.settings = sent.settings;
+          if (offset === 0 && marginsChanged) updateMarginFirebaseStatus(
+            syncJson(state.settings.marginRules) === syncJson(sent.settings.marginRules)
+              ? 'Margins and periods saved to Firebase.' : 'Saving newer margin changes to Firebase…');
           rememberCloudBaseline();
           writeLocalBackup(state);
         }
         els.storageStatus.textContent = `Cloud changes saved. Live updates connected. ${localBackupStatus()}`;
       } catch (error) {
+        if (marginsChanged) updateMarginFirebaseStatus('Firebase save failed: ' + error.message + '. Margins kept locally; retrying.');
         els.storageStatus.textContent = `Cloud save failed: ${error.message}. Changes kept locally; retrying.`;
         clearTimeout(cloudRetryTimer);
         cloudRetryTimer = setTimeout(() => scheduleFirebaseSave(null), 10000);
@@ -6402,14 +6443,44 @@
       .filter(star => [3, 4, 5].includes(star)))].sort((a, b) => a - b);
 
     const defaultMarginForHotels = type => {
-      const isB2C = type === "B2C";
+      const isB2C = type === 'B2C';
       const stars = selectedHotelStarLevels();
       const has = star => stars.includes(star);
-      if (has(4) && has(5)) return isB2C ? 6800 : 5500;
-      if (has(3) && has(4)) return isB2C ? 4500 : 3500;
-      if (has(5)) return isB2C ? 8300 : 6300;
-      if (has(4)) return isB2C ? 5800 : 4300;
-      return isB2C ? 3800 : 2300;
+      const category = has(4) && has(5) ? '4+5' : has(3) && has(4) ? '3+4' : has(5) ? '5' : has(4) ? '4' : '3';
+      const original = { '3': [2300, 3800], '4': [4300, 5800], '5': [6300, 8300], '3+4': [3500, 4500], '4+5': [5500, 6800] };
+      const fallback = original[category][isB2C ? 1 : 0];
+      const rules = [...(state.settings.marginRules || [])].reverse().filter(rule => rule.category === category).sort((a, b) => b.from.localeCompare(a.from));
+      const marginOn = date => {
+        const iso = toLocalDateIso(date);
+        const rule = rules.find(item => item.from <= iso && item.till >= iso);
+        return rule ? Number(isB2C ? rule.b2c : rule.b2b) : fallback;
+      };
+      const start = parseDisplayDate(state.quote.travelDates);
+      if (!start) return marginOn(parseDisplayDate(state.quote.quoteDate) || new Date());
+      // Count each occupied calendar night once, even if multiple rows share a stay.
+      const nights = new Map();
+      (state.quote.days || []).forEach(day => {
+        const date = dateObjForItineraryDay(day.day);
+        const count = Math.max(0, Math.floor(Number(day.nights) || 0));
+        if (!date) return;
+        for (let night = 0; night < count; night++) {
+          const occupied = new Date(date);
+          occupied.setDate(occupied.getDate() + night);
+          nights.set(toLocalDateIso(occupied), occupied);
+        }
+      });
+      // Include tour-only nights and gaps between stays up to the final itinerary day.
+      {
+        const lastDay = Math.max(1, ...(state.quote.days || []).map(day => Number(day.day) || 1));
+        for (let night = 0; night < lastDay - 1; night++) {
+          const occupied = new Date(start);
+          occupied.setDate(occupied.getDate() + night);
+          nights.set(toLocalDateIso(occupied), occupied);
+        }
+      }
+      if (!nights.size) return marginOn(start);
+      const total = [...nights.values()].reduce((sum, date) => sum + marginOn(date), 0);
+      return Math.round((total / nights.size + Number.EPSILON) * 100) / 100;
     };
 
     const applyDefaultMarginForHotels = () => {
@@ -6463,15 +6534,16 @@
         const taxComponents = getTaxComponents(q, taxable, infantSubtotal);
         const taxAmount = taxComponents.taxAmount;
         const total = taxComponents.preTaxTotal + taxAmount;
-        const multiplier = q.quoteType === "B2C" && taxComponents.preTaxTotal ? total / taxComponents.preTaxTotal : 1;
+        const multiplier = taxComponents.preTaxTotal ? total / taxComponents.preTaxTotal : 1;
         const adultPerPerson = adults ? ((adultSubtotal + adultMarkupAmount) / adults) * multiplier : 0;
         const childPerPerson = children ? ((childSubtotal + childMarkupAmount) / children) * multiplier : 0;
         const infantPerPerson = infants ? (infantSubtotal / infants) * multiplier : 0;
         return { total, markupAmount, adultPerPerson, childPerPerson, infantPerPerson };
       };
 
-      const noHotelMarginAmount = q.altNoHotelMarkup !== null && q.altNoHotelMarkup !== undefined ? q.altNoHotelMarkup : Number(q.markup || 0);
-      const noHotelVisaMarginAmount = q.altNoHotelVisaMarkup !== null && q.altNoHotelVisaMarkup !== undefined ? q.altNoHotelVisaMarkup : Number(q.markup || 0);
+      const activeMainMargin = Number(document.body.classList.contains("pro-mode") ? q.proMargin || 0 : q.markup || 0);
+      const noHotelMarginAmount = q.altNoHotelMarkup !== null && q.altNoHotelMarkup !== undefined ? q.altNoHotelMarkup : activeMainMargin;
+      const noHotelVisaMarginAmount = q.altNoHotelVisaMarkup !== null && q.altNoHotelVisaMarkup !== undefined ? q.altNoHotelVisaMarkup : activeMainMargin;
 
       return {
         noHotel: calcPackage(tourOnlyBase + visaFee, noHotelMarginAmount),
@@ -6814,11 +6886,12 @@
       // Sync main markup input
       if (document.activeElement !== els.markup)
         els.markup.value = defaultMarkup;
-      // Sync alternate margin inputs - fall back to the main per-traveler markup amount if not overridden
+      const alternateDefaultMarkup = Number(document.body.classList.contains("pro-mode") ? q.proMargin || 0 : q.markup || 0);
+      // Sync alternate margin inputs using the active mode main margin unless overridden
       if (document.activeElement !== els.altNoHotelMarkupInput)
-        els.altNoHotelMarkupInput.value = q.altNoHotelMarkup !== null && q.altNoHotelMarkup !== undefined ? q.altNoHotelMarkup : defaultMarkup;
+        els.altNoHotelMarkupInput.value = q.altNoHotelMarkup !== null && q.altNoHotelMarkup !== undefined ? q.altNoHotelMarkup : alternateDefaultMarkup;
       if (document.activeElement !== els.altNoHotelVisaMarkupInput)
-        els.altNoHotelVisaMarkupInput.value = q.altNoHotelVisaMarkup !== null && q.altNoHotelVisaMarkup !== undefined ? q.altNoHotelVisaMarkup : defaultMarkup;
+        els.altNoHotelVisaMarkupInput.value = q.altNoHotelVisaMarkup !== null && q.altNoHotelVisaMarkup !== undefined ? q.altNoHotelVisaMarkup : alternateDefaultMarkup;
       // Sync child markup override input (blank means "same as adult")
       if (document.activeElement !== els.childMarkupInput)
         els.childMarkupInput.value = q.childMarkup !== null && q.childMarkup !== undefined ? q.childMarkup : "";
@@ -7229,9 +7302,8 @@
       const children = effectiveChildren();
       const infants = effectiveInfants();
       const packageTotal = totals.total;
-      // For B2C, distribute GST and TCS proportionally into each per-person rate
-      // so the customer-facing rates reconcile to the Grand Total.
-      const taxInclusiveMultiplier = state.quote.quoteType === "B2C" && totals.preTaxTotal
+      // Distribute configured taxes proportionally so per-person prices reconcile to the total.
+      const taxInclusiveMultiplier = totals.preTaxTotal
         ? packageTotal / totals.preTaxTotal
         : 1;
       const adultPerPerson = adults ? ((totals.adultSubtotal + totals.adultMarkupAmount) / adults) * taxInclusiveMultiplier : 0;
@@ -7506,6 +7578,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       } else if (tab === "tours" || tab === "hotels" || tab === "visas") {
         renderLibrary();
       } else if (tab === "settings") {
+        renderMarginRules();
         renderSurchargePeriods();
       } else if (tab === "inclusions") {
         renderInclusions();
@@ -7661,6 +7734,136 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       surchargePeriodStatus.textContent = "Surcharge period deleted.";
     });
 
+
+    const marginForm = document.getElementById('marginRuleForm');
+    const marginFields = Object.fromEntries(['Category', 'From', 'Till', 'B2B', 'B2C', 'Save', 'Cancel', 'Status', 'RuleRows', 'PeriodSelect', 'PeriodSave', 'PeriodAdd'].map(key => [key, document.getElementById('margin' + key)]));
+    let editingMarginId = null;
+    let selectedMarginPeriod = '';
+    const marginLabels = { '3': '3 star / no hotel (default)', '4': '4 star', '5': '5 star', '3+4': '3 + 4 star', '4+5': '4 + 5 star' };
+    const marginDateLabel = date => date.split('-').reverse().join('/');
+    const marginPeriodKey = rule => rule.from + '|' + rule.till;
+    const resetMarginForm = () => {
+      editingMarginId = null;
+      marginForm.reset();
+      marginFields.Save.textContent = 'Add Markup';
+      marginFields.Cancel.hidden = true;
+    };
+    const renderMarginRules = () => {
+      const rules = state.settings.marginRules || [];
+      const periods = [...new Set(rules.map(marginPeriodKey))].sort();
+      if (!periods.includes(selectedMarginPeriod)) selectedMarginPeriod = periods[0] || '';
+      marginFields.PeriodSelect.innerHTML = periods.map(key => {
+        const [from, till] = key.split('|');
+        return '<option value="' + escapeHtml(key) + '">' + marginDateLabel(from) + ' – ' + marginDateLabel(till) + '</option>';
+      }).join('') || '<option value="">No periods yet</option>';
+      marginFields.PeriodSelect.value = selectedMarginPeriod;
+      const [from, till] = selectedMarginPeriod.split('|');
+      marginFields.From.value = from || '2026-01-01';
+      marginFields.Till.value = till || '2026-12-31';
+      marginFields.RuleRows.innerHTML = rules.filter(rule => marginPeriodKey(rule) === selectedMarginPeriod).map(rule => '<tr><td>' + escapeHtml(marginLabels[rule.category] || rule.category) + '</td><td>' + escapeHtml(rule.b2b) + '</td><td>' + escapeHtml(rule.b2c) + '</td><td><button type="button" class="btn" data-margin-edit="' + escapeHtml(rule.id) + '">Edit</button> <button type="button" class="btn" data-margin-delete="' + escapeHtml(rule.id) + '">Delete</button></td></tr>').join('') || '<tr><td colspan="4">Add a period to configure its markups.</td></tr>';
+
+    };
+    const persistMarginSettings = message => {
+      renderMarginRules();
+      applyDefaultMarginForHotels();
+      renderTotals();
+      renderStats();
+      saveState();
+      marginFields.Status.textContent = message;
+      updateMarginFirebaseStatus('Margins saved locally; queued for Firebase sync.');
+    };
+    const validMarginPeriod = () => {
+      marginFields.Till.setCustomValidity(marginFields.Till.value < marginFields.From.value ? 'End date must be on or after start date.' : '');
+      return marginFields.From.reportValidity() && marginFields.Till.reportValidity();
+    };
+    [marginFields.From, marginFields.Till].forEach(field => field.addEventListener('input', () => marginFields.Till.setCustomValidity('')));
+    marginFields.PeriodSelect.addEventListener('change', () => {
+      selectedMarginPeriod = marginFields.PeriodSelect.value;
+      resetMarginForm();
+      renderMarginRules();
+      marginFields.Status.textContent = '';
+    });
+    marginFields.PeriodSave.addEventListener('click', () => {
+      if (!validMarginPeriod()) return;
+      if (!selectedMarginPeriod) { marginFields.Status.textContent = 'Use Add New Period to create a period.'; return; }
+      const next = marginFields.From.value + '|' + marginFields.Till.value;
+      const rules = state.settings.marginRules || [];
+      if (next !== selectedMarginPeriod && rules.some(rule => marginPeriodKey(rule) === next)) {
+        marginFields.Status.textContent = 'This period already exists. Select it from the period list.'; return;
+      }
+      rules.filter(rule => marginPeriodKey(rule) === selectedMarginPeriod).forEach(rule => { rule.from = marginFields.From.value; rule.till = marginFields.Till.value; });
+      selectedMarginPeriod = next;
+      persistMarginSettings('Common period saved for all markups.');
+    });
+    marginFields.PeriodAdd.addEventListener('click', () => {
+      if (!validMarginPeriod()) return;
+      const next = marginFields.From.value + '|' + marginFields.Till.value;
+      const rules = state.settings.marginRules || (state.settings.marginRules = []);
+      if (rules.some(rule => marginPeriodKey(rule) === next)) {
+        marginFields.Status.textContent = 'Enter new From and Till dates, then click Add New Period.'; return;
+      }
+      const defaults = { '3': [2300, 3800], '4': [4300, 5800], '5': [6300, 8300], '3+4': [3500, 4500], '4+5': [5500, 6800] };
+      Object.keys(marginLabels).forEach(category => {
+        const previous = rules.find(rule => marginPeriodKey(rule) === selectedMarginPeriod && rule.category === category);
+        rules.push({ id: 'margin-' + Date.now() + '-' + category + '-' + Math.random().toString(36).slice(2), category, from: marginFields.From.value, till: marginFields.Till.value, b2b: previous ? previous.b2b : defaults[category][0], b2c: previous ? previous.b2c : defaults[category][1] });
+      });
+      selectedMarginPeriod = next;
+      resetMarginForm();
+      persistMarginSettings('New period added with all markups. Edit the amounts below.');
+    });
+    document.getElementById('marginFirebaseSave').addEventListener('click', async () => {
+      const button = document.getElementById('marginFirebaseSave');
+      button.disabled = true;
+      try {
+        // Mark this settings field dirty so already saved local margins are uploaded too.
+        delete cloudBaseline.settings.marginRules;
+        rememberCloudBaseline();
+        saveState();
+        updateMarginFirebaseStatus('Margins saved locally; waiting for Firebase connection…');
+        if (!firebaseLoaded) {
+          firebaseReady = false;
+          await connectFirebase();
+        }
+        if (firebaseLoaded && firebaseReady) {
+          scheduleFirebaseSave(null, 0);
+        } else {
+          updateMarginFirebaseStatus('Firebase is unavailable. Margins are kept locally and will sync after reconnection.');
+        }
+      } finally { button.disabled = false; }
+    });
+    marginFields.Cancel.addEventListener('click', resetMarginForm);
+    marginForm.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!marginForm.reportValidity()) return;
+      if (!selectedMarginPeriod) { marginFields.Status.textContent = 'Add a common period first.'; return; }
+      const rules = state.settings.marginRules;
+      const duplicate = rules.find(rule => marginPeriodKey(rule) === selectedMarginPeriod && rule.category === marginFields.Category.value && rule.id !== editingMarginId);
+      if (duplicate) { marginFields.Status.textContent = 'This category already exists in the selected period. Use Edit on its row.'; return; }
+      const [from, till] = selectedMarginPeriod.split('|');
+      const rule = { id: editingMarginId || 'margin-' + Date.now() + '-' + Math.random().toString(36).slice(2), category: marginFields.Category.value, from, till, b2b: Number(marginFields.B2B.value), b2c: Number(marginFields.B2C.value) };
+      const index = rules.findIndex(item => item.id === editingMarginId);
+      if (index >= 0) rules[index] = rule; else rules.push(rule);
+      resetMarginForm();
+      persistMarginSettings('Markup saved.');
+    });
+    marginFields.RuleRows.addEventListener('click', event => {
+      const edit = event.target.closest('[data-margin-edit]');
+      const remove = event.target.closest('[data-margin-delete]');
+      if (edit) {
+        const rule = state.settings.marginRules.find(item => item.id === edit.dataset.marginEdit);
+        if (!rule) return;
+        editingMarginId = rule.id;
+        ['Category', 'B2B', 'B2C'].forEach(key => marginFields[key].value = rule[key.toLowerCase()]);
+        marginFields.Save.textContent = 'Save Changes';
+        marginFields.Cancel.hidden = false;
+        marginFields.B2B.focus();
+      } else if (remove) {
+        state.settings.marginRules = state.settings.marginRules.filter(item => item.id !== remove.dataset.marginDelete);
+        if (editingMarginId === remove.dataset.marginDelete) resetMarginForm();
+        persistMarginSettings('Markup deleted.');
+      }
+    });
+
     const syncSettingsControls = () => {
       document.querySelectorAll("[data-settings-control]").forEach(control => {
         const source = document.getElementById(control.dataset.settingsControl);
@@ -7722,7 +7925,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         renderVisaSelection();
         renderTotals();
         renderStats();
-        if (id === "travelDates") renderDays();
+        if (id === "travelDates") { applyDefaultMarginForHotels(); renderTotals(); renderDays(); }
         if (id === "foc") {
           state.quote.days.forEach(day => { delete day.roomArrangement; });
           renderDays();
@@ -8337,7 +8540,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         autoDetectDestination();
       }
       if (event.target.dataset.field === "hotelId" && !value) day.earlyCheckin = false;
-      if (event.target.dataset.field === "hotelId") applyDefaultMarginForHotels();
+      if (["hotelId", "nights", "day"].includes(event.target.dataset.field)) applyDefaultMarginForHotels();
       if (event.target.dataset.field === "city") autoDetectDestination();
       renderTotals();
       renderStats();
@@ -8389,6 +8592,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       if (index < 0 || nextIndex >= days.length) return;
       [days[index], days[nextIndex]] = [days[nextIndex], days[index]];
       days.forEach((day, i) => { day.day = i + 1; });
+      applyDefaultMarginForHotels();
       autoDetectDestination();
       renderAll();
       const movedBlock = [...els.daysContainer.querySelectorAll('.day-block')].find(block => block.dataset.dayId === dayId);
@@ -8401,12 +8605,14 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const newDay = { id: uid("d"), day: idx + 2, city: "", hotelId: "", nights: 0, tourId: "", guide: "Without Guide", manualTourName: "", manualMealPlan: "No Meals", manualTransportation: "No Transfer", manualTourCost: 0, remarks: "" };
       state.quote.days.splice(idx + 1, 0, newDay);
       state.quote.days.forEach((day, i) => { day.day = i + 1; });
+      applyDefaultMarginForHotels();
       autoDetectDestination();
       renderAll();
     };
 
     const addDay = () => {
       state.quote.days.push({ id: uid("d"), day: state.quote.days.length + 1, city: "", hotelId: "", nights: 0, tourId: "", guide: "Without Guide", manualTourName: "", manualMealPlan: "No Meals", manualTransportation: "No Transfer", manualTourCost: 0, remarks: "" });
+      applyDefaultMarginForHotels();
       autoDetectDestination();
       renderAll();
     };
