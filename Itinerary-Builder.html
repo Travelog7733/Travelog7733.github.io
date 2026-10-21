@@ -3449,8 +3449,9 @@
                     <input id="destination" type="text" placeholder="Auto-detected from days">
                   </label>
                   <div>
-                    <label>Travel Date (if any)
-                      <input id="travelDates" type="text" placeholder="dd/mm/yyyy">
+                    <label>Travel Date <span aria-hidden="true" style="color:var(--danger)">*</span>
+                      <input id="travelDates" type="text" placeholder="dd/mm/yyyy" required aria-required="true" aria-describedby="travelDateHelp">
+                      <span id="travelDateHelp" style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--muted);">Required. Enter a valid travel start date.</span>
                     </label>
                     <div class="date-visibility-row pro-only">
                       <label title="Show Travel Date in customer PDF" for="togglePdfTravelDate">
@@ -8696,7 +8697,26 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       showToast("New itinerary started.");
     });
 
+    const requireTravelDate = () => {
+      const text = els.travelDates.value.trim();
+      const validFormat = /^(?:\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})$/.test(text);
+      const valid = validFormat && Boolean(parseDisplayDate(text));
+      els.travelDates.setCustomValidity(valid ? '' : text ? 'Enter a valid travel date in dd/mm/yyyy format.' : 'Travel date is required.');
+      if (!valid) {
+        if (!document.getElementById('itinerary').classList.contains('active')) {
+          document.querySelector('[data-tab="itinerary"]').click();
+          els.travelDates.value = text;
+          els.travelDates.setCustomValidity(text ? 'Enter a valid travel date in dd/mm/yyyy format.' : 'Travel date is required.');
+        }
+        els.travelDates.focus();
+        els.travelDates.reportValidity();
+      }
+      return valid;
+    };
+    els.travelDates.addEventListener('input', () => els.travelDates.setCustomValidity(''));
+
     const saveCurrentItinerary = () => {
+      if (!requireTravelDate()) return false;
       syncQuoteFromInputs();
       syncActiveModeDays();
       if (!state.quote.id) state.quote.id = uid("q");
@@ -8724,10 +8744,11 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       }
       renderAll();
       showToast("Itinerary saved and customer pipeline updated.");
+      return true;
     };
 
     document.getElementById("saveQuoteBtn").addEventListener("click", () => {
-      saveCurrentItinerary();
+      if (!saveCurrentItinerary()) return;
       if (!state.quote.shareToken) return;
       prepareCustomerPdf(JSON.parse(JSON.stringify(state.quote))).catch(error => {
         console.warn("PDF preparation will retry when the share link is copied", error);
@@ -8782,6 +8803,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     };
 
     els.copyShareLinkBtn.addEventListener("click", async () => {
+      if (!requireTravelDate()) return;
       const button = els.copyShareLinkBtn;
       const originalButtonHtml = button.innerHTML;
       button.disabled = true;
@@ -8790,7 +8812,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const progress = startShareProgressAnimation(button);
       let issuedQuote = null;
       try {
-        saveCurrentItinerary();
+        if (!saveCurrentItinerary()) return;
         const quote = await issueNewCustomerShare();
         issuedQuote = quote;
         // The immutable customer record has already been confirmed on the server.
@@ -8857,6 +8879,12 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     };
 
     const printCurrentItinerary = async quote => {
+      const travelText = String(quote.travelDates || "").trim();
+      if (!/^(?:\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2})$/.test(travelText) || !parseDisplayDate(travelText)) {
+        loadSavedItinerary(quote);
+        requireTravelDate();
+        return;
+      }
       state.quote = normalizeQuoteDayModes(normalizeProPaxMargins(JSON.parse(JSON.stringify(quote))));
       if (typeof setProMode === "function") setProMode(state.quote.mode === "pro", { syncCurrent: false, render: false });
       updateCustomerPdf(false);
@@ -9831,6 +9859,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     });
 
     document.getElementById("printQuoteBtn").addEventListener("click", async () => {
+      if (!requireTravelDate()) return;
       syncQuoteFromInputs();
       if (!state.quote.id) state.quote.id = uid("q");
       ensureQuotePdfNumber(state.quote);
@@ -9897,7 +9926,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const enabled = pendingModeSwitch;
       closeModeSwitchDialog();
       if (enabled !== null) {
-        saveCurrentItinerary();
+        if (!saveCurrentItinerary()) return;
         setProMode(enabled);
         showToast(enabled ? "Saved and switched to Pro mode." : "Saved and switched to Standard mode.");
       }
