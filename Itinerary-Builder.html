@@ -3322,6 +3322,13 @@
     .pdf-activity-badge span{min-width:0;overflow-wrap:anywhere;}
     .pdf-page.b2c-premium .pdf-selected-activities{background:#f0f8f4;border-color:#d7e8df;border-left-color:#438976;}
     .pdf-page.b2c-premium .pdf-activity-badge{border-color:#d7e8df;color:#2b6353;}
+    .margin-period-cards { display:grid;gap:20px;margin-top:18px; }
+    .margin-period-card { border:1px solid #b9d9e8;border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 4px 14px rgba(15,111,168,.06); }
+    .margin-period-card-head { display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;background:#eaf7fd;border-bottom:1px solid var(--line);flex-wrap:wrap; }
+    .margin-period-card-head h3 { margin:0;font-size:16px;color:var(--brand-dark); }
+    .margin-period-card-head p { margin:4px 0 0;font-size:12px;color:var(--muted); }
+    .margin-period-editor:not(:empty) { padding:0 18px 18px; }
+    #marginRuleForm[hidden] { display:none !important; }
   </style>
 </head>
 <body>
@@ -3858,23 +3865,25 @@
         <div class="panel" style="margin-bottom:20px;">
           <div class="panel-head"><h2>Margin Structure</h2><span class="pill">Auto-sync to Firebase</span></div>
           <div class="panel-body">
-            <p class="subtitle">Select one common period to view and edit all its markups. Dates apply to every markup in the selected period. Trips crossing periods prorate the margin by nights in each period (checkout day excluded).</p>
+            <p class="subtitle">Each saved period appears below in its own box with its margin structure. Click Add to create another period in the popup. Trips crossing periods prorate the margin by nights in each period (checkout day excluded).</p>
             <div class="grid four" style="margin-top:20px;align-items:end;">
-              <label>Margin period<select id="marginPeriodSelect"></select></label>
-              <label>From<input id="marginFrom" type="date" required></label>
-              <label>Till<input id="marginTill" type="date" required></label>
-              <div><button class="btn primary" id="marginPeriodSave" type="button">Save Period</button> <button class="btn" id="marginPeriodAdd" type="button">Add New Period</button></div>
+              <select id="marginPeriodSelect" hidden aria-hidden="true"></select>
+              <input id="marginFrom" type="hidden">
+              <input id="marginTill" type="hidden">
+              <div><button class="btn primary" id="marginPeriodAdd" type="button">Add</button></div>
             </div>
             <p id="marginStatus" class="subtitle" role="status" aria-live="polite"></p>
             <button class="btn" id="marginFirebaseSave" type="button">Save Margins to Firebase</button>
             <p id="marginFirebaseStatus" class="subtitle" role="status" aria-live="polite"></p>
-            <div class="table-wrap"><table><thead><tr><th>Hotel category</th><th>B2B ₹ / pax</th><th>B2C ₹ / pax</th><th>Action</th></tr></thead><tbody id="marginRuleRows"></tbody></table></div>
-            <form id="marginRuleForm" class="grid four" style="margin-top:20px;align-items:end;">
+            <div id="marginRuleRows" class="margin-period-cards"></div>
+            <div id="marginEditorHome">
+            <form id="marginRuleForm" class="grid four" hidden style="margin-top:20px;align-items:end;">
               <label>Hotel category<select id="marginCategory"><option value="3">3 star / no hotel (default)</option><option value="4">4 star</option><option value="5">5 star</option><option value="3+4">3 + 4 star</option><option value="4+5">4 + 5 star</option></select></label>
               <label>B2B margin (₹ / pax)<input id="marginB2B" type="number" min="0" step="0.01" required></label>
               <label>B2C margin (₹ / pax)<input id="marginB2C" type="number" min="0" step="0.01" required></label>
               <div><button class="btn primary" id="marginSave" type="submit">Add Markup</button> <button class="btn" id="marginCancel" type="button" hidden>Cancel</button></div>
             </form>
+            </div>
             <p class="subtitle">New periods start with all five standard hotel categories. Outside configured periods, the original category margins apply.</p>
           </div>
         </div>
@@ -4504,6 +4513,20 @@
     </div>
   </div>
 
+
+  <div class="dialog" id="marginPeriodDialog" aria-hidden="true">
+    <div class="dialog-panel" role="dialog" aria-modal="true" aria-labelledby="marginPeriodTitle" style="width:min(760px,96vw);max-height:90vh;overflow-y:auto;">
+      <div class="dialog-head"><h2 id="marginPeriodTitle">Add Margin Period</h2><button class="mini-btn" id="marginPeriodClose" type="button" aria-label="Close add margin period">✕</button></div>
+      <form id="marginPeriodForm" class="panel-body">
+        <div class="grid two"><label>From<input id="newMarginFrom" type="date" required></label><label>Till<input id="newMarginTill" type="date" required></label></div>
+        <p class="subtitle" style="margin:16px 0;">Enter margins per traveler for each hotel category. These dates apply to all five rows.</p>
+        <div class="table-wrap"><table><thead><tr><th>Hotel category</th><th>B2B ₹ / pax</th><th>B2C ₹ / pax</th></tr></thead><tbody id="newMarginRows"></tbody></table></div>
+        <p id="newMarginError" role="alert" style="color:var(--danger);min-height:1.5em;"></p>
+        <div class="dialog-actions"><button class="btn" id="marginPeriodCancel" type="button">Cancel</button><button class="btn primary" type="submit">Add Period</button></div>
+      </form>
+    </div>
+  </div>
+
   <input id="importFile" type="file" accept="application/json" hidden>
   <div class="toast" id="toast"></div>
 
@@ -5093,6 +5116,16 @@
       };
     };
 
+    const hydrateMarginRules = settings => {
+      const rows = new Map((Array.isArray(settings?.marginRules) ? settings.marginRules : []).filter(row => row?.id).map(row => [row.id, { ...row }]));
+      Object.values(settings?.marginRuleRecords || {}).forEach(record => {
+        if (!record?.id) return;
+        if (record.deleted) rows.delete(record.id);
+        else if (record.rule) rows.set(record.id, { ...record.rule });
+      });
+      return [...rows.values()];
+    };
+
     const normalizeState = incoming => {
       const blank = createBlankState();
       const today = currentDateIso();
@@ -5118,6 +5151,7 @@
         settings: {
           ...blank.settings,
           ...(incoming?.settings || {}),
+          marginRules: hydrateMarginRules({ ...blank.settings, ...(incoming?.settings || {}) }),
           companyLogo: defaultCompanyLogo
         },
         quote: normalizeQuoteDayModes({
@@ -5269,8 +5303,21 @@
       });
     };
 
+    const marginHistoryKey = 'itinerary-margin-history-v1';
+    const backupMargins = settings => {
+      try {
+        const rules = hydrateMarginRules(settings);
+        if (!rules.length) return;
+        const history = JSON.parse(localStorage.getItem(marginHistoryKey) || '[]');
+        const serialized = JSON.stringify(rules);
+        if (history[0]?.serialized === serialized) return;
+        history.unshift({ savedAt: new Date().toISOString(), serialized });
+        localStorage.setItem(marginHistoryKey, JSON.stringify(history.slice(0, 30)));
+      } catch { /* Keep the existing full-state local backup and cloud save available. */ }
+    };
     const writeLocalBackup = (source, fullSerialized = "") => {
       if (sharedQuotePdfView && sharedQuoteId) return true;
+      backupMargins(source.settings);
       saveLocalBackup(fullSerialized || JSON.stringify(source));
       return localBackupAvailable;
     };
@@ -5358,10 +5405,20 @@
     const mergeSyncFields = (base = {}, local = {}, remote = {}) => {
       const result = { ...remote };
       new Set([...Object.keys(base), ...Object.keys(local)]).forEach(key => {
+        if (key === 'marginRules') {
+          if (!Array.isArray(remote[key])) { result[key] = local[key] || []; return; }
+          result[key] = mergeSyncRows(base[key] || [], local[key] || [], remote[key]);
+          return;
+        }
+        if (key === 'marginRuleRecords') {
+          result[key] = { ...(local[key] || {}), ...mergeSyncFields(base[key] || {}, local[key] || {}, remote[key] || {}) };
+          return;
+        }
         if (syncJson(base[key]) === syncJson(local[key])) return;
         if (Object.prototype.hasOwnProperty.call(local, key)) result[key] = local[key];
         else delete result[key];
       });
+      if (result.marginRuleRecords) result.marginRules = hydrateMarginRules(result);
       return result;
     };
     const mergeSyncRows = (baseRows, localRows, remoteRows) => {
@@ -5382,7 +5439,7 @@
     let cloudRetryTimer = null;
     let cloudRenderPending = false;
     let cloudUnsubscribers = [];
-    const cloudEditInProgress = () => document.querySelector("#tourDialog.open, #hotelEditDialog.open, #visaDialog.open, #customerDrawer.open");
+    const cloudEditInProgress = () => document.querySelector("#tourDialog.open, #hotelEditDialog.open, #visaDialog.open, #customerDrawer.open, #marginPeriodDialog.open");
 
     const rememberCloudBaseline = () => { state._cloudBaseline = syncClone(cloudBaseline); };
     const renderCloudUpdate = () => {
@@ -5403,6 +5460,7 @@
     });
 
     const acceptCloudState = remoteState => {
+      backupMargins(state.settings);
       const remote = sharedState(remoteState);
       const local = sharedState(state);
       const previousQuote = state.quotes.find(quote => quote.id && quote.id === state.quote.id);
@@ -7796,7 +7854,22 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
 
 
     const marginForm = document.getElementById('marginRuleForm');
-    const marginFields = Object.fromEntries(['Category', 'From', 'Till', 'B2B', 'B2C', 'Save', 'Cancel', 'Status', 'RuleRows', 'PeriodSelect', 'PeriodSave', 'PeriodAdd'].map(key => [key, document.getElementById('margin' + key)]));
+    const marginFields = Object.fromEntries(['Category', 'From', 'Till', 'B2B', 'B2C', 'Save', 'Cancel', 'Status', 'RuleRows', 'PeriodSelect', 'PeriodAdd'].map(key => [key, document.getElementById('margin' + key)]));
+    let marginRulesBeforeEdit = syncClone(state.settings.marginRules || []);
+    const recordMarginChanges = () => {
+      const current = state.settings.marginRules || [];
+      const previous = new Map(marginRulesBeforeEdit.map(rule => [rule.id, rule]));
+      const records = state.settings.marginRuleRecords || (state.settings.marginRuleRecords = {});
+      current.forEach(rule => {
+        if (!records[rule.id] || syncJson(previous.get(rule.id)) !== syncJson(rule)) {
+          records[rule.id] = { id: rule.id, rule: syncClone(rule), deleted: false, updatedAt: new Date().toISOString() };
+        }
+      });
+      const currentIds = new Set(current.map(rule => rule.id));
+      previous.forEach((rule, id) => {
+        if (!currentIds.has(id)) records[id] = { id, deleted: true, updatedAt: new Date().toISOString() };
+      });
+    };
     let editingMarginId = null;
     let selectedMarginPeriod = '';
     const marginLabels = { '3': '3 star / no hotel (default)', '4': '4 star', '5': '5 star', '3+4': '3 + 4 star', '4+5': '4 + 5 star' };
@@ -7805,6 +7878,8 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     const resetMarginForm = () => {
       editingMarginId = null;
       marginForm.reset();
+      marginForm.hidden = true;
+      document.getElementById('marginEditorHome').appendChild(marginForm);
       marginFields.Save.textContent = 'Add Markup';
       marginFields.Cancel.hidden = true;
     };
@@ -7820,10 +7895,24 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const [from, till] = selectedMarginPeriod.split('|');
       marginFields.From.value = from || '2026-01-01';
       marginFields.Till.value = till || '2026-12-31';
-      marginFields.RuleRows.innerHTML = rules.filter(rule => marginPeriodKey(rule) === selectedMarginPeriod).map(rule => '<tr><td>' + escapeHtml(marginLabels[rule.category] || rule.category) + '</td><td>' + escapeHtml(rule.b2b) + '</td><td>' + escapeHtml(rule.b2c) + '</td><td><button type="button" class="btn" data-margin-edit="' + escapeHtml(rule.id) + '">Edit</button> <button type="button" class="btn" data-margin-delete="' + escapeHtml(rule.id) + '">Delete</button></td></tr>').join('') || '<tr><td colspan="4">Add a period to configure its markups.</td></tr>';
+      // Move the reusable editor out before replacing cards so its listeners survive.
+      document.getElementById('marginEditorHome').appendChild(marginForm);
+      marginFields.RuleRows.innerHTML = periods.map(key => {
+        const [from, till] = key.split('|');
+        const rows = rules.filter(rule => marginPeriodKey(rule) === key);
+        return '<section class="margin-period-card" data-margin-period="' + escapeHtml(key) + '"><div class="margin-period-card-head"><div><h3>' + escapeHtml(marginDateLabel(from)) + ' – ' + escapeHtml(marginDateLabel(till)) + '</h3><p>Margin period · ' + rows.length + ' hotel categories · per traveler</p></div><button class="btn" type="button" data-margin-add-markup="' + escapeHtml(key) + '">Add Markup</button></div><div class="table-wrap"><table><thead><tr><th>Hotel category</th><th>B2B ₹ / pax</th><th>B2C ₹ / pax</th><th>Action</th></tr></thead><tbody>' + rows.map(rule => '<tr><td>' + escapeHtml(marginLabels[rule.category] || rule.category) + '</td><td>' + escapeHtml(rule.b2b) + '</td><td>' + escapeHtml(rule.b2c) + '</td><td><button type="button" class="btn" data-margin-edit="' + escapeHtml(rule.id) + '">Edit</button> <button type="button" class="btn" data-margin-delete="' + escapeHtml(rule.id) + '">Delete</button></td></tr>').join('') + '</tbody></table></div><div class="margin-period-editor"></div></section>';
+      }).join('') || '<p class="subtitle">No saved periods. Click Add to create a period and enter its margins.</p>';
+      if (!marginForm.hidden) {
+        const card = [...marginFields.RuleRows.querySelectorAll('[data-margin-period]')].find(card => card.dataset.marginPeriod === selectedMarginPeriod);
+        if (card) card.querySelector('.margin-period-editor').appendChild(marginForm);
+        else resetMarginForm();
+      }
 
+      marginRulesBeforeEdit = syncClone(rules);
     };
     const persistMarginSettings = message => {
+      recordMarginChanges();
+      backupMargins(state.settings);
       renderMarginRules();
       applyDefaultMarginForHotels();
       renderTotals();
@@ -7832,49 +7921,75 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       marginFields.Status.textContent = message;
       updateMarginFirebaseStatus('Margins saved locally; queued for Firebase sync.');
     };
-    const validMarginPeriod = () => {
-      marginFields.Till.setCustomValidity(marginFields.Till.value < marginFields.From.value ? 'End date must be on or after start date.' : '');
-      return marginFields.From.reportValidity() && marginFields.Till.reportValidity();
-    };
-    [marginFields.From, marginFields.Till].forEach(field => field.addEventListener('input', () => marginFields.Till.setCustomValidity('')));
     marginFields.PeriodSelect.addEventListener('change', () => {
       selectedMarginPeriod = marginFields.PeriodSelect.value;
       resetMarginForm();
       renderMarginRules();
       marginFields.Status.textContent = '';
     });
-    marginFields.PeriodSave.addEventListener('click', () => {
-      if (!validMarginPeriod()) return;
-      if (!selectedMarginPeriod) { marginFields.Status.textContent = 'Use Add New Period to create a period.'; return; }
-      const next = marginFields.From.value + '|' + marginFields.Till.value;
-      const rules = state.settings.marginRules || [];
-      if (next !== selectedMarginPeriod && rules.some(rule => marginPeriodKey(rule) === next)) {
-        marginFields.Status.textContent = 'This period already exists. Select it from the period list.'; return;
-      }
-      rules.filter(rule => marginPeriodKey(rule) === selectedMarginPeriod).forEach(rule => { rule.from = marginFields.From.value; rule.till = marginFields.Till.value; });
-      selectedMarginPeriod = next;
-      persistMarginSettings('Common period saved for all markups.');
-    });
+    const marginPeriodDialog = document.getElementById('marginPeriodDialog');
+    const newMarginForm = document.getElementById('marginPeriodForm');
+    const newMarginFrom = document.getElementById('newMarginFrom');
+    const newMarginTill = document.getElementById('newMarginTill');
+    const newMarginError = document.getElementById('newMarginError');
+    const closeMarginPeriodDialog = () => {
+      marginPeriodDialog.classList.remove('open');
+      marginPeriodDialog.setAttribute('aria-hidden', 'true');
+      newMarginForm.reset();
+      newMarginTill.setCustomValidity('');
+      newMarginError.textContent = '';
+      marginFields.PeriodAdd.focus();
+    };
     marginFields.PeriodAdd.addEventListener('click', () => {
-      if (!validMarginPeriod()) return;
-      const next = marginFields.From.value + '|' + marginFields.Till.value;
+      newMarginForm.reset();
+      newMarginTill.setCustomValidity('');
+      newMarginError.textContent = '';
+      const rules = state.settings.marginRules || [];
+      document.getElementById('newMarginRows').innerHTML = Object.entries(marginLabels).map(([category, label]) => {
+        const previous = rules.find(rule => marginPeriodKey(rule) === selectedMarginPeriod && rule.category === category);
+        return '<tr><td>' + escapeHtml(label) + '</td><td><input type="number" min="0" step="0.01" required data-new-margin-category="' + category + '" data-new-margin-type="b2b" aria-label="' + escapeHtml(label) + ' B2B margin" value="' + escapeHtml(previous?.b2b ?? '') + '"></td><td><input type="number" min="0" step="0.01" required data-new-margin-category="' + category + '" data-new-margin-type="b2c" aria-label="' + escapeHtml(label) + ' B2C margin" value="' + escapeHtml(previous?.b2c ?? '') + '"></td></tr>';
+      }).join('');
+      marginPeriodDialog.classList.add('open');
+      marginPeriodDialog.setAttribute('aria-hidden', 'false');
+      newMarginFrom.focus();
+    });
+    ['marginPeriodClose', 'marginPeriodCancel'].forEach(id => document.getElementById(id).addEventListener('click', closeMarginPeriodDialog));
+    [newMarginFrom, newMarginTill].forEach(field => field.addEventListener('input', () => { newMarginTill.setCustomValidity(''); newMarginError.textContent = ''; }));
+    marginPeriodDialog.addEventListener('click', event => { if (event.target === marginPeriodDialog) closeMarginPeriodDialog(); });
+    marginPeriodDialog.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeMarginPeriodDialog(); return; }
+      if (event.key !== 'Tab') return;
+      const controls = [...marginPeriodDialog.querySelectorAll('button, input')];
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
+    newMarginForm.addEventListener('submit', event => {
+      event.preventDefault();
+      newMarginTill.setCustomValidity(newMarginTill.value < newMarginFrom.value ? 'End date must be on or after start date.' : '');
+      if (!newMarginForm.reportValidity()) return;
+      const from = newMarginFrom.value, till = newMarginTill.value;
+      const next = from + '|' + till;
       const rules = state.settings.marginRules || (state.settings.marginRules = []);
       if (rules.some(rule => marginPeriodKey(rule) === next)) {
-        marginFields.Status.textContent = 'Enter new From and Till dates, then click Add New Period.'; return;
+        newMarginError.textContent = 'This period already exists. Enter a new date period.'; return;
       }
-      const defaults = { '3': [2300, 3800], '4': [4300, 5800], '5': [6300, 8300], '3+4': [3500, 4500], '4+5': [5500, 6800] };
-      Object.keys(marginLabels).forEach(category => {
-        const previous = rules.find(rule => marginPeriodKey(rule) === selectedMarginPeriod && rule.category === category);
-        rules.push({ id: 'margin-' + Date.now() + '-' + category + '-' + Math.random().toString(36).slice(2), category, from: marginFields.From.value, till: marginFields.Till.value, b2b: previous ? previous.b2b : defaults[category][0], b2c: previous ? previous.b2c : defaults[category][1] });
+      const added = Object.keys(marginLabels).map(category => {
+        const amount = type => Number(newMarginForm.querySelector('[data-new-margin-category="' + category + '"][data-new-margin-type="' + type + '"]').value);
+        return { id: 'margin-' + Date.now() + '-' + category + '-' + Math.random().toString(36).slice(2), category, from, till, b2b: amount('b2b'), b2c: amount('b2c') };
       });
+      rules.push(...added);
       selectedMarginPeriod = next;
+      closeMarginPeriodDialog();
       resetMarginForm();
-      persistMarginSettings('New period added with all markups. Edit the amounts below.');
+      persistMarginSettings('New period and all five category margins saved.');
     });
     document.getElementById('marginFirebaseSave').addEventListener('click', async () => {
       const button = document.getElementById('marginFirebaseSave');
       button.disabled = true;
       try {
+        recordMarginChanges();
+        backupMargins(state.settings);
         // Mark this settings field dirty so already saved local margins are uploaded too.
         delete cloudBaseline.settings.marginRules;
         rememberCloudBaseline();
@@ -7907,12 +8022,28 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       persistMarginSettings('Markup saved.');
     });
     marginFields.RuleRows.addEventListener('click', event => {
+      const add = event.target.closest('[data-margin-add-markup]');
+      if (add) {
+        resetMarginForm();
+        selectedMarginPeriod = add.dataset.marginAddMarkup;
+        const existing = (state.settings.marginRules || []).filter(rule => marginPeriodKey(rule) === selectedMarginPeriod).map(rule => rule.category);
+        const missing = Object.keys(marginLabels).find(category => !existing.includes(category));
+        if (!missing) { marginFields.Status.textContent = 'All categories are already listed for this period. Use Edit on the row to change its margin.'; return; }
+        marginFields.Category.value = missing;
+        marginForm.hidden = false;
+        add.closest('[data-margin-period]').querySelector('.margin-period-editor').appendChild(marginForm);
+        marginFields.B2B.focus();
+        return;
+      }
       const edit = event.target.closest('[data-margin-edit]');
       const remove = event.target.closest('[data-margin-delete]');
       if (edit) {
         const rule = state.settings.marginRules.find(item => item.id === edit.dataset.marginEdit);
         if (!rule) return;
+        selectedMarginPeriod = marginPeriodKey(rule);
         editingMarginId = rule.id;
+        marginForm.hidden = false;
+        edit.closest('[data-margin-period]').querySelector('.margin-period-editor').appendChild(marginForm);
         ['Category', 'B2B', 'B2C'].forEach(key => marginFields[key].value = rule[key.toLowerCase()]);
         marginFields.Save.textContent = 'Save Changes';
         marginFields.Cancel.hidden = false;
