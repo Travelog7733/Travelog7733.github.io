@@ -3853,23 +3853,6 @@
       </section>
 
       <section class="tab-panel" id="settings">
-        <div class="panel" style="margin-bottom: 20px;">
-          <div class="panel-head"><h2>Markup Periods</h2><span class="pill">Saved automatically</span></div>
-          <div class="panel-body">
-            <p class="subtitle">Set markup per traveler in INR for each travel period. From and Till dates are inclusive. When itinerary days span periods, markup is the day-weighted average of their rates. Days outside saved periods use the existing quote markup. Each distinct itinerary day, including arrival and departure, counts equally.</p>
-            <p id="settingsCurrentMarkup" class="subtitle" style="margin-top: 14px;" aria-live="polite"></p>
-            <form id="markupPeriodForm" class="grid four" style="margin-top: 20px; align-items: end;">
-              <label for="markupPeriodFrom">From<input id="markupPeriodFrom" type="date" required></label>
-              <label for="markupPeriodTill">Till<input id="markupPeriodTill" type="date" required></label>
-              <label for="markupPeriodAmount">Standard markup (INR / traveler)<input id="markupPeriodAmount" type="number" min="0" step="1" required></label>
-              <label for="markupPeriodPro">Pro markup (INR / traveler)<input id="markupPeriodPro" type="number" min="0" step="1" required></label>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button class="btn primary" id="markupPeriodSave" type="submit">Add Period</button><button class="btn" id="markupPeriodCancel" type="button" hidden>Cancel</button></div>
-            </form>
-            <p id="markupPeriodStatus" class="subtitle" role="status" aria-live="polite"></p>
-            <div class="table-wrap"><table><thead><tr><th>From</th><th>Till</th><th>Standard markup</th><th>Pro markup</th><th>Action</th></tr></thead><tbody id="markupPeriodRows"></tbody></table></div>
-            <p class="subtitle" style="margin-top: 16px;">Periods cannot overlap. Child, alternate-rate and individual Pro traveler overrides remain separate.</p>
-          </div>
-        </div>
             <div class="panel automations-panel open" style="margin-bottom: 20px;" id="automationsPanel">
               <div class="panel-head"><h2>Automations</h2><span class="pill amber">Rules</span></div>
               <div class="panel-body">
@@ -4954,7 +4937,6 @@
       settings: {
         companyLogo: "https://raw.githubusercontent.com/Travelog7733/Travelog7733.github.io/main/assets/travelog-logo-white.png",
         surchargePeriods: [],
-        markupPeriods: [],
         showDepositBalance: true,
         showPdfLogo: true,
         showGrandTotal: true,
@@ -6432,7 +6414,6 @@
 
     const applyDefaultMarginForHotels = () => {
       const margin = defaultMarginForHotels(state.quote.quoteType);
-      delete state.quote.markupBeforePeriod;
       state.quote.markup = margin;
       state.quote.proMargin = margin;
       els.markup.value = margin;
@@ -6790,8 +6771,6 @@
     };
 
     const renderTotals = () => {
-      applyPeriodMarkup();
-      syncMarkupSettings();
       const totals = getTotals();
       els.adultSubtotal.textContent = money(totals.adultSubtotal);
       els.childSubtotal.textContent = money(totals.childSubtotal);
@@ -7682,113 +7661,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       surchargePeriodStatus.textContent = "Surcharge period deleted.";
     });
 
-    function markupPeriodCalculation() {
-      const q = state.quote;
-      const base = q.markupBeforePeriod || { markup: q.markup, proMargin: q.proMargin };
-      const fallback = { amount: Number(base.markup || 0), proAmount: Number(base.proMargin ?? base.markup ?? 0) };
-      const text = String(q.travelDates || '').trim();
-      const parts = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      const iso = parts ? parts[3] + '-' + parts[2].padStart(2, '0') + '-' + parts[1].padStart(2, '0') : text;
-      const startDate = new Date(iso + 'T12:00:00');
-      const empty = { ...fallback, matched: false, dayCount: 0, groups: [] };
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(iso) || Number.isNaN(startDate.getTime()) || toLocalDateIso(startDate) !== iso) return empty;
-      const offsets = [...new Set((q.days || []).map(day => Number(day.day || 1) - 1).filter(offset => Number.isInteger(offset) && offset >= 0))];
-      if (!offsets.length) return empty;
-      const groups = new Map();
-      let amount = 0, proAmount = 0, matched = false;
-      offsets.forEach(offset => {
-        const date = new Date(startDate);
-        date.setDate(date.getDate() + offset);
-        const dayIso = toLocalDateIso(date);
-        const period = (state.settings.markupPeriods || []).find(p => dayIso >= p.from && dayIso <= p.till);
-        const rate = period || fallback;
-        amount += Number(rate.amount);
-        proAmount += Number(rate.proAmount);
-        matched = matched || Boolean(period);
-        const key = period ? period.from + '/' + period.till : 'fallback';
-        if (!groups.has(key)) groups.set(key, { period, amount: Number(rate.amount), proAmount: Number(rate.proAmount), days: 0 });
-        groups.get(key).days++;
-      });
-      return { amount: amount / offsets.length, proAmount: proAmount / offsets.length, matched, dayCount: offsets.length, groups: [...groups.values()] };
-    }
-    function applyPeriodMarkup() {
-      const q = state.quote;
-      const calculation = markupPeriodCalculation();
-      if (calculation.matched) {
-        if (!q.markupBeforePeriod) q.markupBeforePeriod = { markup: q.markup, proMargin: q.proMargin };
-        q.markup = calculation.amount;
-        q.proMargin = calculation.proAmount;
-      } else if (q.markupBeforePeriod) {
-        Object.assign(q, q.markupBeforePeriod);
-        delete q.markupBeforePeriod;
-      }
-      els.markup.value = q.markup;
-      els.proMargin.value = q.proMargin;
-    }
-    function syncMarkupSettings() {
-      const calculation = markupPeriodCalculation();
-      document.getElementById('settingsCurrentMarkup').textContent =
-        'Current markup: Standard ' + money(Number(state.quote.markup || 0)) + ' / traveler · Pro ' + money(Number(state.quote.proMargin || 0)) + ' / traveler. ' +
-        (calculation.matched ? 'Day-weighted average across ' + calculation.dayCount + ' itinerary days. ' + calculation.groups.map(group =>
-          group.days + (group.days === 1 ? ' day' : ' days') + ' × Standard ' + money(group.amount) + ' / Pro ' + money(group.proAmount) +
-          (group.period ? ' (' + formatDateDisplay(group.period.from) + ' to ' + formatDateDisplay(group.period.till) + ')' : ' (quote markup; outside saved periods)')
-        ).join('; ') + '.' : 'No matching itinerary dates; using the quote markup.');
-      document.getElementById('markupPeriodRows').innerHTML = (state.settings.markupPeriods || []).slice().sort((a,b) => a.from.localeCompare(b.from)).map(period =>
-        '<tr><td>' + escapeHtml(formatDateDisplay(period.from)) + '</td><td>' + escapeHtml(formatDateDisplay(period.till)) + '</td><td>' + money(period.amount) + '</td><td>' + money(period.proAmount) + '</td><td><button type="button" class="btn" data-edit-markup="' + escapeHtml(period.id) + '">Edit</button> <button type="button" class="btn" data-delete-markup="' + escapeHtml(period.id) + '">Delete</button></td></tr>'
-      ).join('') || '<tr><td colspan="5">No markup periods added.</td></tr>';
-    }
-    let editingMarkupPeriodId = null;
-    function resetMarkupPeriodEditor() {
-      editingMarkupPeriodId = null;
-      document.getElementById('markupPeriodForm').reset();
-      document.getElementById('markupPeriodSave').textContent = 'Add Period';
-      document.getElementById('markupPeriodCancel').hidden = true;
-    }
-    document.getElementById('markupPeriodCancel').addEventListener('click', resetMarkupPeriodEditor);
-    document.getElementById('markupPeriodForm').addEventListener('submit', event => {
-      event.preventDefault();
-      const from = document.getElementById('markupPeriodFrom').value;
-      const till = document.getElementById('markupPeriodTill').value;
-      const amount = Number(document.getElementById('markupPeriodAmount').value);
-      const proAmount = Number(document.getElementById('markupPeriodPro').value);
-      const status = document.getElementById('markupPeriodStatus');
-      if (!from || !till || till < from) { status.textContent = 'Till date must be on or after From date.'; return; }
-      if (!Number.isFinite(amount) || !Number.isFinite(proAmount) || amount < 0 || proAmount < 0) { status.textContent = 'Enter valid non-negative markup amounts.'; return; }
-      const periods = state.settings.markupPeriods || [];
-      if (periods.some(p => p.id !== editingMarkupPeriodId && from <= p.till && till >= p.from)) { status.textContent = 'These dates overlap an existing markup period. Choose different dates or edit that period.'; return; }
-      const period = { id: editingMarkupPeriodId || uid("markup-period"), from, till, amount, proAmount };
-      state.settings.markupPeriods = periods.filter(p => p.id !== period.id).concat(period);
-      resetMarkupPeriodEditor();
-      renderTotals();
-      renderStats();
-      saveState();
-      status.textContent = 'Markup period saved.';
-    });
-    document.getElementById('markupPeriodRows').addEventListener('click', event => {
-      const edit = event.target.closest('[data-edit-markup]');
-      const remove = event.target.closest('[data-delete-markup]');
-      if (edit) {
-        const period = (state.settings.markupPeriods || []).find(p => p.id === edit.dataset.editMarkup);
-        if (!period) return;
-        editingMarkupPeriodId = period.id;
-        document.getElementById('markupPeriodFrom').value = period.from;
-        document.getElementById('markupPeriodTill').value = period.till;
-        document.getElementById('markupPeriodAmount').value = period.amount;
-        document.getElementById('markupPeriodPro').value = period.proAmount;
-        document.getElementById('markupPeriodSave').textContent = 'Save Period';
-        document.getElementById('markupPeriodCancel').hidden = false;
-        document.getElementById('markupPeriodStatus').textContent = 'Editing markup period.';
-      } else if (remove) {
-        state.settings.markupPeriods = (state.settings.markupPeriods || []).filter(p => p.id !== remove.dataset.deleteMarkup);
-        if (editingMarkupPeriodId === remove.dataset.deleteMarkup) resetMarkupPeriodEditor();
-        renderTotals();
-        renderStats();
-        saveState();
-        document.getElementById('markupPeriodStatus').textContent = 'Markup period deleted.';
-      }
-    });
     const syncSettingsControls = () => {
-      syncMarkupSettings();
       document.querySelectorAll("[data-settings-control]").forEach(control => {
         const source = document.getElementById(control.dataset.settingsControl);
         control.checked = source.checked;
