@@ -5132,6 +5132,17 @@
       return [...rows.values()];
     };
 
+    // Keep individual surcharge records so a stale list cannot erase saved periods.
+    const hydrateSurchargePeriods = settings => {
+      const rows = new Map((Array.isArray(settings?.surchargePeriods) ? settings.surchargePeriods : []).filter(row => row?.id).map(row => [row.id, { ...row }]));
+      Object.values(settings?.surchargePeriodRecords || {}).forEach(record => {
+        if (!record?.id) return;
+        if (record.deleted) rows.delete(record.id);
+        else if (record.period) rows.set(record.id, { ...record.period });
+      });
+      return [...rows.values()];
+    };
+
     const normalizeState = incoming => {
       const blank = createBlankState();
       const today = currentDateIso();
@@ -5158,6 +5169,7 @@
           ...blank.settings,
           ...(incoming?.settings || {}),
           marginRules: hydrateMarginRules({ ...blank.settings, ...(incoming?.settings || {}) }),
+          surchargePeriods: hydrateSurchargePeriods(incoming?.settings),
           companyLogo: defaultCompanyLogo
         },
         quote: normalizeQuoteDayModes({
@@ -5411,6 +5423,14 @@
     const mergeSyncFields = (base = {}, local = {}, remote = {}) => {
       const result = { ...remote };
       new Set([...Object.keys(base), ...Object.keys(local)]).forEach(key => {
+        if (key === 'surchargePeriods') {
+          result[key] = mergeSyncRows(base[key] || [], local[key] || [], remote[key] || []);
+          return;
+        }
+        if (key === 'surchargePeriodRecords') {
+          result[key] = mergeSyncFields(base[key] || {}, local[key] || {}, remote[key] || {});
+          return;
+        }
         if (key === 'marginRules') {
           if (!Array.isArray(remote[key])) { result[key] = local[key] || []; return; }
           result[key] = mergeSyncRows(base[key] || [], local[key] || [], remote[key]);
@@ -5425,6 +5445,7 @@
         else delete result[key];
       });
       if (result.marginRuleRecords) result.marginRules = hydrateMarginRules(result);
+      if (result.surchargePeriodRecords) result.surchargePeriods = hydrateSurchargePeriods(result);
       return result;
     };
     const mergeSyncRows = (baseRows, localRows, remoteRows) => {
@@ -7815,6 +7836,14 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     let editingSurchargePeriodId = null;
     const surchargeSaveBtn = document.getElementById("surchargeSaveBtn");
     const surchargeCancelBtn = document.getElementById("surchargeCancelBtn");
+    const persistSurchargePeriod = (period, deleted = false) => {
+      const records = state.settings.surchargePeriodRecords || (state.settings.surchargePeriodRecords = {});
+      records[period.id] = { id: period.id, period: { ...period }, deleted, updatedAt: new Date().toISOString() };
+      state.settings.surchargePeriods = hydrateSurchargePeriods(state.settings);
+      // Commit this settings edit before a reload can cancel the debounce.
+      flushLocalBackup();
+      saveState();
+    };
     const resetSurchargeEditor = () => {
       editingSurchargePeriodId = null;
       surchargePeriodForm.reset();
@@ -7872,7 +7901,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       } else {
         state.settings.surchargePeriods.push(period);
       }
-      saveState();
+      persistSurchargePeriod(period);
       renderSurchargePeriods();
       renderSurchargeNotices();
       resetSurchargeEditor();
@@ -7899,8 +7928,9 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       }
       const button = event.target.closest("[data-delete-surcharge]");
       if (!button) return;
-      state.settings.surchargePeriods = (state.settings.surchargePeriods || []).filter(period => period.id !== button.dataset.deleteSurcharge);
-      saveState();
+      const period = (state.settings.surchargePeriods || []).find(item => item.id === button.dataset.deleteSurcharge);
+      if (!period) return;
+      persistSurchargePeriod(period, true);
       renderSurchargePeriods();
       if (editingSurchargePeriodId === button.dataset.deleteSurcharge) resetSurchargeEditor();
       renderSurchargeNotices();
