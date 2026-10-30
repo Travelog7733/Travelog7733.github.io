@@ -5262,7 +5262,7 @@
       largeBackupDb = await openLargeBackup();
       const saved = await largeBackupOperation(largeBackupDb);
       if (saved) {
-        JSON.parse(saved);
+        if (typeof saved === "string") JSON.parse(saved);
         latestLocalBackup = saved;
         largeBackupActive = true;
       }
@@ -5272,7 +5272,8 @@
 
     const loadLocalState = () => {
       try {
-        return normalizeState(JSON.parse(latestLocalBackup || localStorage.getItem(storageKey) || "null"));
+        const saved = latestLocalBackup || localStorage.getItem(storageKey) || "null";
+        return normalizeState(typeof saved === "string" ? JSON.parse(saved) : saved);
       } catch {
         localStorage.removeItem(storageKey);
         return createBlankState();
@@ -5379,7 +5380,18 @@
     const writeLocalBackup = (source, fullSerialized = "") => {
       if (sharedQuotePdfView && sharedQuoteId) return true;
       backupMargins(source.settings);
-      saveLocalBackup(fullSerialized || JSON.stringify(source));
+      if (!fullSerialized && largeBackupDb) {
+        backupWriteQueue = backupWriteQueue.then(async () => {
+          try {
+            await largeBackupOperation(largeBackupDb, source);
+            largeBackupActive = true;
+            latestLocalBackup = source;
+            localBackupAvailable = true;
+          } catch {
+            saveLocalBackup(JSON.stringify(source));
+          }
+        });
+      } else saveLocalBackup(fullSerialized || JSON.stringify(source));
       return localBackupAvailable;
     };
 
@@ -5458,10 +5470,86 @@
         ? Object.fromEntries(Object.keys(item).sort().map(k => [k, item[k]])) : item;
     });
     const syncClone = value => JSON.parse(JSON.stringify(value));
+    // Compare JSON data without allocating and sorting a second copy of every record.
+    const syncEqual = (left, right) => {
+      if (left === right) return true;
+      if (left && typeof left.toJSON === "function" || right && typeof right.toJSON === "function") return syncJson(left) === syncJson(right);
+      if (typeof left === "number" && !Number.isFinite(left)) left = null;
+      if (typeof right === "number" && !Number.isFinite(right)) right = null;
+      if (left === right) return true;
+      if (!left || !right || typeof left !== "object" || typeof right !== "object") return syncJson(left) === syncJson(right);
+      if (Array.isArray(left) !== Array.isArray(right)) return false;
+      if (Array.isArray(left)) {
+        if (left.length !== right.length) return false;
+        for (let i = 0; i < left.length; i++) {
+          const a = left[i], b = right[i];
+          const normalizedA = a === undefined || typeof a === "function" || typeof a === "symbol" ? null : a;
+          const normalizedB = b === undefined || typeof b === "function" || typeof b === "symbol" ? null : b;
+          if (!syncEqual(normalizedA, normalizedB)) return false;
+        }
+        return true;
+      }
+      const keys = object => Object.keys(object).filter(key => object[key] !== undefined && typeof object[key] !== "function" && typeof object[key] !== "symbol");
+      const leftKeys = keys(left), rightKeys = keys(right);
+      if (leftKeys.length !== rightKeys.length) return false;
+      for (const key of leftKeys) {
+        if (!Object.prototype.hasOwnProperty.call(right, key) || !syncEqual(left[key], right[key])) return false;
+      }
+      return true;
+    };
     const sharedState = source => Object.fromEntries([
       ...firebaseCollectionKeys.map(key => [key, firebaseItemsForKey(key, source[key]).map(row => row.data)]),
       ["settings", firestoreSafeValue(source.settings || {})]
     ]);
+    const calculateCloudChanges = (source, base) => {
+      const sent = sharedState(source);
+      const changes = [];
+      firebaseCollectionKeys.forEach(key => {
+        const before = new Map((base[key] || []).map(row => [row.id, row]));
+        const after = new Map(sent[key].map(row => [row.id, row]));
+        new Set([...before.keys(), ...after.keys()]).forEach(id => {
+          if (!syncEqual(before.get(id), after.get(id))) changes.push({ key, id, before: before.get(id), after: after.get(id) });
+        });
+      });
+      return { sent: { settings: sent.settings }, changes,
+        settingsChanged: !syncEqual(base.settings, sent.settings),
+        marginsChanged: !syncEqual(base.settings?.marginRules, sent.settings?.marginRules) };
+    };
+    let cloudCompareWorker = null;
+    let cloudCompareSequence = 0;
+    const cloudCompareJobs = new Map();
+    const buildCloudChanges = (source, base) => {
+      const snapshot = Object.fromEntries([...firebaseCollectionKeys, "settings"].map(key => [key, source[key]]));
+      try {
+        if (!cloudCompareWorker) {
+          const functions = { uid, normalizeSelectableList, firestoreSafeValue, safeFirebaseDocId, firebaseItemsForKey, syncJson, syncEqual, sharedState, calculateCloudChanges };
+          const code = 'const firebaseCollectionKeys = ' + JSON.stringify(firebaseCollectionKeys) + ';\n'
+            + Object.entries(functions).map(([name, fn]) => 'const ' + name + ' = ' + fn.toString() + ';').join('\n')
+            + '\nonmessage = event => { const { id, source, base } = event.data; try { postMessage({ id, result: calculateCloudChanges(source, base) }); } catch (error) { postMessage({ id, error: error.message }); } };';
+          const url = URL.createObjectURL(new Blob([code], { type: "text/javascript" }));
+          cloudCompareWorker = new Worker(url);
+          URL.revokeObjectURL(url);
+          cloudCompareWorker.onmessage = event => {
+            const job = cloudCompareJobs.get(event.data.id);
+            if (!job) return;
+            cloudCompareJobs.delete(event.data.id);
+            if (event.data.error) job.reject(new Error(event.data.error)); else job.resolve(event.data.result);
+          };
+          cloudCompareWorker.onerror = error => {
+            cloudCompareWorker.terminate(); cloudCompareWorker = null;
+            cloudCompareJobs.forEach(job => job.reject(new Error(error.message || "Background comparison unavailable")));
+            cloudCompareJobs.clear();
+          };
+        }
+        return new Promise((resolve, reject) => {
+          const id = ++cloudCompareSequence;
+          cloudCompareJobs.set(id, { resolve, reject });
+          try { cloudCompareWorker.postMessage({ id, source: snapshot, base }); }
+          catch (error) { cloudCompareJobs.delete(id); reject(error); }
+        }).catch(() => calculateCloudChanges(snapshot, base));
+      } catch { return Promise.resolve(calculateCloudChanges(snapshot, base)); }
+    };
+
     // Apply only fields actually edited here, retaining unrelated changes from another device.
     const mergeSyncFields = (base = {}, local = {}, remote = {}) => {
       const result = { ...remote };
@@ -5483,7 +5571,7 @@
           result[key] = { ...(local[key] || {}), ...mergeSyncFields(base[key] || {}, local[key] || {}, remote[key] || {}) };
           return;
         }
-        if (syncJson(base[key]) === syncJson(local[key])) return;
+        if (syncEqual(base[key], local[key])) return;
         if (Object.prototype.hasOwnProperty.call(local, key)) result[key] = local[key];
         else delete result[key];
       });
@@ -5496,7 +5584,7 @@
       const local = new Map(localRows.map(row => [row.id, row]));
       const result = new Map(remoteRows.map(row => [row.id, row]));
       new Set([...base.keys(), ...local.keys()]).forEach(id => {
-        if (syncJson(base.get(id)) === syncJson(local.get(id))) return;
+        if (syncEqual(base.get(id), local.get(id))) return;
         if (!local.has(id)) result.delete(id);
         else result.set(id, mergeSyncFields(base.get(id), local.get(id), result.get(id)));
       });
@@ -5511,7 +5599,7 @@
     let cloudUnsubscribers = [];
     const cloudEditInProgress = () => document.querySelector("#tourDialog.open, #hotelEditDialog.open, #visaDialog.open, #customerDrawer.open, #marginPeriodDialog.open");
 
-    const rememberCloudBaseline = () => { state._cloudBaseline = syncClone(cloudBaseline); };
+    const rememberCloudBaseline = () => { state._cloudBaseline = cloudBaseline; };
     let cloudRenderTimer = null;
     let pointerInteractionActive = false;
     let lastUiInteraction = 0;
@@ -5557,24 +5645,24 @@
     const acceptCloudState = remoteState => {
       backupMargins(state.settings);
       const remote = sharedState(remoteState);
-      if (syncJson(remote) === syncJson(cloudBaseline)) return;
+      if (syncEqual(remote, cloudBaseline)) return;
       const local = sharedState(state);
       const previousQuote = state.quotes.find(quote => quote.id && quote.id === state.quote.id);
       const generatedQuoteFields = new Set(["quoteDate", "quoteExpiryDate", "updated", "total", "mode"]);
       const cleanSavedDraft = previousQuote && Object.keys(state.quote).every(key =>
-        generatedQuoteFields.has(key) || syncJson(state.quote[key]) === syncJson(previousQuote[key]));
+        generatedQuoteFields.has(key) || syncEqual(state.quote[key], previousQuote[key]));
       firebaseCollectionKeys.forEach(key => {
         state[key] = mergeSyncRows(cloudBaseline[key] || [], local[key], remote[key]);
       });
       const incomingQuote = state.quotes.find(quote => quote.id && quote.id === state.quote.id);
-      if (cleanSavedDraft && incomingQuote && syncJson(previousQuote) !== syncJson(incomingQuote)) {
+      if (cleanSavedDraft && incomingQuote && !syncEqual(previousQuote, incomingQuote)) {
         state.quote = syncClone(incomingQuote);
         setProMode(state.quote.mode === "pro", { syncCurrent: false, render: false });
       }
       state.settings = mergeSyncFields(cloudBaseline.settings, local.settings, remote.settings);
       // Editors mutate records and nested arrays in place. The acknowledged cloud
       // baseline must never share those objects, or edits become invisible to diffing.
-      cloudBaseline = syncClone(remote);
+      cloudBaseline = typeof structuredClone === "function" ? structuredClone(remote) : syncClone(remote);
       rememberCloudBaseline();
       writeLocalBackup(state);
       renderCloudUpdate();
@@ -5603,7 +5691,7 @@
         }
         els.storageStatus.textContent = `Live cloud updates connected. ${localBackupStatus()}`;
         // Rebuild any pending save from the newly merged state, never an old queued snapshot.
-        if (syncJson(sharedState(state)) !== syncJson(cloudBaseline)) scheduleFirebaseSave(null);
+        scheduleFirebaseSave(null);
       } catch (error) {
         els.storageStatus.textContent = `Live updates unavailable: ${error.message}. Retrying. ${localBackupStatus()}`;
         clearTimeout(cloudRetryTimer);
@@ -5666,18 +5754,8 @@
       if (uiNeedsPriority()) { scheduleFirebaseSave(null, 150); return; }
       firebaseSaveInFlight = true;
       firebaseSaveQueued = false;
-      const base = syncClone(cloudBaseline);
-      const sent = sharedState(state);
-      const changes = [];
-      firebaseCollectionKeys.forEach(key => {
-        const before = new Map((base[key] || []).map(row => [row.id, row]));
-        const after = new Map(sent[key].map(row => [row.id, row]));
-        new Set([...before.keys(), ...after.keys()]).forEach(id => {
-          if (syncJson(before.get(id)) !== syncJson(after.get(id))) changes.push({ key, id, before: before.get(id), after: after.get(id) });
-        });
-      });
-      const settingsChanged = syncJson(base.settings) !== syncJson(sent.settings);
-      const marginsChanged = syncJson(base.settings?.marginRules) !== syncJson(sent.settings?.marginRules);
+      const base = cloudBaseline;
+      const { sent, changes, settingsChanged, marginsChanged } = await buildCloudChanges(state, base);
       if (marginsChanged) updateMarginFirebaseStatus('Saving margins to Firebase…');
       try {
         const fb = window.itineraryFirebase;
@@ -5706,6 +5784,7 @@
             transaction.set(fb.docRef, next, { merge: true });
           });
           // Advance only acknowledged changes. Edits made during the save remain dirty.
+          cloudBaseline = { ...cloudBaseline };
           group.forEach(change => {
             const rows = cloudBaseline[change.key] || [];
             cloudBaseline[change.key] = rows.filter(row => row.id !== change.id);
@@ -5713,7 +5792,7 @@
           });
           if (offset === 0 && settingsChanged) cloudBaseline.settings = sent.settings;
           if (offset === 0 && marginsChanged) updateMarginFirebaseStatus(
-            syncJson(state.settings.marginRules) === syncJson(sent.settings.marginRules)
+            syncEqual(state.settings.marginRules, sent.settings.marginRules)
               ? 'Margins and periods saved to Firebase.' : 'Saving newer margin changes to Firebase…');
           rememberCloudBaseline();
           writeLocalBackup(state);
@@ -5727,7 +5806,7 @@
       } finally {
         firebaseSaveInFlight = false;
         if (firebaseSaveQueued) scheduleFirebaseSave(null, 500);
-        queueCloudRefresh();
+        if (changes.length || settingsChanged || firebaseSaveQueued) queueCloudRefresh();
       }
     };
 
@@ -5758,11 +5837,11 @@
       };
       localBackupIdle = window.requestIdleCallback ? window.requestIdleCallback(run, { timeout: 1200 }) : setTimeout(run, 0);
     };
-    const flushLocalBackup = () => {
+    const flushLocalBackup = (synchronous = false) => {
       cancelBackupIdle();
       clearTimeout(localBackupTimer);
       localBackupTimer = null;
-      writeLocalBackup(state);
+      writeLocalBackup(state, synchronous ? JSON.stringify(state) : "");
     };
     const saveState = (syncRemote = true) => {
       if (state?.quote && typeof syncActiveModeDays === 'function') syncActiveModeDays();
@@ -5771,9 +5850,9 @@
       localBackupTimer = setTimeout(queueIdleBackup, 220);
       if (syncRemote) scheduleFirebaseSave(null, 500);
     };
-    window.addEventListener('pagehide', flushLocalBackup);
+    window.addEventListener('pagehide', () => flushLocalBackup(true));
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden' && (localBackupTimer !== null || localBackupIdle !== null)) flushLocalBackup();
+      if (document.visibilityState === 'hidden' && (localBackupTimer !== null || localBackupIdle !== null)) flushLocalBackup(true);
     });
 
     const showToast = message => {
@@ -6140,7 +6219,7 @@
             ? orderedIds.map(id => rowsById.get(id)).filter(Boolean)
             : [...rowsById.values()];
           rebuilt[key] = rows.map(({ updatedAt, ...item }) => {
-            firebaseDocCache.set(key + "/" + item.id, JSON.stringify(firestoreSafeValue(item)));
+
             return item;
           });
         }));
@@ -6250,7 +6329,6 @@
           if (remoteState) {
             suppressFirebaseSave = true;
             acceptCloudState(remoteState);
-            writeLocalBackup(state);
             firebaseLoaded = true;
             firebaseLoadFinished = true;
             if (!sharedQuotePdfView) renderAll({ save: false });
@@ -6258,7 +6336,7 @@
             els.storageStatus.textContent = `Firebase connected. Cloud records synced. ${localBackupStatus()}`;
             handleSharedQuoteRoute();
             startLiveCloudSync();
-            if (syncJson(sharedState(state)) !== syncJson(cloudBaseline)) scheduleFirebaseSave(null);
+            scheduleFirebaseSave(null);
             return;
           }
         }
@@ -8125,7 +8203,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const previous = new Map(marginRulesBeforeEdit.map(rule => [rule.id, rule]));
       const records = state.settings.marginRuleRecords || (state.settings.marginRuleRecords = {});
       current.forEach(rule => {
-        if (!records[rule.id] || syncJson(previous.get(rule.id)) !== syncJson(rule)) {
+        if (!records[rule.id] || !syncEqual(previous.get(rule.id), rule)) {
           records[rule.id] = { id: rule.id, rule: syncClone(rule), deleted: false, updatedAt: new Date().toISOString() };
         }
       });
@@ -9947,7 +10025,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       await saveStateToFirebase();
       const fb = window.itineraryFirebase;
       const confirmed = await fb.getDocFromServer(fb.dataDocRef("tours", tourId));
-      if (!confirmed.exists() || Object.keys(expected).some(key => syncJson(confirmed.data()[key]) !== syncJson(expected[key]))) {
+      if (!confirmed.exists() || Object.keys(expected).some(key => !syncEqual(confirmed.data()[key], expected[key]))) {
         throw new Error("The cloud has not confirmed this edit. Your text is kept here; please retry.");
       }
     };
