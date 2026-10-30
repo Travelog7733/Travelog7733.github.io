@@ -4701,11 +4701,11 @@
     };
 
     const quoteDisplayName = quote => {
-      const customer = state.customers.find(c => c.id === quoteCustomerId(quote));
+      const customer = recordById(state.customers, quoteCustomerId(quote));
       return customer?.name || quote.destination || "General Customer";
     };
 
-    const quoteCustomerName = quote => state.customers.find(customer => customer.id === quoteCustomerId(quote))?.name || "";
+    const quoteCustomerName = quote => recordById(state.customers, quoteCustomerId(quote))?.name || "";
 
     const itineraryCodeCandidate = (quote, number) => {
       const name = safeFileNamePart(quoteDisplayName(quote));
@@ -4720,7 +4720,31 @@
       return Number.isInteger(number) && number > 0 ? itineraryCodeCandidate(quote, number) : "";
     };
 
+    // A library render shares one code registry instead of rebuilding it for every row.
+    let itineraryCodeRender = null;
+    const withItineraryCodes = action => {
+      if (itineraryCodeRender) return action();
+      const context = { issued: new Set(Array.isArray(state.settings?.issuedItineraryCodes) ? state.settings.issuedItineraryCodes : []), byCode: null, nextNumbers: new Map(), remembered: false };
+      itineraryCodeRender = context;
+      try { return action(); } finally {
+        if (context.remembered) state.settings.issuedItineraryCodes = [...context.issued];
+        itineraryCodeRender = null;
+      }
+    };
     const issuedItineraryCodes = excludedQuoteId => {
+      if (itineraryCodeRender) {
+        const context = itineraryCodeRender;
+        if (!context.byCode) {
+          context.byCode = new Map();
+          for (const quote of state.quotes) {
+            const code = storedItineraryCode(quote);
+            if (!code) continue;
+            if (!context.byCode.has(code)) context.byCode.set(code, new Set());
+            context.byCode.get(code).add(quote);
+          }
+        }
+        return { has: code => context.issued.has(code) || [...(context.byCode.get(code) || [])].some(quote => quote.id !== excludedQuoteId) };
+      }
       const issued = new Set(Array.isArray(state.settings?.issuedItineraryCodes) ? state.settings.issuedItineraryCodes : []);
       state.quotes.forEach(item => {
         if (item.id === excludedQuoteId) return;
@@ -4733,6 +4757,11 @@
     const rememberItineraryCode = code => {
       if (!code) return;
       if (!state.settings) state.settings = {};
+      if (itineraryCodeRender) {
+        itineraryCodeRender.issued.add(code);
+        itineraryCodeRender.remembered = true;
+        return;
+      }
       const issued = new Set(Array.isArray(state.settings.issuedItineraryCodes) ? state.settings.issuedItineraryCodes : []);
       issued.add(code);
       state.settings.issuedItineraryCodes = [...issued];
@@ -4740,14 +4769,20 @@
 
     const nextQuotePdfNumber = quote => {
       const issued = issuedItineraryCodes(quote.id);
-      let number = 1;
+      const prefix = itineraryCodeRender ? itineraryCodeCandidate(quote, 1) : "";
+      let number = itineraryCodeRender?.nextNumbers.get(prefix) || 1;
+      if (itineraryCodeRender) {
+        // Advance past permanently remembered codes only. Other quotes can still change.
+        while (itineraryCodeRender.issued.has(itineraryCodeCandidate(quote, number))) number += 1;
+        itineraryCodeRender.nextNumbers.set(prefix, number);
+      }
       while (issued.has(itineraryCodeCandidate(quote, number))) number += 1;
       return number;
     };
 
     const ensureQuotePdfNumber = quote => {
       const savedCode = String(quote?.itineraryNo || "").trim();
-      const issued = issuedItineraryCodes(quote.id);
+      const previousCode = itineraryCodeRender?.byCode ? storedItineraryCode(quote) : "";
       let number = Number(quote.pdfNumber || 0);
       const currentCandidate = Number.isInteger(number) && number > 0
         ? itineraryCodeCandidate(quote, number)
@@ -4758,11 +4793,18 @@
       // Otherwise the browser Save As dialog can show an old customer/date
       // even though the PDF preview displays the current itinerary code.
       if (!codeMatchesCurrentQuote &&
-          (!Number.isInteger(number) || number < 1 || issued.has(currentCandidate))) {
+          (!Number.isInteger(number) || number < 1 || issuedItineraryCodes(quote.id).has(currentCandidate))) {
         number = nextQuotePdfNumber(quote);
       }
+      // An index may have been created while allocating this number.
+      const indexedPreviousCode = itineraryCodeRender?.byCode ? (previousCode || storedItineraryCode(quote)) : "";
       quote.pdfNumber = number;
       quote.itineraryNo = itineraryCodeCandidate(quote, number);
+      if (itineraryCodeRender?.byCode) {
+        itineraryCodeRender.byCode.get(indexedPreviousCode)?.delete(quote);
+        if (!itineraryCodeRender.byCode.has(quote.itineraryNo)) itineraryCodeRender.byCode.set(quote.itineraryNo, new Set());
+        itineraryCodeRender.byCode.get(quote.itineraryNo).add(quote);
+      }
       rememberItineraryCode(quote.itineraryNo);
       return quote.pdfNumber;
     };
@@ -4774,11 +4816,12 @@
 
     const itineraryNumberForQuote = quote => quote?.id ? pdfFileNameForQuote(quote) : "NEW";
 
+    const displayTimeFormatter = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" });
     const formatDateTimeDisplay = date => {
       const day = String(date.getDate()).padStart(2, "0");
       const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = date.getFullYear();
-      const time = date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+      const time = Number.isNaN(date.getTime()) ? date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : displayTimeFormatter.format(date);
       return `${day}/${month}/${year} ${time}`;
     };
 
@@ -5472,6 +5515,9 @@
     let cloudRenderTimer = null;
     let pointerInteractionActive = false;
     let lastUiInteraction = 0;
+    document.addEventListener('input', () => { lastUiInteraction = performance.now(); }, true);
+    document.addEventListener('keydown', () => { lastUiInteraction = performance.now(); }, true);
+    const uiNeedsPriority = () => pointerInteractionActive || performance.now() - lastUiInteraction < 120 || navigator.scheduling?.isInputPending?.();
     const deferCloudRender = () => {
       clearTimeout(cloudRenderTimer);
       cloudRenderTimer = setTimeout(() => { if (cloudRenderPending) renderCloudUpdate(); }, 280);
@@ -5546,6 +5592,7 @@
         cloudRefreshAgain = true;
         return;
       }
+      if (uiNeedsPriority()) { queueCloudRefresh(150); return; }
       cloudRefreshRunning = true;
       cloudRefreshAgain = false;
       try {
@@ -5568,6 +5615,7 @@
     };
     const startLiveCloudSync = () => {
       if (sharedQuotePdfView) return;
+      cloudCollectionReads.clear();
       cloudUnsubscribers.forEach(unsubscribe => unsubscribe());
       cloudUnsubscribers = [];
       const fb = window.itineraryFirebase;
@@ -5576,18 +5624,29 @@
         clearTimeout(cloudRetryTimer);
         cloudRetryTimer = setTimeout(startLiveCloudSync, 10000);
       };
-      [fb.docRef, ...firebaseCollectionKeys.map(key => fb.collectionRef(key))].forEach(ref => {
+      const watchedCollections = new Map(firebaseCollectionKeys.map(key => [key, fb.collectionRef(key)]));
+      [fb.docRef, ...watchedCollections.values()].forEach(ref => {
         cloudUnsubscribers.push(fb.onSnapshot(ref, { includeMetadataChanges: true }, snapshot => {
-          if (!snapshot.metadata.hasPendingWrites && !snapshot.metadata.fromCache) queueCloudRefresh();
+          const key = firebaseCollectionKeys.find(key => ref === watchedCollections.get(key));
+          if (key && snapshot.docChanges().length > 0) {
+            cloudCollectionReads.delete(key);
+            dirtyCloudCollections.add(key);
+          }
+          if (!snapshot.metadata.hasPendingWrites && !snapshot.metadata.fromCache) {
+            if (key && !dirtyCloudCollections.delete(key)) return;
+            queueCloudRefresh();
+          }
         }, onError));
       });
     };
     window.addEventListener("online", () => {
+      cloudCollectionReads.clear();
       if (!firebaseLoaded) { firebaseReady = false; connectFirebase(); }
       else { startLiveCloudSync(); queueCloudRefresh(); }
     });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible" && !sharedQuotePdfView) {
+        cloudCollectionReads.clear();
         if (!firebaseLoaded) { firebaseReady = false; connectFirebase(); }
         else queueCloudRefresh();
       }
@@ -5604,6 +5663,7 @@
         scheduleFirebaseSave(null, 500);
         return;
       }
+      if (uiNeedsPriority()) { scheduleFirebaseSave(null, 150); return; }
       firebaseSaveInFlight = true;
       firebaseSaveQueued = false;
       const base = syncClone(cloudBaseline);
@@ -5681,7 +5741,25 @@
     };
 
     let localBackupTimer = null;
+    let localBackupIdle = null;
+    const cancelBackupIdle = () => {
+      if (localBackupIdle !== null) {
+        if (window.cancelIdleCallback) window.cancelIdleCallback(localBackupIdle);
+        else clearTimeout(localBackupIdle);
+        localBackupIdle = null;
+      }
+    };
+    const queueIdleBackup = () => {
+      localBackupTimer = null;
+      const run = () => {
+        localBackupIdle = null;
+        if (uiNeedsPriority()) { localBackupTimer = setTimeout(queueIdleBackup, 150); return; }
+        flushLocalBackup();
+      };
+      localBackupIdle = window.requestIdleCallback ? window.requestIdleCallback(run, { timeout: 1200 }) : setTimeout(run, 0);
+    };
     const flushLocalBackup = () => {
+      cancelBackupIdle();
       clearTimeout(localBackupTimer);
       localBackupTimer = null;
       writeLocalBackup(state);
@@ -5689,12 +5767,13 @@
     const saveState = (syncRemote = true) => {
       if (state?.quote && typeof syncActiveModeDays === 'function') syncActiveModeDays();
       clearTimeout(localBackupTimer);
-      localBackupTimer = setTimeout(flushLocalBackup, 220);
+      cancelBackupIdle();
+      localBackupTimer = setTimeout(queueIdleBackup, 220);
       if (syncRemote) scheduleFirebaseSave(null, 500);
     };
     window.addEventListener('pagehide', flushLocalBackup);
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden' && localBackupTimer !== null) flushLocalBackup();
+      if (document.visibilityState === 'hidden' && (localBackupTimer !== null || localBackupIdle !== null)) flushLocalBackup();
     });
 
     const showToast = message => {
@@ -6035,6 +6114,16 @@
       return Promise.race([ready, new Promise(resolve => setTimeout(resolve, timeoutMs))]);
     };
 
+    const cloudCollectionReads = new Map();
+    const dirtyCloudCollections = new Set();
+    const readCloudCollection = key => {
+      if (cloudCollectionReads.has(key)) return cloudCollectionReads.get(key);
+      const pending = window.itineraryFirebase.getDocsFromServer(window.itineraryFirebase.collectionRef(key));
+      cloudCollectionReads.set(key, pending);
+      pending.catch(() => { if (cloudCollectionReads.get(key) === pending) cloudCollectionReads.delete(key); });
+      return pending;
+    };
+
     const readFirebaseState = async docData => {
       if (docData.schema === "collectionsV1") {
         const rebuilt = createBlankState();
@@ -6045,7 +6134,7 @@
           const orderedIds = Array.isArray(idsByType[key]) ? idsByType[key] : null;
           // Fetch each library in one request, rather than one request per record.
           // Keep the manifest's order and exclude archived/deleted documents.
-          const snapshot = await window.itineraryFirebase.getDocsFromServer(window.itineraryFirebase.collectionRef(key));
+          const snapshot = await readCloudCollection(key);
           const rowsById = new Map(snapshot.docs.map(docSnap => [docSnap.id, { ...docSnap.data(), id: docSnap.id }]));
           const rows = orderedIds
             ? orderedIds.map(id => rowsById.get(id)).filter(Boolean)
@@ -6300,11 +6389,22 @@
 
     const getTourPriceForPax = (tour, adultCount) => {
       const pax = Math.max(Math.round(Number(adultCount || 0)), 1);
-      const exactCustom = normalizeCustomPaxPrices(tour?.customPaxPrices).find(rate => rate.pax === pax);
-      if (exactCustom) return Number(exactCustom.price || 0);
-      const basePrices = normalizedTourPaxPrices(tour);
-      const tier = Math.min(pax, TOUR_BASE_PAX_LIMIT) - 1;
-      return Number(basePrices[tier] || 0);
+      if (Number.isNaN(pax)) return 0;
+      const tierPax = Math.min(pax, TOUR_BASE_PAX_LIMIT);
+      let customPrice;
+      let legacyTierPrice;
+      for (const item of (Array.isArray(tour?.customPaxPrices) ? tour.customPaxPrices : [])) {
+        const count = Math.round(Number(item?.pax || 0));
+        const price = Number(item?.price || 0);
+        if (price >= 0 && count > TOUR_BASE_PAX_LIMIT && count === pax) customPrice = price;
+        if (price >= 0 && count > 10 && count <= TOUR_BASE_PAX_LIMIT && count === tierPax) legacyTierPrice = price;
+      }
+      if (customPrice !== undefined) return Number(customPrice || 0);
+      if (splitChoiceList(tour?.transportation).includes("Shared") && tierPax > 10 && tour?.sharedExtendedPaxRatesEnabled !== true) return 0;
+      const stored = Array.isArray(tour?.paxPrices) ? tour.paxPrices : [];
+      if (tierPax <= stored.length) return Number(stored[tierPax - 1] || 0) || 0;
+      if (legacyTierPrice !== undefined) return Number(legacyTierPrice || 0);
+      return (stored.length ? Number(stored[Math.min(stored.length, TOUR_BASE_PAX_LIMIT) - 1] || 0) : Number(tour?.adult || 0)) || 0;
     };
 
     const tourActivities = tour => (Array.isArray(tour?.activities) ? tour.activities : [])
@@ -6315,7 +6415,7 @@
     };
     const activityRateForDay = (day, tour) => selectedTourActivities(day, tour).reduce((sum, activity) => sum + Number(activity.price), 0);
     const renderDayActivities = day => {
-      const tour = state.tours.find(item => item.id === day.tourId);
+      const tour = recordById(state.tours, day.tourId);
       const activities = tourActivities(tour);
       if (!activities.length) return "";
       const selected = new Set(Array.isArray(day.selectedActivityIds) ? day.selectedActivityIds : []);
@@ -6482,11 +6582,11 @@
       const hotelBilledPax = hotelBilledPaxFor(q, adults);
       let adultBaseRate = 0;
       let hotelBaseRate = 0;
-      const itineraryVisa = state.visas.find(item => item.id === q.visaId);
+      const itineraryVisa = recordById(state.visas, q.visaId);
 
       q.days.forEach(day => {
-        const tour = state.tours.find(item => item.id === day.tourId);
-        const hotel = state.hotels.find(item => item.id === day.hotelId);
+        const tour = recordById(state.tours, day.tourId);
+        const hotel = recordById(state.hotels, day.hotelId);
 
         if (tour) {
           adultBaseRate += getTourPriceForPax(tour, adults) + additionalMealRateForDay(day, tour) + activityRateForDay(day, tour);
@@ -6560,7 +6660,7 @@
       if (locked) return locked.proRates;
       const customPaxCounts = new Set();
       (state.quote.days || []).forEach(day => {
-        const tour = state.tours.find(item => item.id === day.tourId);
+        const tour = recordById(state.tours, day.tourId);
         normalizeCustomPaxPrices(tour?.customPaxPrices).forEach(rate => customPaxCounts.add(rate.pax));
       });
       const currentAdults = Math.round(Number(state.quote.adults || 0));
@@ -6602,7 +6702,7 @@
     };
 
     const selectedHotelStarLevels = () => [...new Set((state.quote.days || [])
-      .map(day => state.hotels.find(hotel => hotel.id === day.hotelId)?.category || "")
+      .map(day => recordById(state.hotels, day.hotelId)?.category || "")
       .map(category => Number(String(category).match(/\b([345])\s*star\b/i)?.[1] || 0))
       .filter(star => [3, 4, 5].includes(star)))].sort((a, b) => a - b);
 
@@ -6670,7 +6770,7 @@
       return margin;
     };
     const resolveDepositPercent = customerId => {
-      const customer = state.customers.find(item => item.id === customerId);
+      const customer = recordById(state.customers, customerId);
       return customer && customer.depositPercent !== undefined && customer.depositPercent !== null && customer.depositPercent !== ""
         ? Number(customer.depositPercent)
         : 60;
@@ -6687,12 +6787,12 @@
       const infants = effectiveInfants();
       const childPercent = Number(q.hotelChildPercent || 0) / 100;
       const infantRate = Number(q.infantManualRate ?? q.hotelInfantRate ?? 0);
-      const itineraryVisa = state.visas.find(item => item.id === q.visaId);
+      const itineraryVisa = recordById(state.visas, q.visaId);
       const visaFee = itineraryVisa ? Number(itineraryVisa.fee || 0) : 0;
 
       let tourOnlyBase = 0;
       q.days.forEach(day => {
-        const tour = state.tours.find(item => item.id === day.tourId);
+        const tour = recordById(state.tours, day.tourId);
         if (tour) tourOnlyBase += getTourPriceForPax(tour, adults) + additionalMealRateForDay(day, tour) + activityRateForDay(day, tour);
         else if (day.tourId === MANUAL_TOUR_ID) tourOnlyBase += Number(day.manualTourCost || 0);
         // hotels excluded intentionally
@@ -6739,7 +6839,7 @@
     const renderCustomerOptions = () => {
       els.quoteCustomer.innerHTML = '<option value="">— No customer —</option>' + state.customers.map(c => `<option value="${c.id}">${c.name} - ${c.type || "B2C"}</option>`).join("");
       els.quoteCustomer.value = state.quote.customerId || "";
-      const selected = state.customers.find(c => c.id === state.quote.customerId);
+      const selected = recordById(state.customers, state.quote.customerId);
       els.quoteCustomerSearch.value = selected ? `${selected.name} - ${selected.type || "B2C"}` : "";
       syncCustomerClearBtn(selected);
     };
@@ -6765,7 +6865,7 @@
     const closeCustomerDropdown = () => {
       els.quoteCustomerDropdown.style.display = "none";
       // If the user typed something but never picked a match, snap the text back to the current selection
-      const selected = state.customers.find(c => c.id === state.quote.customerId);
+      const selected = recordById(state.customers, state.quote.customerId);
       els.quoteCustomerSearch.value = selected ? `${selected.name} - ${selected.type || "B2C"}` : "";
       syncCustomerClearBtn(selected);
     };
@@ -6813,7 +6913,7 @@
     });
 
     const renderVisaSelection = () => {
-      const selectedVisa = state.visas.find(item => item.id === state.quote.visaId);
+      const selectedVisa = recordById(state.visas, state.quote.visaId);
       els.itineraryVisa.innerHTML = '<option value="">No visa</option>' + state.visas.map(v => `<option value="${v.id}" ${v.id === state.quote.visaId ? "selected" : ""}>${escapeHtml(v.country)} ${escapeHtml(v.type)} - ${money(v.fee)}/person</option>`).join("");
       els.visaStatus.textContent = selectedVisa ? "Visa Included" : "Visa Not Included";
       els.visaStatus.classList.toggle("gray", !selectedVisa);
@@ -6847,7 +6947,7 @@
     };
 
     const renderTourInclusions = tourId => {
-      const tour = state.tours.find(item => item.id === tourId);
+      const tour = recordById(state.tours, tourId);
       if (tourId === MANUAL_TOUR_ID) return '<span class="subtitle">Manual tour details are set below.</span>';
       if (!tour) return '<span class="subtitle">Select a tour to view included meals and transportation.</span>';
       const meals = splitChoiceList(tour.mealPlan || "No Meals");
@@ -6891,7 +6991,7 @@
 
     const renderTourOverrideFields = day => {
       if (!day.tourId || day.tourId === MANUAL_TOUR_ID) return "";
-      const tour = state.tours.find(item => item.id === day.tourId);
+      const tour = recordById(state.tours, day.tourId);
       if (!tour) return "";
       const mealPlan = day.mealPlan || tour.mealPlan || "No Meals";
       const transportation = day.transportation || tour.transportation || "No Transfer";
@@ -6908,13 +7008,70 @@
       `;
     };
 
-    const renderDays = () => {
+    // Index libraries only for a synchronous render; discard before any later edits.
+    let renderLookups = null;
+    const withRenderLookups = action => {
+      if (renderLookups) return action();
+      renderLookups = new Map();
+      try { return action(); } finally { renderLookups = null; }
+    };
+    const recordById = (rows, id) => {
+      if (!renderLookups) return rows.find(row => row.id === id);
+      let index = renderLookups.get(rows);
+      if (!index) {
+        index = new Map();
+        for (const row of rows) if (!index.has(row.id)) index.set(row.id, row);
+        renderLookups.set(rows, index);
+      }
+      return index.get(id);
+    };
+
+    const frameSearch = action => {
+      let frame = null;
+      return () => {
+        if (frame !== null) return;
+        frame = requestAnimationFrame(() => { frame = null; action(); });
+      };
+    };
+    const dayMarkupCache = new Map();
+    const patchDayMarkup = entries => {
+      const active = new Set(entries.map(entry => entry.key));
+      for (const [key, entry] of dayMarkupCache) {
+        if (active.has(key)) continue;
+        entry.nodes.forEach(node => node.remove());
+        dayMarkupCache.delete(key);
+      }
+      if (!dayMarkupCache.size) els.daysContainer.replaceChildren();
+      let cursor = els.daysContainer.firstChild;
+      for (const { key, html } of entries) {
+        let entry = dayMarkupCache.get(key);
+        if (!entry || entry.html !== html) {
+          const template = document.createElement("template");
+          template.innerHTML = html;
+          const nodes = [...template.content.childNodes];
+          if (entry) {
+            if (entry.nodes.includes(cursor)) cursor = entry.nodes[entry.nodes.length - 1].nextSibling;
+            entry.nodes.forEach(node => node.remove());
+          }
+          entry = { html, nodes };
+          dayMarkupCache.set(key, entry);
+        }
+        for (const node of entry.nodes) {
+          if (node === cursor) cursor = cursor.nextSibling;
+          else els.daysContainer.insertBefore(node, cursor);
+        }
+      }
+    };
+
+    const renderDays = () => withRenderLookups(renderDaysNow);
+    const renderDaysNow = () => {
       if (!state.quote.days.length) {
+        dayMarkupCache.clear();
         els.daysContainer.innerHTML = '<div class="empty-state">Add the first itinerary day to start building the quote.</div>';
         return;
       }
 
-      els.daysContainer.innerHTML = state.quote.days.map((day, dayIdx) => `
+      patchDayMarkup(state.quote.days.map((day, dayIdx) => ({ key: day.id, html: `
         <article class="day-block" data-day-id="${day.id}">
           <div class="day-header">
             <label>Day<input data-field="day" type="number" min="1" value="${day.day}">${dateForItineraryDay(day.day) ? `<span class="day-date">${escapeHtml(dateForItineraryDay(day.day))}</span>` : ""}</label>
@@ -6927,7 +7084,7 @@
           <div class="day-body">
             <div class="day-field day-field--hotel"><span class="hotel-field-caption">Hotel</span>
               ${(() => {
-                const selectedHotel = state.hotels.find(h => h.id === day.hotelId);
+                const selectedHotel = recordById(state.hotels, day.hotelId);
                 const catName = day.hotelRoomCategory || (selectedHotel?.roomCategories?.[0]?.name) || "";
                 const seasonName = selectedHotel && day.hotelSeason ? (SEASON_LABEL[day.hotelSeason] || "") : "";
                 const labelText = selectedHotel ? `${selectedHotel.name}${catName ? " · " + catName : ""}${seasonName ? " · " + seasonName : ""}` : null;
@@ -6944,7 +7101,7 @@
             </div>
             <label class="day-field day-field--tour">Tour
               ${(() => {
-                const selectedTour = state.tours.find(t => t.id === day.tourId);
+                const selectedTour = recordById(state.tours, day.tourId);
                 const labelText = day.tourId === MANUAL_TOUR_ID ? "✎ Type Tour (manual)" : selectedTour ? tourDisplayName(selectedTour) : null;
                 const labelHtml = selectedTour ? tourDisplayNameHtml(selectedTour) : (labelText ? escapeHtml(labelText) : "");
                 return `<button type="button" class="tour-picker-trigger" data-day-id="${day.id}">
@@ -6957,7 +7114,7 @@
             <label class="day-field day-field--inclusions">Included With Tour
               <div class="tour-inclusions">${renderTourInclusions(day.tourId)}</div>
             </label>
-            <label class="day-field day-field--description">Tour Description<textarea data-field="description" placeholder="Brief itinerary description for this day's tour...">${escapeHtml(day.description ?? (state.tours.find(item => item.id === day.tourId)?.description || ""))}</textarea></label>
+            <label class="day-field day-field--description">Tour Description<textarea data-field="description" placeholder="Brief itinerary description for this day's tour...">${escapeHtml(day.description ?? (recordById(state.tours, day.tourId)?.description || ""))}</textarea></label>
             <label class="day-field day-field--guide day-guide-options">Guide
               <div class="check-group">${renderGuidePills(day)}</div>
             </label>
@@ -6976,7 +7133,7 @@
             Insert Day
           </button>
         </div>` : ""}
-      `).join("");
+      ` })));
     };
 
     const renderQuote = () => {
@@ -7020,7 +7177,8 @@
       renderTotals();
     };
 
-    const renderTotals = () => {
+    const renderTotals = () => withRenderLookups(renderTotalsNow);
+    const renderTotalsNow = () => {
       const totals = getTotals();
       els.adultSubtotal.textContent = money(totals.adultSubtotal);
       els.childSubtotal.textContent = money(totals.childSubtotal);
@@ -7142,7 +7300,14 @@
       return `<span class="pdf-type-pill compact ${safeType.toLowerCase()}" style="margin:0;">${safeType}</span>`;
     };
 
-    const renderItineraryLibrary = () => {
+    let itineraryRowsMarkup = null;
+    const setItineraryRows = markup => {
+      if (itineraryRowsMarkup === markup) return;
+      els.itineraryRows.innerHTML = markup;
+      itineraryRowsMarkup = markup;
+    };
+    const renderItineraryLibrary = () => withRenderLookups(() => withItineraryCodes(renderItineraryLibraryNow));
+    const renderItineraryLibraryNow = () => {
       const search = (els.itineraryLibrarySearch?.value || "").trim().toLowerCase();
       const activeMode = document.body.classList.contains("pro-mode") ? "pro" : "normal";
       let rows = state.quotes
@@ -7182,10 +7347,17 @@
           if (!group.length) return "";
           return `<tr class="city-group-row"><td colspan="7">${type} - ${group.length} saved itinerar${group.length === 1 ? "y" : "ies"}</td></tr>${group.map(renderQuoteRow).join("")}`;
         }).join("");
-        els.itineraryRows.innerHTML = groupedRows;
+        setItineraryRows(groupedRows);
       } else {
-        els.itineraryRows.innerHTML = rows.map(renderQuoteRow).join("") || `<tr><td colspan="7"><div class="empty-state">No ${activeMode === "pro" ? "Pro" : "Normal"} mode itineraries yet.${otherModeCount ? ` ${otherModeCount} saved itinerary${otherModeCount === 1 ? " is" : "ies are"} in ${activeMode === "pro" ? "Standard" : "Pro"} mode. Switch modes to view ${otherModeCount === 1 ? "it" : "them"}.` : ` Save an itinerary in ${activeMode === "pro" ? "Pro" : "Normal"} mode to add it here.`}</div></td></tr>`;
+        setItineraryRows(rows.map(renderQuoteRow).join("") || `<tr><td colspan="7"><div class="empty-state">No ${activeMode === "pro" ? "Pro" : "Normal"} mode itineraries yet.${otherModeCount ? ` ${otherModeCount} saved itinerary${otherModeCount === 1 ? " is" : "ies are"} in ${activeMode === "pro" ? "Standard" : "Pro"} mode. Switch modes to view ${otherModeCount === 1 ? "it" : "them"}.` : ` Save an itinerary in ${activeMode === "pro" ? "Pro" : "Normal"} mode to add it here.`}</div></td></tr>`);
       }
+    };
+
+    const stableMarkupCache = new WeakMap();
+    const setStableMarkup = (element, markup) => {
+      if (stableMarkupCache.get(element) === markup) return;
+      element.innerHTML = markup;
+      stableMarkupCache.set(element, markup);
     };
 
     const renderCustomers = () => {
@@ -7200,7 +7372,7 @@
       if (els.customerSort.value === "value") rows.sort((a, b) => Number(b.value || 0) - Number(a.value || 0));
       if (els.customerSort.value === "updated") rows.sort((a, b) => Number(b.updated || 0) - Number(a.updated || 0));
 
-      els.customerRows.innerHTML = rows.map(c => `
+      setStableMarkup(els.customerRows, rows.map(c => `
         <tr>
           <td><strong>${c.name}</strong><br><span class="subtitle">${c.notes || ""}</span></td>
           <td>${c.email || ""}<br><span class="subtitle">${c.phone || ""}</span></td>
@@ -7215,7 +7387,7 @@
             </div>
           </td>
         </tr>
-      `).join("") || '<tr><td colspan="7"><div class="empty-state">No customers match this view.</div></td></tr>';
+      `).join("") || '<tr><td colspan="7"><div class="empty-state">No customers match this view.</div></td></tr>');
     };
 
     let showHiddenToursOnly = false;
@@ -7263,21 +7435,27 @@
           return groups;
         }, {});
 
-      els.tourRows.innerHTML = Object.entries(cityGroups).map(([city, tours]) => `
+      setStableMarkup(els.tourRows, Object.entries(cityGroups).map(([city, tours]) => `
           <tr class="city-group-row"><td colspan="7">${escapeHtml(city)} - ${tours.length} tour${tours.length === 1 ? "" : "s"}</td></tr>
           ${tours.map(t => {
             const paxSummary = (() => {
               const tiers = getTourPaxTiers(t);
               if (tiers.length) {
-                const nonZero = tiers.map(rate => rate.price > 0 ? `${rate.pax}${rate.pax === TOUR_BASE_PAX_LIMIT && rate.base ? "+" : ""}px:${money(rate.price)}` : null).filter(Boolean);
-                return nonZero.length ? nonZero.slice(0,4).join(' · ') + (nonZero.length > 4 ? ' …' : '') : money(0);
+                const nonZero = [];
+                let more = false;
+                for (const rate of tiers) {
+                  if (!(rate.price > 0)) continue;
+                  if (nonZero.length === 4) { more = true; break; }
+                  nonZero.push(                    `${rate.pax}${rate.pax === TOUR_BASE_PAX_LIMIT && rate.base ? "+" : ""}px:${money(rate.price)}`);
+                }
+                return nonZero.length ? nonZero.join(' · ') + (more ? ' …' : '') : money(0);
               }
               return money(t.adult);
             })();
             return `
             <tr><td><strong>${tourDisplayNameHtml(t)}</strong></td><td>${escapeHtml(t.city || "")}</td><td>${escapeHtml(t.mealPlan || "No Meals")}</td><td>${escapeHtml(t.transportation || "No Transfer")}</td><td>${escapeHtml(t.guide || "Without Guide")}</td><td style="font-size:12px;">${paxSummary}</td><td class="table-actions"><button class="mini-btn edit-tour" data-id="${t.id}" title="Edit tour"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="mini-btn clone-tour" data-id="${t.id}" title="Clone tour"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button><button class="mini-btn toggle-tour-hidden" type="button" data-id="${t.id}" title="${t.hidden ? "Unhide tour" : "Hide tour"}" aria-label="${t.hidden ? "Unhide tour" : "Hide tour"}"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>${t.hidden ? "" : '<path d="m3 3 18 18"/>'}</svg></button><button class="mini-btn delete-library" data-type="tours" data-id="${t.id}" title="Delete"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></td></tr>
           `}).join("")}
-        `).join("") || (tourSearch ? `<tr><td colspan="7"><div class="empty-state">No tours match "${escapeHtml(els.tourSearch.value)}".</div></td></tr>` : `<tr><td colspan="7"><div class="empty-state">${showHiddenToursOnly ? "No hidden tours." : "No visible tours."}</div></td></tr>`);
+        `).join("") || (tourSearch ? `<tr><td colspan="7"><div class="empty-state">No tours match "${escapeHtml(els.tourSearch.value)}".</div></td></tr>` : `<tr><td colspan="7"><div class="empty-state">${showHiddenToursOnly ? "No hidden tours." : "No visible tours."}</div></td></tr>`));
 
       }
       if (libraryTab === "hotels") {
@@ -7298,20 +7476,20 @@
           return groups;
         }, {});
 
-      els.hotelRows.innerHTML = Object.entries(hotelCityGroups).map(([city, hotels]) => `
+      setStableMarkup(els.hotelRows, Object.entries(hotelCityGroups).map(([city, hotels]) => `
           <tr class="city-group-row"><td colspan="5">${escapeHtml(city)} - ${hotels.length} hotel${hotels.length === 1 ? "" : "s"}</td></tr>
           ${hotels.map(h => {
             const cats = Array.isArray(h.roomCategories) && h.roomCategories.length ? h.roomCategories : [{ name: "Standard", rate: h.room || 0 }];
             const catHtml = cats.map(c => `<span class="pill gray" style="font-size:11px;">${escapeHtml(c.name)} – ${summarizeCategoryRates(h, c)}</span>`).join(" ");
             return `<tr><td><strong>${h.name}</strong></td><td>${h.city}</td><td>${h.category}</td><td style="display:flex;flex-wrap:wrap;gap:5px;padding:8px 0;">${catHtml}</td><td class="table-actions"><button class="mini-btn edit-hotel" data-id="${h.id}" title="Edit hotel"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="mini-btn delete-library" data-type="hotels" data-id="${h.id}" title="Delete"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></td></tr>`;
           }).join("")}
-        `).join("") || (hotelSearch ? `<tr><td colspan="5"><div class="empty-state">No hotels match "${escapeHtml(els.hotelSearch.value)}".</div></td></tr>` : '<tr><td colspan="5"><div class="empty-state">No hotels added yet.</div></td></tr>');
+        `).join("") || (hotelSearch ? `<tr><td colspan="5"><div class="empty-state">No hotels match "${escapeHtml(els.hotelSearch.value)}".</div></td></tr>` : '<tr><td colspan="5"><div class="empty-state">No hotels added yet.</div></td></tr>'));
 
       }
       if (libraryTab === "visas") {
-      els.visaRows.innerHTML = state.visas.map(v => `
+      setStableMarkup(els.visaRows, state.visas.map(v => `
         <tr><td><strong>${v.country}</strong></td><td>${v.type}</td><td>${money(v.fee)}</td><td>${v.days} days</td><td>${v.checklist}</td><td class="table-actions"><button class="mini-btn edit-visa" data-id="${v.id}" title="Edit"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="mini-btn delete-library" data-type="visas" data-id="${v.id}" title="Delete"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></td></tr>
-      `).join("") || '<tr><td colspan="6"><div class="empty-state">No visa records added yet.</div></td></tr>';
+      `).join("") || '<tr><td colspan="6"><div class="empty-state">No visa records added yet.</div></td></tr>');
       }
     };
 
@@ -7327,7 +7505,7 @@
 
     const autoHotelCategoryInclusion = () => {
       const labels = (state.quote.days || [])
-        .map(day => state.hotels.find(hotel => hotel.id === day.hotelId))
+        .map(day => recordById(state.hotels, day.hotelId))
         .map(hotelCategoryLabel)
         .filter(Boolean);
       const unique = [...new Set(labels)].sort((a, b) => (parseInt(a, 10) || 99) - (parseInt(b, 10) || 99) || a.localeCompare(b));
@@ -7557,14 +7735,14 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         };
         (q.days || []).forEach(day => {
           const date = dateObjForItineraryDay(day.day);
-          const tour = state.tours.find(item => item.id === day.tourId);
+          const tour = recordById(state.tours, day.tourId);
           if (matches(date)) {
             const perAdult = tour
               ? getTourPriceForPax(tour, adults) + additionalMealRateForDay(day, tour) + activityRateForDay(day, tour)
               : day.tourId === MANUAL_TOUR_ID ? Number(day.manualTourCost || 0) : 0;
             tourBase += groupCost(Math.max(0, perAdult));
           }
-          const hotel = state.hotels.find(item => item.id === day.hotelId);
+          const hotel = recordById(state.hotels, day.hotelId);
           if (!hotel || !date || Number.isNaN(date.getTime())) return;
           const categories = Array.isArray(hotel.roomCategories) && hotel.roomCategories.length
             ? hotel.roomCategories : [{ name: "Standard", rate: hotel.room || 0 }];
@@ -7601,7 +7779,8 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       });
     };
 
-    const updateCustomerPdf = (syncInputs = true) => {
+    const updateCustomerPdf = (syncInputs = true) => withRenderLookups(() => updateCustomerPdfNow(syncInputs));
+    const updateCustomerPdfNow = (syncInputs = true) => {
       if (syncInputs) syncQuoteFromInputs();
       renderLogo();
       renderPdfDateVisibility();
@@ -7639,7 +7818,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const importantNotes = (state.quote.notes || "").trim();
       els.pdfImportantNotes.textContent = importantNotes;
       els.pdfImportantNotesSection.style.display = importantNotes ? "" : "none";
-      const selectedVisa = state.visas.find(item => item.id === state.quote.visaId);
+      const selectedVisa = recordById(state.visas, state.quote.visaId);
       els.pdfVisaStatus.textContent = selectedVisa ? `Visa Included - ${selectedVisa.country} ${selectedVisa.type}` : "Visa Not Included";
       els.pdfGrandTotal.textContent = money(pdfPricing.packageTotal);
       renderSurchargeNotices();
@@ -7694,8 +7873,8 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const mealFullName = code => ({ "B": "Breakfast", "BR": "Brunch", "L": "Lunch", "D": "Dinner" }[code] ?? code);
 
       els.pdfDays.innerHTML = state.quote.days.length ? state.quote.days.map(day => {
-        const hotel = state.hotels.find(item => item.id === day.hotelId);
-        const tour = state.tours.find(item => item.id === day.tourId);
+        const hotel = recordById(state.hotels, day.hotelId);
+        const tour = recordById(state.tours, day.tourId);
         const tourName = tour ? tourDisplayName(tour) : (day.tourId === MANUAL_TOUR_ID ? day.manualTourName : "");
         const mealPlan = day.tourId === MANUAL_TOUR_ID ? day.manualMealPlan : (day.mealPlan || tour?.mealPlan || "");
         const transportation = day.tourId === MANUAL_TOUR_ID ? day.manualTransportation : (day.transportation || tour?.transportation || "");
@@ -7815,7 +7994,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     };
 
     const applySelectedCustomerPricing = () => {
-      const customer = state.customers.find(item => item.id === els.quoteCustomer.value);
+      const customer = recordById(state.customers, els.quoteCustomer.value);
       if (customer) {
         state.quote.quoteType = customer.type === "B2C" ? "B2C" : "B2B";
         applyDefaultMarginForHotels();
@@ -8559,13 +8738,13 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     els.closeTourPickerBtn.addEventListener("click", closeTourPicker);
 
     const applyTourSelection = (tourId) => {
-      if (state.tours.find(t => t.id === tourId)?.hidden === true) return;
+      if (recordById(state.tours, tourId)?.hidden === true) return;
       if (!tourPickerDayId) return;
       const day = state.quote.days.find(d => d.id === tourPickerDayId);
       if (!day) return;
       if (day.tourId !== tourId) day.selectedActivityIds = [];
       day.tourId = tourId;
-      const selectedTour = state.tours.find(item => item.id === tourId);
+      const selectedTour = recordById(state.tours, tourId);
       if (selectedTour) {
         day.city = selectedTour.city || day.city || "";
         day.guide = selectedTour.guide || "Without Guide";
@@ -8600,9 +8779,9 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       saveState();
     });
 
-    els.tourPickerSearch.addEventListener("input", () => {
+    els.tourPickerSearch.addEventListener("input", frameSearch(() => {
       renderTourPickerContent(els.tourPickerSearch.value.trim());
-    });
+    }));
 
     els.tourPickerContent.addEventListener("click", event => {
       const card = event.target.closest(".tour-card");
@@ -8648,7 +8827,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
           const cards = hotels.map(h => {
             const cats = Array.isArray(h.roomCategories) && h.roomCategories.length ? h.roomCategories : [{ name: "Standard", rate: h.room || 0 }];
             const isExpanded = h.id === currentHotelId;
-            const catRows = cats.map(c => {
+            const catRows = isExpanded ? cats.map(c => {
               const isCatSelected = isExpanded && c.name === currentRoomCat;
               const rateChips = SEASONS.map(s => {
                 const isSelected = isCatSelected && currentSeasonSel === s.id;
@@ -8662,7 +8841,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
                 <div style="font-size:13px;font-weight:${isCatSelected ? "600" : "400"};color:${isCatSelected ? "var(--brand-dark)" : "var(--ink)"};margin-bottom:6px;">${escapeHtml(c.name)}${isCatSelected ? " ✓" : ""}</div>
                 <div style="display:flex;gap:6px;">${rateChips}</div>
               </div>`;
-            }).join("");
+            }).join("") : "";
             return `<div class="hotel-picker-card" style="border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:rgba(255,255,255,0.88);">
               <div class="hotel-picker-card-head" data-hotel-id="${h.id}" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:${isExpanded ? "rgba(15,111,168,0.06)" : "rgba(236,249,255,0.5)"};">
                 <div>
@@ -8737,12 +8916,12 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       saveState();
     };
 
-    els.hotelPickerSearch.addEventListener("input", () => renderHotelPickerContent(els.hotelPickerSearch.value.trim()));
+    els.hotelPickerSearch.addEventListener("input", frameSearch(() => renderHotelPickerContent(els.hotelPickerSearch.value.trim())));
 
     els.hotelPickerContent.addEventListener("click", event => {
       const pickerEditBtn = event.target.closest(".edit-hotel-from-picker");
       if (pickerEditBtn) {
-        const hotel = state.hotels.find(h => h.id === pickerEditBtn.dataset.id);
+        const hotel = recordById(state.hotels, pickerEditBtn.dataset.id);
         if (hotel) openHotelEditDialog(hotel);
         return;
       }
@@ -8820,6 +8999,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     });
 
     const updateDayFromControl = event => {
+      if (event.type === "input" && event.target.matches('input[type="checkbox"], input[type="radio"], select')) return;
       const block = event.target.closest(".day-block");
       if (!block || !event.target.dataset.field) return;
       const day = state.quote.days.find(item => item.id === block.dataset.dayId);
@@ -8831,7 +9011,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         renderTotals();
         renderStats();
         saveState();
-        const tour = state.tours.find(item => item.id === day.tourId);
+        const tour = recordById(state.tours, day.tourId);
         const count = selectedTourActivities(day, tour).length;
         const summary = block.querySelector(".activity-selection-summary");
         if (summary) summary.textContent = count ? count + " selected · +" + money(activityRateForDay(day, tour)) + " / pax" : "Select activities";
@@ -9014,7 +9194,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       if (existing) Object.assign(existing, snapshot);
       else state.quotes.push(snapshot);
 
-      const customer = state.customers.find(c => c.id === state.quote.customerId);
+      const customer = recordById(state.customers, state.quote.customerId);
       if (customer) {
         customer.status = state.quote.status === "Draft" ? "Quoted" : state.quote.status;
         customer.value = totals.total;
@@ -9493,10 +9673,10 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         followUp: els.customerFollowUp.value,
         notes: els.customerNotes.value,
         depositPercent: Number(els.customerDepositPercent.value || 60),
-        value: state.customers.find(c => c.id === els.customerId.value)?.value || 0,
+        value: recordById(state.customers, els.customerId.value)?.value || 0,
         updated: Date.now()
       };
-      const existing = state.customers.find(c => c.id === payload.id);
+      const existing = recordById(state.customers, payload.id);
       if (existing) Object.assign(existing, payload);
       else state.customers.push(payload);
       els.customerDrawer.classList.remove("open");
@@ -9505,13 +9685,10 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     });
 
     ["customerSearch", "customerStatusFilter", "customerSort"].forEach(id => els[id].addEventListener("input", renderCustomers));
-    const delayedLibrarySearch = () => {
-      let timer;
-      return () => { clearTimeout(timer); timer = setTimeout(renderLibrary, 140); };
-    };
+    const delayedLibrarySearch = () => frameSearch(renderLibrary);
     els.tourSearch.addEventListener('input', delayedLibrarySearch());
     els.hotelSearch.addEventListener('input', delayedLibrarySearch());
-    els.itineraryLibrarySearch.addEventListener("input", renderItineraryLibrary);
+    els.itineraryLibrarySearch.addEventListener("input", frameSearch(renderItineraryLibrary));
 
     const addLibrarySelectable = (type, text) => {
       const value = String(text || "").trim();
@@ -9569,9 +9746,9 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     els.customerRows.addEventListener("click", event => {
       const edit = event.target.closest(".edit-customer");
       const quote = event.target.closest(".quote-customer");
-      if (edit) openCustomerDrawer(state.customers.find(c => c.id === edit.dataset.id));
+      if (edit) openCustomerDrawer(recordById(state.customers, edit.dataset.id));
       if (quote) {
-        const customer = state.customers.find(c => c.id === quote.dataset.id);
+        const customer = recordById(state.customers, quote.dataset.id);
         state.quote.customerId = customer.id;
         state.quote.quoteType = customer.type === "B2C" ? "B2C" : "B2B";
         applyDefaultMarginForHotels();
@@ -9809,7 +9986,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         transportation,
         guide
       };
-      const existing = editingTourId ? state.tours.find(tour => tour.id === editingTourId) : null;
+      const existing = editingTourId ? recordById(state.tours, editingTourId) : null;
       if (existing) Object.assign(existing, payload);
       else state.tours.push(payload);
       // Retain the submitted text until the server confirms every saved field.
@@ -9993,7 +10170,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         roomCategories,
         room: roomCategories[0]?.low || 0 // legacy compat
       };
-      const existing = id ? state.hotels.find(h => h.id === id) : null;
+      const existing = id ? recordById(state.hotels, id) : null;
       if (existing) {
         Object.assign(existing, payload);
         delete existing.periods;
@@ -10010,7 +10187,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     document.addEventListener("click", event => {
       const editBtn = event.target.closest(".edit-hotel");
       if (editBtn) {
-        const hotel = state.hotels.find(h => h.id === editBtn.dataset.id);
+        const hotel = recordById(state.hotels, editBtn.dataset.id);
         if (hotel) openHotelEditDialog(hotel);
       }
     });
@@ -10051,7 +10228,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       event.preventDefault();
       const form = new FormData(event.target);
       const id = form.get("id");
-      const existing = state.visas.find(v => v.id === id);
+      const existing = recordById(state.visas, id);
       if (existing) {
         existing.country = form.get("country");
         existing.type = form.get("type");
@@ -10066,7 +10243,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     document.body.addEventListener("click", event => {
       const visibilityButton = event.target.closest(".toggle-tour-hidden");
       if (visibilityButton) {
-        const tour = state.tours.find(item => item.id === visibilityButton.dataset.id);
+        const tour = recordById(state.tours, visibilityButton.dataset.id);
         if (!tour || (tour.hidden === true && !showHiddenToursOnly)) return;
         tour.hidden = tour.hidden !== true;
         saveState();
@@ -10077,7 +10254,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       }
       const editTour = event.target.closest(".edit-tour");
       if (editTour) {
-        const tour = state.tours.find(item => item.id === editTour.dataset.id);
+        const tour = recordById(state.tours, editTour.dataset.id);
         if (!tour) return;
         openTourDialog(tour);
         return;
@@ -10085,7 +10262,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
 
       const cloneTour = event.target.closest(".clone-tour");
       if (cloneTour) {
-        const tour = state.tours.find(item => item.id === cloneTour.dataset.id);
+        const tour = recordById(state.tours, cloneTour.dataset.id);
         if (!tour) return;
         const clone = JSON.parse(JSON.stringify(tour));
         clone.id = uid("t");
@@ -10098,7 +10275,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
 
       const editVisa = event.target.closest(".edit-visa");
       if (editVisa) {
-        const visa = state.visas.find(item => item.id === editVisa.dataset.id);
+        const visa = recordById(state.visas, editVisa.dataset.id);
         if (!visa) return;
         openVisaDialog(visa);
         return;
