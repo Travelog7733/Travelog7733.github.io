@@ -4732,6 +4732,16 @@ html:not(.guest-access-granted) body{overflow:hidden !important;}
 }
 </style>
 <style id="hotel-stay-dates-only">.hotel-voucher-form .hotel-stay-row .hotel-voucher-grid{grid-template-columns:repeat(2,minmax(0,1fr));}</style>
+<style id="hotel-booking-status-pills">
+.hotel-name-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin-bottom:3px;}
+.hotel-name-row .gd-item-title{margin-bottom:0;overflow-wrap:anywhere;}
+.hotel-booking-pill{display:inline-flex;align-items:center;max-width:100%;padding:3px 9px;border:1px solid;border-radius:999px;font-size:10px;font-weight:700;line-height:1.5;letter-spacing:.2px;overflow-wrap:anywhere;}
+.hotel-booked{background:#dcfce7;color:#166534;border-color:#bbf7d0;}
+.hotel-customer-booked{background:#dbeafe;color:#1e40af;border-color:#bfdbfe;}
+.hotel-booking-pending{background:#fef3c7;color:#92400e;border-color:#fde68a;}
+.hotel-booking-requested{background:#ede9fe;color:#6d28d9;border-color:#ddd6fe;}
+.hotel-booking-unknown{background:#f1f5f9;color:#475569;border-color:#cbd5e1;}
+</style>
 </head>
 
 <body>
@@ -6157,11 +6167,11 @@ function hotelTimeLabel(value){
 function renderHotelDetails(g){
  return (g.hotels || []).length ? g.hotels.map((h,index)=>`<div class="gd-item-card hotel-detail-card">
  <div class="gd-item-icon">${gdIcon('bed',18)}</div><div class="gd-item-body">
- <div class="gd-item-title">${escapeHTML(h.hotel || 'No hotel selected')}</div>
+ <div class="hotel-name-row"><div class="gd-item-title">${escapeHTML(h.hotel || 'No hotel selected')}</div><span class="hotel-booking-pill ${({'BOOKED':'hotel-booked','BOOKED BY CUSTOMER':'hotel-customer-booked','PENDING FOR BOOKING':'hotel-booking-pending','REQUESTED':'hotel-booking-requested'})[String(h.status || '').trim().toUpperCase()] || 'hotel-booking-unknown'}" aria-label="Booking status: ${escapeHTML(h.status || 'Not provided')}">${escapeHTML(h.status || 'Not provided')}</span></div>
  <div class="gd-item-sub">${escapeHTML(h.place || '-')}</div>
  <div class="gd-item-sub">Booking No: ${escapeHTML(h.bookingNo || '-')}</div>
  <details class="hotel-view-details"><summary aria-label="Expand or collapse hotel details" title="Hotel details"><svg class="hotel-view-chevron" aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><div class="hotel-view-expanded">
- <div class="gd-item-sub"><strong>Status:</strong> ${escapeHTML(h.status || '-')}</div>
+
  ${h.address ? `<div class="gd-item-sub"><strong>Address:</strong> ${escapeHTML(h.address)}</div>` : ''}
  ${h.telephone ? `<div class="gd-item-sub"><strong>Phone:</strong> ${escapeHTML(h.telephone)}</div>` : ''}
  ${(h.stays || []).map((stay,i)=>`<div class="gd-item-sub"><strong>Stay ${i+1}:</strong> ${escapeHTML(hotelDateLabel(stay.checkIn))} - ${escapeHTML(hotelDateLabel(stay.checkOut))} · ${hotelNights(stay) ?? '-'} night(s)</div>`).join('')}
