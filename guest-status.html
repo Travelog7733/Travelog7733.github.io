@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://www.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 
@@ -267,8 +267,9 @@ transition:transform .36s cubic-bezier(.22,1,.36,1), box-shadow .36s ease, borde
 overflow:hidden;
 position:relative;
 backdrop-filter:blur(18px);
-animation:tileEnter .66s cubic-bezier(.22,1,.36,1) both;
-animation-delay:var(--tile-delay, 0ms);
+animation:none;
+content-visibility:auto;
+contain-intrinsic-size:auto 520px;
 transform-origin:center bottom;
 isolation:isolate;
 }
@@ -5366,7 +5367,9 @@ import("https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js"),
 import("https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js")
 ]).then(([appSDK, storeSDK]) => {
 const app = appSDK.getApps().length ? appSDK.getApp() : appSDK.initializeApp(firebaseConfig);
-window.db = storeSDK.getFirestore(app);
+try{
+window.db = storeSDK.initializeFirestore(app, {localCache:storeSDK.persistentLocalCache({tabManager:storeSDK.persistentMultipleTabManager()})});
+}catch(error){window.db = storeSDK.getFirestore(app);}
 for(const name of ["collection", "addDoc", "deleteDoc", "doc", "onSnapshot", "updateDoc", "setDoc"]){
 window[name] = storeSDK[name];
 }
@@ -6796,13 +6799,18 @@ const [dd, mm, yyyy] = d.split('/');
 return new Date(yyyy, mm - 1, dd);
 };
 
-guests.sort((a, b) => parseDate(a.travelDate) - parseDate(b.travelDate));
+const travelTimes = new Map(guests.map(g => [g, +parseDate(g.travelDate)]));
+guests.sort((a, b) => travelTimes.get(a) - travelTimes.get(b));
 
 window.allGuests = guests;
+renderGuestTiles(guests);
+// Prepare edit-form suggestions after the cards have been inserted.
+if(window.guestSuggestionsTask) clearTimeout(window.guestSuggestionsTask);
+window.guestSuggestionsTask = setTimeout(() => {
+if(attempt !== guestLoadAttempt) return;
 refreshCitySuggestions();
 refreshSavedHotelMenus();
-
-renderGuestTiles(guests);
+}, 0);
 clearTimeout(guestLoadTimer);
 setGuestLoadStatus(guests.length ? "" : "No guest records found.");
 }catch(error){ guestLoadFailed(error); }
@@ -7170,8 +7178,10 @@ html += tileHtml;
 
 });
 
-document.getElementById("guestContainer").innerHTML = html;
-document.getElementById("completedContainer").innerHTML = completedHtml;
+const activeContainer = document.getElementById("guestContainer");
+const completedContainer = document.getElementById("completedContainer");
+if(activeContainer._guestHTML !== html){activeContainer.innerHTML = html;activeContainer._guestHTML = html;}
+if(completedContainer._guestHTML !== completedHtml){completedContainer.innerHTML = completedHtml;completedContainer._guestHTML = completedHtml;}
 applyGuestFilters();
 
 updateNotifications(guests);
@@ -7920,7 +7930,7 @@ return "₹" + (amount / unit[0]).toLocaleString("en-IN", { maximumFractionDigit
 }
 
 function buildMonthlyProfitData(guests, month){
-const result={sales:0,tour:0,hotel:0,visa:0,count:0,missing:0};
+const result={sales:0,tour:0,hotel:0,visa:0,tcs:0,gst:0,count:0,missing:0};
 const sum=rows=>Array.isArray(rows)?rows.reduce((total,value)=>total+(Number.isFinite(Number(value))&&Number(value)>=0?Number(value):0),0):0;
 for(const g of guests){
 if(!g.costReport)continue;
@@ -7929,9 +7939,10 @@ if(!date||sales<=0||getSalesMonthKey(date)!==getSalesMonthKey(month))continue;
 const costs=g.costReport||{};
 result.sales+=sales;result.tour+=sum(costs.tourCosts);result.hotel+=sum(costs.hotelCosts);
 result.visa+=Array.isArray(costs.visaCosts)?sum(costs.visaCosts):2500;
+result.tcs+=sum(costs.tcsCosts);result.gst+=sum(costs.gstCosts);
 result.count++;if(!g.costReport)result.missing++;
 }
-result.profit=result.sales-result.tour-result.hotel-result.visa;return result;
+result.profit=result.sales-result.tour-result.hotel-result.visa-result.tcs-result.gst;return result;
 }
 
 function renderSalesPerformance(){
@@ -10869,6 +10880,8 @@ closePdfDestinationModal();
 <div class="cr-section"><h3>Tour cost <button type="button" class="cr-add" data-cr-add="tour">+ Add</button></h3><div id="crTour"></div><div class="cr-total"><span>Total tour cost</span><strong id="crTourTotal"></strong></div></div>
 <div class="cr-section"><h3>Hotel cost <button type="button" class="cr-add" data-cr-add="hotel">+ Add</button></h3><div id="crHotel"></div><div class="cr-total"><span>Total hotel cost</span><strong id="crHotelTotal"></strong></div></div>
 <div class="cr-section"><h3>Visa cost <button type="button" class="cr-add" data-cr-add="visa">+ Add</button></h3><div id="crVisa"></div><div class="cr-total"><span>Total visa cost</span><strong id="crVisaTotal"></strong></div></div>
+<div class="cr-section"><h3>TCS cost <button type="button" class="cr-add" data-cr-add="tcs">+ Add</button></h3><div id="crTcs"></div><div class="cr-total"><span>Total tcs cost</span><strong id="crTcsTotal"></strong></div></div>
+<div class="cr-section"><h3>GST cost <button type="button" class="cr-add" data-cr-add="gst">+ Add</button></h3><div id="crGst"></div><div class="cr-total"><span>Total gst cost</span><strong id="crGstTotal"></strong></div></div>
 <div class="cr-profit" id="crProfitBox" aria-live="polite"><span>Profit</span><strong id="crProfit"></strong></div><p id="crError" role="alert" hidden></p><div class="cr-actions" id="crActions" hidden><button type="button" id="crCancel">Cancel</button><button type="submit" class="cr-save" id="crSave">Save</button></div></form>
 </dialog>
 <script id="cost-report-script">
@@ -10876,21 +10889,21 @@ closePdfDestinationModal();
 const dialog=document.getElementById('costReportDialog');
 const el=id=>document.getElementById(id);
 let guestId=null,editing=false,saving=false,returnFocus=null;
-let costs={tour:[0],hotel:[0],visa:[0]};
+let costs={tour:[0],hotel:[0],visa:[0],tcs:[0],gst:[0]};
 const money=value=>'₹ '+Number(value).toLocaleString('en-IN',{maximumFractionDigits:2,minimumFractionDigits:2});
 const guest=()=> (window.allGuests||[]).find(g=>g.id===guestId);
 const normalize=rows=>Array.isArray(rows)&&rows.length?rows.map(n=>Number.isFinite(Number(n))&&Number(n)>=0?Number(n):0):[0];
-function load(){const report=guest()?.costReport||{};costs={tour:normalize(report.tourCosts),hotel:normalize(report.hotelCosts),visa:Array.isArray(report.visaCosts)?normalize(report.visaCosts):[2500]};}
+function load(){const report=guest()?.costReport||{};costs={tour:normalize(report.tourCosts),hotel:normalize(report.hotelCosts),visa:Array.isArray(report.visaCosts)?normalize(report.visaCosts):[2500],tcs:normalize(report.tcsCosts),gst:normalize(report.gstCosts)};}
 function totals(){
-const tour=costs.tour.reduce((a,b)=>a+b,0),hotel=costs.hotel.reduce((a,b)=>a+b,0),visa=costs.visa.reduce((a,b)=>a+b,0),sales=Number(guest()?.invoiceAmount)||0;
-el('crSales').textContent=money(sales);el('crTourTotal').textContent=money(tour);el('crHotelTotal').textContent=money(hotel);el('crVisaTotal').textContent=money(visa);el('crProfit').textContent=money(sales-tour-hotel-visa);el('crProfitBox').classList.toggle('cr-loss',sales-tour-hotel-visa<0);
+const tour=costs.tour.reduce((a,b)=>a+b,0),hotel=costs.hotel.reduce((a,b)=>a+b,0),visa=costs.visa.reduce((a,b)=>a+b,0),tcs=costs.tcs.reduce((a,b)=>a+b,0),gst=costs.gst.reduce((a,b)=>a+b,0),sales=Number(guest()?.invoiceAmount)||0;
+el('crSales').textContent=money(sales);el('crTourTotal').textContent=money(tour);el('crHotelTotal').textContent=money(hotel);el('crVisaTotal').textContent=money(visa);el('crTcsTotal').textContent=money(tcs);el('crGstTotal').textContent=money(gst);el('crProfit').textContent=money(sales-tour-hotel-visa-tcs-gst);el('crProfitBox').classList.toggle('cr-loss',sales-tour-hotel-visa-tcs-gst<0);
 }
 function render(){
-for(const kind of ['tour','hotel','visa']){
-const host=el(kind==='tour'?'crTour':kind==='hotel'?'crHotel':'crVisa');host.replaceChildren();
+for(const kind of ['tour','hotel','visa','tcs','gst']){
+const host=el('cr'+kind[0].toUpperCase()+kind.slice(1));host.replaceChildren();
 costs[kind].forEach((value,index)=>{
 const row=document.createElement('div');row.className='cr-row';
-const label=document.createElement('label');label.htmlFor=`cr-${kind}-${index}`;label.textContent=`${kind==='tour'?'Tour':kind==='hotel'?'Hotel':'Visa'} cost ${index+1}`;
+const label=document.createElement('label');label.htmlFor=`cr-${kind}-${index}`;label.textContent=`${({tour:'Tour',hotel:'Hotel',visa:'Visa',tcs:'TCS',gst:'GST'})[kind]} cost ${index+1}`;
 const input=document.createElement('input');input.id=label.htmlFor;input.type='number';input.min='0';input.step='0.01';input.required=true;input.value=value;input.disabled=!editing||saving;
 input.addEventListener('input',()=>{costs[kind][index]=Number(input.value)||0;totals();});row.append(label,input);
 if(editing){const remove=document.createElement('button');remove.type='button';remove.className='cr-remove';remove.textContent='×';remove.setAttribute('aria-label',`Remove ${label.textContent}`);remove.disabled=saving;remove.onclick=()=>{costs[kind].splice(index,1);render();};row.append(remove);}
@@ -10905,14 +10918,14 @@ const code=prompt('Enter Cost Report passcode');if(code===null)return;if(code!==
 guestId=g.id;returnFocus=document.activeElement;editing=false;el('crError').hidden=true;el('crGuest').textContent=g.guestName||'';load();render();dialog.showModal();
 };
 el('crEdit').onclick=()=>{editing=true;render();dialog.querySelector('input')?.focus();};el('crClose').onclick=close;el('crCancel').onclick=()=>{load();editing=false;el('crError').hidden=true;render();};
-dialog.querySelectorAll('[data-cr-add]').forEach(b=>b.onclick=()=>{costs[b.dataset.crAdd].push(0);render();const host=el(b.dataset.crAdd==='tour'?'crTour':b.dataset.crAdd==='hotel'?'crHotel':'crVisa');host.querySelector('div:last-child input')?.focus();});
+dialog.querySelectorAll('[data-cr-add]').forEach(b=>b.onclick=()=>{costs[b.dataset.crAdd].push(0);render();const host=el('cr'+b.dataset.crAdd[0].toUpperCase()+b.dataset.crAdd.slice(1));host.querySelector('div:last-child input')?.focus();});
 dialog.addEventListener('cancel',event=>{event.preventDefault();event.stopPropagation();close();});
 // Keep Escape inside this popup so the guest details remain open underneath.
 window.addEventListener('keydown',event=>{if(dialog.open&&event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();close();}},true);
 el('crForm').onsubmit=async event=>{
 event.preventDefault();if(saving||!el('crForm').reportValidity())return;
-const report={tourCosts:[...costs.tour],hotelCosts:[...costs.hotel],visaCosts:[...costs.visa]};
-if([...report.tourCosts,...report.hotelCosts,...report.visaCosts].some(n=>!Number.isFinite(n)||n<0)){el('crError').textContent='Enter valid costs of zero or more.';el('crError').hidden=false;return;}
+const report={tourCosts:[...costs.tour],hotelCosts:[...costs.hotel],visaCosts:[...costs.visa],tcsCosts:[...costs.tcs],gstCosts:[...costs.gst]};
+if([...report.tourCosts,...report.hotelCosts,...report.visaCosts,...report.tcsCosts,...report.gstCosts].some(n=>!Number.isFinite(n)||n<0)){el('crError').textContent='Enter valid costs of zero or more.';el('crError').hidden=false;return;}
 saving=true;el('crError').hidden=true;render();
 try{await window.connectGuestDatabase();await updateDoc(doc(db,'guestStatus',guestId),{costReport:report});const g=guest();if(g)g.costReport=report;editing=false;}
 catch(error){el('crError').textContent='Could not save costs. Please check your connection and try again.';el('crError').hidden=false;}
