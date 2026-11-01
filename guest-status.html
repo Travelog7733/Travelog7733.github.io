@@ -2648,6 +2648,15 @@ flex-wrap:wrap;
 margin-bottom:22px;
 }
 
+.gd-badges .gd-cost-report{
+margin-left:auto;
+border:0;
+font-family:inherit;
+background:linear-gradient(135deg,#5965f5,#3848cd);
+cursor:pointer;
+}
+.gd-badges .gd-cost-report:hover{filter:brightness(1.08);}
+.gd-badges .gd-cost-report:focus-visible{outline:3px solid #a5b4fc;outline-offset:3px;}
 .gd-facts{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
@@ -4742,7 +4751,15 @@ html:not(.guest-access-granted) body{overflow:hidden !important;}
 .hotel-booking-requested{background:#ede9fe;color:#6d28d9;border-color:#ddd6fe;}
 .hotel-booking-unknown{background:#f1f5f9;color:#475569;border-color:#cbd5e1;}
 </style>
-</head>
+<style>
+.monthly-profit-section{margin:24px 0;}
+.monthly-profit-value{text-align:center;font-size:34px;font-weight:800;margin:18px 0;}
+.monthly-profit-breakdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+.monthly-profit-breakdown>span{padding:12px;background:#f3f5ff;border-radius:12px;color:#737f9e;font-size:12px;}
+.monthly-profit-breakdown strong{display:block;margin-top:6px;color:#273351;font-size:15px;overflow-wrap:anywhere;}
+.monthly-profit-note{font-size:12px;color:#737f9e;margin:14px 0 0;}
+@media(max-width:600px){.monthly-profit-breakdown{grid-template-columns:repeat(2,minmax(0,1fr));}}
+</style></head>
 
 <body>
 <section id="guest-access-gate" aria-labelledby="guest-access-title">
@@ -7902,11 +7919,27 @@ const unit = absolute >= 10000000 ? [10000000, "Cr"] : absolute >= 100000 ? [100
 return "₹" + (amount / unit[0]).toLocaleString("en-IN", { maximumFractionDigits: unit[0] === 1 ? 0 : 2 }) + unit[1];
 }
 
+function buildMonthlyProfitData(guests, month){
+const result={sales:0,tour:0,hotel:0,visa:0,count:0,missing:0};
+const sum=rows=>Array.isArray(rows)?rows.reduce((total,value)=>total+(Number.isFinite(Number(value))&&Number(value)>=0?Number(value):0),0):0;
+for(const g of guests){
+if(!g.costReport)continue;
+const date=parseSalesDate(g),sales=Number(g.invoiceAmount)||0;
+if(!date||sales<=0||getSalesMonthKey(date)!==getSalesMonthKey(month))continue;
+const costs=g.costReport||{};
+result.sales+=sales;result.tour+=sum(costs.tourCosts);result.hotel+=sum(costs.hotelCosts);
+result.visa+=Array.isArray(costs.visaCosts)?sum(costs.visaCosts):2500;
+result.count++;if(!g.costReport)result.missing++;
+}
+result.profit=result.sales-result.tour-result.hotel-result.visa;return result;
+}
+
 function renderSalesPerformance(){
 const body = document.getElementById("salesPerformanceBody");
 if(!body) return;
 
 const data = buildSalesPerformanceData(window.allGuests || [], salesPerformanceMonth);
+const profit = buildMonthlyProfitData(window.allGuests || [], salesPerformanceMonth);
 const maxMonth = Math.max(...data.months.flatMap(m => [m.b2b, m.b2c]), 1);
 const maxPerson = Math.max(...data.personRows.flatMap(p => [p.b2b, p.b2c]), 1);
 
@@ -7937,6 +7970,15 @@ body.innerHTML = `
     <div class="sales-leaders-period">${data.selectedMonthLabel}</div>
   </div>
 </div>
+
+<section class="sales-chart-section monthly-profit-section" aria-label="Monthly profit">
+  <div class="sales-person-header">
+    <button type="button" class="sales-month-nav" onclick="shiftSalesPerformanceMonth(-1)" aria-label="Previous month" title="Previous month">&#10094;</button>
+    <div class="sales-month-title"><div class="sales-section-title" style="margin-bottom:0;">Monthly Profit</div><div class="sales-month-label">${data.selectedMonthLabel}</div></div>
+    <button type="button" class="sales-month-nav" onclick="shiftSalesPerformanceMonth(1)" aria-label="Next month" title="Next month">&#10095;</button>
+  </div>
+  <div class="monthly-profit-value" style="color:${profit.profit < 0 ? "#b42323" : "#08754e"}" aria-live="polite">${formatINR(profit.profit)}</div>
+</section>
 
 <div class="sales-chart-section">
   <div class="sales-chart-head">
@@ -9230,6 +9272,7 @@ return `
 <div class="gd-badges" id="gdStatusBadgeSection">
   <span class="status-badge ${badge}">${g.travelStatus||""}</span>
   <span class="status-badge ${tripStageClass}">${tripStage}</span>
+  <button type="button" class="status-badge gd-cost-report" onclick="openCostReport()">Cost Report</button>
 </div>
 
 <div class="gd-facts gd-summary-compact" id="gdBasicDetailsSection">
@@ -9434,6 +9477,7 @@ document.getElementById("modalContent").innerHTML=`
 <div class="gd-badges">
   <span class="status-badge ${badge}">${g.travelStatus||""}</span>
   <span class="status-badge ${tripStageClass}">${tripStage}</span>
+  <button type="button" class="status-badge gd-cost-report" onclick="openCostReport()">Cost Report</button>
 </div>
 
 <div class="gd-facts gd-summary-compact">
@@ -10809,6 +10853,74 @@ closePdfDestinationModal();
 </div>
 
 <datalist id="itineraryCitySuggestions"></datalist>
+<style id="cost-report-style">
+#costReportDialog{position:fixed;inset:0;margin:auto;box-sizing:border-box;overflow-y:auto;border:0;border-radius:24px;padding:0;width:min(620px,calc(100vw - 32px));max-height:90vh;color:#202944;box-shadow:0 24px 90px #17203355;}
+#costReportDialog::backdrop{background:#17203388;}
+.cr-head{display:flex;align-items:center;gap:10px;padding:22px;background:linear-gradient(120deg,#5965f5,#09b5ac);color:white;}
+.cr-head h2{margin:0;flex:1;font-size:21px;}.cr-icon{border:0;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:22px;background:#ffffffdd;color:#3848cd;}
+.cr-body{padding:24px;}.cr-guest{margin:0 0 20px;color:#68738e;}.cr-sales,.cr-profit{padding:16px;border-radius:14px;background:#eef2ff;display:flex;justify-content:space-between;gap:12px;font-weight:700;}
+.cr-section{margin:22px 0;}.cr-section h3{display:flex;justify-content:space-between;align-items:center;font-size:15px;}.cr-add{border:0;border-radius:20px;background:#e9edff;color:#3848cd;padding:7px 14px;cursor:pointer;}
+.cr-row{display:flex;align-items:center;gap:10px;margin:10px 0;}.cr-row label{flex:1;}.cr-row input{width:150px;max-width:45%;padding:10px;border:1px solid #d9dff2;border-radius:9px;font:inherit;}.cr-row input:disabled{background:#f6f8fc;color:#202944;opacity:1;}.cr-remove{border:0;background:#fff0f0;color:#c63838;border-radius:8px;padding:8px;cursor:pointer;}
+.cr-total{display:flex;justify-content:space-between;font-size:13px;color:#68738e;}.cr-profit{background:#e1f6ec;color:#08754e;}.cr-profit.cr-loss{background:#fff0f0;color:#b42323;}.cr-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}.cr-actions button{border:0;border-radius:20px;padding:10px 20px;cursor:pointer;font:inherit;}.cr-save{background:#4656df;color:white;}#crError{color:#b42323;}#costReportDialog [hidden]{display:none!important;}
+</style>
+<dialog id="costReportDialog" aria-labelledby="crTitle">
+<div class="cr-head"><h2 id="crTitle">Cost Report</h2><button type="button" class="cr-icon" id="crEdit" aria-label="Edit cost report" title="Edit">&#9998;</button><button type="button" class="cr-icon" id="crClose" aria-label="Close cost report" title="Close">&times;</button></div>
+<form class="cr-body" id="crForm"><p class="cr-guest" id="crGuest"></p><div class="cr-sales"><span>Total sales amount</span><span id="crSales"></span></div>
+<div class="cr-section"><h3>Tour cost <button type="button" class="cr-add" data-cr-add="tour">+ Add</button></h3><div id="crTour"></div><div class="cr-total"><span>Total tour cost</span><strong id="crTourTotal"></strong></div></div>
+<div class="cr-section"><h3>Hotel cost <button type="button" class="cr-add" data-cr-add="hotel">+ Add</button></h3><div id="crHotel"></div><div class="cr-total"><span>Total hotel cost</span><strong id="crHotelTotal"></strong></div></div>
+<div class="cr-section"><h3>Visa cost <button type="button" class="cr-add" data-cr-add="visa">+ Add</button></h3><div id="crVisa"></div><div class="cr-total"><span>Total visa cost</span><strong id="crVisaTotal"></strong></div></div>
+<div class="cr-profit" id="crProfitBox" aria-live="polite"><span>Profit</span><strong id="crProfit"></strong></div><p id="crError" role="alert" hidden></p><div class="cr-actions" id="crActions" hidden><button type="button" id="crCancel">Cancel</button><button type="submit" class="cr-save" id="crSave">Save</button></div></form>
+</dialog>
+<script id="cost-report-script">
+(()=>{
+const dialog=document.getElementById('costReportDialog');
+const el=id=>document.getElementById(id);
+let guestId=null,editing=false,saving=false,returnFocus=null;
+let costs={tour:[0],hotel:[0],visa:[0]};
+const money=value=>'₹ '+Number(value).toLocaleString('en-IN',{maximumFractionDigits:2,minimumFractionDigits:2});
+const guest=()=> (window.allGuests||[]).find(g=>g.id===guestId);
+const normalize=rows=>Array.isArray(rows)&&rows.length?rows.map(n=>Number.isFinite(Number(n))&&Number(n)>=0?Number(n):0):[0];
+function load(){const report=guest()?.costReport||{};costs={tour:normalize(report.tourCosts),hotel:normalize(report.hotelCosts),visa:Array.isArray(report.visaCosts)?normalize(report.visaCosts):[2500]};}
+function totals(){
+const tour=costs.tour.reduce((a,b)=>a+b,0),hotel=costs.hotel.reduce((a,b)=>a+b,0),visa=costs.visa.reduce((a,b)=>a+b,0),sales=Number(guest()?.invoiceAmount)||0;
+el('crSales').textContent=money(sales);el('crTourTotal').textContent=money(tour);el('crHotelTotal').textContent=money(hotel);el('crVisaTotal').textContent=money(visa);el('crProfit').textContent=money(sales-tour-hotel-visa);el('crProfitBox').classList.toggle('cr-loss',sales-tour-hotel-visa<0);
+}
+function render(){
+for(const kind of ['tour','hotel','visa']){
+const host=el(kind==='tour'?'crTour':kind==='hotel'?'crHotel':'crVisa');host.replaceChildren();
+costs[kind].forEach((value,index)=>{
+const row=document.createElement('div');row.className='cr-row';
+const label=document.createElement('label');label.htmlFor=`cr-${kind}-${index}`;label.textContent=`${kind==='tour'?'Tour':kind==='hotel'?'Hotel':'Visa'} cost ${index+1}`;
+const input=document.createElement('input');input.id=label.htmlFor;input.type='number';input.min='0';input.step='0.01';input.required=true;input.value=value;input.disabled=!editing||saving;
+input.addEventListener('input',()=>{costs[kind][index]=Number(input.value)||0;totals();});row.append(label,input);
+if(editing){const remove=document.createElement('button');remove.type='button';remove.className='cr-remove';remove.textContent='×';remove.setAttribute('aria-label',`Remove ${label.textContent}`);remove.disabled=saving;remove.onclick=()=>{costs[kind].splice(index,1);render();};row.append(remove);}
+host.append(row);
+});}
+dialog.querySelectorAll('[data-cr-add]').forEach(b=>{b.hidden=!editing;b.disabled=saving;});el('crActions').hidden=!editing;el('crEdit').hidden=editing;el('crSave').disabled=saving;el('crCancel').disabled=saving;el('crClose').disabled=saving;totals();
+}
+function close(){if(saving)return;dialog.close();returnFocus?.focus();}
+window.openCostReport=function(){
+const g=(window.allGuests||[]).find(g=>g.id===window.currentModalGuestId);if(!g)return;
+const code=prompt('Enter Cost Report passcode');if(code===null)return;if(code!=='5655'){alert('Incorrect passcode. Please try again.');return;}
+guestId=g.id;returnFocus=document.activeElement;editing=false;el('crError').hidden=true;el('crGuest').textContent=g.guestName||'';load();render();dialog.showModal();
+};
+el('crEdit').onclick=()=>{editing=true;render();dialog.querySelector('input')?.focus();};el('crClose').onclick=close;el('crCancel').onclick=()=>{load();editing=false;el('crError').hidden=true;render();};
+dialog.querySelectorAll('[data-cr-add]').forEach(b=>b.onclick=()=>{costs[b.dataset.crAdd].push(0);render();const host=el(b.dataset.crAdd==='tour'?'crTour':b.dataset.crAdd==='hotel'?'crHotel':'crVisa');host.querySelector('div:last-child input')?.focus();});
+dialog.addEventListener('cancel',event=>{event.preventDefault();event.stopPropagation();close();});
+// Keep Escape inside this popup so the guest details remain open underneath.
+window.addEventListener('keydown',event=>{if(dialog.open&&event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();close();}},true);
+el('crForm').onsubmit=async event=>{
+event.preventDefault();if(saving||!el('crForm').reportValidity())return;
+const report={tourCosts:[...costs.tour],hotelCosts:[...costs.hotel],visaCosts:[...costs.visa]};
+if([...report.tourCosts,...report.hotelCosts,...report.visaCosts].some(n=>!Number.isFinite(n)||n<0)){el('crError').textContent='Enter valid costs of zero or more.';el('crError').hidden=false;return;}
+saving=true;el('crError').hidden=true;render();
+try{await window.connectGuestDatabase();await updateDoc(doc(db,'guestStatus',guestId),{costReport:report});const g=guest();if(g)g.costReport=report;editing=false;}
+catch(error){el('crError').textContent='Could not save costs. Please check your connection and try again.';el('crError').hidden=false;}
+finally{saving=false;render();}
+};
+})();
+</script>
+
 </body>
 
 </html> 
