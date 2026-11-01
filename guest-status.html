@@ -5367,9 +5367,7 @@ import("https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js"),
 import("https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js")
 ]).then(([appSDK, storeSDK]) => {
 const app = appSDK.getApps().length ? appSDK.getApp() : appSDK.initializeApp(firebaseConfig);
-try{
-window.db = storeSDK.initializeFirestore(app, {localCache:storeSDK.persistentLocalCache({tabManager:storeSDK.persistentMultipleTabManager()})});
-}catch(error){window.db = storeSDK.getFirestore(app);}
+window.db = storeSDK.getFirestore(app);
 for(const name of ["collection", "addDoc", "deleteDoc", "doc", "onSnapshot", "updateDoc", "setDoc"]){
 window[name] = storeSDK[name];
 }
