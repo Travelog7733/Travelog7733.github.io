@@ -263,7 +263,7 @@ border-radius:24px;
 border:1px solid rgba(255,255,255,.76);
 box-shadow:var(--shadow-card);
 cursor:pointer;
-transition:transform .36s cubic-bezier(.22,1,.36,1), box-shadow .36s ease, border-color .36s ease, background .36s ease;
+transition:box-shadow .2s ease, border-color .2s ease;
 overflow:hidden;
 position:relative;
 backdrop-filter:blur(18px);
@@ -318,32 +318,16 @@ transition:opacity .35s ease;
 z-index:-2;
 }
 
-.guest-tile::after{
-content:"";
-position:absolute;
-top:-30%;
-left:-85%;
-width:70%;
-height:160%;
-background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,.62) 50%, transparent 100%);
-transform:rotate(12deg);
-transition:left .72s ease;
-z-index:-1;
-}
-
+/* Keep guest cards steady and use a subtle highlight for mouse hover. */
+@media (hover:hover) and (pointer:fine){
 .guest-tile:hover{
-transform:translateY(-8px) rotateX(2deg);
-box-shadow:0 26px 70px rgba(23,32,51,.16);
-border-color:rgba(91,124,250,.24);
-background:linear-gradient(145deg, rgba(255,255,255,.98) 0%, rgba(248,251,255,.84) 100%);
+box-shadow:0 20px 48px rgba(23,32,51,.13);
+border-color:rgba(91,124,250,.30);
 }
 
 .guest-tile:hover::before{
-opacity:1;
+opacity:.8;
 }
-
-.guest-tile:hover::after{
-left:115%;
 }
 
 .tile-head{
