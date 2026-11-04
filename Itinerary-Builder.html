@@ -4005,6 +4005,7 @@
           </div>
           <section class="pdf-section" id="pdfTripDetailsSection">
             <h3>Trip Details</h3>
+            <p id="pdfEmployeeAttribution" style="display:none;margin:0 0 10px;color:#173044;font-size:11px;font-weight:600;"></p>
             <div class="pdf-info-grid">
               <div class="pdf-info"><span>Customer</span><strong id="pdfCustomer">General Customer</strong></div>
               <div class="pdf-info"><span>Destination</span><strong id="pdfDestination">Not specified</strong></div>
@@ -5909,6 +5910,16 @@
       (day.remarks || "").trim()
     );
 
+    const itineraryHasContent = quote => Boolean(quote && (
+      quote.customerId || quote.normalCustomerId || quote.proCustomerId ||
+      quote.visaId || quote.normalVisaId || quote.proVisaId ||
+      String(quote.destination || "").trim() || String(quote.travelDates || "").trim() ||
+      String(quote.notes || "").trim() ||
+      ["adults", "children", "infants", "foc", "total", "extraCostPerPax", "proExtraCostPerPax"].some(key => Number(quote[key] || 0) > 0) ||
+      ["days", "normalDays", "proDays"].some(key => (quote[key] || []).some(dayHasSelections))
+    ));
+    const isEmptyUnsavedItinerary = quote => !quote.updated && !quote.shareToken && !itineraryHasContent(quote);
+
     const quoteHasModeSelections = () => {
       syncQuoteFromInputs();
       syncActiveModeDays();
@@ -7389,6 +7400,7 @@
       const search = (els.itineraryLibrarySearch?.value || "").trim().toLowerCase();
       const activeMode = document.body.classList.contains("pro-mode") ? "pro" : "normal";
       let rows = state.quotes
+        .filter(quote => !isEmptyUnsavedItinerary(quote))
         .filter(quote => (quote.mode === "pro" ? "pro" : "normal") === activeMode)
         .sort((a, b) => Number(b.updated || 0) - Number(a.updated || 0));
       if (search) {
@@ -7397,7 +7409,7 @@
           return haystack.includes(search);
         });
       }
-      const otherModeCount = state.quotes.filter(quote => (quote.mode === "pro" ? "pro" : "normal") !== activeMode).length;
+      const otherModeCount = state.quotes.filter(quote => !isEmptyUnsavedItinerary(quote)).filter(quote => (quote.mode === "pro" ? "pro" : "normal") !== activeMode).length;
       const renderQuoteRow = quote => {
         const customerName = escapeHtml(quoteCustomerName(quote));
         const updated = quote.updated ? formatDateTimeDisplay(new Date(quote.updated)) : "Not saved";
@@ -7872,6 +7884,10 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const quoteType = quoteTypeValue();
       els.pdfQuoteName.textContent = quoteName;
       els.pdfQuoteCode.textContent = quoteLabel;
+      const employeeAttribution = document.getElementById("pdfEmployeeAttribution");
+      const employeeName = state.quote.lastUpdatedBy || state.quote.createdBy || "";
+      employeeAttribution.textContent = employeeName ? (state.quote.employeeAction || "Prepared by") + ": " + employeeName : "";
+      employeeAttribution.style.display = employeeName ? "" : "none";
       els.pdfPageCodeFooter.textContent = `Itinerary Code: ${state.quote.id ? itineraryNumberForQuote(state.quote) : "DRAFT"}`;
       els.pdfQuoteType.textContent = quoteType;
       els.pdfQuoteType.classList.toggle("b2b", quoteType === "B2B");
@@ -9209,7 +9225,37 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     document.getElementById("addDayBtn").addEventListener("click", addDay);
     document.getElementById("addDayBtnBottom").addEventListener("click", addDay);
 
+    // Employee identity is held only for this editing session; passcodes are never saved in quotes.
+    let itineraryEditor = null;
+    let authorizedItinerary = null;
+    const requestItineraryEmployee = () => {
+      const code = window.prompt("Enter your 4-digit employee passcode to create or edit this itinerary:");
+      if (code === null) return null;
+      const employees = { "6121": "SAHAL", "2093": "KRIPA", "6012": "CHANDANA", "5655": "AKHIL" };
+      const employee = /^\d{4}$/.test(code.trim()) ? employees[code.trim()] : null;
+      if (!employee) showToast("Invalid employee passcode. Itinerary was not authorized.");
+      return employee || null;
+    };
+    const authorizeItinerary = employee => {
+      itineraryEditor = employee;
+      authorizedItinerary = state.quote;
+    };
+    const stampItineraryEmployee = () => {
+      const existing = state.quotes.find(quote => quote.id === state.quote.id);
+      if (authorizedItinerary !== state.quote || !itineraryEditor) {
+        const employee = requestItineraryEmployee();
+        if (!employee) return false;
+        authorizeItinerary(employee);
+      }
+      if (!existing) state.quote.createdBy = itineraryEditor;
+      state.quote.lastUpdatedBy = itineraryEditor;
+      state.quote.employeeAction = existing ? "Updated by" : "Created by";
+      return true;
+    };
+
     els.newItineraryBtn.addEventListener("click", () => {
+      const employee = requestItineraryEmployee();
+      if (!employee) return;
       const blank = createBlankState().quote;
       state.quote = {
         ...blank,
@@ -9218,6 +9264,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
         quoteExpiryDate: quoteExpiryIso()
       };
       renderAll();
+      authorizeItinerary(employee);
       showToast("New itinerary started.");
     });
 
@@ -9250,6 +9297,13 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     els.travelDates.addEventListener('input', () => els.travelDates.setCustomValidity(''));
 
     const saveCurrentItinerary = () => {
+      syncQuoteFromInputs();
+      syncActiveModeDays();
+      if (!itineraryHasContent(state.quote)) {
+        showToast("Add itinerary details before saving.");
+        return false;
+      }
+      if (!stampItineraryEmployee()) return false;
       migrateEditedQuoteMargins();
       if (!requireTravelDate()) return false;
       syncQuoteFromInputs();
@@ -9393,6 +9447,8 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
     };
 
     const cloneSavedItinerary = quote => {
+      const employee = requestItineraryEmployee();
+      if (!employee) return;
       const clone = normalizeQuoteDayModes(normalizeProPaxMargins(JSON.parse(JSON.stringify(quote))));
       clone.id = uid("q");
       clone.status = "Draft";
@@ -9401,6 +9457,9 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       clone.createdDate = currentDateIso();
       clone.quoteExpiryDate = quoteExpiryIso();
       clone.updated = "";
+      delete clone.createdBy;
+      delete clone.lastUpdatedBy;
+      delete clone.employeeAction;
       delete clone.total;
       clone.pdfNumber = "";
       clone.itineraryNo = "";
@@ -9410,6 +9469,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       ensureQuotePdfNumber(clone);
       clone.itineraryNo = itineraryNumberForQuote(clone);
       state.quote = clone;
+      authorizeItinerary(employee);
       if (typeof setProMode === "function") setProMode(state.quote.mode === "pro", { syncCurrent: false, render: false });
       document.querySelector('[data-tab="itinerary"]').click();
       renderAll();
@@ -9695,7 +9755,10 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       if (!quote) return;
 
       if (edit) {
+        const employee = requestItineraryEmployee();
+        if (!employee) return;
         loadSavedItinerary(quote);
+        authorizeItinerary(employee);
         return;
       }
 
@@ -9826,7 +9889,13 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
       const quote = event.target.closest(".quote-customer");
       if (edit) openCustomerDrawer(recordById(state.customers, edit.dataset.id));
       if (quote) {
+        const employee = requestItineraryEmployee();
+        if (!employee) return;
         const customer = recordById(state.customers, quote.dataset.id);
+        delete state.quote.createdBy;
+        delete state.quote.lastUpdatedBy;
+        delete state.quote.employeeAction;
+        authorizeItinerary(employee);
         state.quote.customerId = customer.id;
         state.quote.quoteType = customer.type === "B2C" ? "B2C" : "B2B";
         applyDefaultMarginForHotels();
@@ -10406,6 +10475,7 @@ const hotelBilledPax = hotelBilledPaxFor(q, adults);
 
     document.getElementById("printQuoteBtn").addEventListener("click", async () => {
       if (!requireTravelDate()) return;
+      if (!saveCurrentItinerary()) return;
       syncQuoteFromInputs();
       if (!state.quote.id) state.quote.id = uid("q");
       ensureQuotePdfNumber(state.quote);
