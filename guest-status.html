@@ -6530,8 +6530,22 @@ button.closest(".flight-card").remove();
 
 }
 
-async function addGuest(){
+function guestBookingKey({id, created, ...booking}){
+return JSON.stringify(booking, (key, value) => {
+if(value && typeof value === "object" && !Array.isArray(value)){
+return Object.fromEntries(Object.keys(value).sort().map(field => [field, value[field]]));
+}
+return value;
+});
+}
 
+let guestSaveInProgress = false;
+async function addGuest(){
+if(guestSaveInProgress) return;
+
+const saveButton = document.querySelector("#addGuestBox .modal-save-btn");
+guestSaveInProgress = true;
+saveButton.disabled = true;
 try{
 
 syncPaymentTotal("paymentTransactions");
@@ -6716,6 +6730,12 @@ editingId = null;
 
 }else{
 
+const bookingKey = guestBookingKey(guest);
+if((window.allGuests || []).some(existing => guestBookingKey(existing) === bookingKey)){
+alert("This booking is already saved.");
+return;
+}
+
 await addDoc(
 collection(db,"guestStatus"),
 guest
@@ -6735,6 +6755,9 @@ closeAddModal();
 }catch(e){
 console.error("Guest save failed", e);
 alert("Save failed. Please check the guest details and try again.");
+}finally{
+guestSaveInProgress = false;
+saveButton.disabled = false;
 }
 
 }
@@ -6764,14 +6787,16 @@ guestUnsubscribe = onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
 if(attempt !== guestLoadAttempt) return;
 try{
 
-let guests = [];
-
+const uniqueBookings = new Map();
 snapshot.forEach((docItem)=>{
-guests.push({
-id:docItem.id,
-...docItem.data()
+const guest = {...docItem.data(), id:docItem.id};
+const key = guestBookingKey(guest);
+const existing = uniqueBookings.get(key);
+if(!existing || (guest.created || "") > (existing.created || "")){
+uniqueBookings.set(key, guest);
+}
 });
-});
+const guests = Array.from(uniqueBookings.values());
 
 // ✅ SINGLE CLEAN SORT: nearest date first
 const parseDate = (d) => {
