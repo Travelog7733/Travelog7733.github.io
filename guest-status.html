@@ -12,6 +12,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 <link rel="preconnect" href="https://www.gstatic.com">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -79,7 +81,6 @@ border-radius:50%;
 background:conic-gradient(from 160deg, rgba(91,124,250,.20), rgba(0,194,168,.18), rgba(255,179,71,.18), rgba(91,124,250,.20));
 filter:blur(14px);
 opacity:.75;
-animation:ambientSpin 24s linear infinite;
 pointer-events:none;
 z-index:-1;
 }
@@ -88,7 +89,6 @@ z-index:-1;
 max-width:1400px;
 margin:auto;
 position:relative;
-animation:pageRise .7s cubic-bezier(.22,1,.36,1) both;
 }
 
 .page-title{
@@ -3735,22 +3735,6 @@ background:#999;
 border-color:#999;
 }
 
-@keyframes pageRise{
-from{ opacity:0; transform:translateY(18px); }
-to{ opacity:1; transform:translateY(0); }
-}
-
-@keyframes tileEnter{
-from{ opacity:0; transform:translateY(22px) scale(.97); filter:blur(4px); }
-to{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
-}
-
-@keyframes ambientSpin{
-from{ transform:rotate(0deg) scale(1); }
-50%{ transform:rotate(180deg) scale(1.06); }
-to{ transform:rotate(360deg) scale(1); }
-}
-
 @keyframes softPulse{
 0%, 100%{ box-shadow:0 12px 28px rgba(37,211,102,0.30); }
 50%{ box-shadow:0 14px 34px rgba(37,211,102,0.48); }
@@ -6815,8 +6799,6 @@ if(attempt === guestLoadAttempt) setGuestLoadStatus("The connection is taking lo
 try{
 await window.connectGuestDatabase();
 if(attempt !== guestLoadAttempt) return;
-startSettingsSync();
-
 guestUnsubscribe = onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
 if(attempt !== guestLoadAttempt) return;
 try{
@@ -6847,6 +6829,7 @@ clearTimeout(guestLoadTimer);
 setGuestLoadStatus(guests.length ? "" : "No guest records found.");
 }catch(error){ guestLoadFailed(error); }
 }, guestLoadFailed);
+startSettingsSync();
 }catch(error){ guestLoadFailed(error); }
 function guestLoadFailed(error){
 if(attempt !== guestLoadAttempt) return;
@@ -6869,7 +6852,7 @@ if(totalPackages) totalPackages.textContent = guests.length.toLocaleString("en-I
 let html = "";
 let completedHtml = "";
 
-guests.forEach((g, index)=>{
+guests.forEach(g=>{
 
 const createdAt = Date.parse(g.created || "");
 const newGuestAge = Date.now() - createdAt;
@@ -6950,7 +6933,7 @@ tripStageClass = "pending";
 
 }
 const tileHtml = `
-<div data-guest-id="${escapeHTML(g.id)}" class="guest-tile${hasPendingHotel ? " hotel-pending" : ""}${hasRequestedHotel ? " hotel-requested" : ""}" style="--tile-delay:${Math.min(index * 55, 550)}ms" onclick="openModal('${g.id}')">
+<div data-guest-id="${escapeHTML(g.id)}" class="guest-tile${hasPendingHotel ? " hotel-pending" : ""}${hasRequestedHotel ? " hotel-requested" : ""}" onclick="openModal('${g.id}')">
 
 <div class="tile-ribbon">
 <span class="tile-ribbon-date">${g.travelDate || "-"}</span>
@@ -10195,7 +10178,7 @@ const s = getSettings();
 applyTheme(s);
 const guests = window.allGuests || [];
 if(typeof renderGuestTiles === "function") renderGuestTiles(guests);
-if(typeof updateNotifications === "function") updateNotifications(guests);
+
 if(document.getElementById("guestModal").classList.contains("open") && window.currentModalGuestId){
 openModal(window.currentModalGuestId);
 }
@@ -10276,12 +10259,11 @@ window.addEventListener(
 "DOMContentLoaded",
 ()=>{
 
+loadGuests();
 applyTheme();
 
 document.getElementById("hotelContainer").innerHTML = hotelFormCard();
 refreshCitySuggestions();
-
-loadGuests();
 
 generateDates();
 
