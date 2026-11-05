@@ -6530,13 +6530,47 @@ button.closest(".flight-card").remove();
 
 }
 
-function guestBookingKey({id, created, ...booking}){
+function guestBookingKey({id, created, costReport, ...booking}){
 return JSON.stringify(booking, (key, value) => {
 if(value && typeof value === "object" && !Array.isArray(value)){
 return Object.fromEntries(Object.keys(value).sort().map(field => [field, value[field]]));
 }
 return value;
 });
+}
+
+function groupGuestBookings(snapshot){
+const groups = new Map();
+const guests = [];
+const normalize = value => String(value ?? "").trim().replace(/\s+/g, " ").toUpperCase();
+
+snapshot.forEach(docItem => {
+const guest = {...docItem.data(), id:docItem.id};
+const identity = [guest.guestName, guest.companyName, guest.destination, guest.salesPerson].map(normalize);
+if(!identity[0] || !identity[1] || !identity[2]){
+guests.push(guest);
+return;
+}
+
+const key = JSON.stringify(identity);
+if(!groups.has(key)) groups.set(key, new Map());
+const bookingsByDate = groups.get(key);
+const date = normalize(guest.travelDate);
+const dateKey = date === "-" ? "" : date;
+const existing = bookingsByDate.get(dateKey);
+// Keep the record with a cost report when available, then favor the newest copy.
+const reportDifference = Number(Boolean(guest.costReport)) - Number(Boolean(existing?.costReport));
+if(!existing || reportDifference > 0 || (reportDifference === 0 && (guest.created || "") > (existing.created || ""))){
+bookingsByDate.set(dateKey, guest);
+}
+});
+
+for(const bookingsByDate of groups.values()){
+// An undated copy is only attributable when there is exactly one dated trip.
+if(bookingsByDate.size === 2) bookingsByDate.delete("");
+guests.push(...bookingsByDate.values());
+}
+return guests;
 }
 
 let guestSaveInProgress = false;
@@ -6787,16 +6821,7 @@ guestUnsubscribe = onSnapshot(collection(db,"guestStatus"),(snapshot)=>{
 if(attempt !== guestLoadAttempt) return;
 try{
 
-const uniqueBookings = new Map();
-snapshot.forEach((docItem)=>{
-const guest = {...docItem.data(), id:docItem.id};
-const key = guestBookingKey(guest);
-const existing = uniqueBookings.get(key);
-if(!existing || (guest.created || "") > (existing.created || "")){
-uniqueBookings.set(key, guest);
-}
-});
-const guests = Array.from(uniqueBookings.values());
+const guests = groupGuestBookings(snapshot);
 
 // ✅ SINGLE CLEAN SORT: nearest date first
 const parseDate = (d) => {
