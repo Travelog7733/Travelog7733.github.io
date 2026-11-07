@@ -456,7 +456,20 @@ body.sidebar-collapsed #sidebar-toggle svg{transform:rotate(180deg)}
 .purchase-bill-actions .icon-actions{display:flex;justify-content:flex-end;gap:5px;flex-wrap:nowrap}
 .purchase-bill-actions .icon-actions button{width:28px;height:28px;min-height:0;padding:5px}
 .purchase-bill-actions .icon-actions svg{width:16px;height:16px}
-#records-view .purchase-bill-table tfoot th,#records-view .purchase-bill-table tfoot td{background:#eef5fb;font-weight:600;border-top:2px solid #d9e4f0;padding-top:13px;padding-bottom:13px}.records-heading:has(#purchase-supplier-filter){flex-wrap:wrap;gap:18px}.records-heading:has(#purchase-supplier-filter) .payment-heading-actions{flex-wrap:wrap;gap:12px}
+#records-view .purchase-bill-table tfoot th,#records-view .purchase-bill-table tfoot td{background:#eef5fb;font-weight:600;border-top:2px solid #d9e4f0;padding-top:13px;padding-bottom:13px}.outgoing-heading{margin-bottom:12px;flex-wrap:wrap;gap:12px}
+.outgoing-heading .payment-heading-actions{gap:12px}
+.outgoing-heading select{max-width:min(250px,75vw)}
+#outgoing-notice:empty{display:none}
+.outgoing-payment-list{gap:6px}
+.outgoing-payment-list .record-card{margin:0;padding:8px 12px;gap:8px 16px;align-items:center}
+.outgoing-payment-details{min-width:0;overflow-wrap:anywhere;line-height:1.4}
+.outgoing-payment-details h2{display:inline;font-size:14px;margin:0 8px 0 0}
+.outgoing-payment-details span{font-size:13px;color:var(--muted)}
+.outgoing-payment-list .outgoing-payment-details small{display:block;font-size:12px;line-height:1.4}
+.outgoing-payment-list .record-actions{flex-shrink:0;gap:8px}
+.outgoing-payment-list .record-actions strong{font-size:15px}
+@media(max-width:700px){.outgoing-payment-list .record-card{align-items:stretch}}
+.records-heading:has(#purchase-supplier-filter){flex-wrap:wrap;gap:18px}.records-heading:has(#purchase-supplier-filter) .payment-heading-actions{flex-wrap:wrap;gap:12px}
 
 /* Footer cells span columns, so align by class rather than child index. */
 #records-view .purchase-bill-table tfoot td.purchase-bill-money{text-align:right;padding-left:16px;padding-right:16px;white-space:nowrap}
@@ -1279,13 +1292,29 @@ function setupSupplierPaymentForm(selectedId,dialog,editing=null){
  }catch(error){$('outgoing-message').textContent=error.message+(staged?' Keep this page open and export a backup; do not record this payment again.':'');if(!staged)submit.disabled=false}};
 }
 
+let outgoingSupplierFilter='';
 function outgoingPaymentsView(editingId='',selectedId='',notice='',openForm=false){
  const editing=db.outgoingPayments.find(p=>p.id===editingId),today=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const eligible=db.purchases.filter(p=>purchaseBalance(p)>0||p.id===editing?.purchaseId||editing?.allocations?.some(a=>a.purchaseId===p.id)),selected=eligible.find(p=>p.id===(editing?.purchaseId||selectedId))||eligible[0];
- const cards=db.outgoingPayments.slice().reverse().map(p=>{const purchase=db.purchases.find(b=>b.id===(p.purchaseId||p.allocations?.[0]?.purchaseId));return `<div class="record-card payment-card"><div><h2>${esc(p.number)}</h2><p>${esc(purchase?.supplier||'Supplier')} · ${date(p.date)}</p><small>${p.allocations?p.allocations.map(a=>{const bill=db.purchases.find(b=>b.id===a.purchaseId);return esc(bill?.billNumber||bill?.number||'Bill')+': '+esc(paymentMoney(a.amount,p.currency))}).join(' · '):esc(purchase?.number||'Purchase')} · ${esc(p.method)}${p.bankId?' · '+esc(bankLabel(p.bankId)):''}${p.reference?' · '+esc(p.reference):''}</small></div><div class="record-actions"><strong>${paymentMoney(p.amount,p.currency)}</strong><div class="icon-actions">${iconAction('edit','Edit payment '+p.number,`data-outgoing-edit="${esc(p.id)}"`)}${iconAction('delete','Delete payment '+p.number,`data-outgoing-delete="${esc(p.id)}"`)}</div></div></div>`}).join('');
+ const purchaseById=new Map(db.purchases.map(p=>[p.id,p]));
+ const payments=db.outgoingPayments.map(p=>{
+  const purchase=purchaseById.get(p.allocations?.[0]?.purchaseId||p.purchaseId);
+  return {p,purchase,supplier:purchase?.supplier||'Supplier'};
+ });
+ const suppliers=[...new Set(payments.map(row=>row.supplier))].sort((a,b)=>a.localeCompare(b));
+ if(outgoingSupplierFilter&&!suppliers.includes(outgoingSupplierFilter)){
+  suppliers.push(outgoingSupplierFilter);
+  suppliers.sort((a,b)=>a.localeCompare(b));
+ }
+ const visiblePayments=payments.filter(row=>!outgoingSupplierFilter||row.supplier===outgoingSupplierFilter);
+ visiblePayments.sort((a,b)=>b.p.date.localeCompare(a.p.date)||Number(b.p.number.slice(7))-Number(a.p.number.slice(7)));
+ const cards=visiblePayments.map(({p,purchase,supplier})=>{
+  return `<div class="record-card payment-card"><div class="outgoing-payment-details"><h2>${esc(p.number)}</h2><span>${esc(supplier)} · ${date(p.date)}</span><small>${p.allocations?p.allocations.map(a=>{const bill=purchaseById.get(a.purchaseId);return esc(bill?.billNumber||bill?.number||'Bill')+': '+esc(paymentMoney(a.amount,p.currency))}).join(' · '):esc(purchase?.number||'Purchase')} · ${esc(p.method)}${p.bankId?' · '+esc(bankLabel(p.bankId)):''}${p.reference?' · '+esc(p.reference):''}</small></div><div class="record-actions"><strong>${paymentMoney(p.amount,p.currency)}</strong><div class="icon-actions">${iconAction('edit','Edit payment '+p.number,`data-outgoing-edit="${esc(p.id)}"`)}${iconAction('delete','Delete payment '+p.number,`data-outgoing-delete="${esc(p.id)}"`)}</div></div></div>`;
+ }).join('');
  const options=eligible.map(p=>`<option value="${esc(p.id)}" ${p===selected?'selected':''}>${esc(p.number)} · ${esc(p.supplier)} · ${paymentMoney(purchaseBalance(p),p.currency)} due</option>`).join('');
  const form=eligible.length&&(!editing||editing.allocations)? supplierPaymentForm(today) : eligible.length?`<div class="fields"><label class="full">Purchase<select name="purchaseId" id="outgoing-purchase" ${editing?'disabled':''} required>${options}</select></label>${editing?`<input type="hidden" name="purchaseId" value="${esc(editing.purchaseId)}">`:''}<div class="payment-breakdown full" id="outgoing-balance"></div><label>Amount paid<input name="amount" id="outgoing-amount" type="number" min="0.01" max="1000000000000" step="0.01" value="${editing?.amount||''}" required></label>${ledgerDateField('date','Payment date',editing?.date||today)}<label>Payment method<select name="method">${paymentMethods.map(m=>`<option ${m===(editing?.method||'UPI')?'selected':''}>${m}</option>`).join('')}</select></label>${bankSelectField(editing?.bankId||(editing?.method==='Cash'?'cash':''))}<label>Reference<input name="reference" value="${esc(editing?.reference||'')}" maxlength="200"></label><label class="full">Notes<textarea name="notes" maxlength="10000">${esc(editing?.notes||'')}</textarea></label></div><div class="record-form-actions"><button class="primary" type="submit">${editing?'Save changes':'Record payment'}</button><button type="button" class="quiet" id="outgoing-cancel">Cancel</button></div><p id="outgoing-message" role="alert"></p>`:'<p class="hint">Save a supplier purchase with a balance due before recording an outgoing payment.</p><button type="button" class="quiet" id="outgoing-create-purchase">Go to Purchase</button>';
- $('records-view').innerHTML=`<div class="records-heading"><div><span class="eyebrow">WORKSPACE</span><h1>Payments</h1><p>Money paid to suppliers against saved purchases.</p></div><div class="payment-heading-actions"><span class="record-count">${db.outgoingPayments.length} payment${db.outgoingPayments.length===1?'':'s'}</span><button type="button" id="outgoing-add" class="primary">+ Record payment</button></div></div><p id="outgoing-notice" role="status">${esc(notice)}</p><div class="record-list">${cards||'<div class="empty">No outgoing payments recorded yet.</div>'}</div><dialog id="outgoing-dialog" class="payment-dialog" aria-labelledby="outgoing-form-title"><form id="outgoing-form" class="record-form"><div class="payment-dialog-heading"><h2 id="outgoing-form-title">${editing?'Edit payment':'Record payment'}</h2><button type="button" class="icon-button" id="outgoing-close" aria-label="Close payment form">×</button></div>${form}</form></dialog>`;
+ $('records-view').innerHTML=`<div class="records-heading outgoing-heading"><div><span class="eyebrow">WORKSPACE</span><h1>Payments</h1><p>Money paid to suppliers against saved purchases.</p></div><div class="payment-heading-actions"><span class="record-count">${visiblePayments.length} payment${visiblePayments.length===1?'':'s'}</span><label class="purchase-sort-control">Supplier<select id="outgoing-supplier-filter" aria-label="Filter payments by supplier"><option value="">All suppliers</option>${suppliers.map(s=>`<option value="${esc(s)}" ${s===outgoingSupplierFilter?'selected':''}>${esc(s)}</option>`).join('')}</select></label><button type="button" id="outgoing-add" class="primary">+ Record payment</button></div></div><p id="outgoing-notice" role="status">${esc(notice)}</p><div class="record-list outgoing-payment-list">${cards||`<div class="empty">${outgoingSupplierFilter?'No payments for this supplier.':'No outgoing payments recorded yet.'}</div>`}</div><dialog id="outgoing-dialog" class="payment-dialog" aria-labelledby="outgoing-form-title"><form id="outgoing-form" class="record-form"><div class="payment-dialog-heading"><h2 id="outgoing-form-title">${editing?'Edit payment':'Record payment'}</h2><button type="button" class="icon-button" id="outgoing-close" aria-label="Close payment form">×</button></div>${form}</form></dialog>`;
+ $('outgoing-supplier-filter').onchange=e=>{outgoingSupplierFilter=e.target.value;outgoingPaymentsView();$('outgoing-supplier-filter').focus();};
  const dialog=$('outgoing-dialog');$('outgoing-add').onclick=()=>outgoingPaymentsView('','','',true);$('outgoing-close').onclick=()=>dialog.close();if(openForm||editing)dialog.showModal();
  if(!eligible.length){$('outgoing-create-purchase').onclick=()=>showTab('purchase');return}
  if(!editing||editing.allocations){setupSupplierPaymentForm(selectedId,dialog,editing);return}
